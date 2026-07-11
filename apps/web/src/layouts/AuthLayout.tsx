@@ -13,12 +13,12 @@ const pageMeta: Record<string, { title: string; subtitle: string }> = {
   '/login': {
     title: 'Command Centre Access',
     subtitle:
-      'Sign in to manage your elite companions, bookings, and operational intelligence — all from one secure dashboard.',
+      'Sign in to manage your command center, operations, and intelligence — all from one secure dashboard.',
   },
   '/register': {
     title: 'Join the Command Centre',
     subtitle:
-      'Create your Vestara admin account and unlock full access to the elite companion management platform.',
+      'Create your Vestara admin account and unlock full access to the command center platform.',
   },
   '/forgot-password': {
     title: 'Recover Your Access',
@@ -173,8 +173,8 @@ export function AuthLayout({ children }: AuthLayoutProps): JSX.Element {
           {/* Stats row */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             {[
-              { label: 'Active Companions', value: '328+' },
-              { label: 'Elite Clients', value: '612+' },
+              { label: 'Active Commands', value: '328+' },
+              { label: 'Command Centers', value: '612+' },
               { label: 'Monthly Revenue', value: '\u20B114.5M' },
             ].map((s) => (
               <Box key={s.label}>
@@ -222,8 +222,8 @@ export function AuthLayout({ children }: AuthLayoutProps): JSX.Element {
               mb: 1.5,
             }}
           >
-            &ldquo;Vestara has transformed how we manage elite engagements. The
-            platform&apos;s precision and discretion are unmatched in the
+            &ldquo;Vestara has transformed how we manage our command center. The
+            platform&apos;s precision and reliability are unmatched in the
             industry.&rdquo;
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
