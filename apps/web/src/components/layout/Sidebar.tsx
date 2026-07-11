@@ -2,7 +2,6 @@ import { type JSX, useState, useEffect } from "react";
 import {
   Box,
   Typography,
-  Avatar,
   ListItemIcon,
   ListItemText,
   MenuItem,

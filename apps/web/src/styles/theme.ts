@@ -55,34 +55,8 @@ export function createAppTheme(config: ThemeConfig): Theme {
   const fontFamily = fontFamilyValues[config.fontFamily];
   const scale = config.fontSizeScale;
 
-  // Maintenance mode styles
-  const maintenanceStyles = config.maintenanceMode
-    ? {
-        '&::before': {
-          content: '"MAINTENANCE"',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          color: '#FFFFFF',
-          zIndex: 9999,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '48px',
-          fontWeight: '700',
-          letterSpacing: '4px',
-          textTransform: 'uppercase',
-          animation: 'fadeIn 0.5s ease-in-out',
-        },
-        '@keyframes fadeIn': {
-          from: { opacity: 0 },
-          to: { opacity: 1 },
-        },
-      }
-    : {};
+  // Scale a base font size (px) by the user's font-size preference.
+  const scaleFontSize = (px: number): number => Math.round(px * scale);
 
   const options: ThemeOptions = {
     palette: {
@@ -260,16 +234,16 @@ export function createAppTheme(config: ThemeConfig): Theme {
     typography: {
       fontFamily,
       fontSize: Math.round(14 * scale),
-      h1: { fontWeight: 700, fontSize: fontSize(32) },
-      h2: { fontWeight: 700, fontSize: fontSize(28) },
-      h3: { fontWeight: 600, fontSize: fontSize(24) },
-      h4: { fontWeight: 600, fontSize: fontSize(20) },
-      h5: { fontWeight: 600, fontSize: fontSize(18) },
-      h6: { fontWeight: 600, fontSize: fontSize(16) },
-      body1: { fontSize: fontSize(14) },
-      body2: { fontSize: fontSize(13) },
-      caption: { fontSize: fontSize(12) },
-      button: { textTransform: 'none', fontWeight: 600, fontSize: fontSize(14) },
+      h1: { fontWeight: 700, fontSize: scaleFontSize(32) },
+      h2: { fontWeight: 700, fontSize: scaleFontSize(28) },
+      h3: { fontWeight: 600, fontSize: scaleFontSize(24) },
+      h4: { fontWeight: 600, fontSize: scaleFontSize(20) },
+      h5: { fontWeight: 600, fontSize: scaleFontSize(18) },
+      h6: { fontWeight: 600, fontSize: scaleFontSize(16) },
+      body1: { fontSize: scaleFontSize(14) },
+      body2: { fontSize: scaleFontSize(13) },
+      caption: { fontSize: scaleFontSize(12) },
+      button: { textTransform: 'none', fontWeight: 600, fontSize: scaleFontSize(14) },
     },
 
     shape: {
@@ -279,78 +253,6 @@ export function createAppTheme(config: ThemeConfig): Theme {
     },
 
     spacing: (factor: number) => `${factor * (density.padding === 1.5 ? 8 : density.padding === 2 ? 8 : 8)}px`,
-
-    components: {
-      MuiButton: {
-        styleOverrides: {
-          root: {
-            borderRadius: density.borderRadius,
-            padding: density.padding === 1.5 ? '6px 16px' : density.padding === 2 ? '8px 20px' : '10px 24px',
-            fontWeight: 600,
-          },
-          containedPrimary: {
-            '&:hover': {
-              boxShadow: `0 4px 14px 0 ${primary.main}40`,
-            },
-          },
-        },
-        defaultProps: {
-          disableElevation: true,
-        },
-      },
-      MuiCard: {
-        styleOverrides: {
-          root: {
-            borderRadius: density.borderRadius + 4,
-            border: `1px solid ${divider}`,
-            boxShadow: 'none',
-            backgroundImage: 'none',
-          },
-        },
-      },
-      MuiPaper: {
-        styleOverrides: {
-          root: {
-            backgroundImage: 'none',
-          },
-        },
-      },
-      MuiDialog: {
-        styleOverrides: {
-          paper: {
-            borderRadius: density.borderRadius + 4,
-          },
-        },
-      },
-      MuiChip: {
-        styleOverrides: {
-          root: {
-            borderRadius: density.borderRadius,
-          },
-        },
-      },
-      MuiTableCell: {
-        styleOverrides: {
-          root: {
-            padding: density.padding === 1.5 ? '8px 12px' : density.padding === 2 ? '12px 16px' : '16px 20px',
-          },
-        },
-      },
-      MuiTooltip: {
-        styleOverrides: {
-          tooltip: {
-            borderRadius: density.borderRadius - 2,
-          },
-        },
-      },
-      MuiCssBaseline: {
-        styleOverrides: {
-          body: {
-            scrollbarColor: isDark ? '#334155 #0B111B' : '#CBD5E1 #F8FAFC',
-          },
-        },
-      },
-    },
   };
 
   return createTheme(options);
