@@ -1,13 +1,26 @@
 import { Box, Typography, Grid, Paper, styled } from '@mui/material';
 import {
   People as PeopleIcon,
-  TrendingUp as TrendingUpIcon,
-  ShoppingCart as ShoppingCartIcon,
-  AttachMoney as AttachMoneyIcon,
+  CheckCircle as CheckCircleIcon,
+  Settings as SettingsIcon,
+  Assessment as AssessmentIcon,
+  Login as LoginIcon,
+  Logout as LogoutIcon,
+  PersonAdd as PersonAddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Cancel as CancelIcon,
+  Block as BlockIcon,
+  Lock as LockIcon,
 } from '@mui/icons-material';
+import type { ReactNode } from 'react';
 import { StatCard } from '../components/data/StatCard';
 import { ActivityFeed } from '../components/data/ActivityFeed';
 import type { ActivityItem } from '../components/data/ActivityFeed';
+import { useUsers } from '../features/users/hooks';
+import { useSettings } from '../features/settings/hooks';
+import { useAuditLogs } from '../features/audit-logs/hooks';
+import { AuditAction, EntityType, type AuditLogDTO } from '@vestara/types';
 
 const DashboardContainer = styled(Box)(() => ({
   display: 'flex',
@@ -36,50 +49,166 @@ const ChartCard = styled(Paper)(({ theme }) => ({
   height: '100%',
 }));
 
-const mockActivityItems: ActivityItem[] = [
-  {
-    id: '1',
-    user: { name: 'Sarah Chen', initials: 'SC' },
-    action: 'created a new user account',
-    target: 'john.doe@example.com',
-    timestamp: '2 minutes ago',
-    iconColor: 'success',
-  },
-  {
-    id: '2',
-    user: { name: 'Mike Johnson', initials: 'MJ' },
-    action: 'updated system setting',
-    target: 'Email Configuration',
-    timestamp: '15 minutes ago',
-    iconColor: 'warning',
-  },
-  {
-    id: '3',
-    user: { name: 'Emily Rodriguez', initials: 'ER' },
-    action: 'exported report',
-    target: 'Q4 Sales Report',
-    timestamp: '1 hour ago',
-    iconColor: 'info',
-  },
-  {
-    id: '4',
-    user: { name: 'David Kim', initials: 'DK' },
-    action: 'deleted user account',
-    target: 'old.admin@example.com',
-    timestamp: '2 hours ago',
-    iconColor: 'error',
-  },
-  {
-    id: '5',
-    user: { name: 'Lisa Wang', initials: 'LW' },
-    action: 'uploaded file',
-    target: 'brand-guidelines.pdf',
-    timestamp: '3 hours ago',
-    iconColor: 'primary',
-  },
-];
+// ── Audit log → Activity feed mapping ─────────────────
+
+type ActivityColor = 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info';
+
+function actionVerb(action: AuditAction): string {
+  switch (action) {
+    case AuditAction.LOGIN:
+      return 'logged in';
+    case AuditAction.LOGOUT:
+      return 'logged out';
+    case AuditAction.CREATE:
+      return 'created a';
+    case AuditAction.UPDATE:
+      return 'updated a';
+    case AuditAction.DELETE:
+      return 'deleted a';
+    case AuditAction.APPROVE:
+      return 'approved a';
+    case AuditAction.REJECT:
+      return 'rejected a';
+    case AuditAction.SUSPEND:
+      return 'suspended a';
+    case AuditAction.ACTIVATE:
+      return 'activated a';
+    case AuditAction.PASSWORD_CHANGE:
+      return 'changed their password';
+    case AuditAction.SETTINGS_UPDATE:
+      return 'updated a setting';
+    case AuditAction.SETTINGS_DELETE:
+      return 'deleted a setting';
+    default:
+      return 'performed an action on a';
+  }
+}
+
+function entityLabel(entity: EntityType): string {
+  switch (entity) {
+    case EntityType.USER:
+      return 'user';
+    case EntityType.ROLE:
+      return 'role';
+    case EntityType.SETTING:
+      return 'setting';
+    case EntityType.AUDIT_LOG:
+      return 'audit log';
+    default:
+      return 'record';
+  }
+}
+
+function actionColor(action: AuditAction): ActivityColor {
+  switch (action) {
+    case AuditAction.LOGIN:
+    case AuditAction.LOGOUT:
+      return 'info';
+    case AuditAction.CREATE:
+    case AuditAction.APPROVE:
+    case AuditAction.ACTIVATE:
+      return 'success';
+    case AuditAction.UPDATE:
+    case AuditAction.SETTINGS_UPDATE:
+    case AuditAction.PASSWORD_CHANGE:
+      return 'warning';
+    case AuditAction.DELETE:
+    case AuditAction.REJECT:
+    case AuditAction.SUSPEND:
+    case AuditAction.SETTINGS_DELETE:
+      return 'error';
+    default:
+      return 'primary';
+  }
+}
+
+function actionIcon(action: AuditAction): ReactNode {
+  switch (action) {
+    case AuditAction.LOGIN:
+      return <LoginIcon />;
+    case AuditAction.LOGOUT:
+      return <LogoutIcon />;
+    case AuditAction.CREATE:
+      return <PersonAddIcon />;
+    case AuditAction.UPDATE:
+      return <EditIcon />;
+    case AuditAction.DELETE:
+    case AuditAction.SETTINGS_DELETE:
+      return <DeleteIcon />;
+    case AuditAction.APPROVE:
+    case AuditAction.ACTIVATE:
+      return <CheckCircleIcon />;
+    case AuditAction.REJECT:
+      return <CancelIcon />;
+    case AuditAction.SUSPEND:
+      return <BlockIcon />;
+    case AuditAction.PASSWORD_CHANGE:
+      return <LockIcon />;
+    case AuditAction.SETTINGS_UPDATE:
+      return <SettingsIcon />;
+    default:
+      return undefined;
+  }
+}
+
+function initialsOf(name: string): string {
+  const trimmed = name.trim();
+  if (!trimmed) return '?';
+  return trimmed
+    .split(/\s+/)
+    .map((part) => part.charAt(0).toUpperCase())
+    .slice(0, 2)
+    .join('');
+}
+
+function formatRelativeTime(iso: string): string {
+  const then = new Date(iso).getTime();
+  if (Number.isNaN(then)) return '';
+  const seconds = Math.max(0, Math.round((Date.now() - then) / 1000));
+  if (seconds < 60) return `${seconds} second${seconds === 1 ? '' : 's'} ago`;
+  const minutes = Math.round(seconds / 60);
+  if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+  const days = Math.round(hours / 24);
+  if (days < 30) return `${days} day${days === 1 ? '' : 's'} ago`;
+  const months = Math.round(days / 30);
+  if (months < 12) return `${months} month${months === 1 ? '' : 's'} ago`;
+  const years = Math.round(months / 12);
+  return `${years} year${years === 1 ? '' : 's'} ago`;
+}
+
+function toActivityItem(log: AuditLogDTO): ActivityItem {
+  const name = log.userName?.trim() || 'System';
+  const actionText =
+    log.action === AuditAction.PASSWORD_CHANGE
+      ? 'changed their password'
+      : `${actionVerb(log.action)} ${entityLabel(log.entity)}`;
+  return {
+    id: log.id,
+    user: { name, initials: initialsOf(name) },
+    action: actionText,
+    timestamp: formatRelativeTime(log.createdAt),
+    icon: actionIcon(log.action),
+    iconColor: actionColor(log.action),
+  };
+}
+
+// ── Page ──────────────────────────────────────────────
 
 export function DashboardPage() {
+  const usersAll = useUsers({ perPage: 1 });
+  const usersActive = useUsers({ perPage: 1, isActive: true });
+  const settingsQuery = useSettings();
+  const auditQuery = useAuditLogs({ perPage: 6, sort: 'createdAt', order: 'desc' });
+
+  const totalUsers = usersAll.data?.meta?.total ?? 0;
+  const activeUsers = usersActive.data?.meta?.total ?? 0;
+  const settingsCount = Object.keys(settingsQuery.data?.data?.settings ?? {}).length;
+  const totalEvents = auditQuery.data?.meta?.total ?? 0;
+
+  const activityItems = (auditQuery.data?.data ?? []).map(toActivityItem);
+
   return (
     <DashboardContainer>
       <WelcomeSection>
@@ -95,41 +224,37 @@ export function DashboardPage() {
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
             title="Total Users"
-            value="12,345"
-            change={12.5}
-            changeLabel="vs last month"
+            value={totalUsers}
             icon={<PeopleIcon />}
             iconColor="primary"
+            loading={usersAll.isLoading}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
-            title="Revenue"
-            value="$45,678"
-            change={8.2}
-            changeLabel="vs last month"
-            icon={<AttachMoneyIcon />}
+            title="Active Users"
+            value={activeUsers}
+            icon={<CheckCircleIcon />}
             iconColor="success"
+            loading={usersActive.isLoading}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
-            title="Orders"
-            value="1,892"
-            change={-3.1}
-            changeLabel="vs last month"
-            icon={<ShoppingCartIcon />}
+            title="System Settings"
+            value={settingsCount}
+            icon={<SettingsIcon />}
             iconColor="warning"
+            loading={settingsQuery.isLoading}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
-            title="Growth"
-            value="24.8%"
-            change={5.4}
-            changeLabel="vs last month"
-            icon={<TrendingUpIcon />}
+            title="Audit Events"
+            value={totalEvents}
+            icon={<AssessmentIcon />}
             iconColor="info"
+            loading={auditQuery.isLoading}
           />
         </Grid>
       </StatsGrid>
@@ -138,18 +263,25 @@ export function DashboardPage() {
         <Grid size={{ xs: 12, lg: 8 }}>
           <ChartCard>
             <Typography variant="h6" fontWeight={600} gutterBottom>
-              Revenue Overview
+              Analytics
             </Typography>
-            <Box sx={{ height: { xs: 200, sm: 300 }, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Box
+              sx={{
+                height: { xs: 200, sm: 300 },
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
               <Typography variant="body2" color="text.secondary">
-                Chart will be integrated here
+                Charts and reports will be integrated here
               </Typography>
             </Box>
           </ChartCard>
         </Grid>
         <Grid size={{ xs: 12, lg: 4 }}>
           <ChartCard sx={{ p: 0, overflow: 'hidden' }}>
-            <ActivityFeed items={mockActivityItems} title="Recent Activity" maxItems={5} />
+            <ActivityFeed items={activityItems} title="Recent Activity" maxItems={6} />
           </ChartCard>
         </Grid>
       </Grid>

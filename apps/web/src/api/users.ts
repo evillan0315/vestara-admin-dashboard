@@ -8,6 +8,8 @@ export interface UserListParams {
   search?: string;
   sort?: string;
   order?: 'asc' | 'desc';
+  isActive?: boolean;
+  role?: string;
 }
 
 export interface UserListResponse {
@@ -23,6 +25,8 @@ export const usersApi = {
     if (params?.search) searchParams.set('search', params.search);
     if (params?.sort) searchParams.set('sort', params.sort);
     if (params?.order) searchParams.set('order', params.order);
+    if (params?.isActive !== undefined) searchParams.set('isActive', String(params.isActive));
+    if (params?.role) searchParams.set('role', params.role);
     const qs = searchParams.toString();
     return apiClient.get<UserDTO[]>(`/users${qs ? `?${qs}` : ''}`);
   },

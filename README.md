@@ -1870,19 +1870,15 @@ pnpm build
 
 # 📚 Documentation
 
-Project documentation includes:
+Project documentation lives in the [`/docs`](./docs) directory:
 
-- Architecture
-- API Documentation
-- Database Design
-- UI Guidelines
-- Development Guide
-- Deployment Guide
-- Security Practices
-- Coding Standards
-- ADRs (Architecture Decision Records)
+- [Developer Guide](./docs/DEVELOPER_GUIDE.md) — setup, common commands, how to add backend/frontend features, testing, troubleshooting
+- [API Documentation](./docs/api/README.md) — endpoints, auth, error codes, data models, architecture
+- [Deployment Guide](./docs/DEPLOYMENT.md) — Vercel deployment (API + web), environment variables, OAuth, rollback, monitoring
+- [Architecture Decision Records](./docs/decisions/README.md) — key technology and design decisions (monorepo, React/MUI, Express/Prisma, JWT, Vercel, Zod, OAuth)
+- [Roadmap](./ROADMAP.md) — phased delivery plan and status
 
-Documentation is available in the `/docs` directory.
+Additional references: Architecture overview (this README), Security, Database Design, and UI Guidelines sections above.
 
 ---
 
