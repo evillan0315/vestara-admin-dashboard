@@ -10,83 +10,83 @@ const prisma = new PrismaClient({ adapter });
 async function main(): Promise<void> {
   console.log('🌱 Seeding database...');
 
-  // ── Create Default Organization ────────────
+  // ── Create Multiple Organizations ────────────
 
-  const organization = await prisma.organization.upsert({
-    where: { slug: 'vestara' },
-    update: {},
-    create: {
+  const organizations = [
+    {
       name: 'Vestara',
       slug: 'vestara',
     },
-  });
-  console.log(`  ✓ Default organization created: ${organization.name}`);
+    {
+      name: 'Acme Corporation',
+      slug: 'acme-corp',
+    },
+    {
+      name: 'Global Tech Solutions',
+      slug: 'global-tech',
+    },
+    {
+      name: 'StartupXYZ',
+      slug: 'startup-xyz',
+    },
+  ];
+
+  const createdOrgs: Array<{ id: string; name: string; slug: string }> = [];
+
+  for (const orgData of organizations) {
+    const org = await prisma.organization.upsert({
+      where: { slug: orgData.slug },
+      update: {},
+      create: orgData,
+    });
+    createdOrgs.push(org);
+    console.log(`  ✓ Organization created: ${org.name} (${org.slug})`);
+  }
 
   // ── Create Admin Users ─────────────────────
 
   const passwordHash = await bcrypt.hash('Admin123!', 12);
 
-  const superAdmin = await prisma.user.upsert({
-    where: { email: 'superadmin@vestara-admin-api.vercel.app' },
-    update: {},
-    create: {
-      email: 'superadmin@vestara-admin-api.vercel.app',
-      passwordHash,
-      firstName: 'Super',
-      lastName: 'Admin',
-      role: UserRole.super_admin,
-      organizationId: organization.id,
-      isActive: true,
-    },
-  });
-  console.log(`  ✓ Super admin created: ${superAdmin.email}`);
+  // Create users across different organizations
+  const userData = [
+    // Vestara organization
+    { email: 'superadmin@vestara.com', firstName: 'Super', lastName: 'Admin', role: UserRole.super_admin, orgIndex: 0 },
+    { email: 'admin@vestara.com', firstName: 'Admin', lastName: 'User', role: UserRole.admin, orgIndex: 0 },
+    { email: 'moderator@vestara.com', firstName: 'Moderator', lastName: 'User', role: UserRole.moderator, orgIndex: 0 },
+    { email: 'support@vestara.com', firstName: 'Support', lastName: 'Agent', role: UserRole.support, orgIndex: 0 },
+    // Acme Corporation
+    { email: 'admin@acme.com', firstName: 'Admin', lastName: 'Acme', role: UserRole.admin, orgIndex: 1 },
+    { email: 'moderator@acme.com', firstName: 'Moderator', lastName: 'Acme', role: UserRole.moderator, orgIndex: 1 },
+    { email: 'support@acme.com', firstName: 'Support', lastName: 'Acme', role: UserRole.support, orgIndex: 1 },
+    // Global Tech Solutions
+    { email: 'admin@globaltech.com', firstName: 'Admin', lastName: 'Global', role: UserRole.admin, orgIndex: 2 },
+    { email: 'support@globaltech.com', firstName: 'Support', lastName: 'Global', role: UserRole.support, orgIndex: 2 },
+    // StartupXYZ
+    { email: 'admin@startupxyz.com', firstName: 'Admin', lastName: 'Startup', role: UserRole.admin, orgIndex: 3 },
+  ];
 
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@vestara-admin-api.vercel.app' },
-    update: {},
-    create: {
-      email: 'admin@vestara-admin-api.vercel.app',
-      passwordHash,
-      firstName: 'Admin',
-      lastName: 'User',
-      role: UserRole.admin,
-      organizationId: organization.id,
-      isActive: true,
-    },
-  });
-  console.log(`  ✓ Admin created: ${admin.email}`);
+  const createdUsers: Array<{ id: string; email: string; organizationId: string }> = [];
 
-  const moderator = await prisma.user.upsert({
-    where: { email: 'moderator@vestara-admin-api.vercel.app' },
-    update: {},
-    create: {
-      email: 'moderator@vestara-admin-api.vercel.app',
-      passwordHash,
-      firstName: 'Moderator',
-      lastName: 'User',
-      role: UserRole.moderator,
-      organizationId: organization.id,
-      isActive: true,
-    },
-  });
-  console.log(`  ✓ Moderator created: ${moderator.email}`);
+  for (const user of userData) {
+    const org = createdOrgs[user.orgIndex];
+    const userRecord = await prisma.user.upsert({
+      where: { email: user.email },
+      update: {},
+      create: {
+        email: user.email,
+        passwordHash,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        organizationId: org.id,
+        isActive: true,
+      },
+    });
+    createdUsers.push({ id: userRecord.id, email: userRecord.email, organizationId: org.id });
+    console.log(`  ✓ User created: ${userRecord.email} (${user.role}) in ${org.name}`);
+  }
 
-  const support = await prisma.user.upsert({
-    where: { email: 'support@vestara-admin-api.vercel.app' },
-    update: {},
-    create: {
-      email: 'support@vestara-admin-api.vercel.app',
-      passwordHash,
-      firstName: 'Support',
-      lastName: 'Agent',
-      role: UserRole.support,
-      organizationId: organization.id,
-      isActive: true,
-    },
-  });
-  console.log(`  ✓ Support agent created: ${support.email}`);
-
-  // ── Create System Settings ─────────────────
+  // ── Create System Settings per Organization ─────────────────
 
   const defaultSettings = [
     {
@@ -121,40 +121,57 @@ async function main(): Promise<void> {
     },
   ];
 
-  for (const setting of defaultSettings) {
-    await prisma.systemSetting.upsert({
-      where: { organizationId_key: { organizationId: organization.id, key: setting.key } },
-      update: { value: setting.value },
-      create: {
-        key: setting.key,
-        value: setting.value,
-        organizationId: organization.id,
-        updatedBy: superAdmin.id,
+  for (const org of createdOrgs) {
+    const orgSuperAdmin = createdUsers.find(u => u.organizationId === org.id && u.email.includes('superadmin'));
+    const orgAdmin = createdUsers.find(u => u.organizationId === org.id && u.email.includes('admin@'));
+    const settingCreator = orgSuperAdmin?.id || orgAdmin?.id || createdUsers[0].id;
+
+    for (const setting of defaultSettings) {
+      await prisma.systemSetting.upsert({
+        where: { organizationId_key: { organizationId: org.id, key: setting.key } },
+        update: { value: setting.value },
+        create: {
+          key: setting.key,
+          value: setting.value,
+          organizationId: org.id,
+          updatedBy: settingCreator,
+        },
+      });
+    }
+    console.log(`  ✓ ${defaultSettings.length} system settings created for ${org.name}`);
+  }
+
+  // ── Create Audit Log Entries ─────────────────
+
+  for (const org of createdOrgs) {
+    const orgSuperAdmin = createdUsers.find(u => u.organizationId === org.id && u.email.includes('superadmin'));
+    const auditUser = orgSuperAdmin?.id || createdUsers.find(u => u.organizationId === org.id)?.id || createdUsers[0].id;
+
+    await prisma.auditLog.create({
+      data: {
+        action: 'create',
+        entity: 'user',
+        entityId: auditUser,
+        userId: auditUser,
+        organizationId: org.id,
+        metadata: { description: `Database seeded with initial data for ${org.name}` },
+        ipAddress: '127.0.0.1',
+        userAgent: 'seed-script',
       },
     });
+    console.log(`  ✓ Initial audit log entry created for ${org.name}`);
   }
-  console.log(`  ✓ ${defaultSettings.length} system settings created`);
-
-  // ── Create Audit Log Entry ─────────────────
-
-  await prisma.auditLog.create({
-    data: {
-      action: 'create',
-      entity: 'user',
-      entityId: superAdmin.id,
-      userId: superAdmin.id,
-      organizationId: organization.id,
-      metadata: { description: 'Database seeded with initial data' },
-      ipAddress: '127.0.0.1',
-      userAgent: 'seed-script',
-    },
-  });
-  console.log('  ✓ Initial audit log entry created');
 
   console.log('\n✅ Database seeding complete!');
-  console.log('   Login credentials:');
-  console.log('   Email:      superadmin@vestara-admin-api.vercel.app');
-  console.log('   Password:   Admin123!');
+  console.log('   Organizations created:');
+  for (const org of createdOrgs) {
+    console.log(`   - ${org.name} (${org.slug})`);
+  }
+  console.log('   Login credentials (password: Admin123!):');
+  console.log('   Email:      superadmin@vestara.com');
+  console.log('   Email:      admin@acme.com');
+  console.log('   Email:      admin@globaltech.com');
+  console.log('   Email:      admin@startupxyz.com');
 }
 
 main()

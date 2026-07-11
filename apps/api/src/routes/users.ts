@@ -46,7 +46,8 @@ router.get(
         sort,
         order,
         search,
-        organizationId: req.user!.organizationId,
+        // SUPER_ADMIN sees all users across all organizations; others scoped to their org
+        organizationId: req.user!.role === UserRole.SUPER_ADMIN ? undefined : req.user!.organizationId,
       });
 
       sendPaginated(res, result.users, {
