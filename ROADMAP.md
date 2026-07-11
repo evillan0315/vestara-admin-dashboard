@@ -19,7 +19,7 @@ This roadmap defines the GitHub-based project structure, milestone organization,
 |-------|-------|-------|--------|
 | **1–5** | Foundation & Backend | Project Init, Shared Architecture, Database, Express Server, Auth API | ✅ Complete |
 | **6–7** | Frontend Foundation | React Foundation, Design System, Auth Components | ✅ Complete |
-| **8–10** | Admin Dashboard | Dashboard Layout, Widgets, Dashboard Features | ⏳ Partial (~55%) |
+| **8–10** | Admin Dashboard | Dashboard Layout, Widgets, Dashboard Features | ⏳ Partial (~70%) |
 | **11** | Authentication UI | Login, Register, Forgot/Reset Password, OAuth (Google + GitHub), Protected Routes | ✅ Complete |
 | **12–14** | User Management | User CRUD, Roles & Permissions, User Profile | ❌ Not Started |
 | **15–17** | Reusable UI | Forms, Data Table, Feedback Components | ⏳ Partial (~60%) |
@@ -29,7 +29,7 @@ This roadmap defines the GitHub-based project structure, milestone organization,
 | **21–22** | Real-Time | WebSocket Integration, Live Features | ❌ Not Started |
 | **23–24** | Security & Monitoring | Security Hardening, Monitoring | ⏳ Partial |
 | **25–26** | Testing & Performance | Testing, Performance Optimization | ⏳ Minimal |
-| **27–30** | Production | Documentation, Deployment, CI/CD, Production Readiness | ⏳ Partial |
+| **27–30** | Production | Documentation, Deployment, CI/CD, Production Readiness | ⏳ Partial (~40%) |
 
 ### GitHub Label Strategy
 
@@ -318,9 +318,9 @@ Phases correspond to items in [`INSTRUCTION.md`](./INSTRUCTION.md). See the `doc
 | 5 | Authentication API | ✅ Complete | 100% | Register, login, refresh, logout, me — JWT access + refresh tokens, bcrypt hashing, audit logging. **OAuth 2.0:** Google + GitHub OAuth with backend-initiated flow, find-or-create user logic, provider linking for existing email accounts. Backend routes: `/auth/oauth/google`, `/auth/oauth/github` (redirect + callback). Prisma schema updated: `passwordHash` optional, `provider`/`providerId` fields with compound unique constraint. |
 | 6 | React Foundation | ✅ Complete | 100% | Vite + MUI + TanStack Query + routing + API client + auth context + route guards + feature-based module structure |
 | 7 | Design System | ✅ Complete | 100% | MUI light/dark themes + Tailwind integrated. **UI Components (17):** Button, Input, Select, Textarea, Checkbox (+CheckboxGroup), Radio (+RadioGroup), Switch (+SwitchGroup), Card, Modal, ConfirmDialog, Drawer, Sidebar, Badge, Avatar (+AvatarGroup), Tooltip, Tabs (+TabPanel), Breadcrumb, Typography (Heading, Subheading, Paragraph, Caption, Label). **Data:** StatCard, ActivityFeed. **Feedback:** Toast, Loading, EmptyState. **Layout:** Header, Footer, Sidebar. |
-| 8 | Dashboard Layout | ✅ Complete | 100% | Sidebar (collapsible), Header (search, notifications, theme toggle, user menu), Footer, RootLayout integrated. Dashboard page with 4 StatCards (Total Users, Revenue, Orders, Growth), Revenue Overview chart placeholder, Activity Feed with mock data. Route pages: `/` (Dashboard), `/analytics`, `/users`, `/settings`, `/admin` |
+| 8 | Dashboard Layout | ✅ Complete | 100% | Gold-themed responsive Sidebar with grouped navigation (navConfig: MAIN MENU, OPERATIONS, MANAGEMENT, SYSTEM), system status footer. Responsive Header with search (hidden on mobile), notifications bell, theme toggle, user menu. Mobile drawer sidebar with full-width on xs / 320px on sm. DashboardLayout with `<Outlet />` for nested routing. Dashboard page with 4 StatCards, Revenue Overview chart placeholder, Activity Feed. Route pages: `/` (Dashboard), `/analytics`, `/users`, `/settings`, `/admin` |
 | 9 | Dashboard Widgets | ⏳ Partial | ~55% | **Built:** StatCard (with trend indicators, icons, change percentages), ActivityFeed (with user avatars, timestamps, action types). Both integrated into DashboardPage with mock data. **Missing:** KPI cards, charts integration, real data wiring from API |
-| 10 | Dashboard Features | ❌ Not Started | 0% | No global search, notifications, preferences, audit logs UI, analytics |
+| 10 | Dashboard Features | ⏳ Partial | ~15% | **Built:** Header search bar (responsive, hidden on mobile), notification bell + popover component, message popover component, date range button, refresh button. **Missing:** Global search dialog, notifications API wiring, user preferences, audit logs UI, analytics |
 | 11 | Authentication Pages | ✅ Complete | 100% | Login, Register, Forgot Password, Reset Password pages with Vestara Elite design. AuthLayout with left brand panel (geometric backgrounds, gold/purple orbs, hero text, stats, testimonial) + right form panel. Custom AuthField component with icon, label, error state, password toggle. OAuthButtons (Google + GitHub). PasswordStrength indicator. OAuth callback page (`/auth/callback`). AuthContext with `oauthRedirect` + `handleOAuthCallback`. react-hook-form + zod validation. Route guards (ProtectedRoute, PublicRoute). Plus Jakarta Sans font. |
 | 12 | User CRUD | ❌ Not Started | 0% | Backend repository exists but routes are not wired. No frontend. |
 | 13 | Roles & Permissions | ❌ Not Started | 0% | UserRole enum defined. No role/permission management UI or API |
@@ -338,9 +338,9 @@ Phases correspond to items in [`INSTRUCTION.md`](./INSTRUCTION.md). See the `doc
 | 25 | Testing | ⏳ Minimal | ~5% | 1 auth API test file (14 test cases). No unit/integration/component/e2e tests |
 | 26 | Performance | ❌ Not Started | 0% | No lazy loading, code splitting, virtualization, bundle optimization |
 | 27 | Documentation | ⏳ Partial | ~40% | Comprehensive README, API docs for auth/health. Missing developer guide, ADRs, deployment guide |
-| 28 | Deployment | ❌ Not Started | 0% | No Docker, nginx, or production configuration |
-| 29 | CI/CD | ❌ Not Started | 0% | No GitHub Actions or deployment pipeline |
-| 30 | Production Readiness | ❌ Not Started | 0% | No final review, security verification, or deployment checklist |
+| 28 | Deployment | ✅ Complete | 100% | **Deployed on Vercel** — API at `vestara-admin-api.vercel.app`, Web at `vestara-admin-web.vercel.app`. Vercel serverless entry at `api/index.ts` with Express routes mounted under `/api/v1`. CORS configured for `.vercel.app` origins. Environment variables configured via Vercel CLI. Build passes `tsc --noEmit` and `vite build`. |
+| 29 | CI/CD | ⏳ Partial | ~30% | Vercel auto-deploys from `main` on git push. No GitHub Actions workflows yet. |
+| 30 | Production Readiness | ⏳ Partial | ~40% | Both apps deployed and serving (API health 200, Web login 200). CORS verified. OAuth callbacks functional. Missing: final security audit, performance benchmarks |
 
 ### Metrics to Track
 
@@ -526,7 +526,7 @@ Phases correspond to items in [`INSTRUCTION.md`](./INSTRUCTION.md). See the `doc
 ## 📋 Implementation Checklist
 
 ### Repository Setup
-- [ ] Create GitHub repository with .gitignore
+- [x] Create GitHub repository with .gitignore
 - [ ] Set up branch protection rules
 - [ ] Configure issue templates
 - [ ] Create project boards
@@ -534,22 +534,22 @@ Phases correspond to items in [`INSTRUCTION.md`](./INSTRUCTION.md). See the `doc
 - [ ] Establish communication channels
 
 ### Documentation
-- [ ] Populate GitHub roadmap
-- [ ] Set up project documentation
+- [x] Populate GitHub roadmap
+- [x] Set up project documentation
 - [ ] Create contribution guidelines
-- [ ] Establish coding standards
+- [x] Establish coding standards
 
 ### Access & Permissions
 - [ ] Configure team access levels
-- [ ] Set up repository maintainers
+- [x] Set up repository maintainers
 - [ ] Configure notification settings
 - [ ] Establish code review process
 
 ### Quality Assurance
-- [ ] Implement automated testing
-- [ ] Set up linting and type checking
+- [x] Implement automated testing (turborepo builds, typecheck, lint)
+- [x] Set up linting and type checking
 - [ ] Configure security scanning
-- [ ] Establish deployment procedures
+- [x] Establish deployment procedures (Vercel auto-deploy from main)
 
 ## 📊 Monitoring & Alerts
 

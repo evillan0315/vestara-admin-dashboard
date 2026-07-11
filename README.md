@@ -16,7 +16,7 @@
 <p align="center">
 
 ![License](https://img.shields.io/badge/license-Proprietary-gold?style=for-the-badge)
-![Status](https://img.shields.io/badge/status-Phase%201%20MVP-success?style=for-the-badge)
+![Status](https://img.shields.io/badge/status-Phase%201%20%E2%80%93%20Admin%20Dashboard-success?style=for-the-badge)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![Express](https://img.shields.io/badge/Express-5.x-000000?style=for-the-badge&logo=express)
@@ -783,24 +783,33 @@ flowchart TD
 vestara/
 │
 ├── apps/
-│   ├── web/
-│   └── api/
+│   ├── web/              # React 19 Frontend (Vite)
+│   └── api/              # Express 5 Backend
 │
 ├── packages/
-│   ├── sdk/
-│   ├── shared/
-│   ├── types/
-│   ├── ui/
-│   └── validation/
+│   ├── types/            # Shared TypeScript types & enums
+│   ├── constants/        # Global constants
+│   ├── validation/       # Zod validation schemas
+│   ├── utils/            # Shared utilities
+│   └── config/           # Shared configuration
 │
-├── infrastructure/
-│   ├── docker/
-│   ├── github/
-│   └── scripts/
+├── prisma/
+│   ├── migrations/
+│   ├── schema.prisma
+│   └── seed.ts
 │
 ├── docs/
-├── prisma/
-└── package.json
+│   ├── architecture/
+│   ├── api/
+│   ├── screenshots/
+│   └── decisions/
+│
+├── .github/
+├── .vscode/
+├── package.json
+├── pnpm-workspace.yaml
+├── turbo.json
+└── tsconfig.json
 ```
 
 ---
@@ -814,7 +823,7 @@ vestara/
 | React 19 | User Interface |
 | TypeScript | Type Safety |
 | Vite | Build Tool |
-| Material UI v6 | Component Library |
+| Material UI v7 | Component Library |
 | Tailwind CSS v4 | Utility Styling |
 | React Router | Routing |
 | Zustand | Client State |
@@ -931,15 +940,13 @@ The repository is organized into reusable workspaces.
 
 | Workspace | Purpose |
 |-----------|---------|
-| apps/web | Frontend Application |
-| apps/api | Backend REST API |
-| packages/ui | Shared UI Components |
-| packages/sdk | API SDK |
-| packages/types | Shared Types |
-| packages/shared | Shared Logic |
-| packages/validation | Validation Schemas |
-| packages/utils | Utilities |
-| packages/config | Shared Configuration |
+| apps/web | Admin Dashboard Frontend (React 19) |
+| apps/api | Admin Dashboard Backend (Express 5) |
+| packages/types | Shared TypeScript types, enums, DTOs |
+| packages/constants | Shared global constants |
+| packages/validation | Zod validation schemas |
+| packages/utils | Shared utility functions |
+| packages/config | Shared configuration helpers |
 
 ---
 
@@ -1231,19 +1238,22 @@ pnpm dev:api
 
 | Command | Description |
 |----------|-------------|
-| pnpm dev | Start all services |
-| pnpm dev:web | Start frontend |
-| pnpm dev:api | Start backend |
-| pnpm build | Build all packages |
-| pnpm lint | Run ESLint |
-| pnpm format | Format source code |
-| pnpm typecheck | Type checking |
+| pnpm dev | Start all services (web + api) |
+| pnpm dev:web | Start frontend (Vite dev server) |
+| pnpm dev:api | Start backend (Express with tsx watch) |
+| pnpm build | Build all packages and apps |
+| pnpm build:web | Build frontend only |
+| pnpm build:api | Build backend only |
+| pnpm lint | Run ESLint across all packages |
+| pnpm format | Format source code with Prettier |
+| pnpm format:check | Check formatting without changes |
+| pnpm typecheck | TypeScript strict type checking |
 | pnpm test | Run tests |
-| pnpm test:watch | Watch mode |
-| pnpm test:coverage | Coverage report |
 | pnpm prisma:generate | Generate Prisma Client |
-| pnpm prisma:migrate | Run migrations |
+| pnpm prisma:migrate | Run database migrations |
 | pnpm prisma:studio | Open Prisma Studio |
+| pnpm prisma:seed | Seed development data |
+| pnpm clean | Clean all build artifacts |
 
 ---
 
@@ -1408,7 +1418,7 @@ Every endpoint is documented using OpenAPI.
 REST API
         │
         ▼
-Fastify Controllers
+Express Controllers / Routes
         │
         ▼
 Services
@@ -1704,30 +1714,17 @@ flowchart TB
 
 ## Deployment Targets
 
-### Frontend
+### Frontend (Current)
 
-- Vercel
-- Netlify
-- Cloudflare Pages
+- ✅ **Vercel** — `vestara-admin-web.vercel.app`
 
----
+### Backend (Current)
 
-### Backend
+- ✅ **Vercel Serverless** — `vestara-admin-api.vercel.app` (Express mounted at `/api/v1`)
 
-- Railway
-- Fly.io
-- DigitalOcean
-- VPS
-- Kubernetes
+### Database (Current)
 
----
-
-### Database
-
-- PostgreSQL 17
-- Managed PostgreSQL
-- Amazon RDS
-- Supabase Database
+- **Prisma Postgres** — hosted PostgreSQL with `PrismaPg` adapter
 
 ---
 
@@ -1921,28 +1918,28 @@ Future licensing terms may change as the platform evolves.
 | Category | Status |
 |----------|--------|
 | Development | 🚧 Active |
-| Current Phase | Phase 1 – MVP |
-| API | In Development |
-| Frontend | In Development |
-| Mobile | Planned |
-| AI Services | Planned |
-| Investment Platform | Planned |
-| Blockchain | Planned |
+| Current Phase | Phase 1 – Admin Dashboard MVP |
+| API (Express) | 🟢 Deployed to Vercel |
+| Frontend (React) | 🟢 Deployed to Vercel |
+| OAuth (Google + GitHub) | 🟢 Configured |
+| User Management | 🟡 In Progress |
+| Mobile | 📋 Planned |
+| AI Services | 📋 Planned |
+| Investment Platform | 📋 Planned |
+| Blockchain | 📋 Planned |
 
 ---
 
 ## Current Focus
 
-- Core Infrastructure
-- Authentication
-- Wallet Platform
-- Vestara Points
-- Marketplace
-- Booking Platform
-- Payment Infrastructure
-- Administration Dashboard
-- CI/CD Automation
-- API Documentation
+- ✅ Administration Dashboard (responsive layout, sidebar, OAuth auth)
+- ✅ Authentication (JWT, OAuth Google + GitHub)
+- ✅ Vercel Deployment (API + Web)
+- 🟡 User Management (CRUD, Roles & Permissions)
+- 🟡 Reusable UI Components (data table, forms, feedback)
+- 📋 Reporting (CSV/Excel/PDF export)
+- 📋 Real-time features (WebSocket, live notifications)
+- 📋 Testing & Performance optimization
 
 ---
 
