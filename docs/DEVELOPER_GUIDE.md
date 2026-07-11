@@ -253,6 +253,141 @@ Example: a new admin page `Analytics`.
 - Server state: TanStack Query. UI state: React context (e.g. `AuthContext`).
 - Reuse the shared `DataTable`, `StatCard`, `ConfirmDialog`, `Toast` rather than building one-off components.
 - Theme: extend `apps/web/src/styles/theme.ts` / `apps/web/src/theme/tokens.ts` — do **not** hardcode colors; read from `theme` or `tokens`.
+- **Forms**: Use the reusable form components from `@/components/ui/forms`:
+  - `FormInput`, `FormSelect`, `FormTextarea`, `FormCheckbox`, `FormRadioGroup`, `FormSwitch`
+  - `FormField` (Controller wrapper for custom fields)
+  - `FormSection`, `FormLayout`, `FormActions`, `FormSubmit`, `FormCancel`
+  - `FormError`, `FormHelperText` for validation display
+  - `useFormWithZod` hook from `@/hooks` for Zod schema validation
+- **Feedback**: Use the Toast system (`useToast()`) for notifications; `useConfirm()` for confirmation dialogs.
+- **Toast queue**: Max 5 concurrent toasts; auto-dismisses after 5s (7s for errors). Variants: `showSuccess`, `showError`, `showWarning`, `showInfo`, `showToast`, `hideAllToasts`.
+
+---
+
+## Toast Example
+
+```tsx
+import { useToast } from '@/components/feedback';
+
+export function DeleteUserButton({ userId }: { userId: string }) {
+  const { showSuccess, showError, showWarning, showInfo } = useToast();
+
+  const handleDelete = async () => {
+    try {
+      await api.delete(`/users/${userId}`);
+      showSuccess('User deleted successfully');
+    } catch (err) {
+      showError(err.response?.data?.message ?? 'Failed to delete user');
+    }
+  };
+
+  return <Button onClick={handleDelete} color="error">Delete</Button>;
+}
+
+// Toast variants:
+const { showSuccess, showError, showWarning, showInfo, showToast, hideToast } = useToast();
+showSuccess('Operation completed');
+showError('Something went wrong', { duration: 7000 });
+showWarning('This action cannot be undone');
+showInfo('New feature available!');
+showToast({ message: 'Custom toast', severity: 'warning' });
+hideToast('toast-id');
+```
+
+---
+
+## Confirm Dialog Example
+
+```tsx
+import { useConfirm } from '@/hooks';
+
+export function DeleteUserButton({ userId, onDeleted }: { userId: string; onDeleted: () => void }) {
+  const { openConfirm, ConfirmDialog } = useConfirm();
+
+  const handleDelete = async () => {
+    const confirmed = await openConfirm({
+      title: 'Delete User',
+      message: 'Are you sure you want to delete this user? This action cannot be undone.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      variant: 'danger',
+    });
+
+    if (confirmed) {
+      await api.delete(`/users/${userId}`);
+      onDeleted();
+    }
+  };
+
+  return (
+    <>
+      <Button onClick={handleDelete} color="error">Delete</Button>
+      {ConfirmDialog}
+    </>
+  );
+}
+```
+
+---
+
+## Frontend Form Example
+
+```tsx
+import { useFormWithZod } from '@/hooks';
+import {
+  FormSection,
+  FormLayout,
+  FormInput,
+  FormSelect,
+  FormTextarea,
+  FormCheckbox,
+  FormSwitch,
+  FormActions,
+  FormSubmit,
+  FormCancel,
+} from '@/components/ui/forms';
+import { z } from 'zod';
+
+const schema = z.object({
+  name: z.string().min(2),
+  email: z.string().email(),
+  role: z.enum(['admin', 'moderator', 'support']),
+  bio: z.string().optional(),
+  notifications: z.boolean(),
+  active: z.boolean(),
+});
+
+export function UserFormDialog({ onClose, defaultValues }) {
+  const form = useFormWithZod({ schema, defaultValues });
+
+  return (
+    <form onSubmit={form.handleSubmit(async (data) => { /* submit */ })}>
+      <FormSection title="User Details">
+        <FormLayout columns={2}>
+          <FormInput {...form.register('name')} label="Name" placeholder="John Doe" />
+          <FormInput {...form.register('email')} label="Email" type="email" placeholder="john@example.com" />
+        </FormLayout>
+        <FormSelect {...form.register('role')} label="Role" options={[
+          { value: 'admin', label: 'Admin' },
+          { value: 'moderator', label: 'Moderator' },
+          { value: 'support', label: 'Support' },
+        ]} placeholder="Select role" />
+        <FormTextarea {...form.register('bio')} label="Bio" placeholder="Optional bio" rows={3} />
+      </FormSection>
+      <FormSection title="Preferences">
+        <FormLayout columns={2}>
+          <FormSwitch {...form.register('notifications')} label="Email Notifications" />
+          <FormSwitch {...form.register('active')} label="Active" />
+        </FormLayout>
+      </FormSection>
+      <FormActions>
+        <FormCancel onClick={onClose}>Cancel</FormCancel>
+        <FormSubmit loading={form.formState.isSubmitting}>Save</FormSubmit>
+      </FormActions>
+    </form>
+  );
+}
+```
 
 ---
 
