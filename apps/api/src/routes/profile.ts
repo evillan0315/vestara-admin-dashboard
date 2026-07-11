@@ -57,7 +57,7 @@ router.put('/', validate(updateProfileSchema), async (req, res, next) => {
 
 /**
  * PUT /profile/password — Change the current user's password.
- * Fields: currentPassword, newPassword
+ * Fields: currentPassword (optional if no password set), newPassword
  */
 router.put('/password', validate(changePasswordSchema), async (req, res, next) => {
   try {
@@ -70,18 +70,18 @@ router.put('/password', validate(changePasswordSchema), async (req, res, next) =
       throw new BadRequestError('User not found');
     }
 
-    // OAuth-only accounts have no password set
-    if (!user.passwordHash) {
-      throw new BadRequestError(
-        'Password change is not available for OAuth-linked accounts',
-        'OAUTH_ACCOUNT',
-      );
-    }
-
-    // Verify current password
-    const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
-    if (!isValid) {
-      throw new BadRequestError('Current password is incorrect', 'PASSWORD_MISMATCH');
+    // If user has a password hash, verify current password
+    if (user.passwordHash) {
+      if (!currentPassword) {
+        throw new BadRequestError('Current password is required', 'PASSWORD_MISMATCH');
+      }
+      const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
+      if (!isValid) {
+        throw new BadRequestError('Current password is incorrect', 'PASSWORD_MISMATCH');
+      }
+    } else {
+      // OAuth account without password - allow setting initial password
+      // currentPassword should not be provided (or we ignore it)
     }
 
     // Hash and update the new password

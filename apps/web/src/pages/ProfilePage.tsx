@@ -104,9 +104,16 @@ export default function ProfilePage() {
       return;
     }
 
+    // For OAuth accounts, currentPassword is optional
+    // For non-OAuth accounts, it's required
+    if (!isOAuthAccount && !currentPassword) {
+      setPasswordError('Current password is required');
+      return;
+    }
+
     try {
       await changePasswordMutation.mutateAsync({
-        currentPassword,
+        currentPassword: currentPassword ?? '',
         newPassword,
       });
       setPasswordSuccess('Password changed successfully');
@@ -325,46 +332,42 @@ export default function ProfilePage() {
             Update your password to keep your account secure
           </Typography>
 
-          {isOAuthAccount ? (
-            <Alert
-              severity="info"
-              sx={{ borderRadius: 2, bgcolor: 'rgba(33,150,243,0.1)', color: '#2196f3' }}
-            >
-              Password management is not available for OAuth-linked accounts.
-            </Alert>
-          ) : (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, maxWidth: 440 }}>
-              <TextField
-                label="Current Password"
-                type="password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                fullWidth
-                size="small"
-                sx={textFieldStyles}
-              />
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, maxWidth: 440 }}>
+            <TextField
+              label="Current Password"
+              type="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              fullWidth
+              size="small"
+              required={!isOAuthAccount}
+              helperText={isOAuthAccount ? 'Optional for OAuth accounts setting initial password' : 'Required'}
+              sx={textFieldStyles}
+            />
 
-              <TextField
-                label="New Password"
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                fullWidth
-                size="small"
-                helperText="Min 8 characters, at least one uppercase, lowercase, and number"
-                sx={textFieldStyles}
-              />
+            <TextField
+              label="New Password"
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              fullWidth
+              size="small"
+              required
+              helperText="Min 8 characters, at least one uppercase, lowercase, and number"
+              sx={textFieldStyles}
+            />
 
-              <TextField
-                label="Confirm New Password"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                fullWidth
-                size="small"
-                error={!!passwordError && passwordError === 'Passwords do not match'}
-                sx={textFieldStyles}
-              />
+            <TextField
+              label="Confirm New Password"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              fullWidth
+              size="small"
+              required
+              error={!!passwordError && passwordError === 'Passwords do not match'}
+              sx={textFieldStyles}
+            />
 
               {/* Success */}
               {passwordSuccess && (
@@ -391,7 +394,7 @@ export default function ProfilePage() {
               <Button
                 variant="contained"
                 onClick={handleChangePassword}
-                disabled={changePasswordMutation.isPending || !currentPassword || !newPassword || !confirmPassword}
+                disabled={changePasswordMutation.isPending || !newPassword || !confirmPassword || (!isOAuthAccount && !currentPassword)}
                 sx={{
                   alignSelf: 'flex-start',
                   mt: 1,
@@ -409,7 +412,6 @@ export default function ProfilePage() {
                 {changePasswordMutation.isPending ? 'Changing...' : 'Change Password'}
               </Button>
             </Box>
-          )}
         </Paper>
       )}
     </Box>
