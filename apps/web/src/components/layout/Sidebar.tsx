@@ -25,6 +25,19 @@ interface ApiStatus {
   version?: string;
 }
 
+// Utility functions for API status
+function isApiLoading(status: ApiStatus): boolean {
+  return status.status === 'loading';
+}
+
+function isApiError(status: ApiStatus): boolean {
+  return status.status === 'error';
+}
+
+function isApiHealthy(status: ApiStatus): boolean {
+  return status.status === 'healthy';
+}
+
 export const SIDEBAR_WIDTH = 264;
 
 export interface SidebarProps {
@@ -253,14 +266,14 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element {
 
           {/* API Status Indicator */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-            {apiStatus.isLoading ? (
+            {isApiLoading(apiStatus) ? (
               <>
                 <Activity size={16} color={colors.info} className="animate-pulse" />
                 <Typography sx={{ fontSize: 12, color: colors.info, fontWeight: 600 }}>
                   Checking...
                 </Typography>
               </>
-            ) : apiStatus.error ? (
+            ) : isApiError(apiStatus) ? (
               <>
                 <Box
                   sx={{
@@ -275,7 +288,7 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element {
                   Disconnected
                 </Typography>
               </>
-            ) : (
+            ) : isApiHealthy(apiStatus) ? (
               <>
                 <Box
                   sx={{
@@ -290,18 +303,33 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element {
                   Connected
                 </Typography>
               </>
+            ) : (
+              <>
+                <Box
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    bgcolor: colors.warning,
+                    boxShadow: `0 0 6px ${colors.warning}80`,
+                  }}
+                />
+                <Typography sx={{ fontSize: 12, color: colors.warning, fontWeight: 600 }}>
+                  Unknown
+                </Typography>
+              </>
             )}
           </Box>
 
           {/* API Response Details */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-            {apiStatus.isLoading ? (
+            {isApiLoading(apiStatus) ? (
               <Skeleton variant="text" width={120} height={16} />
-            ) : apiStatus.error ? (
+            ) : isApiError(apiStatus) ? (
               <Typography sx={{ fontSize: 11, color: colors.error }}>
                 {apiStatus.error}
               </Typography>
-            ) : (
+            ) : isApiHealthy(apiStatus) ? (
               <>
                 <Chip
                   label={`v${apiStatus.version || '1.0.0'}`}
@@ -320,6 +348,10 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element {
                   </Typography>
                 )}
               </>
+            ) : (
+              <Typography sx={{ fontSize: 11, color: colors.muted }}>
+                Not initialized
+              </Typography>
             )}
           </Box>
 
