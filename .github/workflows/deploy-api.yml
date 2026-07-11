@@ -1,0 +1,121 @@
+name: Deploy API to Vercel
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/api/**'
+      - 'packages/**'
+      - 'pnpm-lock.yaml'
+      - 'turbo.json'
+      - 'package.json'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/api/**'
+      - 'packages/**'
+      - 'pnpm-lock.yaml'
+      - 'turbo.json'
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deploy target'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - preview
+
+env:
+  NODE_VERSION: '24'
+  PNPM_VERSION: '10'
+
+jobs:
+  quality:
+    name: Quality Checks
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        run: pnpm turbo typecheck --filter=@vestara/api
+
+      - name: Lint
+        run: pnpm turbo lint --filter=@vestara/api
+
+      - name: Build check
+        run: pnpm turbo build --filter=@vestara/api
+
+  deploy:
+    name: Deploy to Vercel
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build project
+        run: pnpm turbo build --filter=@vestara/api
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Deploy to Vercel
+        run: |
+          if [ "${{ inputs.environment }}" = "preview" ]; then
+            vercel deploy \
+              --token "${{ secrets.VERCEL_TOKEN }}" \
+              --yes
+          else
+            vercel deploy --prod \
+              --token "${{ secrets.VERCEL_TOKEN }}" \
+              --yes
+          fi
+        working-directory: apps/api
+
+      - name: Health check
+        run: |
+          echo "Waiting for deployment to settle..."
+          sleep 15
+          for i in $(seq 1 6); do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "https://vestara-admin-api.vercel.app/api/v1/health" 2>/dev/null || echo "000")
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "✅ Health check passed (HTTP $HTTP_CODE)"
+              curl -s "https://vestara-admin-api.vercel.app/api/v1/health" | python3 -m json.tool
+              exit 0
+            fi
+            echo "Attempt $i/6: HTTP $HTTP_CODE — retrying in 10s..."
+            sleep 10
+          done
+          echo "❌ Health check failed after 6 attempts"
+          exit 1
