@@ -1,4 +1,4 @@
-import { type JSX } from "react";
+import { type JSX, useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -6,13 +6,24 @@ import {
   ListItemIcon,
   ListItemText,
   MenuItem,
+  Chip,
+  Skeleton,
 } from "@mui/material";
-import { LogOut } from "lucide-react";
+import { LogOut, Activity } from "lucide-react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../features/auth/AuthContext";
 import { colors } from "../../theme/tokens";
 import Logo from "../common/Logo";
 import { navGroups } from "../../layouts/navConfig";
+
+// API Status types
+interface ApiStatus {
+  status: 'healthy' | 'error' | 'loading';
+  latency?: number;
+  error?: string;
+  url?: string;
+  version?: string;
+}
 
 export const SIDEBAR_WIDTH = 264;
 
@@ -24,6 +35,56 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+
+  // API Status State
+  const [apiStatus, setApiStatus] = useState<ApiStatus>({
+    status: 'loading',
+    url: 'vestara-admin-api.vercel.app',
+  });
+
+  // Fetch API status
+  useEffect(() => {
+    const fetchApiStatus = async () => {
+      try {
+        const startTime = Date.now();
+        const response = await fetch('https://vestara-admin-api.vercel.app/api/v1/health', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'Vestara-Admin-Dashboard/1.0',
+          },
+        });
+        const endTime = Date.now();
+        const latency = endTime - startTime;
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        setApiStatus({
+          status: 'healthy',
+          latency,
+          url: new URL(response.url).hostname,
+          version: data.version || '1.0.0',
+        });
+      } catch (error) {
+        setApiStatus({
+          status: 'error',
+          error: error instanceof Error ? error.message : 'Connection failed',
+          url: 'vestara-admin-api.vercel.app',
+        });
+      }
+    };
+
+    // Initial fetch
+    fetchApiStatus();
+
+    // Poll every 30 seconds
+    const interval = setInterval(fetchApiStatus, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   /** Filter nav items based on the current user's role */
   const visibleGroups = navGroups
@@ -165,72 +226,142 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element {
         ))}
       </Box>
 
-      {/* Footer — User Info & Logout */}
-      {user && (
-        <Box sx={{ borderTop: `1px solid ${colors.border}`, px: 2, py: 1.5 }}>
-          {/* User Avatar & Info */}
-          <Box
+      {/* Footer - Server API Status & Logout */}
+      <Box sx={{ borderTop: `1px solid ${colors.border}`, px: 2, py: 1.5 }}>
+        {/* Server API Status */}
+        <Box
+          sx={{
+            mb: 2,
+            p: 1.5,
+            borderRadius: "10px",
+            bgcolor: colors.cardAlt,
+            border: `1px solid ${colors.border}`,
+          }}
+        >
+          <Typography
             sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1.5,
+              fontSize: 11.5,
+              fontWeight: 700,
+              color: colors.muted,
               mb: 1,
+              textTransform: "uppercase",
+              letterSpacing: "0.08em",
             }}
           >
-            <Avatar
-              src={user.avatarUrl || undefined}
-              alt={`${user.firstName} ${user.lastName}`}
-              sx={{
-                width: 36,
-                height: 36,
-                bgcolor: colors.gold,
-                color: "#0A0F18",
-                fontWeight: 700,
-                fontSize: 14,
-              }}
-            >
-              {user.firstName?.[0]?.toUpperCase() || "U"}
-              {user.lastName?.[0]?.toUpperCase() || ""}
-            </Avatar>
-            <Box sx={{ flex: 1, minWidth: 0 }}>
-              <Typography
-                sx={{
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: colors.text,
-                  lineHeight: 1.2,
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                {user.firstName} {user.lastName}
-              </Typography>
-              <Typography
-                sx={{
-                  fontSize: 11,
-                  color: colors.muted,
-                  textTransform: "capitalize",
-                  lineHeight: 1.3,
-                }}
-              >
-                {user.role.replace("_", " ")}
-              </Typography>
-            </Box>
+            Server API Status
+          </Typography>
+
+          {/* API Status Indicator */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+            {apiStatus.isLoading ? (
+              <>
+                <Activity size={16} color={colors.info} className="animate-pulse" />
+                <Typography sx={{ fontSize: 12, color: colors.info, fontWeight: 600 }}>
+                  Checking...
+                </Typography>
+              </>
+            ) : apiStatus.error ? (
+              <>
+                <Box
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    bgcolor: colors.error,
+                    boxShadow: `0 0 6px ${colors.error}80`,
+                  }}
+                />
+                <Typography sx={{ fontSize: 12, color: colors.error, fontWeight: 600 }}>
+                  Disconnected
+                </Typography>
+              </>
+            ) : (
+              <>
+                <Box
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    bgcolor: colors.success,
+                    boxShadow: `0 0 8px ${colors.success}80`,
+                  }}
+                />
+                <Typography sx={{ fontSize: 12, color: colors.success, fontWeight: 600 }}>
+                  Connected
+                </Typography>
+              </>
+            )}
           </Box>
 
-          {/* Logout */}
+          {/* API Response Details */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+            {apiStatus.isLoading ? (
+              <Skeleton variant="text" width={120} height={16} />
+            ) : apiStatus.error ? (
+              <Typography sx={{ fontSize: 11, color: colors.error }}>
+                {apiStatus.error}
+              </Typography>
+            ) : (
+              <>
+                <Chip
+                  label={`v${apiStatus.version || '1.0.0'}`}
+                  size="small"
+                  sx={{
+                    height: 20,
+                    fontSize: '0.65rem',
+                    backgroundColor: colors.success + '20',
+                    color: colors.success,
+                    border: `1px solid ${colors.success}40`,
+                  }}
+                />
+                {apiStatus.latency && (
+                  <Typography sx={{ fontSize: '0.65rem', color: colors.muted }}>
+                    • {apiStatus.latency}ms
+                  </Typography>
+                )}
+              </>
+            )}
+          </Box>
+
+          {/* API URL */}
+          <Box
+            sx={{
+              mt: 1,
+              p: 1,
+              borderRadius: "6px",
+              bgcolor: colors.background,
+              border: `1px solid ${colors.border}`,
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: '0.625rem',
+                color: colors.muted,
+                fontFamily: "'SF Mono', 'Monaco', monospace",
+                textAlign: "center",
+              }}
+            >
+              {apiStatus.url || "vestara-admin-api.vercel.app"}
+            </Typography>
+          </Box>
+        </Box>
+
+        {/* Logout Button */}
+        <Box>
           <MenuItem
             onClick={handleLogout}
             disableRipple
             sx={{
               borderRadius: "10px",
-              px: 1.25,
-              py: 0.75,
+              px: 1.5,
+              py: 1,
               color: colors.error,
+              backgroundColor: colors.errorSoft,
               "&:hover": {
-                bgcolor: colors.errorSoft,
+                backgroundColor: colors.errorSoft,
+                opacity: 0.9,
               },
+              transition: "all 0.2s ease",
             }}
           >
             <ListItemIcon sx={{ minWidth: 30, color: "inherit" }}>
@@ -245,7 +376,7 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element {
             />
           </MenuItem>
         </Box>
-      )}
+      </Box>
     </Box>
   );
 }
