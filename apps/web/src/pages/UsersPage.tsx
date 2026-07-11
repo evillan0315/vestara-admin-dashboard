@@ -7,6 +7,7 @@ import {
   Block as BlockIcon,
   CheckCircle as CheckCircleIcon,
   Download as DownloadIcon,
+  Business as BusinessIcon,
 } from '@mui/icons-material';
 import { useState, useCallback, type ReactElement } from 'react';
 import { DataTable, type Column, type SortState, type PaginationState } from '../components/data/DataTable';
@@ -294,6 +295,20 @@ export function UsersPage(): ReactElement {
           size="small"
           variant="outlined"
         />
+      ),
+    },
+    {
+      id: 'organization',
+      label: 'Organization',
+      width: 180,
+      sortable: true,
+      render: (_value, row) => (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <BusinessIcon fontSize="small" color="action" />
+          <Typography variant="body2" color="text.secondary">
+            {row.organizationId ? row.organizationId.slice(0, 8) + '...' : '—'}
+          </Typography>
+        </Box>
       ),
     },
     {

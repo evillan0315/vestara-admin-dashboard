@@ -6,6 +6,7 @@ import usersRouter from './users.js';
 import settingsRouter from './settings.js';
 import auditLogsRouter from './audit-logs.js';
 import profileRouter from './profile.js';
+import organizationsRouter from './organizations.js';
 
 const router = Router();
 
@@ -23,5 +24,6 @@ router.use('/users', usersRouter);
 router.use('/settings', settingsRouter);
 router.use('/audit-logs', auditLogsRouter);
 router.use('/profile', profileRouter);
+router.use('/organizations', organizationsRouter);
 
 export default router;

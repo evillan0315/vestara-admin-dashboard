@@ -40,7 +40,14 @@ router.get(
         search?: string;
       };
 
-      const result = await userRepository.findAll({ page, perPage, sort, order, search });
+      const result = await userRepository.findAll({
+        page,
+        perPage,
+        sort,
+        order,
+        search,
+        organizationId: req.user!.organizationId,
+      });
 
       sendPaginated(res, result.users, {
         page: Number(page),
@@ -152,6 +159,7 @@ router.post(
         firstName,
         lastName,
         role,
+        organizationId: req.user!.organizationId,
       });
 
       sendCreated(res, { user });

@@ -82,6 +82,29 @@ export const updateSettingSchema = z.object({
   value: z.record(z.unknown()),
 });
 
+// ── Organization (multi-tenancy) ──────────────
+
+export const slugField = z
+  .string()
+  .min(2, 'Slug must be at least 2 characters')
+  .max(60, 'Slug must be at most 60 characters')
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase alphanumeric with optional hyphens');
+
+export const createOrganizationSchema = z.object({
+  name: nameField('Organization name'),
+  slug: slugField,
+  logoUrl: z.string().url('Invalid logo URL').optional().or(z.literal('')),
+});
+
+export const updateOrganizationSchema = z.object({
+  name: nameField('Organization name').optional(),
+  logoUrl: z.string().url('Invalid logo URL').optional().or(z.literal('')),
+});
+
+export const organizationIdParamSchema = z.object({
+  id: uuidField,
+});
+
 // ── Audit ─────────────────────────────────────
 
 export const auditLogQuerySchema = z.object({
@@ -166,3 +189,6 @@ export type UpdateSettingInput = z.infer<typeof updateSettingSchema>;
 export type IdsBodyInput = z.infer<typeof idsBodySchema>;
 export type BulkStatusInput = z.infer<typeof bulkStatusSchema>;
 export type BulkActionInput = z.infer<typeof bulkActionSchema>;
+export type CreateOrganizationInput = z.infer<typeof createOrganizationSchema>;
+export type UpdateOrganizationInput = z.infer<typeof updateOrganizationSchema>;
+export type OrganizationIdParamInput = z.infer<typeof organizationIdParamSchema>;

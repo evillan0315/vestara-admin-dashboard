@@ -10,6 +10,18 @@ const prisma = new PrismaClient({ adapter });
 async function main(): Promise<void> {
   console.log('🌱 Seeding database...');
 
+  // ── Create Default Organization ────────────
+
+  const organization = await prisma.organization.upsert({
+    where: { slug: 'vestara' },
+    update: {},
+    create: {
+      name: 'Vestara',
+      slug: 'vestara',
+    },
+  });
+  console.log(`  ✓ Default organization created: ${organization.name}`);
+
   // ── Create Admin Users ─────────────────────
 
   const passwordHash = await bcrypt.hash('Admin123!', 12);
@@ -23,6 +35,7 @@ async function main(): Promise<void> {
       firstName: 'Super',
       lastName: 'Admin',
       role: UserRole.super_admin,
+      organizationId: organization.id,
       isActive: true,
     },
   });
@@ -37,6 +50,7 @@ async function main(): Promise<void> {
       firstName: 'Admin',
       lastName: 'User',
       role: UserRole.admin,
+      organizationId: organization.id,
       isActive: true,
     },
   });
@@ -51,6 +65,7 @@ async function main(): Promise<void> {
       firstName: 'Moderator',
       lastName: 'User',
       role: UserRole.moderator,
+      organizationId: organization.id,
       isActive: true,
     },
   });
@@ -65,6 +80,7 @@ async function main(): Promise<void> {
       firstName: 'Support',
       lastName: 'Agent',
       role: UserRole.support,
+      organizationId: organization.id,
       isActive: true,
     },
   });
@@ -107,11 +123,12 @@ async function main(): Promise<void> {
 
   for (const setting of defaultSettings) {
     await prisma.systemSetting.upsert({
-      where: { key: setting.key },
+      where: { organizationId_key: { organizationId: organization.id, key: setting.key } },
       update: { value: setting.value },
       create: {
         key: setting.key,
         value: setting.value,
+        organizationId: organization.id,
         updatedBy: superAdmin.id,
       },
     });
@@ -126,6 +143,7 @@ async function main(): Promise<void> {
       entity: 'user',
       entityId: superAdmin.id,
       userId: superAdmin.id,
+      organizationId: organization.id,
       metadata: { description: 'Database seeded with initial data' },
       ipAddress: '127.0.0.1',
       userAgent: 'seed-script',

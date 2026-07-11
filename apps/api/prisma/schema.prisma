@@ -64,45 +64,54 @@ model User {
 }
 
 model RefreshToken {
-  id        String   @id @default(uuid())
-  token     String   @unique
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  revokedAt DateTime?
+  id            String    @id @default(uuid())
+  token         String    @unique
+  userId        String
+  organizationId String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization  Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  expiresAt     DateTime
+  createdAt     DateTime  @default(now())
+  revokedAt     DateTime?
 
+  @@index([organizationId])
   @@map("refresh_tokens")
 }
 
 model Session {
-  id           String   @id @default(uuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  token        String   @unique
-  ipAddress    String?
-  userAgent    String?
-  lastActivity DateTime @default(now())
-  expiresAt    DateTime
-  createdAt    DateTime @default(now())
+  id            String    @id @default(uuid())
+  userId        String
+  organizationId String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization  Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  token         String    @unique
+  ipAddress     String?
+  userAgent     String?
+  lastActivity  DateTime  @default(now())
+  expiresAt     DateTime
+  createdAt     DateTime  @default(now())
 
+  @@index([organizationId])
   @@map("sessions")
 }
 
 // ── Audit & Logging ──────────────────────────
 
 model AuditLog {
-  id        String   @id @default(uuid())
-  action    String
-  entity    String
-  entityId  String
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  metadata  Json?
-  ipAddress String?
-  userAgent String?
-  createdAt DateTime @default(now())
+  id            String    @id @default(uuid())
+  action        String
+  entity        String
+  entityId      String
+  userId        String
+  organizationId String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization  Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  metadata      Json?
+  ipAddress     String?
+  userAgent     String?
+  createdAt     DateTime  @default(now())
 
+  @@index([organizationId])
   @@index([userId])
   @@index([action])
   @@index([entity])
@@ -114,12 +123,17 @@ model AuditLog {
 // ── Settings ─────────────────────────────────
 
 model SystemSetting {
-  id        String   @id @default(uuid())
-  key       String   @unique
-  value     Json
-  updatedBy String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(uuid())
+  key           String
+  value         Json
+  updatedBy     String?
+  organizationId String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+
+  @@unique([organizationId, key])
+  @@index([organizationId])
   @@map("system_settings")
 }

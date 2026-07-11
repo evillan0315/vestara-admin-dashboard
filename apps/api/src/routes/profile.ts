@@ -45,6 +45,7 @@ router.put('/', validate(updateProfileSchema), async (req, res, next) => {
       entity: 'user',
       entityId: userId,
       userId,
+      organizationId: req.user!.organizationId,
       metadata: { updatedFields: Object.keys(req.body) },
     });
 
@@ -92,6 +93,7 @@ router.put('/password', validate(changePasswordSchema), async (req, res, next) =
       entity: 'user',
       entityId: userId,
       userId,
+      organizationId: req.user!.organizationId,
       metadata: { timestamp: new Date().toISOString() },
     });
 

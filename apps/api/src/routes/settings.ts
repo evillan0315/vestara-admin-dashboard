@@ -23,7 +23,7 @@ router.get(
   requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN),
   async (req, res, next) => {
     try {
-      const settings = await settingsRepository.getAllAsMap();
+      const settings = await settingsRepository.getAllAsMap(req.user!.organizationId);
       sendSuccess(res, { settings });
     } catch (error) {
       next(error);
@@ -41,7 +41,7 @@ router.get(
   async (req, res, next) => {
     try {
       const key = param(req.params.key);
-      const setting = await settingsRepository.findByKeyOrThrow(key);
+      const setting = await settingsRepository.findByKeyOrThrow(key, req.user!.organizationId);
       sendSuccess(res, { setting });
     } catch (error) {
       next(error);
@@ -64,6 +64,7 @@ router.put(
         key,
         req.body.value,
         req.user?.id,
+        req.user!.organizationId,
       );
       sendSuccess(res, { setting });
     } catch (error) {
@@ -82,8 +83,8 @@ router.delete(
   async (req, res, next) => {
     try {
       const key = param(req.params.key);
-      await settingsRepository.findByKeyOrThrow(key);
-      await settingsRepository.delete(key);
+      await settingsRepository.findByKeyOrThrow(key, req.user!.organizationId);
+      await settingsRepository.delete(key, req.user!.organizationId);
       sendNoContent(res);
     } catch (error) {
       next(error);

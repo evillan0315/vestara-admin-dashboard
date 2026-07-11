@@ -6,6 +6,7 @@ export class SessionRepository extends BaseRepository {
    */
   async create(data: {
     userId: string;
+    organizationId: string;
     token: string;
     ipAddress?: string;
     userAgent?: string;

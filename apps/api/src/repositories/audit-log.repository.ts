@@ -10,6 +10,7 @@ export class AuditLogRepository extends BaseRepository {
     entity: string;
     entityId: string;
     userId: string;
+    organizationId: string;
     metadata?: Record<string, unknown>;
     ipAddress?: string;
     userAgent?: string;
@@ -20,6 +21,7 @@ export class AuditLogRepository extends BaseRepository {
         entity: data.entity,
         entityId: data.entityId,
         userId: data.userId,
+        organizationId: data.organizationId,
         metadata: data.metadata !== undefined
           ? (data.metadata as Prisma.InputJsonValue)
           : Prisma.JsonNull,
@@ -38,6 +40,7 @@ export class AuditLogRepository extends BaseRepository {
     action?: string;
     entity?: string;
     userId?: string;
+    organizationId?: string;
     startDate?: string;
     endDate?: string;
     sort?: string;
@@ -49,6 +52,7 @@ export class AuditLogRepository extends BaseRepository {
 
     const where: Prisma.AuditLogWhereInput = {};
 
+    if (params?.organizationId) where.organizationId = params.organizationId;
     if (params?.action) where.action = params.action;
     if (params?.entity) where.entity = params.entity;
     if (params?.userId) where.userId = params.userId;
