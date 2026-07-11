@@ -2,10 +2,6 @@
 node_modules/
 .pnpm-store/
 
-# Assets — large binaries, screenshots, and marketing materials
-assets/
-screens/
-
 # Build output
 dist/
 build/
