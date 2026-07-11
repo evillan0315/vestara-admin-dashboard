@@ -11,8 +11,7 @@ import {
 } from '@mui/icons-material';
 import { useState, useCallback, type ReactElement } from 'react';
 import { DataTable, type Column, type SortState, type PaginationState } from '../components/data/DataTable';
-import {
-  useUsers,
+import { useUsers,
   useCreateUser,
   useUpdateUser,
   useDeleteUser,
@@ -20,10 +19,12 @@ import {
   useBulkDeleteUsers,
   useBulkUpdateUserStatus,
 } from '../features/users/hooks';
+import { useOrganizations } from '../features/organizations/hooks';
 import { exportUsersCsv } from '../features/users/exportUsers';
 import { UserFormDialog } from '../features/users/UserFormDialog';
 import { useToast } from '../components/feedback/Toast';
 import { ConfirmDialog } from '../components/ui/Modal';
+import { useAuth } from '../features/auth/AuthContext';
 import type { UserDTO, UserRole } from '@vestara/types';
 
 // ── Styled ──
@@ -101,6 +102,9 @@ export function UsersPage(): ReactElement {
     order: sort.direction,
   });
 
+  const { data: organizations = [] } = useOrganizations();
+  const { user } = useAuth();
+
   const createMutation = useCreateUser();
   const updateMutation = useUpdateUser();
   const deleteMutation = useDeleteUser();
@@ -152,7 +156,7 @@ export function UsersPage(): ReactElement {
   }, []);
 
   const handleDialogSubmit = useCallback(
-    async (data: { firstName: string; lastName: string; email: string; password?: string; role: UserRole }) => {
+    async (data: { firstName: string; lastName: string; email: string; password?: string; role: UserRole; organizationId?: string }) => {
       try {
         if (editUser) {
           await updateMutation.mutateAsync({
@@ -161,6 +165,7 @@ export function UsersPage(): ReactElement {
               firstName: data.firstName,
               lastName: data.lastName,
               role: data.role,
+              organizationId: data.organizationId,
             },
           });
           showSuccess('User updated successfully');
@@ -456,6 +461,8 @@ export function UsersPage(): ReactElement {
         onClose={handleDialogClose}
         onSubmit={handleDialogSubmit}
         loading={createMutation.isPending || updateMutation.isPending}
+        organizations={organizations}
+        currentUserRole={user?.role}
       />
 
       {/* Delete Confirmation */}

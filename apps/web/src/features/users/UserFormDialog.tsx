@@ -10,7 +10,7 @@ import {
   styled,
 } from '@mui/material';
 import { useState, useEffect, type ReactElement } from 'react';
-import type { UserDTO, UserRole } from '@vestara/types';
+import type { UserDTO, UserRole, OrganizationDTO } from '@vestara/types';
 
 export interface UserFormData {
   firstName: string;
@@ -18,6 +18,7 @@ export interface UserFormData {
   email: string;
   password?: string;
   role: UserRole;
+  organizationId?: string;
 }
 
 interface UserFormDialogProps {
@@ -26,6 +27,8 @@ interface UserFormDialogProps {
   onClose: () => void;
   onSubmit: (data: UserFormData) => Promise<void>;
   loading?: boolean;
+  organizations?: OrganizationDTO[];
+  currentUserRole?: UserRole;
 }
 
 const StyledDialog = styled(Dialog)(({ theme: _theme }) => ({
@@ -67,6 +70,8 @@ export function UserFormDialog({
   onClose,
   onSubmit,
   loading = false,
+  organizations = [],
+  currentUserRole,
 }: UserFormDialogProps): ReactElement {
   const isEdit = !!user;
 
@@ -76,6 +81,7 @@ export function UserFormDialog({
     email: '',
     password: '',
     role: 'admin' as UserRole,
+    organizationId: '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -89,6 +95,7 @@ export function UserFormDialog({
           email: user.email,
           password: '',
           role: user.role,
+          organizationId: user.organizationId || '',
         });
       } else {
         setFormData({
@@ -97,6 +104,7 @@ export function UserFormDialog({
           email: '',
           password: '',
           role: 'admin' as UserRole,
+          organizationId: '',
         });
       }
       setErrors({});
@@ -128,6 +136,7 @@ export function UserFormDialog({
       lastName: formData.lastName.trim(),
       email: formData.email.trim(),
       role: formData.role,
+      organizationId: formData.organizationId || undefined,
     };
     if (!isEdit && formData.password) {
       data.password = formData.password;
@@ -217,6 +226,23 @@ export function UserFormDialog({
             </MenuItem>
           ))}
         </TextField>
+
+        {currentUserRole === 'super_admin' && organizations && organizations.length > 0 && (
+          <TextField
+            label="Organization"
+            select
+            value={formData.organizationId}
+            onChange={handleChange('organizationId')}
+            fullWidth
+            size="small"
+          >
+            {organizations.map((org) => (
+              <MenuItem key={org.id} value={org.id}>
+                {org.name} ({org.slug})
+              </MenuItem>
+            ))}
+          </TextField>
+        )}
       </StyledDialogContent>
 
       <StyledDialogActions>

@@ -146,6 +146,7 @@ export interface CreateUserRequestDTO {
   firstName: string;
   lastName: string;
   role: UserRole;
+  organizationId?: string;
 }
 
 export interface UpdateUserRequestDTO {
@@ -153,6 +154,7 @@ export interface UpdateUserRequestDTO {
   lastName?: string;
   role?: UserRole;
   isActive?: boolean;
+  organizationId?: string;
 }
 
 export interface ChangePasswordRequestDTO {

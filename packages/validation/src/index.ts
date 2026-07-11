@@ -49,6 +49,7 @@ export const createUserSchema = z.object({
   firstName: nameField('First name'),
   lastName: nameField('Last name'),
   role: roleField,
+  organizationId: uuidField.optional(),
 });
 
 export const updateUserSchema = z.object({
@@ -56,6 +57,7 @@ export const updateUserSchema = z.object({
   lastName: nameField('Last name').optional(),
   role: roleField.optional(),
   isActive: z.boolean().optional(),
+  organizationId: uuidField.optional(),
 });
 
 export const changePasswordSchema = z.object({
