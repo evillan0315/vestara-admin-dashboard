@@ -1,0 +1,168 @@
+import { Router } from 'express';
+import { UserRole } from '@vestara/types';
+import { createUserSchema, updateUserSchema, paginationSchema, userIdParamSchema } from '@vestara/validation';
+import { validate } from '../middleware/validate.js';
+import { authenticate, requireRole } from '../middleware/authenticate.js';
+import { userRepository } from '../repositories/index.js';
+import { sendSuccess, sendPaginated, sendCreated, sendNoContent } from '../utils/response.js';
+import bcrypt from 'bcryptjs';
+
+const router = Router();
+
+// Helper to safely extract param (Express 5 type quirk)
+const param = (val: string | string[] | undefined): string => String(val ?? '');
+
+// All routes require authentication
+router.use(authenticate);
+
+/**
+ * GET /users — List users (paginated, filterable)
+ * Access: SUPER_ADMIN, ADMIN
+ */
+router.get(
+  '/',
+  requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  validate(paginationSchema, 'query'),
+  async (req, res, next) => {
+    try {
+      const { page, perPage, sort, order, search } = req.query as unknown as {
+        page: number;
+        perPage: number;
+        sort?: string;
+        order?: 'asc' | 'desc';
+        search?: string;
+      };
+
+      const result = await userRepository.findAll({ page, perPage, sort, order, search });
+
+      sendPaginated(res, result.users, {
+        page: Number(page),
+        perPage: Number(perPage),
+        total: result.total,
+        totalPages: Math.ceil(result.total / Number(perPage)),
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+);
+
+/**
+ * GET /users/:id — Get user by ID
+ * Access: SUPER_ADMIN, ADMIN
+ */
+router.get(
+  '/:id',
+  requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  validate(userIdParamSchema, 'params'),
+  async (req, res, next) => {
+    try {
+      const id = param(req.params.id);
+      const user = await userRepository.findByIdOrThrow(id);
+      sendSuccess(res, { user });
+    } catch (error) {
+      next(error);
+    }
+  },
+);
+
+/**
+ * POST /users — Create a new user
+ * Access: SUPER_ADMIN
+ */
+router.post(
+  '/',
+  requireRole(UserRole.SUPER_ADMIN),
+  validate(createUserSchema),
+  async (req, res, next) => {
+    try {
+      const { email, password, firstName, lastName, role } = req.body;
+
+      // Check for existing user
+      const existing = await userRepository.findByEmail(email);
+      if (existing) {
+        return res.status(409).json({
+          success: false,
+          error: { code: 'USER_ALREADY_EXISTS', message: 'A user with this email already exists' },
+        });
+      }
+
+      const passwordHash = await bcrypt.hash(password, 12);
+      const user = await userRepository.create({
+        email,
+        passwordHash,
+        firstName,
+        lastName,
+        role,
+      });
+
+      sendCreated(res, { user });
+    } catch (error) {
+      next(error);
+    }
+  },
+);
+
+/**
+ * PUT /users/:id — Update a user
+ * Access: SUPER_ADMIN, ADMIN
+ */
+router.put(
+  '/:id',
+  requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  validate(updateUserSchema),
+  async (req, res, next) => {
+    try {
+      const id = param(req.params.id);
+      // Verify user exists
+      await userRepository.findByIdOrThrow(id);
+
+      const user = await userRepository.update(id, req.body);
+      sendSuccess(res, { user });
+    } catch (error) {
+      next(error);
+    }
+  },
+);
+
+/**
+ * DELETE /users/:id — Delete a user (super_admin only)
+ * Access: SUPER_ADMIN
+ */
+router.delete(
+  '/:id',
+  requireRole(UserRole.SUPER_ADMIN),
+  async (req, res, next) => {
+    try {
+      const id = param(req.params.id);
+      await userRepository.findByIdOrThrow(id);
+      await userRepository.delete(id);
+      sendNoContent(res);
+    } catch (error) {
+      next(error);
+    }
+  },
+);
+
+/**
+ * PATCH /users/:id/status — Toggle user active status
+ * Access: SUPER_ADMIN, ADMIN
+ */
+router.patch(
+  '/:id/status',
+  requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  async (req, res, next) => {
+    try {
+      const id = param(req.params.id);
+      const user = await userRepository.findByIdOrThrow(id);
+      const updated = await userRepository.update(id, {
+        isActive: !user.isActive,
+      });
+      sendSuccess(res, { user: updated });
+    } catch (error) {
+      next(error);
+    }
+  },
+);
+
+export default router;
