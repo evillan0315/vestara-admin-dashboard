@@ -14,6 +14,7 @@ interface AuthContextValue extends AuthState {
   login: (email: string, password: string) => Promise<void>;
   register: (data: { email: string; password: string; firstName: string; lastName: string }) => Promise<void>;
   logout: () => Promise<void>;
+  updateUser: (user: UserDTO) => void;
   oauthRedirect: (provider: 'google' | 'github') => void;
   handleOAuthCallback: (accessToken: string, refreshToken: string) => Promise<void>;
 }
@@ -88,6 +89,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [setUser]);
 
+  const updateUser = useCallback((updatedUser: UserDTO) => {
+    setState((prev) => ({
+      ...prev,
+      user: updatedUser,
+    }));
+  }, []);
+
   const logout = useCallback(async () => {
     const userId = state.user?.id;
     try {
@@ -135,7 +143,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [setUser]);
 
   return (
-    <AuthContext.Provider value={{ ...state, login, register, logout, oauthRedirect, handleOAuthCallback }}>
+    <AuthContext.Provider value={{ ...state, login, register, logout, updateUser, oauthRedirect, handleOAuthCallback }}>
       {children}
     </AuthContext.Provider>
   );

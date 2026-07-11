@@ -131,6 +131,8 @@ export interface UserDTO {
   role: UserRole;
   isActive: boolean;
   avatarUrl?: string;
+  provider?: string;
+  providerId?: string;
   lastLoginAt?: string;
   createdAt: string;
   updatedAt: string;

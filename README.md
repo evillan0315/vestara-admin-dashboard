@@ -1926,6 +1926,7 @@ Future licensing terms may change as the platform evolves.
 | Roles & Permissions (RBAC) | 🟢 Implemented (enum-based) |
 | Data Table | 🟢 Reusable, sort/filter/paginate/select |
 | Application Settings | 🟢 Complete (backend + frontend) |
+| User Profile (name, avatar, password) | 🟢 Complete (backend + frontend) |
 | Audit Logs / System Logs | 🟢 API + Frontend Page |
 | CI/CD (GitHub Actions) | 🟢 API Deploy Workflow |
 | Mobile | 📋 Planned |
@@ -1946,7 +1947,7 @@ Future licensing terms may change as the platform evolves.
 - ✅ Application Settings (CRUD backend + frontend)
 - ✅ System Audit Logs (API + DataTable page)
 - ✅ GitHub Actions CI/CD (API deployment workflow)
-- 🟡 User Profile (password, avatar, settings)
+- ✅ User Profile (name, avatar, password change)
 - 🟡 Reusable Feedback Components (dialogs, toast queue)
 - 🟡 Security Hardening (rate limiting, CSRF, password policies)
 - 📋 Reporting (CSV/Excel/PDF export)
