@@ -1,0 +1,24 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "declaration": false,
+    "declarationMap": false,
+    "composite": false,
+    "paths": {
+      "@vestara/types": ["../../packages/types/src"],
+      "@vestara/types/*": ["../../packages/types/src/*"],
+      "@vestara/validation": ["../../packages/validation/src"],
+      "@vestara/validation/*": ["../../packages/validation/src/*"],
+      "@vestara/config": ["../../packages/config/src"],
+      "@vestara/config/*": ["../../packages/config/src/*"],
+      "@vestara/constants": ["../../packages/constants/src"],
+      "@vestara/constants/*": ["../../packages/constants/src/*"],
+      "@vestara/utils": ["../../packages/utils/src"],
+      "@vestara/utils/*": ["../../packages/utils/src/*"]
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

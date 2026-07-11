@@ -1,0 +1,28 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "types": ["vite/client"],
+    "declaration": false,
+    "declarationMap": false,
+    "composite": false,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@vestara/types": ["../../packages/types/src"],
+      "@vestara/types/*": ["../../packages/types/src/*"],
+      "@vestara/validation": ["../../packages/validation/src"],
+      "@vestara/validation/*": ["../../packages/validation/src/*"],
+      "@vestara/config": ["../../packages/config/src"],
+      "@vestara/config/*": ["../../packages/config/src/*"],
+      "@vestara/constants": ["../../packages/constants/src"],
+      "@vestara/constants/*": ["../../packages/constants/src/*"],
+      "@vestara/utils": ["../../packages/utils/src"],
+      "@vestara/utils/*": ["../../packages/utils/src/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "vite-env.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}

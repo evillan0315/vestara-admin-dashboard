@@ -1,0 +1,62 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Assets — large binaries, screenshots, and marketing materials
+assets/
+screens/
+
+# Build output
+dist/
+build/
+
+# Environment
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Google OAuth client secret (never commit)
+client_secret_*.json
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Testing
+coverage/
+
+# Turbo
+.turbo/
+
+# Prisma
+apps/api/prisma/migrations/
+generated/
+
+# Docker
+.docker/
+
+# Temp
+tmp/
+temp/
+
+# TypeScript
+*.tsbuildinfo
+
+# Vercel
+.vercel/
+.vercel/project.json
+.vercel
+google_service.json

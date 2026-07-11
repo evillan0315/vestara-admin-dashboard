@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "composite": true,
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+      "@vestara/types": ["./packages/types/src"],
+      "@vestara/types/*": ["./packages/types/src/*"],
+      "@vestara/validation": ["./packages/validation/src"],
+      "@vestara/validation/*": ["./packages/validation/src/*"],
+      "@vestara/config": ["./packages/config/src"],
+      "@vestara/config/*": ["./packages/config/src/*"],
+      "@vestara/constants": ["./packages/constants/src"],
+      "@vestara/constants/*": ["./packages/constants/src/*"],
+      "@vestara/utils": ["./packages/utils/src"],
+      "@vestara/utils/*": ["./packages/utils/src/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}

@@ -1,0 +1,42 @@
+# Dependencies (Vercel installs these via installCommand)
+node_modules/
+
+# Git
+.git/
+
+# Turborepo cache
+.turbo/
+
+# API dev files (not needed for frontend build)
+apps/api/node_modules/
+apps/api/.turbo/
+apps/api/tests/
+
+# Frontend dev files
+apps/web/node_modules/
+apps/web/.turbo/
+apps/web/tests/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Testing
+coverage/
+
+# Prisma migrations (not needed at runtime)
+prisma/migrations/
+
+# Temp files
+tmp/
+temp/
+
+# TypeScript build info
+*.tsbuildinfo

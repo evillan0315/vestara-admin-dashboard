@@ -1,0 +1,51 @@
+{
+  "name": "vestara-admin-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Vestara Admin Dashboard — Enterprise administration platform for the Vestara ecosystem",
+  "scripts": {
+    "dev": "turbo dev",
+    "dev:web": "turbo dev --filter=@vestara/web",
+    "dev:api": "turbo dev --filter=@vestara/api",
+    "build": "turbo build",
+    "build:web": "turbo build --filter=@vestara/web",
+    "build:api": "turbo build --filter=@vestara/api",
+    "typecheck": "turbo typecheck",
+    "lint": "turbo lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "test": "turbo test",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
+    "prisma:seed": "tsx prisma/seed.ts",
+    "clean": "turbo clean && rm -rf node_modules"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.8.0"
+  },
+  "devDependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/pg": "^8.20.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.0",
+    "eslint": "^9.0.0",
+    "globals": "^16.0.0",
+    "pg": "^8.22.0",
+    "prettier": "^3.4.0",
+    "prettier-plugin-tailwindcss": "^0.6.0",
+    "prisma": "^7.8.0",
+    "tsx": "^4.19.0",
+    "turbo": "^2.4.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=10.0.0"
+  },
+  "packageManager": "pnpm@10.6.0"
+}
