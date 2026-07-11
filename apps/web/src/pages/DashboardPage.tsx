@@ -29,7 +29,10 @@ const ChartCard = styled(Paper)(({ theme }) => ({
   borderRadius: 12,
   border: `1px solid ${theme.palette.divider}`,
   boxShadow: 'none',
-  padding: theme.spacing(3),
+  padding: theme.spacing(2),
+  [theme.breakpoints.up('sm')]: {
+    padding: theme.spacing(3),
+  },
   height: '100%',
 }));
 
@@ -137,7 +140,7 @@ export function DashboardPage() {
             <Typography variant="h6" fontWeight={600} gutterBottom>
               Revenue Overview
             </Typography>
-            <Box sx={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Box sx={{ height: { xs: 200, sm: 300 }, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Typography variant="body2" color="text.secondary">
                 Chart will be integrated here
               </Typography>

@@ -30,7 +30,10 @@ const HeaderContent = styled(Box)(({ theme }) => ({
   justifyContent: 'space-between',
   alignItems: 'center',
   gap: theme.spacing(2),
-  padding: theme.spacing(1, 3),
+  padding: theme.spacing(1, 2),
+  [theme.breakpoints.up('sm')]: {
+    padding: theme.spacing(1, 3),
+  },
   minHeight: 64,
 }));
 
@@ -70,13 +73,18 @@ const SearchInput = styled('input')(({ theme }) => ({
   fontSize: '0.875rem',
   color: theme.palette.text.primary,
   borderRadius: theme.shape.borderRadius,
-  width: 280,
+  width: 200,
   transition: 'width 0.2s ease',
+  [theme.breakpoints.up('lg')]: {
+    width: 280,
+    '&:focus': {
+      width: 360,
+    },
+  },
   '&::placeholder': {
     color: theme.palette.text.disabled,
   },
   '&:focus': {
-    width: 360,
     background: theme.palette.background.paper,
     boxShadow: `0 0 0 2px ${theme.palette.primary.main}`,
   },
@@ -203,7 +211,11 @@ export const Header = ({
         <ActionContainer>
           {showSearch && (
             <Tooltip title="Search">
-              <SearchContainer>
+              <SearchContainer
+                sx={{
+                  display: { xs: 'none', md: 'flex' },
+                }}
+              >
                 <Search />
                 <SearchInput
                   type="text"
@@ -252,7 +264,9 @@ export const Header = ({
                 <UserAvatar src={user.avatarUrl || undefined}>
                   {user.firstName?.[0]?.toUpperCase() || 'U'}
                 </UserAvatar>
-                <UserName>{user.firstName} {user.lastName}</UserName>
+                <UserName sx={{ display: { xs: 'none', md: 'block' } }}>
+                  {user.firstName} {user.lastName}
+                </UserName>
               </UserMenuButton>
             </Tooltip>
           )}

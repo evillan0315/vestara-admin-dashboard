@@ -2,11 +2,12 @@ import { useState } from "react";
 import { Box, Drawer } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import type { ReactNode } from "react";
-import { Sidebar } from "../components/layout/Sidebar";
+import Sidebar from "../components/layout/Sidebar";
 import { Header } from "../components/layout/Header";
 import { colors } from "../theme/tokens";
 
-const SIDEBAR_WIDTH = 264;
+const SIDEBAR_DESKTOP_WIDTH = 280;
+const SIDEBAR_MOBILE_WIDTH = 320;
 
 interface DashboardLayoutProps {
   title?: string;
@@ -25,6 +26,10 @@ export default function DashboardLayout({
     setMobileOpen((prev) => !prev);
   };
 
+  const handleDrawerClose = () => {
+    setMobileOpen(false);
+  };
+
   return (
     <Box
       sx={{
@@ -33,7 +38,7 @@ export default function DashboardLayout({
         bgcolor: colors.background,
       }}
     >
-      {/* Desktop Sidebar */}
+      {/* Desktop Sidebar — permanent, collapsible */}
       <Box
         sx={{
           display: { xs: "none", lg: "block" },
@@ -43,25 +48,24 @@ export default function DashboardLayout({
         <Sidebar />
       </Box>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Drawer — temporary overlay */}
       <Drawer
         variant="temporary"
         open={mobileOpen}
         onClose={handleDrawerToggle}
-        ModalProps={{
-          keepMounted: true,
-        }}
+        ModalProps={{ keepMounted: true }}
         sx={{
           display: { xs: "block", lg: "none" },
           "& .MuiDrawer-paper": {
             boxSizing: "border-box",
-            width: SIDEBAR_WIDTH,
+            width: { xs: "100%", sm: SIDEBAR_MOBILE_WIDTH },
+            maxWidth: "100vw",
             bgcolor: colors.sidebar,
             borderRight: `1px solid ${colors.border}`,
           },
         }}
       >
-        <Sidebar onClose={() => setMobileOpen(false)} />
+        <Sidebar onClose={handleDrawerClose} />
       </Drawer>
 
       {/* Main Content Area */}
@@ -71,6 +75,7 @@ export default function DashboardLayout({
           minWidth: 0,
           display: "flex",
           flexDirection: "column",
+          width: "100%",
         }}
       >
         <Header
@@ -85,7 +90,8 @@ export default function DashboardLayout({
             p: { xs: 2, sm: 3, md: 3.5 },
             display: "flex",
             flexDirection: "column",
-            gap: 3,
+            gap: { xs: 2, sm: 3 },
+            overflow: "auto",
           }}
         >
           {children ?? <Outlet />}
