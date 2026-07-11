@@ -15,7 +15,7 @@ import {
 import { useState, useCallback, type ReactElement } from 'react';
 import { DataTable, type Column, type SortState, type PaginationState } from '../components/data/DataTable';
 import { useAuditLogs } from '../features/audit-logs/hooks';
-import type { AuditLogDTO, AuditAction } from '@vestara/types';
+import type { AuditLogDTO } from '@vestara/types';
 
 // ── Styled ──
 

@@ -6,7 +6,6 @@ import Sidebar from "../components/layout/Sidebar";
 import { Header } from "../components/layout/Header";
 import { colors } from "../theme/tokens";
 
-const SIDEBAR_DESKTOP_WIDTH = 280;
 const SIDEBAR_MOBILE_WIDTH = 320;
 
 interface DashboardLayoutProps {

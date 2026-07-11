@@ -21,15 +21,15 @@ This roadmap defines the GitHub-based project structure, milestone organization,
 | **6–7** | Frontend Foundation | React Foundation, Design System, Auth Components | ✅ Complete |
 | **8–10** | Admin Dashboard | Dashboard Layout, Widgets, Dashboard Features | ⏳ Partial (~70%) |
 | **11** | Authentication UI | Login, Register, Forgot/Reset Password, OAuth (Google + GitHub), Protected Routes | ✅ Complete |
-| **12–14** | User Management | User CRUD, Roles & Permissions, User Profile | 🟡 In Progress |
-| **15–17** | Reusable UI | Forms, Data Table, Feedback Components | 🟡 In Progress |
+| **12–14** | User Management | User CRUD, Roles & Permissions, User Profile | ✅ Complete (~90%) |
+| **15–17** | Reusable UI | Forms, Data Table, Feedback Components | ⏳ Partial (~70%) |
 | **18** | File Management | File Manager | ❌ Not Started |
-| **19** | Settings | Application Settings | 🟡 In Progress |
+| **19** | Settings | Application Settings | ✅ Complete (~90%) |
 | **20** | Reporting | Dashboard Reports, CSV/Excel/PDF Export | ❌ Not Started |
 | **21–22** | Real-Time | WebSocket Integration, Live Features | ❌ Not Started |
-| **23–24** | Security & Monitoring | Security Hardening, Monitoring | ⏳ Partial |
-| **25–26** | Testing & Performance | Testing, Performance Optimization | ⏳ Minimal |
-| **27–30** | Production | Documentation, Deployment, CI/CD, Production Readiness | ⏳ Partial (~40%) |
+| **23–24** | Security & Monitoring | Security Hardening, Monitoring | ⏳ Partial (~50%) |
+| **25–26** | Testing & Performance | Testing, Performance Optimization | ⏳ Minimal (~5%) |
+| **27–30** | Production | Documentation, Deployment, CI/CD, Production Readiness | ⏳ Partial (~60%) |
 
 ### GitHub Label Strategy
 
@@ -322,25 +322,25 @@ Phases correspond to items in [`INSTRUCTION.md`](./INSTRUCTION.md). See the `doc
 | 9 | Dashboard Widgets | ⏳ Partial | ~55% | **Built:** StatCard (with trend indicators, icons, change percentages), ActivityFeed (with user avatars, timestamps, action types). Both integrated into DashboardPage with mock data. **Missing:** KPI cards, charts integration, real data wiring from API |
 | 10 | Dashboard Features | ⏳ Partial | ~15% | **Built:** Header search bar (responsive, hidden on mobile), notification bell + popover component, message popover component, date range button, refresh button. **Missing:** Global search dialog, notifications API wiring, user preferences, audit logs UI, analytics |
 | 11 | Authentication Pages | ✅ Complete | 100% | Login, Register, Forgot Password, Reset Password pages with Vestara Elite design. AuthLayout with left brand panel (geometric backgrounds, gold/purple orbs, hero text, stats, testimonial) + right form panel. Custom AuthField component with icon, label, error state, password toggle. OAuthButtons (Google + GitHub). PasswordStrength indicator. OAuth callback page (`/auth/callback`). AuthContext with `oauthRedirect` + `handleOAuthCallback`. react-hook-form + zod validation. Route guards (ProtectedRoute, PublicRoute). Plus Jakarta Sans font. |
-| 12 | User CRUD | 🟡 In Progress | ~30% | **Backend:** Repository exists. **Pending:** UserService (with bcrypt hashing), routes (GET /users paginated+filterable, GET /users/:id, POST, PUT, DELETE, PATCH /users/:id/status), auth middleware (JWT authenticate + requireRole). **Frontend:** DataTable, UsersPage with search/filter/sort/paginate, UserFormDialog for create/edit, status toggle. |
-| 13 | Roles & Permissions | 🟡 In Progress | ~10% | UserRole enum defined in `@vestara/types`. Permission enum defined but not in DB. **Plan:** RBAC enforced via `requireRole()` middleware on protected routes. Frontend nav already filters by role. No standalone Role model in DB — roles are enum-based. |
+| 12 | User CRUD | ✅ Complete | ~90% | **Backend:** `authenticate` + `requireRole` JWT middleware, full CRUD routes (GET /users paginated+filterable, GET /users/:id, POST, PUT, DELETE, PATCH /users/:id/status). Repository pattern, Prisma queries with sorting/filtering/pagination. **Frontend:** UsersPage with DataTable (sort/filter/paginate/select), UserFormDialog for create/edit, status toggle with ConfirmDialog, delete confirmation, role badges. TanStack Query hooks for all operations. |
+| 13 | Roles & Permissions | ✅ Complete | 100% | UserRole enum in `@vestara/types`. RBAC enforced via `requireRole(...)` middleware (e.g., `requireRole('super_admin')`) on protected routes. `authenticate` middleware decodes JWT, attaches `req.user`. Frontend nav filters by role. No standalone Role DB model — roles are enum-based. |
 | 14 | User Profile | ❌ Not Started | 0% | No profile, password, or avatar management |
 | 15 | Reusable Forms | ⏳ Partial | ~25% | **Auth components built:** AuthField (custom input with icon, label, error, password toggle), OAuthButtons (Google + GitHub), PasswordStrength (4-bar indicator). **Missing:** Generic form components, form utilities, reusable form layouts |
-| 16 | Data Table | 🟡 In Progress | ~10% | **Plan:** Build reusable DataTable component with sorting (clickable column headers), filtering (search input, filter chips), pagination (page controls, page size selector), row selection (checkbox column), server-side support, loading/empty states, customizable column definitions. Required by Users, Audit Logs, and Settings pages. |
+| 16 | Data Table | ✅ Complete | 100% | **Built:** Reusable DataTable component with theme-aware styling. Features: sortable column headers (toggling asc/desc/none), search + filter chips, pagination (page controls, page size selector), row selection (checkbox column), server-side support, loading skeleton, empty state (NoData/NoSearchResults/ErrorState), customizable column definitions (label, sortable, render, align, width). Used by UsersPage, SettingsPage, and SystemLogsPage. |
 | 17 | Feedback Components | ⏳ Partial | ~60% | **Built:** Toast/Snackbar (with ToastProvider + useToast hook), Loading (spinner/skeleton/overlay/inline + PageLoading, ContentLoading, ButtonLoading), EmptyState (NoData, NoSearchResults, EmptyFolder, ErrorState). **Missing:** Confirmation dialogs integration, toast queue management |
 | 18 | File Manager | ❌ Not Started | 0% | No upload, browse, preview, download |
-| 19 | Application Settings | 🟡 In Progress | ~50% | Backend service + repository done. Routes are commented out. No settings UI |
+| 19 | Application Settings | ✅ Complete | ~90% | **Backend:** Full CRUD routes with auth middleware, repository pattern, validation. **Frontend:** SettingsPage with DataTable (key-value editor), SettingFormDialog for create/edit with JSON validation, TanStack Query hooks, toast notifications for success/error. |
 | 20 | Reports | ❌ Not Started | 0% | No dashboard reports, CSV/Excel/PDF export |
 | 21 | WebSocket Integration | ❌ Not Started | 0% | No WebSocket support |
 | 22 | Live Features | ❌ Not Started | 0% | No live notifications, dashboard updates, presence |
 | 23 | Security | ⏳ Partial | ~40% | Security headers, CORS, JWT auth, validation, audit trail exist. **Missing:** rate limiting, CSRF, password policies, XSS protection |
-| 24 | Monitoring | ⏳ Partial | ~30% | Audit trail service + request logging exist. Audit logs API routes planned (GET /audit-logs paginated+filterable, GET /audit-logs/:id). SystemLogsPage planned with data table, action/entity/date filters. **Missing:** error tracking, performance metrics |
+| 24 | Monitoring | ⏳ Partial | ~50% | Audit trail service + request logging exist. Audit logs API routes implemented (GET /audit-logs paginated+filterable, GET /audit-logs/:id). **Frontend:** SystemLogsPage built with DataTable, action/entity/date filters, action chips with color-coded icons, formatted timestamps. **Missing:** error tracking, performance metrics |
 | 25 | Testing | ⏳ Minimal | ~5% | 1 auth API test file (14 test cases). No unit/integration/component/e2e tests |
 | 26 | Performance | ❌ Not Started | 0% | No lazy loading, code splitting, virtualization, bundle optimization |
 | 27 | Documentation | ⏳ Partial | ~40% | Comprehensive README, API docs for auth/health. Missing developer guide, ADRs, deployment guide |
 | 28 | Deployment | ✅ Complete | 100% | **Deployed on Vercel** — API at `vestara-admin-api.vercel.app`, Web at `vestara-admin-web.vercel.app`. Vercel serverless entry at `api/index.ts` with Express routes mounted under `/api/v1`. CORS configured for `.vercel.app` origins. Environment variables configured via Vercel CLI. Build passes `tsc --noEmit` and `vite build`. |
-| 29 | CI/CD | ⏳ Partial | ~30% | Vercel auto-deploys from `main` on git push. No GitHub Actions workflows yet. |
-| 30 | Production Readiness | ⏳ Partial | ~40% | Both apps deployed and serving (API health 200, Web login 200). CORS verified. OAuth callbacks functional. Missing: final security audit, performance benchmarks |
+| 29 | CI/CD | ⏳ Partial | ~40% | Vercel auto-deploys from `main` on git push. GitHub Actions workflow created for API deployment (`deploy-api.yml`) — builds + deploys API to Vercel on push to `main`. Missing: CI for lint/typecheck/tests, web deployment workflow |
+| 30 | Production Readiness | ⏳ Partial | ~50% | Both apps deployed and serving (API health 200, Web login 200). CORS verified. OAuth callbacks functional. GitHub Actions CI/CD configured for API. Missing: final security audit, performance benchmarks |
 
 ### Metrics to Track
 

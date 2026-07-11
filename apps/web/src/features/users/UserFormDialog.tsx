@@ -28,7 +28,7 @@ interface UserFormDialogProps {
   loading?: boolean;
 }
 
-const StyledDialog = styled(Dialog)(({ theme }) => ({
+const StyledDialog = styled(Dialog)(({ theme: _theme }) => ({
   '& .MuiDialog-paper': {
     borderRadius: 12,
     maxWidth: 480,

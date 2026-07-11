@@ -16,6 +16,10 @@ Base URL: `/api/v1`
 - [Endpoints](#endpoints)
   - [Health](#health)
   - [Auth](#auth)
+  - [Protected Routes](#protected-routes)
+    - [Users](#get-users)
+    - [Settings](#settings)
+    - [Audit Logs](#audit-logs)
 - [Data Models](#data-models)
 - [Enums](#enums)
 - [Error Codes](#error-codes)
@@ -425,6 +429,448 @@ Get the currently authenticated user's profile.
 
 ---
 
+### Protected Routes
+
+All protected routes require an `Authorization: Bearer <access_token>` header and are only accessible to authenticated users. Some routes also require specific roles (RBAC).
+
+#### `GET /users`
+
+Returns a paginated, filterable list of users. Requires authentication.
+
+**Query Parameters**
+
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `page` | number | 1 | Page number |
+| `perPage` | number | 20 | Results per page (max 100) |
+| `sortBy` | string | `createdAt` | Sort column |
+| `sortOrder` | enum | `desc` | Sort direction (`asc`, `desc`) |
+| `search` | string | — | Full-text search across name/email |
+| `role` | string | — | Filter by role (`super_admin`, `admin`, `moderator`, `support`) |
+| `isActive` | boolean | — | Filter by active/inactive status |
+
+**Response `200`**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "uuid",
+      "email": "user@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "role": "admin",
+      "isActive": true,
+      "avatarUrl": null,
+      "lastLoginAt": "2025-01-01T00:00:00.000Z",
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "perPage": 20,
+    "total": 50,
+    "totalPages": 3
+  }
+}
+```
+
+**Error Codes**
+
+| Code | Status | Condition |
+|------|--------|-----------|
+| `TOKEN_INVALID` | 401 | Missing or invalid access token |
+
+---
+
+#### `GET /users/:id`
+
+Get a single user by ID. Requires authentication.
+
+**Response `200`**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "email": "user@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "role": "admin",
+    "isActive": true,
+    "avatarUrl": null,
+    "lastLoginAt": "2025-01-01T00:00:00.000Z",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  }
+}
+```
+
+**Error Codes**
+
+| Code | Status | Condition |
+|------|--------|-----------|
+| `TOKEN_INVALID` | 401 | Missing or invalid access token |
+| `NOT_FOUND` | 404 | User does not exist |
+
+---
+
+#### `POST /users`
+
+Create a new user. Requires `super_admin` or `admin` role.
+
+**Request Body**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `email` | string | yes | Valid email address |
+| `password` | string | yes | Min 8 chars, uppercase, lowercase, number |
+| `firstName` | string | yes | 1-100 characters |
+| `lastName` | string | yes | 1-100 characters |
+| `role` | string | no | User role (default: `admin`) |
+
+**Response `201`**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "email": "user@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "role": "admin",
+    "isActive": true,
+    "avatarUrl": null,
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  }
+}
+```
+
+**Error Codes**
+
+| Code | Status | Condition |
+|------|--------|-----------|
+| `VALIDATION_ERROR` | 422 | Invalid input fields |
+| `USER_ALREADY_EXISTS` | 409 | Email already registered |
+| `FORBIDDEN` | 403 | Insufficient role permissions |
+
+---
+
+#### `PUT /users/:id`
+
+Update an existing user. Requires `super_admin` or `admin` role.
+
+**Request Body**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `email` | string | no | Valid email address |
+| `firstName` | string | no | 1-100 characters |
+| `lastName` | string | no | 1-100 characters |
+| `role` | string | no | User role |
+
+**Response `200`**
+
+Same shape as `POST /users` response.
+
+**Error Codes**
+
+| Code | Status | Condition |
+|------|--------|-----------|
+| `VALIDATION_ERROR` | 422 | Invalid input fields |
+| `NOT_FOUND` | 404 | User not found |
+| `FORBIDDEN` | 403 | Insufficient role permissions |
+
+---
+
+#### `DELETE /users/:id`
+
+Delete a user. Requires `super_admin` role.
+
+**Response `200`**
+
+```json
+{
+  "success": true,
+  "data": { "message": "User deleted successfully" }
+}
+```
+
+**Error Codes**
+
+| Code | Status | Condition |
+|------|--------|-----------|
+| `NOT_FOUND` | 404 | User not found |
+| `FORBIDDEN` | 403 | Only super_admin can delete users |
+
+---
+
+#### `PATCH /users/:id/status`
+
+Toggle a user's active/inactive status. Requires `super_admin` or `admin` role.
+
+**Request Body**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `isActive` | boolean | yes | New active status |
+
+**Response `200`**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "isActive": false,
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  }
+}
+```
+
+**Error Codes**
+
+| Code | Status | Condition |
+|------|--------|-----------|
+| `NOT_FOUND` | 404 | User not found |
+| `FORBIDDEN` | 403 | Cannot deactivate own account |
+
+---
+
+### Settings
+
+All settings endpoints are prefixed with `/settings` and require authentication.
+
+#### `GET /settings`
+
+Returns a paginated list of system settings.
+
+**Query Parameters**
+
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `page` | number | 1 | Page number |
+| `perPage` | number | 20 | Results per page |
+| `sortBy` | string | `key` | Sort column |
+| `sortOrder` | enum | `asc` | Sort direction |
+| `search` | string | — | Search by key |
+
+**Response `200`**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "uuid",
+      "key": "platform_name",
+      "value": "Vestara",
+      "updatedBy": "user-uuid",
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "perPage": 20,
+    "total": 10,
+    "totalPages": 1
+  }
+}
+```
+
+---
+
+#### `GET /settings/:key`
+
+Get a single setting by its key.
+
+**Response `200`**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "key": "platform_name",
+    "value": "Vestara",
+    "updatedBy": "user-uuid",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  }
+}
+```
+
+**Error Codes**
+
+| Code | Status | Condition |
+|------|--------|-----------|
+| `NOT_FOUND` | 404 | Setting key not found |
+
+---
+
+#### `POST /settings`
+
+Create a new system setting. Requires `super_admin` or `admin` role.
+
+**Request Body**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `key` | string | yes | Unique setting key |
+| `value` | object | yes | Setting value (JSON) |
+
+**Response `201`**
+
+Same shape as `GET /settings/:key` response.
+
+**Error Codes**
+
+| Code | Status | Condition |
+|------|--------|-----------|
+| `VALIDATION_ERROR` | 422 | Invalid input |
+| `ALREADY_EXISTS` | 409 | Setting key already exists |
+| `FORBIDDEN` | 403 | Insufficient role permissions |
+
+---
+
+#### `PUT /settings/:key`
+
+Update an existing setting. Requires `super_admin` or `admin` role.
+
+**Request Body**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `value` | object | yes | New setting value (JSON) |
+
+**Response `200`**
+
+Same shape as `GET /settings/:key` response.
+
+**Error Codes**
+
+| Code | Status | Condition |
+|------|--------|-----------|
+| `VALIDATION_ERROR` | 422 | Invalid input |
+| `NOT_FOUND` | 404 | Setting key not found |
+| `FORBIDDEN` | 403 | Insufficient role permissions |
+
+---
+
+#### `DELETE /settings/:key`
+
+Delete a system setting. Requires `super_admin` role.
+
+**Response `200`**
+
+```json
+{
+  "success": true,
+  "data": { "message": "Setting deleted successfully" }
+}
+```
+
+**Error Codes**
+
+| Code | Status | Condition |
+|------|--------|-----------|
+| `NOT_FOUND` | 404 | Setting key not found |
+| `FORBIDDEN` | 403 | Only super_admin can delete settings |
+
+---
+
+### Audit Logs
+
+All audit log endpoints are prefixed with `/audit-logs` and require `super_admin` or `admin` role.
+
+#### `GET /audit-logs`
+
+Returns a paginated, filterable list of audit log entries.
+
+**Query Parameters**
+
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `page` | number | 1 | Page number |
+| `perPage` | number | 20 | Results per page |
+| `sortBy` | string | `createdAt` | Sort column |
+| `sortOrder` | enum | `desc` | Sort direction |
+| `action` | string | — | Filter by action (`login`, `logout`, `create`, `update`, `delete`, etc.) |
+| `entity` | string | — | Filter by entity type (`user`, `setting`, `audit_log`) |
+| `entityId` | string | — | Filter by affected entity ID |
+| `userId` | string | — | Filter by acting user ID |
+| `search` | string | — | Full-text search |
+| `startDate` | string | — | ISO date filter (start range) |
+| `endDate` | string | — | ISO date filter (end range) |
+
+**Response `200`**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "uuid",
+      "action": "login",
+      "entity": "user",
+      "entityId": "user-uuid",
+      "userId": "user-uuid",
+      "userName": "John Doe",
+      "metadata": { "ipAddress": "192.168.1.1" },
+      "ipAddress": "192.168.1.1",
+      "userAgent": "Mozilla/5.0...",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "perPage": 20,
+    "total": 500,
+    "totalPages": 25
+  }
+}
+```
+
+---
+
+#### `GET /audit-logs/:id`
+
+Get a single audit log entry by ID.
+
+**Response `200`**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "action": "login",
+    "entity": "user",
+    "entityId": "user-uuid",
+    "userId": "user-uuid",
+    "userName": "John Doe",
+    "metadata": {},
+    "ipAddress": "192.168.1.1",
+    "userAgent": "Mozilla/5.0...",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  }
+}
+```
+
+**Error Codes**
+
+| Code | Status | Condition |
+|------|--------|-----------|
+| `NOT_FOUND` | 404 | Audit log entry not found |
+
+---
+
 ## Data Models
 
 ### User
@@ -616,16 +1062,20 @@ Request Logger Middleware
     ▼
 Route Handler
     │
-    ├── Validation Middleware (Zod)
-    │       │
-    │       ▼
-    │   Service Layer (business logic)
-    │       │
-    │       ▼
-    │   Repository Layer (Prisma queries)
-    │       │
-    │       ▼
-    │   Database (PostgreSQL)
+    ├── Auth Middleware (optional per route)
+    │   │   ├── authenticate()  — Decodes JWT, attaches req.user
+    │   │   └── requireRole(...) — Restricts to specific roles
+    │   │
+    │   ├── Validation Middleware (Zod)
+    │   │       │
+    │   │       ▼
+    │   │   Service Layer (business logic)
+    │   │       │
+    │   │       ▼
+    │   │   Repository Layer (Prisma queries)
+    │   │       │
+    │   │       ▼
+    │   │   Database (PostgreSQL)
     │
     ▼
 404 Handler (if no route matched)
