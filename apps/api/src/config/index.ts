@@ -3,7 +3,12 @@ import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// Base configuration lives in the repo-root `.env` (gitignored, holds all
+// runtime secrets). Local overrides in `apps/api/.env.local` take precedence
+// when present (e.g. for developer-specific tuning).
 dotenv.config({ path: resolve(__dirname, '../../../../.env') });
+dotenv.config({ path: resolve(__dirname, '../../.env.local'), override: true });
 
 interface Config {
   nodeEnv: string;
