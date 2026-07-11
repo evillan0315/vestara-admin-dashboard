@@ -79,7 +79,7 @@ export default function Logo({
               whiteSpace: 'nowrap',
             }}
           >
-            ELITE COMPANIONS
+            Command Center
           </Typography>
         </Box>
       )}
