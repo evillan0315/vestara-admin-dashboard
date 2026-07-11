@@ -287,7 +287,7 @@ export class UserRepository extends BaseRepository {
       passwordHash,
       firstName: 'Test',
       lastName: 'User',
-      role: 'admin' as UserRole,
+      role: 'support' as UserRole,
       organizationId,
     });
   }

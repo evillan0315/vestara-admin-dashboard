@@ -43,7 +43,7 @@ model User {
   passwordHash String?
   firstName    String
   lastName     String
-  role         UserRole @default(admin)
+  role         UserRole @default(support)
   isActive     Boolean  @default(true)
   avatarUrl    String?
   provider     String?  // "google" | "github" | null (email/password)

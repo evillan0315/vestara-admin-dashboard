@@ -213,7 +213,7 @@ export class AuthService {
       email,
       firstName,
       lastName,
-      role: 'admin' as import('@vestara/types').UserRole,
+      role: 'support' as import('@vestara/types').UserRole,
       organizationId: organization.id,
       provider,
       providerId,
