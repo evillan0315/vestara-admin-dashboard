@@ -1,6 +1,6 @@
 import { Snackbar, Alert, type AlertColor, Slide, styled, IconButton } from '@mui/material';
 import { Close } from '@mui/icons-material';
-import { useState, useCallback, createContext, useContext, type ReactNode } from 'react';
+import { useState, useCallback, createContext, useContext, type ReactNode, useMemo } from 'react';
 import type { TransitionProps } from '@mui/material/transitions';
 
 function SlideTransition(props: TransitionProps & { children: React.ReactElement }) {
@@ -11,19 +11,26 @@ export interface ToastOptions {
   message: string;
   severity?: AlertColor;
   duration?: number;
+  id?: string;
 }
 
-interface ToastState extends ToastOptions {
+interface ToastState {
   open: boolean;
+  message: string;
+  severity: AlertColor;
+  duration: number;
+  id: string;
 }
 
 interface ToastContextValue {
   showToast: (options: ToastOptions) => void;
-  showSuccess: (message: string) => void;
-  showError: (message: string) => void;
-  showWarning: (message: string) => void;
-  showInfo: (message: string) => void;
-  hideToast: () => void;
+  showSuccess: (message: string, options?: Partial<ToastOptions>) => void;
+  showError: (message: string, options?: Partial<ToastOptions>) => void;
+  showWarning: (message: string, options?: Partial<ToastOptions>) => void;
+  showInfo: (message: string, options?: Partial<ToastOptions>) => void;
+  hideToast: (id: string) => void;
+  hideAllToasts: () => void;
+  toasts: ToastState[];
 }
 
 const ToastContext = createContext<ToastContextValue | undefined>(undefined);
@@ -32,6 +39,8 @@ const ToastAlert = styled(Alert)(({ theme, severity }) => ({
   borderRadius: 12,
   boxShadow: theme.shadows[6],
   alignItems: 'center',
+  minWidth: 300,
+  maxWidth: 480,
   ...(severity === 'success' && {
     borderLeft: `4px solid ${theme.palette.success.main}`,
   }),
@@ -46,82 +55,119 @@ const ToastAlert = styled(Alert)(({ theme, severity }) => ({
   }),
 }));
 
-export function ToastProvider({ children }: { children: ReactNode }) {
-  const [toast, setToast] = useState<ToastState>({
-    open: false,
-    message: '',
-    severity: 'info',
-  });
+const ToastContainer = styled('div')(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing(1),
+  pointerEvents: 'none',
+  '& > *': {
+    pointerEvents: 'auto',
+  },
+}));
 
-  const hideToast = useCallback(() => {
-    setToast((prev) => ({ ...prev, open: false }));
+const generateId = () => Math.random().toString(36).substring(2, 9);
+
+export function ToastProvider({ children }: { children: ReactNode }) {
+  const [toasts, setToasts] = useState<ToastState[]>([]);
+
+  const hideToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
 
-  const showToast = useCallback(
-    (options: ToastOptions) => {
-      setToast({
-        open: true,
-        message: options.message,
-        severity: options.severity || 'info',
-        duration: options.duration,
-      });
-    },
-    []
-  );
+  const hideAllToasts = useCallback(() => {
+    setToasts([]);
+  }, []);
+
+  const showToast = useCallback((options: ToastOptions) => {
+    const id = options.id || generateId();
+    const newToast: ToastState = {
+      open: true,
+      message: options.message,
+      severity: options.severity || 'info',
+      duration: options.duration || 5000,
+      id,
+    };
+
+    setToasts((prev) => [...prev, newToast]);
+
+    // Auto-hide after duration
+    if (newToast.duration && newToast.duration > 0) {
+      setTimeout(() => {
+        hideToast(id);
+      }, newToast.duration);
+    }
+  }, [hideToast]);
 
   const showSuccess = useCallback(
-    (message: string) => {
-      showToast({ message, severity: 'success' });
+    (message: string, options?: Partial<ToastOptions>) => {
+      showToast({ message, severity: 'success', ...options });
     },
     [showToast]
   );
 
   const showError = useCallback(
-    (message: string) => {
-      showToast({ message, severity: 'error' });
+    (message: string, options?: Partial<ToastOptions>) => {
+      showToast({ message, severity: 'error', duration: 7000, ...options });
     },
     [showToast]
   );
 
   const showWarning = useCallback(
-    (message: string) => {
-      showToast({ message, severity: 'warning' });
+    (message: string, options?: Partial<ToastOptions>) => {
+      showToast({ message, severity: 'warning', ...options });
     },
     [showToast]
   );
 
   const showInfo = useCallback(
-    (message: string) => {
-      showToast({ message, severity: 'info' });
+    (message: string, options?: Partial<ToastOptions>) => {
+      showToast({ message, severity: 'info', ...options });
     },
     [showToast]
   );
 
+  const contextValue = useMemo<ToastContextValue>(
+    () => ({
+      showToast,
+      showSuccess,
+      showError,
+      showWarning,
+      showInfo,
+      hideToast,
+      hideAllToasts,
+      toasts,
+    }),
+    [showToast, showSuccess, showError, showWarning, showInfo, hideToast, hideAllToasts, toasts]
+  );
+
   return (
-    <ToastContext.Provider
-      value={{ showToast, showSuccess, showError, showWarning, showInfo, hideToast }}
-    >
+    <ToastContext.Provider value={contextValue}>
       {children}
-      <Snackbar
-        open={toast.open}
-        autoHideDuration={toast.duration || 5000}
-        onClose={hideToast}
-        TransitionComponent={SlideTransition}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      >
-        <ToastAlert
-          severity={toast.severity}
-          onClose={hideToast}
-          variant="filled"
-          action={
-            <IconButton size="small" color="inherit" onClick={hideToast}>
-              <Close fontSize="small" />
-            </IconButton>
-          }
-        >
-          {toast.message}
-        </ToastAlert>
-      </Snackbar>
+      <ToastContainer>
+        {toasts.map((toast) => (
+          <Snackbar
+            key={toast.id}
+            open={toast.open}
+            autoHideDuration={toast.duration || 5000}
+            onClose={() => hideToast(toast.id)}
+            TransitionComponent={SlideTransition}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          >
+            <ToastAlert
+              severity={toast.severity}
+              onClose={() => hideToast(toast.id)}
+              variant="filled"
+              action={
+                <IconButton size="small" color="inherit" onClick={() => hideToast(toast.id)}>
+                  <Close fontSize="small" />
+                </IconButton>
+              }
+            >
+              {toast.message}
+            </ToastAlert>
+          </Snackbar>
+        ))}
+      </ToastContainer>
     </ToastContext.Provider>
   );
 }

@@ -51,3 +51,38 @@ export type { BreadcrumbProps, BreadcrumbItem } from './Breadcrumb';
 // ── Typography ────────────────────────────────────────
 export { Typography, Heading, Subheading, Paragraph, Caption, Label, default as TypographyComponent } from './Typography';
 export type { TypographyProps } from './Typography';
+
+// ── Forms ──────────────────────────────────────────────
+export {
+  FormField,
+  FormInput,
+  FormTextarea,
+  FormSelect,
+  FormCheckbox,
+  FormRadioGroup,
+  FormSwitch,
+  FormError,
+  FormHelperText,
+  FormSection,
+  FormLayout,
+  FormActions,
+  FormSubmit,
+  FormCancel,
+} from './forms';
+export type {
+  FormFieldProps,
+  FormInputProps,
+  FormTextareaProps,
+  FormSelectProps,
+  FormSelectOption,
+  FormCheckboxProps,
+  FormRadioGroupProps,
+  FormSwitchProps,
+  FormErrorProps,
+  FormHelperTextProps,
+  FormSectionProps,
+  FormLayoutProps,
+  FormActionsProps,
+  FormSubmitProps,
+  FormCancelProps,
+} from './forms';
