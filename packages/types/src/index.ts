@@ -131,6 +131,7 @@ export interface UserDTO {
   lastName: string;
   role: UserRole;
   isActive: boolean;
+  organizationId: string;
   avatarUrl?: string;
   provider?: string;
   providerId?: string;
@@ -145,6 +146,7 @@ export interface CreateUserRequestDTO {
   firstName: string;
   lastName: string;
   role: UserRole;
+  organizationId?: string;
 }
 
 export interface UpdateUserRequestDTO {
@@ -152,6 +154,7 @@ export interface UpdateUserRequestDTO {
   lastName?: string;
   role?: UserRole;
   isActive?: boolean;
+  organizationId?: string;
 }
 
 export interface ChangePasswordRequestDTO {
@@ -182,6 +185,7 @@ export interface AuditLogDTO {
   entity: EntityType;
   entityId: string;
   userId: string;
+  organizationId: string;
   userName?: string;
   metadata?: Record<string, unknown>;
   ipAddress?: string;
@@ -195,6 +199,7 @@ export interface SystemSettingDTO {
   id: string;
   key: string;
   value: Record<string, unknown>;
+  organizationId: string;
   updatedBy?: string;
   createdAt: string;
   updatedAt: string;
@@ -203,6 +208,29 @@ export interface SystemSettingDTO {
 export interface UpdateSettingRequestDTO {
   key: string;
   value: Record<string, unknown>;
+}
+
+// ── Domain: Organization (multi-tenancy) ───────
+
+export interface OrganizationDTO {
+  id: string;
+  name: string;
+  slug: string;
+  logoUrl?: string;
+  userCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateOrganizationRequestDTO {
+  name: string;
+  slug: string;
+  logoUrl?: string;
+}
+
+export interface UpdateOrganizationRequestDTO {
+  name?: string;
+  logoUrl?: string;
 }
 
 // ── Navigation ────────────────────────────────

@@ -33,6 +33,7 @@ import type { ActivityItem } from '../components/data/ActivityFeed';
 import { useUsers } from '../features/users/hooks';
 import { useSettings } from '../features/settings/hooks';
 import { useAuditLogs, useAuditLogsRange } from '../features/audit-logs/hooks';
+import { useAuth } from '../features/auth/AuthContext';
 import { AuditAction, EntityType, type AuditLogDTO } from '@vestara/types';
 
 const DashboardContainer = styled(Box)(() => ({
@@ -312,6 +313,7 @@ const RANGE_OPTIONS = [7, 14, 30] as const;
 export function DashboardPage() {
   const theme = useTheme();
   const [range, setRange] = useState<number>(14);
+  const { user } = useAuth();
 
   const usersAll = useUsers({ perPage: 1 });
   const usersActive = useUsers({ perPage: 1, isActive: true });
@@ -350,12 +352,23 @@ export function DashboardPage() {
   return (
     <DashboardContainer>
       <WelcomeSection>
-        <Typography variant="h4" fontWeight={700}>
-          Dashboard
-        </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>
-          Welcome back! Here's what's happening with your platform.
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', mb: 1 }}>
+          <Box>
+            <Typography variant="h4" fontWeight={700}>
+              Dashboard
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>
+              Welcome back! Here's what's happening with your platform.
+            </Typography>
+          </Box>
+          {user?.organizationId && (
+            <Box sx={{ ml: 'auto' }}>
+              <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                Organization: {user.organizationId}
+              </Typography>
+            </Box>
+          )}
+        </Box>
       </WelcomeSection>
 
       <StatsGrid container spacing={3}>

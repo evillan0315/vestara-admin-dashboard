@@ -1,17 +1,18 @@
 import jwt, { type SignOptions, type JwtPayload } from 'jsonwebtoken';
 import { config } from '../config/index.js';
+import { randomUUID } from 'node:crypto';
 
 export class JwtService {
   /**
    * Generate JWT access token.
    */
-  static generateAccessToken(userId: string): string {
+  static generateAccessToken(userId: string, organizationId: string): string {
     const options: SignOptions = {
       expiresIn: config.jwt.expiresIn as SignOptions['expiresIn'],
       algorithm: 'HS256',
     };
     return jwt.sign(
-      { id: userId, type: 'access' },
+      { id: userId, organizationId, type: 'access', jti: randomUUID() },
       config.jwt.secret,
       options,
     );
@@ -20,13 +21,13 @@ export class JwtService {
   /**
    * Generate JWT refresh token.
    */
-  static generateRefreshToken(userId: string): string {
+  static generateRefreshToken(userId: string, organizationId: string): string {
     const options: SignOptions = {
       expiresIn: config.jwt.refreshExpiresIn as SignOptions['expiresIn'],
       algorithm: 'HS256',
     };
     return jwt.sign(
-      { id: userId, type: 'refresh' },
+      { id: userId, organizationId, type: 'refresh', jti: randomUUID() },
       config.jwt.refreshSecret,
       options,
     );
@@ -35,10 +36,11 @@ export class JwtService {
   /**
    * Validate JWT access token.
    */
-  static validateAccessToken(token: string): { id: string } | null {
+  static validateAccessToken(token: string): { id: string; organizationId: string } | null {
     try {
       const decoded = jwt.verify(token, config.jwt.secret as string) as JwtPayload;
-      return { id: decoded.id };
+      if (typeof decoded.organizationId !== 'string') return null;
+      return { id: decoded.id, organizationId: decoded.organizationId };
     } catch {
       return null;
     }
@@ -47,10 +49,11 @@ export class JwtService {
   /**
    * Validate JWT refresh token.
    */
-  static validateRefreshToken(token: string): { id: string } | null {
+  static validateRefreshToken(token: string): { id: string; organizationId: string } | null {
     try {
       const decoded = jwt.verify(token, config.jwt.refreshSecret as string) as JwtPayload;
-      return { id: decoded.id };
+      if (typeof decoded.organizationId !== 'string') return null;
+      return { id: decoded.id, organizationId: decoded.organizationId };
     } catch {
       return null;
     }

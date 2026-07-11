@@ -5,15 +5,15 @@ export class SettingsService {
   /**
    * Get a setting by key.
    */
-  async findByKey(key: string) {
-    return settingsRepository.findByKeyOrThrow(key);
+  async findByKey(key: string, organizationId: string) {
+    return settingsRepository.findByKeyOrThrow(key, organizationId);
   }
 
   /**
    * Get all settings as key-value pairs.
    */
-  async getAllAsMap(): Promise<Record<string, unknown>> {
-    return settingsRepository.getAllAsMap();
+  async getAllAsMap(organizationId: string): Promise<Record<string, unknown>> {
+    return settingsRepository.getAllAsMap(organizationId);
   }
 
   /**
@@ -22,12 +22,13 @@ export class SettingsService {
   async upsert(
     key: string,
     value: Record<string, unknown>,
-    updatedBy?: string,
+    updatedBy: string | undefined,
+    organizationId: string,
     action: AuditAction = AuditAction.SETTINGS_UPDATE,
   ) {
-    const setting = await settingsRepository.upsert(key, value, updatedBy);
+    const setting = await settingsRepository.upsert(key, value, updatedBy, organizationId);
 
-    await this.logAudit(action, 'setting', key, {
+    await this.logAudit(action, 'setting', key, organizationId, {
       value,
       updatedBy,
     });
@@ -38,12 +39,12 @@ export class SettingsService {
   /**
    * Delete a setting.
    */
-  async delete(key: string, updatedBy?: string) {
-    const setting = await this.findByKey(key);
+  async delete(key: string, organizationId: string, updatedBy?: string) {
+    const setting = await this.findByKey(key, organizationId);
 
-    await settingsRepository.delete(key);
+    await settingsRepository.delete(key, organizationId);
 
-    await this.logAudit(AuditAction.SETTINGS_DELETE, 'setting', key, {
+    await this.logAudit(AuditAction.SETTINGS_DELETE, 'setting', key, organizationId, {
       previousValue: setting.value,
       updatedBy,
     });
@@ -54,7 +55,13 @@ export class SettingsService {
   /**
    * Log settings-related audit entries.
    */
-  private async logAudit(action: AuditAction, entity: string, entityId: string, metadata?: Record<string, unknown>) {
+  private async logAudit(
+    action: AuditAction,
+    entity: string,
+    entityId: string,
+    organizationId: string,
+    metadata?: Record<string, unknown>,
+  ) {
     const userId: string = typeof metadata?.updatedBy === 'string' ? metadata.updatedBy : 'system';
 
     await auditLogRepository.create({
@@ -62,6 +69,7 @@ export class SettingsService {
       entity,
       entityId,
       userId,
+      organizationId,
       metadata,
       ipAddress: undefined,
       userAgent: undefined,

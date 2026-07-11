@@ -20,69 +20,98 @@ enum UserRole {
   support
 }
 
+model Organization {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  logoUrl   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users          User[]
+  settings       SystemSetting[]
+  auditLogs      AuditLog[]
+  sessions       Session[]
+  refreshTokens  RefreshToken[]
+
+  @@map("organizations")
+}
+
 model User {
   id           String   @id @default(uuid())
   email        String   @unique
   passwordHash String?
   firstName    String
   lastName     String
-  role         UserRole @default(admin)
+  role         UserRole @default(support)
   isActive     Boolean  @default(true)
   avatarUrl    String?
   provider     String?  // "google" | "github" | null (email/password)
   providerId   String?  // OAuth provider's user ID
   lastLoginAt  DateTime?
+  organizationId String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  refreshTokens RefreshToken[]
-  auditLogs     AuditLog[]
-  sessions      Session[]
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  refreshTokens  RefreshToken[]
+  auditLogs      AuditLog[]
+  sessions       Session[]
 
   @@unique([provider, providerId])
+  @@index([organizationId])
   @@map("users")
 }
 
 model RefreshToken {
-  id        String   @id @default(uuid())
-  token     String   @unique
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  revokedAt DateTime?
+  id            String    @id @default(uuid())
+  token         String    @unique
+  userId        String
+  organizationId String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization  Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  expiresAt     DateTime
+  createdAt     DateTime  @default(now())
+  revokedAt     DateTime?
 
+  @@index([organizationId])
   @@map("refresh_tokens")
 }
 
 model Session {
-  id           String   @id @default(uuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  token        String   @unique
-  ipAddress    String?
-  userAgent    String?
-  lastActivity DateTime @default(now())
-  expiresAt    DateTime
-  createdAt    DateTime @default(now())
+  id            String    @id @default(uuid())
+  userId        String
+  organizationId String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization  Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  token         String    @unique
+  ipAddress     String?
+  userAgent     String?
+  lastActivity  DateTime  @default(now())
+  expiresAt     DateTime
+  createdAt     DateTime  @default(now())
 
+  @@index([organizationId])
   @@map("sessions")
 }
 
 // ── Audit & Logging ──────────────────────────
 
 model AuditLog {
-  id        String   @id @default(uuid())
-  action    String
-  entity    String
-  entityId  String
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  metadata  Json?
-  ipAddress String?
-  userAgent String?
-  createdAt DateTime @default(now())
+  id            String    @id @default(uuid())
+  action        String
+  entity        String
+  entityId      String
+  userId        String
+  organizationId String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization  Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  metadata      Json?
+  ipAddress     String?
+  userAgent     String?
+  createdAt     DateTime  @default(now())
 
+  @@index([organizationId])
   @@index([userId])
   @@index([action])
   @@index([entity])
@@ -94,12 +123,17 @@ model AuditLog {
 // ── Settings ─────────────────────────────────
 
 model SystemSetting {
-  id        String   @id @default(uuid())
-  key       String   @unique
-  value     Json
-  updatedBy String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(uuid())
+  key           String
+  value         Json
+  updatedBy     String?
+  organizationId String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+
+  @@unique([organizationId, key])
+  @@index([organizationId])
   @@map("system_settings")
 }

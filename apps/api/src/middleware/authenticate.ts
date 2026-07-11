@@ -43,6 +43,7 @@ export async function authenticate(
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role as UserRole,
+      organizationId: user.organizationId,
     };
 
     next();

@@ -43,6 +43,7 @@ async function logApiError(req: Request, err: Error, info: ApiErrorDetails): Pro
     entity: 'api',
     entityId: req.path,
     userId: user.id,
+    organizationId: user.organizationId,
     metadata,
     ipAddress: req.ip,
     userAgent: req.headers['user-agent'],

@@ -74,6 +74,19 @@ jobs:
       matrix:
         app: [api, web]
     services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: vestara
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
       redis:
         image: redis:7-alpine
         options: >-
@@ -103,10 +116,10 @@ jobs:
         env:
           DATABASE_URL: "postgresql://localhost:5432/vestara"
 
-      - name: Run tests
+- name: Run tests
         run: pnpm turbo test --filter=@vestara/${{ matrix.app }}
         env:
-          DATABASE_URL: ${{ secrets.PRISMA_POSTGRES_URL }}
+          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/vestara"
           REDIS_URL: redis://localhost:6379
 
   # ── Build ────────────────────────────────────────────

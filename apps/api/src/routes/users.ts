@@ -40,7 +40,15 @@ router.get(
         search?: string;
       };
 
-      const result = await userRepository.findAll({ page, perPage, sort, order, search });
+      const result = await userRepository.findAll({
+        page,
+        perPage,
+        sort,
+        order,
+        search,
+        // SUPER_ADMIN sees all users across all organizations; others scoped to their org
+        organizationId: req.user!.role === UserRole.SUPER_ADMIN ? undefined : req.user!.organizationId,
+      });
 
       sendPaginated(res, result.users, {
         page: Number(page),
@@ -134,7 +142,7 @@ router.post(
   validate(createUserSchema),
   async (req, res, next) => {
     try {
-      const { email, password, firstName, lastName, role } = req.body;
+      const { email, password, firstName, lastName, role, organizationId } = req.body;
 
       // Check for existing user
       const existing = await userRepository.findByEmail(email);
@@ -146,12 +154,17 @@ router.post(
       }
 
       const passwordHash = await bcrypt.hash(password, 12);
+
+      // SUPER_ADMIN can specify organizationId, otherwise use their own organization
+      const targetOrgId = organizationId ?? req.user!.organizationId;
+
       const user = await userRepository.create({
         email,
         passwordHash,
         firstName,
         lastName,
         role,
+        organizationId: targetOrgId,
       });
 
       sendCreated(res, { user });
@@ -175,7 +188,13 @@ router.put(
       // Verify user exists
       await userRepository.findByIdOrThrow(id);
 
-      const user = await userRepository.update(id, req.body);
+      // SUPER_ADMIN can change organization, ADMIN cannot
+      const updateData = { ...req.body };
+      if (req.user!.role !== UserRole.SUPER_ADMIN) {
+        delete updateData.organizationId;
+      }
+
+      const user = await userRepository.update(id, updateData);
       sendSuccess(res, { user });
     } catch (error) {
       next(error);

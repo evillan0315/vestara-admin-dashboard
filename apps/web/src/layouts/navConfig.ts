@@ -23,6 +23,7 @@ import {
   KeyRound,
   ScrollText,
   BookText,
+  Building2,
 } from "lucide-react";
 
 export interface NavItem {
@@ -86,6 +87,12 @@ export const navGroups: NavGroup[] = [
     title: "SYSTEM",
     items: [
       { label: "Settings", icon: Settings, path: "/settings" },
+      {
+        label: "Organizations",
+        icon: Building2,
+        path: "/organizations",
+        allowedRoles: [UserRole.SUPER_ADMIN],
+      },
       {
         label: "Users & Roles",
         icon: KeyRound,

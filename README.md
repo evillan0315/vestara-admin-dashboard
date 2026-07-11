@@ -678,6 +678,15 @@ Designed for administrators, compliance teams, and operations personnel, it cent
 - Suspensions
 - Identity Verification
 
+## Multi-Tenant Organizations
+
+- Organization Directory
+- Organization Creation (Super Admin)
+- Organization Settings
+- Organization Members Management
+- Cross-Organization User Management (Super Admin)
+- Organization-Scoped Resources & Settings
+
 ## Marketplace Administration
 
 - Product Moderation
@@ -860,6 +869,24 @@ vestara/
 | Nginx | Reverse Proxy |
 | S3 Compatible Storage | Object Storage |
 | Cloudflare | CDN & Security |
+
+---
+
+## Database
+
+| Technology | Purpose |
+|------------|---------|
+| PostgreSQL 17 | Primary Database (via Prisma Postgres) |
+| Prisma 7 | Type-safe Database ORM with Multi-Tenant Support |
+
+### Schema Highlights
+
+- **Multi-Tenant Organizations**: Organization model with slug-based identification
+- **Organization-Scoped Resources**: Users, Settings, Audit Logs, Sessions, Refresh Tokens all scoped by `organizationId`
+- **Compound Unique Constraints**: Settings keyed by `[organizationId, key]` for per-org configuration
+- **Row-Level Security Pattern**: Application-level org scoping via middleware
+- **Audit Trail**: Full audit logging with organization scoping for compliance
+- **Compound Indexes**: Optimized queries for org-scoped queries
 
 ---
 
@@ -1725,6 +1752,7 @@ flowchart TB
 ### Database (Current)
 
 - **Prisma Postgres** — hosted PostgreSQL with `PrismaPg` adapter
+- **Multi-Tenant Schema** — Organization model with org-scoped resources (Users, SystemSettings, AuditLogs, Sessions, RefreshTokens)
 
 ---
 

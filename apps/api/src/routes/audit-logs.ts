@@ -43,6 +43,7 @@ router.get(
         action,
         entity,
         userId,
+        organizationId: req.user!.organizationId,
         startDate,
         endDate,
         sort,

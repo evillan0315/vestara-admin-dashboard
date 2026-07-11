@@ -5,9 +5,9 @@
   "type": "module",
   "description": "Vestara Admin Dashboard — Enterprise administration platform for the Vestara ecosystem",
   "scripts": {
-    "dev": "turbo dev",
-    "dev:web": "turbo dev --filter=@vestara/web",
-    "dev:api": "turbo dev --filter=@vestara/api",
+    "dev": "NODE_ENV=development turbo dev",
+    "dev:web": "NODE_ENV=development turbo dev --filter=@vestara/web",
+    "dev:api": "NODE_ENV=development turbo dev --filter=@vestara/api",
     "build": "turbo build",
     "build:web": "turbo build --filter=@vestara/web",
     "build:api": "turbo build --filter=@vestara/api",

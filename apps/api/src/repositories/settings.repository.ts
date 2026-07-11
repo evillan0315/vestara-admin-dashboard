@@ -3,26 +3,26 @@ import { BaseRepository } from './base.repository.js';
 
 export class SettingsRepository extends BaseRepository {
   /**
-   * Find a setting by key.
+   * Find a setting by key within an organization.
    */
-  async findByKey(key: string) {
-    return this.prisma.systemSetting.findUnique({ where: { key } });
+  async findByKey(key: string, organizationId: string) {
+    return this.prisma.systemSetting.findUnique({ where: { organizationId_key: { organizationId, key } } });
   }
 
   /**
    * Find a setting by key or throw.
    */
-  async findByKeyOrThrow(key: string) {
-    const setting = await this.findByKey(key);
+  async findByKeyOrThrow(key: string, organizationId: string) {
+    const setting = await this.findByKey(key, organizationId);
     this.assertFound(setting, 'System setting', key);
     return setting;
   }
 
   /**
-   * Get all settings as a key-value map.
+   * Get all settings as a key-value map within an organization.
    */
-  async getAllAsMap(): Promise<Record<string, unknown>> {
-    const settings = await this.prisma.systemSetting.findMany();
+  async getAllAsMap(organizationId: string): Promise<Record<string, unknown>> {
+    const settings = await this.prisma.systemSetting.findMany({ where: { organizationId } });
     return settings.reduce<Record<string, unknown>>(
       (acc: Record<string, unknown>, s: { key: string; value: unknown }) => {
         acc[s.key] = s.value as Record<string, unknown>;
@@ -33,20 +33,20 @@ export class SettingsRepository extends BaseRepository {
   }
 
   /**
-   * Upsert a setting (create or update).
+   * Upsert a setting (create or update) within an organization.
    */
-  async upsert(key: string, value: Record<string, unknown>, updatedBy?: string) {
+  async upsert(key: string, value: Record<string, unknown>, updatedBy: string | undefined, organizationId: string) {
     return this.prisma.systemSetting.upsert({
-      where: { key },
-      create: { key, value: value as Prisma.InputJsonValue, updatedBy },
+      where: { organizationId_key: { organizationId, key } },
+      create: { key, value: value as Prisma.InputJsonValue, updatedBy, organizationId },
       update: { value: value as Prisma.InputJsonValue, updatedBy },
     });
   }
 
   /**
-   * Delete a setting by key.
+   * Delete a setting by key within an organization.
    */
-  async delete(key: string) {
-    await this.prisma.systemSetting.delete({ where: { key } });
+  async delete(key: string, organizationId: string) {
+    await this.prisma.systemSetting.delete({ where: { organizationId_key: { organizationId, key } } });
   }
 }

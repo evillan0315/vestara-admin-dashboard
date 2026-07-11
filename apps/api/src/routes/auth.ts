@@ -23,6 +23,7 @@ router.post('/register', validate(createUserSchema), async (req, res, next) => {
         lastName: authResult.user.lastName,
         role: authResult.user.role as unknown as UserRole,
         isActive: authResult.user.isActive,
+        organizationId: authResult.user.organizationId,
         avatarUrl: authResult.user.avatarUrl ?? undefined,
         createdAt: authResult.user.createdAt.toISOString(),
         updatedAt: authResult.user.updatedAt.toISOString(),
@@ -63,6 +64,7 @@ router.post('/login', validate(loginSchema), async (req, res, next) => {
         lastName: authResult.user.lastName,
         role: authResult.user.role as unknown as UserRole,
         isActive: authResult.user.isActive,
+        organizationId: authResult.user.organizationId,
         avatarUrl: authResult.user.avatarUrl ?? undefined,
         lastLoginAt: authResult.user.lastLoginAt?.toISOString(),
         createdAt: authResult.user.createdAt.toISOString(),
@@ -120,7 +122,7 @@ router.post('/refresh', async (req, res, next) => {
  */
 router.post('/logout', async (req, res, next) => {
   try {
-    const { userId, refreshToken } = req.body;
+    const { userId, refreshToken, organizationId } = req.body;
     if (!userId) {
       return res.status(400).json({
         success: false,
@@ -131,7 +133,7 @@ router.post('/logout', async (req, res, next) => {
       });
     }
 
-    await authService.logout({ userId, refreshToken });
+    await authService.logout({ userId, refreshToken, organizationId });
     res.json({ success: true });
   } catch (error) {
     next(error);

@@ -12,6 +12,7 @@ export class UserRepository extends BaseRepository {
     search?: string;
     role?: UserRole;
     isActive?: boolean;
+    organizationId?: string;
     sort?: string;
     order?: 'asc' | 'desc';
   }) {
@@ -20,6 +21,10 @@ export class UserRepository extends BaseRepository {
     const skip = (page - 1) * perPage;
 
     const where: Prisma.UserWhereInput = {};
+
+    if (params?.organizationId) {
+      where.organizationId = params.organizationId;
+    }
 
     if (params?.search) {
       where.OR = [
@@ -57,6 +62,7 @@ export class UserRepository extends BaseRepository {
           lastName: true,
           role: true,
           isActive: true,
+          organizationId: true,
           avatarUrl: true,
           provider: true,
           lastLoginAt: true,
@@ -97,6 +103,7 @@ export class UserRepository extends BaseRepository {
         lastName: true,
         role: true,
         isActive: true,
+        organizationId: true,
         avatarUrl: true,
         provider: true,
         providerId: true,
@@ -135,6 +142,7 @@ export class UserRepository extends BaseRepository {
     firstName: string;
     lastName: string;
     role: UserRole;
+    organizationId: string;
     provider?: string;
     providerId?: string;
     avatarUrl?: string;
@@ -146,6 +154,7 @@ export class UserRepository extends BaseRepository {
         firstName: data.firstName,
         lastName: data.lastName,
         role: data.role,
+        organization: { connect: { id: data.organizationId } },
         ...(data.provider && { provider: data.provider }),
         ...(data.providerId && { providerId: data.providerId }),
         ...(data.avatarUrl && { avatarUrl: data.avatarUrl }),
@@ -157,6 +166,7 @@ export class UserRepository extends BaseRepository {
         lastName: true,
         role: true,
         isActive: true,
+        organizationId: true,
         avatarUrl: true,
         provider: true,
         providerId: true,
@@ -261,14 +271,14 @@ export class UserRepository extends BaseRepository {
   /**
    * Count total users.
    */
-  async count(where?: { isActive?: boolean; role?: UserRole }) {
+  async count(where?: { isActive?: boolean; role?: UserRole; organizationId?: string }) {
     return this.prisma.user.count({ where: where as Prisma.UserCountArgs['where'] });
   }
 
   /**
    * Create a test user for development.
    */
-  async createTestUser() {
+  async createTestUser(organizationId: string) {
     const email = `test-${Date.now()}@example.com`;
     const passwordHash = await bcrypt.hash('Password123', 12);
 
@@ -277,7 +287,8 @@ export class UserRepository extends BaseRepository {
       passwordHash,
       firstName: 'Test',
       lastName: 'User',
-      role: 'admin' as UserRole,
+      role: 'support' as UserRole,
+      organizationId,
     });
   }
 }
