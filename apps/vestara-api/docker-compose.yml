@@ -1,0 +1,81 @@
+version: "3.9"
+
+services:
+  # =========================
+  # ⚡ Redis (Queue + Cache)
+  # =========================
+  redis:
+    image: redis:7-alpine
+    container_name: vestara_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =========================
+  # 🚀 API (Fastify Server)
+  # =========================
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vestara_api
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+
+      # External PostgreSQL (Neon / Supabase / RDS / etc.)
+      DATABASE_URL: ${DATABASE_URL}
+
+      REDIS_URL: redis://redis:6379
+
+      JWT_SECRET: super_secret_jwt
+      BULLMQ_PREFIX: vestara
+
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev
+
+  # =========================
+  # ⚙️ Worker Service (BullMQ)
+  # =========================
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vestara_worker
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+
+      # External PostgreSQL only
+      DATABASE_URL: ${DATABASE_URL}
+
+      REDIS_URL: redis://redis:6379
+
+      BULLMQ_PREFIX: vestara
+      WORKER_CONCURRENCY: 5
+
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run worker
+
+volumes:
+  redis_data:

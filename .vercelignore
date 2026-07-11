@@ -31,6 +31,15 @@ logs/
 # Testing
 coverage/
 
+# Build outputs
+dist/
+apps/api/dist/
+apps/web/dist/
+packages/*/dist/
+
+# Separate Vestara API (Fastify-based, not part of workspace)
+apps/vestara-api/
+
 # Prisma migrations (not needed at runtime)
 prisma/migrations/
 

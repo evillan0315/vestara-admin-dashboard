@@ -3,11 +3,13 @@
   "compilerOptions": {
     "lib": ["ES2022"],
     "types": ["node"],
+    "moduleResolution": "nodenext",
+    "module": "nodenext",
     "declaration": false,
     "declarationMap": false,
     "composite": false,
     "noEmit": true
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "api/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

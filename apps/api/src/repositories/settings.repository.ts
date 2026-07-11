@@ -1,4 +1,4 @@
-import { Prisma } from '../../generated/prisma/client';
+import { Prisma } from '../../generated/prisma/client.js';
 import { BaseRepository } from './base.repository.js';
 
 export class SettingsRepository extends BaseRepository {
@@ -24,7 +24,7 @@ export class SettingsRepository extends BaseRepository {
   async getAllAsMap(): Promise<Record<string, unknown>> {
     const settings = await this.prisma.systemSetting.findMany();
     return settings.reduce<Record<string, unknown>>(
-      (acc, s) => {
+      (acc: Record<string, unknown>, s: { key: string; value: unknown }) => {
         acc[s.key] = s.value as Record<string, unknown>;
         return acc;
       },
