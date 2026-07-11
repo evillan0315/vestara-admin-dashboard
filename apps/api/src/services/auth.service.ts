@@ -54,6 +54,87 @@ export class AuthService {
   }
 
   /**
+   * Complete onboarding: create organization + user + generate tokens
+   * Used for first-time setup where a new organization is created.
+   */
+  async onboard(data: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    organizationName: string;
+    organizationSlug: string;
+    organizationLogoUrl?: string;
+  }) {
+    const { email, password, firstName, lastName, organizationName, organizationSlug, organizationLogoUrl } = data;
+
+    const existingUser = await userRepository.findByEmail(email);
+    if (existingUser) {
+      throw new ConflictError('Email already registered', ERROR_CODES.USER_ALREADY_EXISTS);
+    }
+
+    // Check if organization slug exists
+    const existingOrg = await organizationRepository.findBySlug(organizationSlug);
+    if (existingOrg) {
+      throw new ConflictError('Organization slug already taken', ERROR_CODES.ORGANIZATION_SLUG_EXISTS);
+    }
+
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    // Create organization
+    const organization = await organizationRepository.create({
+      name: organizationName,
+      slug: organizationSlug,
+      ...(organizationLogoUrl ? { logoUrl: organizationLogoUrl } : {}),
+    });
+
+    // Create user with super_admin role in the new organization
+    const user = await userRepository.create({
+      email,
+      passwordHash,
+      firstName,
+      lastName,
+      role: 'super_admin' as UserRole,
+      organizationId: organization.id,
+    });
+
+    const tokens = await this.generateTokens(user.id, organization.id);
+
+    await this.logAudit('REGISTER', 'user', user.id, organization.id, {
+      email: user.email,
+      role: user.role,
+      organizationName: organization.name,
+      organizationSlug: organization.slug,
+    });
+
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        isActive: user.isActive,
+        organizationId: user.organizationId,
+        avatarUrl: user.avatarUrl ?? undefined,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
+      organization: {
+        id: organization.id,
+        name: organization.name,
+        slug: organization.slug,
+        logoUrl: organization.logoUrl,
+      },
+      tokens: {
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+        expiresIn: 3600,
+      },
+    };
+  }
+
+  /**
    * Authenticate user and generate tokens.
    */
   async login(data: { email: string; password: string; ipAddress?: string; userAgent?: string }) {

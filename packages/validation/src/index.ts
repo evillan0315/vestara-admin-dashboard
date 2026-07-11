@@ -107,6 +107,18 @@ export const organizationIdParamSchema = z.object({
   id: uuidField,
 });
 
+// ── Onboarding (first-time setup) ──────────────────
+
+export const onboardSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(8, 'Password must be at least 8 characters').regex(/[A-Z]/, 'Password must contain at least one uppercase letter').regex(/[a-z]/, 'Password must contain at least one lowercase letter').regex(/[0-9]/, 'Password must contain at least one number'),
+  firstName: nameField('First name'),
+  lastName: nameField('Last name'),
+  organizationName: z.string().min(2, 'Organization name must be at least 2 characters').max(100, 'Organization name must be at most 100 characters'),
+  organizationSlug: z.string().min(2, 'Slug must be at least 2 characters').max(60, 'Slug must be at most 60 characters').regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase alphanumeric with optional hyphens'),
+  organizationLogoUrl: z.string().url('Invalid logo URL').optional().or(z.literal('')),
+});
+
 // ── Audit ─────────────────────────────────────
 
 export const auditLogQuerySchema = z.object({
@@ -194,3 +206,4 @@ export type BulkActionInput = z.infer<typeof bulkActionSchema>;
 export type CreateOrganizationInput = z.infer<typeof createOrganizationSchema>;
 export type UpdateOrganizationInput = z.infer<typeof updateOrganizationSchema>;
 export type OrganizationIdParamInput = z.infer<typeof organizationIdParamSchema>;
+export type OnboardInput = z.infer<typeof onboardSchema>;
