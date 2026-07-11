@@ -1,3 +1,4 @@
+import { UserRole } from "@vestara/types";
 import {
   LayoutDashboard,
   CalendarClock,
@@ -28,7 +29,7 @@ export interface NavItem {
   icon: React.ComponentType<{ size?: number; strokeWidth?: number }>;
   path: string;
   badge?: number;
-  allowedRoles?: string[];
+  allowedRoles?: UserRole[];
 }
 
 export interface NavGroup {
@@ -88,13 +89,13 @@ export const navGroups: NavGroup[] = [
         label: "Users & Roles",
         icon: KeyRound,
         path: "/users",
-        allowedRoles: ["Super Admin", "Admin"],
+        allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
       },
       {
         label: "System Logs",
         icon: ScrollText,
         path: "/logs",
-        allowedRoles: ["Super Admin", "Admin"],
+        allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
       },
     ],
   },

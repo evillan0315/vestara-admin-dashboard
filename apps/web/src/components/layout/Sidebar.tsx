@@ -1,6 +1,15 @@
 import { type JSX } from "react";
-import { Box, Typography, Button } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Avatar,
+  ListItemIcon,
+  ListItemText,
+  MenuItem,
+} from "@mui/material";
+import { LogOut } from "lucide-react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../features/auth/AuthContext";
 import { colors } from "../../theme/tokens";
 import Logo from "../common/Logo";
 import { navGroups } from "../../layouts/navConfig";
@@ -14,10 +23,28 @@ export interface SidebarProps {
 export default function Sidebar({ onClose }: SidebarProps): JSX.Element {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  /** Filter nav items based on the current user's role */
+  const visibleGroups = navGroups
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) => {
+        if (!item.allowedRoles) return true;
+        if (!user?.role) return false;
+        return item.allowedRoles.includes(user.role);
+      }),
+    }))
+    .filter((group) => group.items.length > 0);
 
   const handleNavClick = (path: string) => {
     navigate(path);
     onClose?.();
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
   };
 
   return (
@@ -63,7 +90,7 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element {
         className="scrollbar-none"
         sx={{ flex: 1, overflowY: "auto", px: 1.75, pb: 2 }}
       >
-        {navGroups.map((group) => (
+        {visibleGroups.map((group) => (
           <Box key={group.title} sx={{ mb: 1.5 }}>
             <Typography
               sx={{
@@ -138,71 +165,87 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element {
         ))}
       </Box>
 
-      {/* Footer — System Status & Copyright */}
-      <Box sx={{ p: 2, borderTop: `1px solid ${colors.border}` }}>
-        <Box
-          sx={{
-            bgcolor: colors.cardAlt,
-            borderRadius: "12px",
-            p: 1.5,
-            mb: 1.5,
-          }}
-        >
-          <Typography
+      {/* Footer — User Info & Logout */}
+      {user && (
+        <Box sx={{ borderTop: `1px solid ${colors.border}`, px: 2, py: 1.5 }}>
+          {/* User Avatar & Info */}
+          <Box
             sx={{
-              fontSize: 11.5,
-              fontWeight: 600,
-              color: colors.secondary,
+              display: "flex",
+              alignItems: "center",
+              gap: 1.5,
               mb: 1,
             }}
           >
-            System Status
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1 }}>
-            <Box
+            <Avatar
+              src={user.avatarUrl || undefined}
+              alt={`${user.firstName} ${user.lastName}`}
               sx={{
-                width: 6,
-                height: 6,
-                borderRadius: "50%",
-                bgcolor: colors.success,
+                width: 36,
+                height: 36,
+                bgcolor: colors.gold,
+                color: "#0A0F18",
+                fontWeight: 700,
+                fontSize: 14,
+              }}
+            >
+              {user.firstName?.[0]?.toUpperCase() || "U"}
+              {user.lastName?.[0]?.toUpperCase() || ""}
+            </Avatar>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Typography
+                sx={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: colors.text,
+                  lineHeight: 1.2,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {user.firstName} {user.lastName}
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: 11,
+                  color: colors.muted,
+                  textTransform: "capitalize",
+                  lineHeight: 1.3,
+                }}
+              >
+                {user.role.replace("_", " ")}
+              </Typography>
+            </Box>
+          </Box>
+
+          {/* Logout */}
+          <MenuItem
+            onClick={handleLogout}
+            disableRipple
+            sx={{
+              borderRadius: "10px",
+              px: 1.25,
+              py: 0.75,
+              color: colors.error,
+              "&:hover": {
+                bgcolor: colors.errorSoft,
+              },
+            }}
+          >
+            <ListItemIcon sx={{ minWidth: 30, color: "inherit" }}>
+              <LogOut size={16} strokeWidth={2} />
+            </ListItemIcon>
+            <ListItemText
+              primary="Logout"
+              primaryTypographyProps={{
+                fontSize: 13,
+                fontWeight: 600,
               }}
             />
-            <Typography
-              sx={{ fontSize: 12, fontWeight: 600, color: colors.text }}
-            >
-              All Systems Operational
-            </Typography>
-          </Box>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Box
-                key={i}
-                sx={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: "50%",
-                  bgcolor: colors.success,
-                }}
-              />
-            ))}
-          </Box>
+          </MenuItem>
         </Box>
-
-        <Typography
-          sx={{
-            fontSize: 10.5,
-            color: colors.muted,
-            px: 0.5,
-            lineHeight: 1.5,
-          }}
-        >
-          © 2026 Vestara Elite Companions
-          <br />
-          All rights reserved.
-        </Typography>
-      </Box>
+      )}
     </Box>
   );
 }
-
-
