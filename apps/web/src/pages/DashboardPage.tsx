@@ -1,4 +1,17 @@
-import { Box, Typography, Grid, Paper, styled } from '@mui/material';
+import { useMemo, useState } from 'react';
+import {
+  Box,
+  Typography,
+  Grid,
+  Paper,
+  styled,
+  ToggleButton,
+  ToggleButtonGroup,
+  Skeleton,
+  useTheme,
+  type ToggleButtonGroupProps,
+} from '@mui/material';
+import { LineChart, PieChart, BarChart } from '@mui/x-charts';
 import {
   People as PeopleIcon,
   CheckCircle as CheckCircleIcon,
@@ -19,7 +32,7 @@ import { ActivityFeed } from '../components/data/ActivityFeed';
 import type { ActivityItem } from '../components/data/ActivityFeed';
 import { useUsers } from '../features/users/hooks';
 import { useSettings } from '../features/settings/hooks';
-import { useAuditLogs } from '../features/audit-logs/hooks';
+import { useAuditLogs, useAuditLogsRange } from '../features/audit-logs/hooks';
 import { AuditAction, EntityType, type AuditLogDTO } from '@vestara/types';
 
 const DashboardContainer = styled(Box)(() => ({
@@ -48,6 +61,14 @@ const ChartCard = styled(Paper)(({ theme }) => ({
   },
   height: '100%',
 }));
+
+const ChartTitleRow = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 12,
+  marginBottom: 8,
+});
 
 // ── Audit log → Activity feed mapping ─────────────────
 
@@ -194,20 +215,136 @@ function toActivityItem(log: AuditLogDTO): ActivityItem {
   };
 }
 
+// ── Chart aggregation helpers ────────────────────────
+
+const ACTION_LABELS: Record<AuditAction, string> = {
+  [AuditAction.LOGIN]: 'Login',
+  [AuditAction.LOGOUT]: 'Logout',
+  [AuditAction.CREATE]: 'Create',
+  [AuditAction.UPDATE]: 'Update',
+  [AuditAction.DELETE]: 'Delete',
+  [AuditAction.APPROVE]: 'Approve',
+  [AuditAction.REJECT]: 'Reject',
+  [AuditAction.SUSPEND]: 'Suspend',
+  [AuditAction.ACTIVATE]: 'Activate',
+  [AuditAction.PASSWORD_CHANGE]: 'Password',
+  [AuditAction.SETTINGS_UPDATE]: 'Setting Update',
+  [AuditAction.SETTINGS_DELETE]: 'Setting Delete',
+};
+
+const ENTITY_LABELS: Record<EntityType, string> = {
+  [EntityType.USER]: 'User',
+  [EntityType.ROLE]: 'Role',
+  [EntityType.SETTING]: 'Setting',
+  [EntityType.AUDIT_LOG]: 'Audit Log',
+};
+
+function dayKey(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function useDailySeries(logs: AuditLogDTO[], rangeDays: number, endDate: string) {
+  return useMemo(() => {
+    const labels: string[] = [];
+    const buckets: number[] = [];
+    const indexByDay = new Map<string, number>();
+
+    for (let i = rangeDays - 1; i >= 0; i -= 1) {
+      const d = new Date(endDate);
+      d.setDate(d.getDate() - i);
+      d.setHours(0, 0, 0, 0);
+      indexByDay.set(dayKey(d), buckets.length);
+      labels.push(`${d.getMonth() + 1}/${d.getDate()}`);
+      buckets.push(0);
+    }
+
+    for (const log of logs) {
+      const idx = indexByDay.get(dayKey(new Date(log.createdAt)));
+      if (idx !== undefined) buckets[idx] += 1;
+    }
+
+    return { labels, values: buckets };
+  }, [logs, rangeDays, endDate]);
+}
+
+function useDistribution(logs: AuditLogDTO[], pick: (log: AuditLogDTO) => AuditAction | EntityType, label: (key: string) => string, limit?: number) {
+  return useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const log of logs) {
+      const key = pick(log);
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+    const entries = [...counts.entries()]
+      .map(([key, value]) => ({ label: label(key), value }))
+      .sort((a, b) => b.value - a.value);
+    return limit ? entries.slice(0, limit) : entries;
+  }, [logs, pick, label, limit]);
+}
+
+function ChartSkeleton({ height = 280 }: { height?: number }) {
+  return <Skeleton variant="rectangular" height={height} sx={{ borderRadius: 2 }} />;
+}
+
+function EmptyChart({ height = 280 }: { height?: number }) {
+  return (
+    <Box
+      sx={{
+        height,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'text.secondary',
+      }}
+    >
+      <Typography variant="body2">No activity in this period</Typography>
+    </Box>
+  );
+}
+
 // ── Page ──────────────────────────────────────────────
 
+const RANGE_OPTIONS = [7, 14, 30] as const;
+
 export function DashboardPage() {
+  const theme = useTheme();
+  const [range, setRange] = useState<number>(14);
+
   const usersAll = useUsers({ perPage: 1 });
   const usersActive = useUsers({ perPage: 1, isActive: true });
   const settingsQuery = useSettings();
   const auditQuery = useAuditLogs({ perPage: 6, sort: 'createdAt', order: 'desc' });
 
+  const { startDate, endDate } = useMemo(() => {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(start.getDate() - (range - 1));
+    start.setHours(0, 0, 0, 0);
+    return { startDate: start.toISOString(), endDate: end.toISOString() };
+  }, [range]);
+
+  const analyticsQuery = useAuditLogsRange(startDate, endDate);
+  const logs = analyticsQuery.data ?? [];
+
   const totalUsers = usersAll.data?.meta?.total ?? 0;
   const activeUsers = usersActive.data?.meta?.total ?? 0;
+  const inactiveUsers = Math.max(0, totalUsers - activeUsers);
   const settingsCount = Object.keys(settingsQuery.data?.data?.settings ?? {}).length;
   const totalEvents = auditQuery.data?.meta?.total ?? 0;
 
   const activityItems = (auditQuery.data?.data ?? []).map(toActivityItem);
+
+  const daily = useDailySeries(logs, range, endDate);
+  const byAction = useDistribution(logs, (l) => l.action, (k) => ACTION_LABELS[k as AuditAction] ?? k, 6);
+  const byEntity = useDistribution(logs, (l) => l.entity, (k) => ENTITY_LABELS[k as EntityType] ?? k);
+
+  const chartsLoading = analyticsQuery.isLoading;
+
+  const handleRangeChange: ToggleButtonGroupProps['onChange'] = (_event, newRange) => {
+    if (newRange !== null) setRange(newRange);
+  };
 
   return (
     <DashboardContainer>
@@ -260,28 +397,142 @@ export function DashboardPage() {
       </StatsGrid>
 
       <Grid container spacing={3}>
+        {/* Analytics time-series */}
         <Grid size={{ xs: 12, lg: 8 }}>
           <ChartCard>
-            <Typography variant="h6" fontWeight={600} gutterBottom>
-              Analytics
-            </Typography>
-            <Box
-              sx={{
-                height: { xs: 200, sm: 300 },
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Typography variant="body2" color="text.secondary">
-                Charts and reports will be integrated here
-              </Typography>
-            </Box>
+            <ChartTitleRow>
+              <Box>
+                <Typography variant="h6" fontWeight={600}>
+                  Audit Activity
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Events per day across the selected period
+                </Typography>
+              </Box>
+              <ToggleButtonGroup
+                size="small"
+                value={range}
+                exclusive
+                onChange={handleRangeChange}
+                aria-label="date range"
+              >
+                {RANGE_OPTIONS.map((option) => (
+                  <ToggleButton key={option} value={option}>
+                    {option}d
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
+            </ChartTitleRow>
+            {chartsLoading ? (
+              <ChartSkeleton height={300} />
+            ) : (
+              <LineChart
+                height={300}
+                series={[{ data: daily.values, area: true, color: theme.palette.primary.main }]}
+                xAxis={[{ scaleType: 'band', data: daily.labels }]}
+                yAxis={[{ min: 0 }]}
+                margin={{ top: 16, right: 16, bottom: 28, left: 36 }}
+              />
+            )}
           </ChartCard>
         </Grid>
+
+        {/* Recent activity feed */}
         <Grid size={{ xs: 12, lg: 4 }}>
           <ChartCard sx={{ p: 0, overflow: 'hidden' }}>
             <ActivityFeed items={activityItems} title="Recent Activity" maxItems={6} />
+          </ChartCard>
+        </Grid>
+      </Grid>
+
+      <Grid container spacing={3}>
+        {/* User status distribution */}
+        <Grid size={{ xs: 12, md: 4 }}>
+          <ChartCard>
+            <Typography variant="h6" fontWeight={600} gutterBottom>
+              User Status
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Active vs. inactive accounts
+            </Typography>
+            {usersAll.isLoading || usersActive.isLoading ? (
+              <ChartSkeleton height={240} />
+            ) : (
+              <PieChart
+                height={260}
+                series={[
+                  {
+                    data: [
+                      { id: 'active', value: activeUsers, label: 'Active', color: theme.palette.success.main },
+                      {
+                        id: 'inactive',
+                        value: inactiveUsers,
+                        label: 'Inactive',
+                        color: theme.palette.grey[400],
+                      },
+                    ],
+                    innerRadius: 50,
+                    paddingAngle: 3,
+                    cornerRadius: 4,
+                  },
+                ]}
+                slotProps={{
+                  legend: { direction: 'horizontal', position: { vertical: 'bottom', horizontal: 'center' } },
+                }}
+              />
+            )}
+          </ChartCard>
+        </Grid>
+
+        {/* Activity by action type */}
+        <Grid size={{ xs: 12, md: 4 }}>
+          <ChartCard>
+            <Typography variant="h6" fontWeight={600} gutterBottom>
+              Activity by Action
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Most frequent audit actions
+            </Typography>
+            {chartsLoading ? (
+              <ChartSkeleton height={240} />
+            ) : byAction.length === 0 ? (
+              <EmptyChart height={260} />
+            ) : (
+              <BarChart
+                layout="horizontal"
+                height={260}
+                series={[{ data: byAction.map((entry) => entry.value), color: theme.palette.primary.main }]}
+                yAxis={[{ scaleType: 'band', data: byAction.map((entry) => entry.label) }]}
+                xAxis={[{ min: 0 }]}
+                margin={{ top: 8, right: 24, bottom: 24, left: 100 }}
+              />
+            )}
+          </ChartCard>
+        </Grid>
+
+        {/* Activity by entity */}
+        <Grid size={{ xs: 12, md: 4 }}>
+          <ChartCard>
+            <Typography variant="h6" fontWeight={600} gutterBottom>
+              Activity by Entity
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Events grouped by affected entity
+            </Typography>
+            {chartsLoading ? (
+              <ChartSkeleton height={240} />
+            ) : byEntity.length === 0 ? (
+              <EmptyChart height={260} />
+            ) : (
+              <BarChart
+                layout="horizontal"
+                height={260}
+                series={[{ data: byEntity.map((entry) => entry.value), color: theme.palette.secondary.main }]}
+                yAxis={[{ scaleType: 'band', data: byEntity.map((entry) => entry.label) }]}
+                xAxis={[{ min: 0 }]}
+                margin={{ top: 8, right: 24, bottom: 24, left: 100 }}
+              />
+            )}
           </ChartCard>
         </Grid>
       </Grid>
