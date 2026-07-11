@@ -2,7 +2,7 @@ import type { JSX } from "react";
 import { Avatar, Box, Divider, Typography } from "@mui/material";
 import { Mail } from "lucide-react";
 import { colors } from "../../theme/tokens";
-import type { Message } from "../../types";
+import type { Message } from "./types";
 
 interface MessageListProps {
   messages: Message[];

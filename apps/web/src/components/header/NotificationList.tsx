@@ -7,7 +7,7 @@ import { Bell } from "lucide-react";
 import NotificationItem from "./NotificationItem";
 
 import { colors } from "../../theme/tokens";
-import type { Notification } from "../../types";
+import type { Notification } from "./types";
 
 export interface NotificationListProps {
   notifications: Notification[];

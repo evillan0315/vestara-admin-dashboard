@@ -2,15 +2,12 @@ import { type JSX, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, InputBase, Button, IconButton } from "@mui/material";
 import { Search, Menu } from "lucide-react";
-import { useAuth } from "../../auth/useAuth";
-import { usePWAInstall } from "../../auth/usePWAInstall";
-import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline";
+import { useAuth } from "../../features/auth/AuthContext";
 import { colors } from "../../theme/tokens";
 import HeaderActions from "./HeaderActions";
 import NotificationPopover from "./NotificationPopover";
 import MessagePopover from "./MessagePopover";
-import type { Message } from "../../types";
-import * as notificationsApi from "../../api/services/notifications";
+import type { Message, Notification } from "./types";
 
 interface HeaderProps {
   title: string;
@@ -24,23 +21,19 @@ export default function Header({
   onMenuToggle,
 }: HeaderProps): JSX.Element {
   const { isAuthenticated, logout } = useAuth();
-  const { isInstallable, isStandalone, handleInstallClick } = usePWAInstall();
   const navigate = useNavigate();
 
   const [notifAnchor, setNotifAnchor] = useState<HTMLElement | null>(null);
   const [msgAnchor, setMsgAnchor] = useState<HTMLElement | null>(null);
-  const [notifications, setNotifications] = useState<
-    notificationsApi.Notification[]
-  >([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [dateRange, setDateRange] = useState("May 18 – Jun 18, 2026");
 
   useEffect(() => {
-    notificationsApi
-      .list({ limit: 10 })
-      .then((res) => setNotifications(res.data))
-      .catch(() => {});
+    // Notifications will be wired to the API in a future phase.
+    // For now, start with an empty list.
+    setNotifications([]);
   }, []);
 
   const handleLogout = async () => {
@@ -82,11 +75,6 @@ export default function Header({
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, unread: false } : n)),
     );
-    try {
-      await notificationsApi.markRead(id);
-    } catch {
-      /* ignore */
-    }
   }
 
   const handleMessageClick = (message: Message) => {
@@ -197,27 +185,6 @@ export default function Header({
       <Box sx={{ flexShrink: 0 }}>
         {isAuthenticated ? (
           <>
-            {!isStandalone && isInstallable && (
-              <IconButton
-                onClick={() => handleInstallClick()}
-                size="small"
-                title="Install App"
-                sx={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: "12px",
-                  color: colors.gold,
-                  transition: "all .2s ease",
-                  "&:hover": {
-                    bgcolor: "rgba(255,255,255,.05)",
-                    color: colors.goldHover,
-                  },
-                }}
-              >
-                <DownloadForOfflineIcon sx={{ fontSize: 20 }} />
-              </IconButton>
-            )}
-
             <HeaderActions
               dateRange={dateRange}
               notificationCount={notifications.filter((n) => n.unread).length}
@@ -233,9 +200,7 @@ export default function Header({
             <NotificationPopover
               anchorEl={notifAnchor}
               open={Boolean(notifAnchor)}
-              notifications={
-                notifications as import("../../types").Notification[]
-              }
+              notifications={notifications}
               onClose={handleNotifClose}
               onMarkAllRead={handleMarkAllRead}
               onNotificationClick={(notification) =>

@@ -2,7 +2,7 @@ import type { JSX } from "react";
 import { Box, Divider, Popover, Typography } from "@mui/material";
 import MessageList from "./MessageList";
 import { colors } from "../../theme/tokens";
-import type { Message } from "../../types";
+import type { Message } from "./types";
 
 interface MessagePopoverProps {
   anchorEl: HTMLElement | null;

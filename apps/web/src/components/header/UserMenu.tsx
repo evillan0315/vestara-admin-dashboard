@@ -21,7 +21,7 @@ import {
 
 import { useNavigate } from "react-router-dom";
 
-import { useAuth } from "../../auth/useAuth";
+import { useAuth } from "../../features/auth/AuthContext";
 import { colors } from "../../theme/tokens";
 
 export interface UserMenuProps {
@@ -38,13 +38,17 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
   const open = Boolean(anchorEl);
 
   const initials = useMemo(() => {
-    if (!user?.name) {
+    const name = user
+      ? `${user.firstName} ${user.lastName}`.trim()
+      : "";
+
+    if (!name) {
       return "U";
     }
 
-    return user.name
+    return name
       .split(" ")
-      .map((part) => part[0])
+      .map((part: string) => part[0])
       .join("")
       .slice(0, 2)
       .toUpperCase();
@@ -89,7 +93,7 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
         }}
       >
         <Avatar
-          src={user?.avatar}
+          src={user?.avatarUrl}
           sx={{
             width: 42,
             height: 42,
@@ -118,7 +122,7 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
               lineHeight: 1.2,
             }}
           >
-            {user?.name}
+            {user ? `${user.firstName} ${user.lastName}` : ""}
           </Typography>
 
           <Typography
@@ -172,7 +176,7 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
           }}
         >
           <Avatar
-            src={user?.avatar}
+            src={user?.avatarUrl}
             sx={{
               width: 50,
               height: 50,
@@ -190,7 +194,7 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
                 fontSize: 14,
               }}
             >
-              {user?.name}
+              {user ? `${user.firstName} ${user.lastName}` : ""}
             </Typography>
 
             <Typography

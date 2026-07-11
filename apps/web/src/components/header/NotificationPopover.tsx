@@ -7,7 +7,7 @@ import { CheckCheck } from "lucide-react";
 import NotificationList from "./NotificationList";
 
 import { colors } from "../../theme/tokens";
-import type { Notification } from "../../types";
+import type { Notification } from "./types";
 
 export interface NotificationPopoverProps {
   anchorEl: HTMLElement | null;

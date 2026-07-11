@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 import { colors } from "../../theme/tokens";
-import type { Notification, NotificationType } from "../../types";
+import type { Notification, NotificationType } from "./types";
 
 export interface NotificationItemProps {
   notification: Notification;
