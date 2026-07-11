@@ -94,7 +94,7 @@ export const navGroups: NavGroup[] = [
       {
         label: "System Logs",
         icon: ScrollText,
-        path: "/logs",
+        path: "/system-logs",
         allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
       },
     ],

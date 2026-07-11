@@ -3,6 +3,12 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
 interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
+  meta?: {
+    page: number;
+    perPage: number;
+    total: number;
+    totalPages: number;
+  };
   error?: {
     code: string;
     message: string;
