@@ -2,6 +2,17 @@ import { Router } from 'express';
 import { config } from '../config/index.js';
 import { authService } from '../services/index.js';
 
+/**
+ * Minimal contract for the Fetch API `Response` objects consumed by the OAuth
+ * flows. Declared locally (instead of relying on the ambient global `Response`)
+ * so the handlers compile consistently across TypeScript environments where the
+ * global `Response` type resolution from `@types/node` web globals can vary.
+ */
+interface OAuthHttpResponse {
+  ok: boolean;
+  json(): Promise<unknown>;
+}
+
 const router = Router();
 
 // ── Helpers ────────────────────────────────────────
@@ -63,7 +74,7 @@ router.get('/oauth/google/callback', async (req, res, next) => {
     }
 
     // Exchange authorization code for tokens
-    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+    const tokenRes = (await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
@@ -73,7 +84,7 @@ router.get('/oauth/google/callback', async (req, res, next) => {
         redirect_uri: config.oauth.google.callbackUrl,
         grant_type: 'authorization_code',
       }),
-    });
+    })) as OAuthHttpResponse;
 
     if (!tokenRes.ok) {
       return res.redirect(frontendErrorUrl('Failed to exchange Google authorization code'));
@@ -82,9 +93,9 @@ router.get('/oauth/google/callback', async (req, res, next) => {
     const tokenData = (await tokenRes.json()) as { access_token: string };
 
     // Fetch user info from Google
-    const userRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+    const userRes = (await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
       headers: { Authorization: `Bearer ${tokenData.access_token}` },
-    });
+    })) as OAuthHttpResponse;
 
     if (!userRes.ok) {
       return res.redirect(frontendErrorUrl('Failed to fetch Google user info'));
@@ -156,7 +167,7 @@ router.get('/oauth/github/callback', async (req, res, next) => {
     }
 
     // Exchange authorization code for access token
-    const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
+    const tokenRes = (await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -167,7 +178,7 @@ router.get('/oauth/github/callback', async (req, res, next) => {
         client_secret: config.oauth.github.clientSecret,
         code,
       }),
-    });
+    })) as OAuthHttpResponse;
 
     if (!tokenRes.ok) {
       return res.redirect(frontendErrorUrl('Failed to exchange GitHub authorization code'));
@@ -183,7 +194,7 @@ router.get('/oauth/github/callback', async (req, res, next) => {
     }
 
     // Fetch user info from GitHub
-    const [userRes, emailRes] = await Promise.all([
+    const [userRes, emailRes] = (await Promise.all([
       fetch('https://api.github.com/user', {
         headers: {
           Authorization: `Bearer ${tokenData.access_token}`,
@@ -196,7 +207,7 @@ router.get('/oauth/github/callback', async (req, res, next) => {
           Accept: 'application/vnd.github.v3+json',
         },
       }),
-    ]);
+    ])) as [OAuthHttpResponse, OAuthHttpResponse];
 
     if (!userRes.ok) {
       return res.redirect(frontendErrorUrl('Failed to fetch GitHub user info'));
