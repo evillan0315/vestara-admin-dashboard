@@ -11,6 +11,9 @@
     "pretypecheck": "prisma generate --schema=prisma/schema.prisma",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prisma:generate": "prisma generate --schema=prisma/schema.prisma",
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {

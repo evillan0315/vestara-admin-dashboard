@@ -98,14 +98,11 @@ export class AuthService {
       throw new UnauthorizedError('User account is inactive', ERROR_CODES.ACCOUNT_DISABLED);
     }
 
+    // generateTokens already persists a new refresh token record for the rotated token.
     const tokens = await this.generateTokens(user.id);
 
+    // Revoke the previously-used refresh token to complete the rotation.
     await refreshTokenRepository.revoke(refreshTokenRecord.id);
-    await refreshTokenRepository.create({
-      token: tokens.refreshToken,
-      userId: user.id,
-      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-    });
 
     await this.logAudit('REFRESH_TOKEN', 'user', user.id);
 

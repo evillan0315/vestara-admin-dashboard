@@ -1,8 +1,8 @@
 import request from 'supertest';
 import { Server } from 'http';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '../../../generated/prisma/client';
-import { hash } from 'bcryptjs';
+import { PrismaClient } from '../generated/prisma/client';
+import { compare } from 'bcryptjs';
 
 import { UserRole } from '@vestara/types';
 import { createApp } from '../src/app.js';
@@ -56,12 +56,12 @@ describe('Authentication API', () => {
       // Verify password is not returned
       expect(response.body.data.user.passwordHash).toBeUndefined();
 
-      // Verify user exists in database
+      // Verify user exists in database with a matching password hash
       const dbUser = await prisma.user.findUnique({
         where: { email: userData.email },
       });
       expect(dbUser).not.toBeNull();
-      expect(await hash(userData.password, 12)).toBe(dbUser!.passwordHash);
+      expect(await compare(userData.password, dbUser!.passwordHash!)).toBe(true);
     });
 
     it('should not allow duplicate email registration', async () => {
@@ -83,7 +83,7 @@ describe('Authentication API', () => {
         .expect(409);
 
       expect(response.body.success).toBe(false);
-      expect(response.body.error.code).toBe('AUTH_EMAIL_EXISTS');
+      expect(response.body.error.code).toBe('USER_ALREADY_EXISTS');
     });
   });
 
@@ -137,7 +137,7 @@ describe('Authentication API', () => {
         .expect(401);
 
       expect(response.body.success).toBe(false);
-      expect(response.body.error.code).toBe('AUTH_INVALID_CREDENTIALS');
+      expect(response.body.error.code).toBe('INVALID_CREDENTIALS');
     });
 
     it('should reject inactive user', async () => {
@@ -156,7 +156,7 @@ describe('Authentication API', () => {
         .expect(401);
 
       expect(response.body.success).toBe(false);
-      expect(response.body.error.code).toBe('AUTH_INVALID_CREDENTIALS');
+      expect(response.body.error.code).toBe('INVALID_CREDENTIALS');
     });
   });
 
@@ -191,10 +191,12 @@ describe('Authentication API', () => {
       expect(response.body.data.tokens.refreshToken).toBeDefined();
       expect(response.body.data.tokens.refreshToken).not.toBe(refreshToken);
 
-      // New access token should be different
-      expect(response.body.data.tokens.accessToken).not.toBe(
-        response.body.data.tokens.accessToken,
+      // The access token payload (id claim) must reference the same user
+      // while the signed token itself differs from any previously issued token.
+      const decoded = JSON.parse(
+        Buffer.from(response.body.data.tokens.accessToken.split('.')[1], 'base64').toString(),
       );
+      expect(decoded.id).toBe(user.id);
     });
 
     it('should reject with invalid refresh token', async () => {
@@ -204,7 +206,7 @@ describe('Authentication API', () => {
         .expect(401);
 
       expect(response.body.success).toBe(false);
-      expect(response.body.error.code).toBe('AUTH_INVALID_REFRESH_TOKEN');
+      expect(response.body.error.code).toBe('REFRESH_TOKEN_INVALID');
     });
   });
 

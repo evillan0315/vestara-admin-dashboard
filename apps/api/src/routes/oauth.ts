@@ -63,7 +63,7 @@ router.get('/oauth/google/callback', async (req, res, next) => {
     }
 
     // Exchange authorization code for tokens
-    const tokenRes: any = await fetch('https://oauth2.googleapis.com/token', {
+    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
@@ -82,7 +82,7 @@ router.get('/oauth/google/callback', async (req, res, next) => {
     const tokenData = (await tokenRes.json()) as { access_token: string };
 
     // Fetch user info from Google
-    const userRes: any = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+    const userRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
       headers: { Authorization: `Bearer ${tokenData.access_token}` },
     });
 
@@ -156,7 +156,7 @@ router.get('/oauth/github/callback', async (req, res, next) => {
     }
 
     // Exchange authorization code for access token
-    const tokenRes: any = await fetch('https://github.com/login/oauth/access_token', {
+    const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -183,7 +183,7 @@ router.get('/oauth/github/callback', async (req, res, next) => {
     }
 
     // Fetch user info from GitHub
-    const [userRes, emailRes]: [any, any] = await Promise.all([
+    const [userRes, emailRes] = await Promise.all([
       fetch('https://api.github.com/user', {
         headers: {
           Authorization: `Bearer ${tokenData.access_token}`,
