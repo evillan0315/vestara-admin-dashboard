@@ -36,7 +36,12 @@
         "GOOGLE_CLIENT_ID",
         "GOOGLE_CLIENT_SECRET",
         "GOOGLE_CALLBACK_URL",
-        "CLIENT_URL"
+        "GITHUB_CLIENT_ID",
+        "GITHUB_CLIENT_SECRET",
+        "GITHUB_CALLBACK_URL",
+        "CLIENT_URL",
+        "CORS_ORIGIN",
+        "VERCEL_AI_GATEWAY_API_KEY"
       ]
     },
     "typecheck": {

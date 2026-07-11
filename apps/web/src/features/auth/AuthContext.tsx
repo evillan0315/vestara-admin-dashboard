@@ -107,7 +107,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    * The backend will redirect to the provider's consent screen.
    */
   const oauthRedirect = useCallback((provider: 'google' | 'github') => {
-    const baseUrl = API_BASE_URL.replace(/\/$/, '');
+    // Strip trailing /api/v1 if VITE_API_URL already includes it,
+    // then re-add /api/v1 so both localhost and production work.
+    const baseUrl = API_BASE_URL.replace(/\/api\/v1\/?$/, '').replace(/\/+$/, '');
     window.location.href = `${baseUrl}/api/v1/auth/oauth/${provider}`;
   }, []);
 

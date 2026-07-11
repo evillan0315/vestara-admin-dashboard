@@ -17,10 +17,28 @@ export function createApp(): express.Application {
     next();
   });
 
-  // CORS
+  // CORS — allow known origins + any Vercel deployment
+  const allowedOrigins = [
+    process.env.CORS_ORIGIN,
+    process.env.CLIENT_URL,
+    'http://localhost:5173',
+    'http://localhost:5000',
+  ].filter(Boolean) as string[];
+
   app.use(
     cors({
-      origin: process.env.CORS_ORIGIN || process.env.CLIENT_URL || 'http://localhost:5173',
+      origin: (origin, callback) => {
+        // Allow requests with no origin (server-to-server, curl, etc.)
+        if (!origin) return callback(null, true);
+
+        // Allow any Vercel deployment
+        if (origin.endsWith('.vercel.app')) return callback(null, true);
+
+        // Allow configured origins
+        if (allowedOrigins.some((o) => origin === o)) return callback(null, true);
+
+        callback(null, false);
+      },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
