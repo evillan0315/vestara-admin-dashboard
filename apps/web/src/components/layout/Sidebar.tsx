@@ -376,6 +376,42 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element {
               {apiStatus.url || "vestara-admin-api.vercel.app"}
             </Typography>
           </Box>
+
+          {/* Maintenance Mode Status */}
+          {apiStatus.status === 'healthy' && apiStatus.url && (
+            <Box
+              sx={{
+                mt: 1,
+                p: 1,
+                borderRadius: "6px",
+                bgcolor: colors.background,
+                border: `1px solid ${apiStatus.error ? colors.errorSoft : colors.successSoft}`,
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <Box
+                  sx={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: "50%",
+                    bgcolor: apiStatus.error ? colors.error : colors.success,
+                    boxShadow: apiStatus.error
+                      ? `0 0 4px ${colors.error}80`
+                      : `0 0 4px ${colors.success}80`,
+                  }}
+                />
+                <Typography
+                  sx={{
+                    fontSize: '0.625rem',
+                    color: apiStatus.error ? colors.error : colors.success,
+                    fontWeight: 600,
+                  }}
+                >
+                  {apiStatus.error ? 'Maintenance Mode Active' : 'Operational'}
+                </Typography>
+              </Box>
+            </Box>
+          )}
         </Box>
 
         {/* Logout Button */}

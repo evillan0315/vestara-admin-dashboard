@@ -54,6 +54,8 @@ export interface ThemeConfig {
   borderRadiusScale: number;
   /** Contrast level */
   contrastLevel: 'normal' | 'high';
+  /** Maintenance mode enabled */
+  maintenanceMode: boolean;
 }
 
 // ── Context value (extends config with actions) ──

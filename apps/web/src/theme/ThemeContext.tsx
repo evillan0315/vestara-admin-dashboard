@@ -38,6 +38,7 @@ const DEFAULT_CONFIG: ThemeConfig = {
   fontSizeScale: 1,
   borderRadiusScale: 1,
   contrastLevel: 'normal',
+  maintenanceMode: false,
 };
 
 // ── Load persisted config ──
@@ -160,6 +161,10 @@ export function ThemeContextProvider({ children }: ThemeContextProviderProps) {
     setConfig((prev) => ({ ...prev, contrastLevel }));
   }, []);
 
+  const setMaintenanceMode = useCallback((enabled: boolean) => {
+    setConfig((prev) => ({ ...prev, maintenanceMode: enabled }));
+  }, []);
+
   const resetTheme = useCallback(() => {
     setConfig({ ...DEFAULT_CONFIG, resolvedMode: resolveMode(DEFAULT_CONFIG.mode) });
     localStorage.removeItem(THEME_STORAGE_KEY);
@@ -183,6 +188,7 @@ export function ThemeContextProvider({ children }: ThemeContextProviderProps) {
       setFontSizeScale,
       setBorderRadiusScale,
       setContrastLevel,
+      setMaintenanceMode,
       resetTheme,
       settingsOpen,
       setSettingsOpen,
@@ -190,8 +196,8 @@ export function ThemeContextProvider({ children }: ThemeContextProviderProps) {
     }),
     [config, settingsOpen, toggleTheme, setMode, setPrimaryColor, setDensity,
      setFontFamily, setSidebarCollapsed, toggleSidebar, setSidebarVariant,
-     setFontSizeScale, setBorderRadiusScale, setContrastLevel, resetTheme,
-     toggleSettings],
+     setFontSizeScale, setBorderRadiusScale, setContrastLevel, setMaintenanceMode,
+     resetTheme, toggleSettings],
   );
 
   return (

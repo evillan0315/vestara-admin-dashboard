@@ -55,8 +55,34 @@ export function createAppTheme(config: ThemeConfig): Theme {
   const fontFamily = fontFamilyValues[config.fontFamily];
   const scale = config.fontSizeScale;
 
-  // Base typography font sizes adjusted by scale
-  const fontSize = (px: number) => `${Math.round(px * scale)}px`;
+  // Maintenance mode styles
+  const maintenanceStyles = config.maintenanceMode
+    ? {
+        '&::before': {
+          content: '"MAINTENANCE"',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          color: '#FFFFFF',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '48px',
+          fontWeight: '700',
+          letterSpacing: '4px',
+          textTransform: 'uppercase',
+          animation: 'fadeIn 0.5s ease-in-out',
+        },
+        '@keyframes fadeIn': {
+          from: { opacity: 0 },
+          to: { opacity: 1 },
+        },
+      }
+    : {};
 
   const options: ThemeOptions = {
     palette: {
@@ -105,6 +131,130 @@ export function createAppTheme(config: ThemeConfig): Theme {
             contrastThreshold: 7,
           }
         : {}),
+    },
+
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: density.borderRadius,
+            padding: density.padding === 1.5 ? '6px 16px' : density.padding === 2 ? '8px 20px' : '10px 24px',
+            fontWeight: 600,
+          },
+          containedPrimary: {
+            '&:hover': {
+              boxShadow: `0 4px 14px 0 ${primary.main}40`,
+            },
+          },
+        },
+        defaultProps: {
+          disableElevation: true,
+        },
+      },
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            borderRadius: density.borderRadius + 4,
+            border: `1px solid ${divider}`,
+            boxShadow: 'none',
+            backgroundImage: 'none',
+            ...(config.maintenanceMode && {
+              opacity: 0.5,
+              pointerEvents: 'none',
+              '&::after': {
+                content: '"MAINTENANCE MODE"',
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                backgroundColor: 'rgba(239, 68, 68, 0.9)',
+                color: '#FFFFFF',
+                padding: '8px 16px',
+                borderRadius: '4px',
+                fontSize: '12px',
+                fontWeight: '600',
+                zIndex: 10,
+              },
+            }),
+          },
+        },
+      },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            backgroundImage: 'none',
+            ...(config.maintenanceMode && {
+              position: 'relative',
+              overflow: 'hidden',
+            }),
+          },
+        },
+      },
+      MuiDialog: {
+        styleOverrides: {
+          paper: {
+            borderRadius: density.borderRadius + 4,
+            ...(config.maintenanceMode && {
+              '&::before': {
+                content: '"MAINTENANCE"',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#EF4444',
+                zIndex: 1,
+              },
+            }),
+          },
+        },
+      },
+      MuiChip: {
+        styleOverrides: {
+          root: {
+            borderRadius: density.borderRadius,
+            ...(config.maintenanceMode && {
+              backgroundColor: config.maintenanceMode
+                ? '#EF4444' + '20'
+                : undefined,
+              color: config.maintenanceMode ? '#EF4444' : undefined,
+            }),
+          },
+        },
+      },
+      MuiTableCell: {
+        styleOverrides: {
+          root: {
+            padding: density.padding === 1.5 ? '8px 12px' : density.padding === 2 ? '12px 16px' : '16px 20px',
+            ...(config.maintenanceMode && {
+              color: config.maintenanceMode ? '#94A3B8' + '80' : undefined,
+            }),
+          },
+        },
+      },
+      MuiTooltip: {
+        styleOverrides: {
+          tooltip: {
+            borderRadius: density.borderRadius - 2,
+          },
+        },
+      },
+      MuiCssBaseline: {
+        styleOverrides: {
+          body: {
+            scrollbarColor: isDark ? '#334155 #0B111B' : '#CBD5E1 #F8FAFC',
+            ...(config.maintenanceMode && {
+              overflow: 'hidden',
+            }),
+          },
+        },
+      },
     },
 
     typography: {
