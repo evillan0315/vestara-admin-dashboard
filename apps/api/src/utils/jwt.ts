@@ -1,5 +1,6 @@
 import jwt, { type SignOptions, type JwtPayload } from 'jsonwebtoken';
 import { config } from '../config/index.js';
+import { randomUUID } from 'node:crypto';
 
 export class JwtService {
   /**
@@ -11,7 +12,7 @@ export class JwtService {
       algorithm: 'HS256',
     };
     return jwt.sign(
-      { id: userId, organizationId, type: 'access' },
+      { id: userId, organizationId, type: 'access', jti: randomUUID() },
       config.jwt.secret,
       options,
     );
@@ -26,7 +27,7 @@ export class JwtService {
       algorithm: 'HS256',
     };
     return jwt.sign(
-      { id: userId, organizationId, type: 'refresh' },
+      { id: userId, organizationId, type: 'refresh', jti: randomUUID() },
       config.jwt.refreshSecret,
       options,
     );
