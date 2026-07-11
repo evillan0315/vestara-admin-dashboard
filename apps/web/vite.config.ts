@@ -17,6 +17,11 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    // Allow the dev server to read the repo-root `docs/` folder that the
+    // documentation page imports at build time via `?raw` imports.
+    fs: {
+      allow: [resolve(__dirname, '../../..')],
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:5000',

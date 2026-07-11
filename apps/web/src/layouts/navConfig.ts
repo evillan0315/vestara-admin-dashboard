@@ -22,6 +22,7 @@ import {
   Settings,
   KeyRound,
   ScrollText,
+  BookText,
 } from "lucide-react";
 
 export interface NavItem {
@@ -96,6 +97,11 @@ export const navGroups: NavGroup[] = [
         icon: ScrollText,
         path: "/system-logs",
         allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
+      },
+      {
+        label: "Documentation",
+        icon: BookText,
+        path: "/docs",
       },
     ],
   },

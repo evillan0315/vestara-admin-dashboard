@@ -8,6 +8,7 @@ import { AnalyticsPage } from '../pages/AnalyticsPage';
 import { UsersPage } from '../pages/UsersPage';
 import { SettingsPage } from '../pages/SettingsPage';
 import { SystemLogsPage } from '../pages/SystemLogsPage';
+import DocsPage from '../pages/DocsPage';
 import ProfilePage from '../pages/ProfilePage';
 import { AdminPage } from '../pages/AdminPage';
 import { LoginPage } from '../pages/LoginPage';
@@ -69,6 +70,7 @@ export function AppRoutes() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/security" element={<ProfilePage />} />
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/docs" element={<DocsPage />} />
         </Route>
       </Route>
 
