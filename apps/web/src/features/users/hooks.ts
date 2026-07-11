@@ -63,3 +63,24 @@ export function useToggleUserStatus() {
     },
   });
 }
+
+export function useBulkDeleteUsers() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (ids: string[]) => usersApi.bulkDelete(ids),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userKeys.all });
+    },
+  });
+}
+
+export function useBulkUpdateUserStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ ids, status }: { ids: string[]; status: 'active' | 'inactive' }) =>
+      usersApi.bulkStatus(ids, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userKeys.all });
+    },
+  });
+}

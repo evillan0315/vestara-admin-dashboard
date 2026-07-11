@@ -50,4 +50,12 @@ export const usersApi = {
   toggleStatus(id: string) {
     return apiClient.patch<{ user: UserDTO }>(`/users/${id}/status`);
   },
+
+  bulkDelete(ids: string[]) {
+    return apiClient.post<{ deleted: number }>('/users/bulk-delete', { ids });
+  },
+
+  bulkStatus(ids: string[], status: 'active' | 'inactive') {
+    return apiClient.post<{ updated: number }>('/users/bulk-status', { ids, status });
+  },
 };

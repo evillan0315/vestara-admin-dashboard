@@ -234,6 +234,31 @@ export class UserRepository extends BaseRepository {
   }
 
   /**
+   * Delete multiple users by ID (used for bulk operations).
+   * Returns the number of deleted records.
+   */
+  async deleteMany(ids: string[]) {
+    if (ids.length === 0) return 0;
+    const result = await this.prisma.user.deleteMany({
+      where: { id: { in: ids } },
+    });
+    return result.count;
+  }
+
+  /**
+   * Update the `isActive` flag for multiple users (used for bulk operations).
+   * Returns the number of updated records.
+   */
+  async updateManyStatus(ids: string[], isActive: boolean) {
+    if (ids.length === 0) return 0;
+    const result = await this.prisma.user.updateMany({
+      where: { id: { in: ids } },
+      data: { isActive },
+    });
+    return result.count;
+  }
+
+  /**
    * Count total users.
    */
   async count(where?: { isActive?: boolean; role?: UserRole }) {

@@ -1,4 +1,4 @@
-import { Box, Typography, Button, Chip, IconButton, styled, Avatar, Tooltip } from '@mui/material';
+import { Box, Typography, Button, Chip, IconButton, styled, Avatar, Tooltip, Paper } from '@mui/material';
 import {
   People as PeopleIcon,
   Add as AddIcon,
@@ -6,10 +6,20 @@ import {
   Delete as DeleteIcon,
   Block as BlockIcon,
   CheckCircle as CheckCircleIcon,
+  Download as DownloadIcon,
 } from '@mui/icons-material';
 import { useState, useCallback, type ReactElement } from 'react';
 import { DataTable, type Column, type SortState, type PaginationState } from '../components/data/DataTable';
-import { useUsers, useCreateUser, useUpdateUser, useDeleteUser, useToggleUserStatus } from '../features/users/hooks';
+import {
+  useUsers,
+  useCreateUser,
+  useUpdateUser,
+  useDeleteUser,
+  useToggleUserStatus,
+  useBulkDeleteUsers,
+  useBulkUpdateUserStatus,
+} from '../features/users/hooks';
+import { exportUsersCsv } from '../features/users/exportUsers';
 import { UserFormDialog } from '../features/users/UserFormDialog';
 import { useToast } from '../components/feedback/Toast';
 import { ConfirmDialog } from '../components/ui/Modal';
@@ -76,6 +86,11 @@ export function UsersPage(): ReactElement {
   // Delete confirmation
   const [deleteTarget, setDeleteTarget] = useState<UserDTO | null>(null);
 
+  // Bulk action state
+  const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false);
+  const [bulkAction, setBulkAction] = useState<'delete' | 'activate' | 'deactivate' | null>(null);
+  const [exporting, setExporting] = useState(false);
+
   // Queries & mutations
   const { data, isLoading, isError, error, refetch } = useUsers({
     page,
@@ -89,6 +104,8 @@ export function UsersPage(): ReactElement {
   const updateMutation = useUpdateUser();
   const deleteMutation = useDeleteUser();
   const toggleStatusMutation = useToggleUserStatus();
+  const bulkDeleteMutation = useBulkDeleteUsers();
+  const bulkStatusMutation = useBulkUpdateUserStatus();
 
   const users = data?.data ?? [];
   const paginationMeta = data?.meta;
@@ -104,11 +121,18 @@ export function UsersPage(): ReactElement {
   const handleSortChange = useCallback((newSort: SortState) => {
     setSort(newSort);
     setPage(1);
+    setSelectedIds([]);
   }, []);
 
   const handleSearchChange = useCallback((value: string) => {
     setSearch(value);
     setPage(1);
+    setSelectedIds([]);
+  }, []);
+
+  const handlePageChange = useCallback((newPage: number) => {
+    setPage(newPage);
+    setSelectedIds([]);
   }, []);
 
   const handleCreate = useCallback(() => {
@@ -173,6 +197,51 @@ export function UsersPage(): ReactElement {
     },
     [toggleStatusMutation, showSuccess, showError],
   );
+
+  // Bulk actions
+  const openBulkConfirm = useCallback((action: 'delete' | 'activate' | 'deactivate') => {
+    setBulkAction(action);
+    setBulkConfirmOpen(true);
+  }, []);
+
+  const handleBulkConfirm = useCallback(async () => {
+    if (!bulkAction || selectedIds.length === 0) return;
+    try {
+      if (bulkAction === 'delete') {
+        await bulkDeleteMutation.mutateAsync(selectedIds);
+        showSuccess(`Deleted ${selectedIds.length} user${selectedIds.length === 1 ? '' : 's'}`);
+      } else {
+        await bulkStatusMutation.mutateAsync({
+          ids: selectedIds,
+          status: bulkAction === 'activate' ? 'active' : 'inactive',
+        });
+        showSuccess(
+          `${bulkAction === 'activate' ? 'Activated' : 'Deactivated'} ${
+            selectedIds.length
+          } user${selectedIds.length === 1 ? '' : 's'}`,
+        );
+      }
+      setSelectedIds([]);
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Bulk action failed');
+    } finally {
+      setBulkConfirmOpen(false);
+      setBulkAction(null);
+    }
+  }, [bulkAction, selectedIds, bulkDeleteMutation, bulkStatusMutation, showSuccess, showError]);
+
+  // CSV export
+  const handleExport = useCallback(async () => {
+    try {
+      setExporting(true);
+      await exportUsersCsv({ search: search || undefined, sort: sort.field, order: sort.direction });
+      showSuccess('User export downloaded');
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Export failed');
+    } finally {
+      setExporting(false);
+    }
+  }, [search, sort, showSuccess, showError]);
 
   // Columns
   const columns: Column<UserDTO>[] = [
@@ -282,6 +351,45 @@ export function UsersPage(): ReactElement {
         </Typography>
       </Box>
 
+      {selectedIds.length > 0 && (
+        <Paper
+          variant="outlined"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 2,
+            p: 1.5,
+            px: 2,
+            flexWrap: 'wrap',
+            borderColor: 'primary.main',
+          }}
+        >
+          <Typography variant="body2" fontWeight={600}>
+            {selectedIds.length} selected
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            <Button size="small" startIcon={<CheckCircleIcon />} onClick={() => openBulkConfirm('activate')}>
+              Activate
+            </Button>
+            <Button size="small" startIcon={<BlockIcon />} onClick={() => openBulkConfirm('deactivate')}>
+              Deactivate
+            </Button>
+            <Button
+              size="small"
+              color="error"
+              startIcon={<DeleteIcon />}
+              onClick={() => openBulkConfirm('delete')}
+            >
+              Delete
+            </Button>
+            <Button size="small" onClick={() => setSelectedIds([])}>
+              Clear
+            </Button>
+          </Box>
+        </Paper>
+      )}
+
       <DataTable<UserDTO>
         columns={columns}
         rows={users}
@@ -295,7 +403,7 @@ export function UsersPage(): ReactElement {
         selectedIds={selectedIds}
         onSelectionChange={setSelectedIds}
         pagination={paginationState}
-        onPageChange={setPage}
+        onPageChange={handlePageChange}
         onPerPageChange={setPerPage}
         searchable
         searchValue={search}
@@ -306,13 +414,23 @@ export function UsersPage(): ReactElement {
         emptyTitle="No users found"
         emptyDescription="No users match your search criteria."
         actions={
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleCreate}
-          >
-            Add User
-          </Button>
+          <>
+            <Button
+              variant="outlined"
+              startIcon={<DownloadIcon />}
+              onClick={handleExport}
+              disabled={exporting || isLoading}
+            >
+              Export
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleCreate}
+            >
+              Add User
+            </Button>
+          </>
         }
       />
 
@@ -339,6 +457,35 @@ export function UsersPage(): ReactElement {
         onConfirm={handleDelete}
         onClose={() => setDeleteTarget(null)}
         loading={deleteMutation.isPending}
+      />
+
+      {/* Bulk action confirmation */}
+      <ConfirmDialog
+        open={bulkConfirmOpen}
+        title={
+          bulkAction === 'delete'
+            ? 'Delete Users'
+            : bulkAction === 'activate'
+              ? 'Activate Users'
+              : 'Deactivate Users'
+        }
+        message={
+          bulkAction === 'delete'
+            ? `Are you sure you want to delete ${selectedIds.length} selected user${
+                selectedIds.length === 1 ? '' : 's'
+              }? This action cannot be undone.`
+            : `Are you sure you want to ${
+                bulkAction === 'activate' ? 'activate' : 'deactivate'
+              } ${selectedIds.length} selected user${selectedIds.length === 1 ? '' : 's'}?`
+        }
+        confirmText={bulkAction === 'delete' ? 'Delete' : 'Confirm'}
+        variant={bulkAction === 'delete' ? 'danger' : 'primary'}
+        onConfirm={handleBulkConfirm}
+        onClose={() => {
+          setBulkConfirmOpen(false);
+          setBulkAction(null);
+        }}
+        loading={bulkDeleteMutation.isPending || bulkStatusMutation.isPending}
       />
     </PageContainer>
   );

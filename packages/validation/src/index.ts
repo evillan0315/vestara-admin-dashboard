@@ -116,6 +116,11 @@ export const idsBodySchema = z.object({
   ids: z.array(uuidField).min(1, 'At least one ID is required'),
 });
 
+export const bulkStatusSchema = z.object({
+  ids: z.array(uuidField).min(1, 'At least one ID is required'),
+  status: z.enum(['active', 'inactive']),
+});
+
 export const bulkActionSchema = z.object({
   ids: z.array(uuidField).min(1),
   action: z.string().min(1),
@@ -158,4 +163,6 @@ export type PaginationInput = z.infer<typeof paginationSchema>;
 export type AuditLogQueryInput = z.infer<typeof auditLogQuerySchema>;
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type UpdateSettingInput = z.infer<typeof updateSettingSchema>;
+export type IdsBodyInput = z.infer<typeof idsBodySchema>;
+export type BulkStatusInput = z.infer<typeof bulkStatusSchema>;
 export type BulkActionInput = z.infer<typeof bulkActionSchema>;

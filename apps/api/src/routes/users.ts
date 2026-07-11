@@ -1,6 +1,13 @@
 import { Router } from 'express';
 import { UserRole } from '@vestara/types';
-import { createUserSchema, updateUserSchema, paginationSchema, userIdParamSchema } from '@vestara/validation';
+import {
+  createUserSchema,
+  updateUserSchema,
+  paginationSchema,
+  userIdParamSchema,
+  idsBodySchema,
+  bulkStatusSchema,
+} from '@vestara/validation';
 import { validate } from '../middleware/validate.js';
 import { authenticate, requireRole } from '../middleware/authenticate.js';
 import { userRepository } from '../repositories/index.js';
@@ -41,6 +48,57 @@ router.get(
         total: result.total,
         totalPages: Math.ceil(result.total / Number(perPage)),
       });
+    } catch (error) {
+      next(error);
+    }
+  },
+);
+
+/**
+ * POST /users/bulk-delete — Delete multiple users
+ * Access: SUPER_ADMIN
+ * The requesting user's own ID is always excluded to prevent self-lockout.
+ */
+router.post(
+  '/bulk-delete',
+  requireRole(UserRole.SUPER_ADMIN),
+  validate(idsBodySchema),
+  async (req, res, next) => {
+    try {
+      const currentUserId = req.user!.id;
+      const ids = (req.body.ids as string[]).filter((id) => id !== currentUserId);
+
+      if (ids.length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'CANNOT_DELETE_SELF',
+            message: 'You cannot delete your own account',
+          },
+        });
+      }
+
+      const deleted = await userRepository.deleteMany(ids);
+      res.status(200).json({ success: true, data: { deleted }, meta: { total: deleted } });
+    } catch (error) {
+      next(error);
+    }
+  },
+);
+
+/**
+ * POST /users/bulk-status — Activate or deactivate multiple users
+ * Access: SUPER_ADMIN, ADMIN
+ */
+router.post(
+  '/bulk-status',
+  requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  validate(bulkStatusSchema),
+  async (req, res, next) => {
+    try {
+      const { ids, status } = req.body as { ids: string[]; status: 'active' | 'inactive' };
+      const updated = await userRepository.updateManyStatus(ids, status === 'active');
+      res.status(200).json({ success: true, data: { updated }, meta: { total: updated } });
     } catch (error) {
       next(error);
     }
@@ -135,6 +193,17 @@ router.delete(
   async (req, res, next) => {
     try {
       const id = param(req.params.id);
+
+      if (id === req.user!.id) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'CANNOT_DELETE_SELF',
+            message: 'You cannot delete your own account',
+          },
+        });
+      }
+
       await userRepository.findByIdOrThrow(id);
       await userRepository.delete(id);
       sendNoContent(res);
