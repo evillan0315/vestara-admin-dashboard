@@ -17,12 +17,14 @@ import {
   Settings,
   Shield,
   User as UserIcon,
+  SlidersHorizontal,
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../features/auth/AuthContext";
 import { colors } from "../../theme/tokens";
+import UserPreferencesDialog from "../layout/UserPreferencesDialog";
 
 export interface UserMenuProps {
   onLogout?: () => Promise<void> | void;
@@ -34,6 +36,7 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
   const { user } = useAuth();
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [preferencesOpen, setPreferencesOpen] = useState(false);
 
   const open = Boolean(anchorEl);
 
@@ -70,6 +73,11 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
   const logout = async () => {
     closeMenu();
     await onLogout?.();
+  };
+
+  const openPreferences = () => {
+    closeMenu();
+    setPreferencesOpen(true);
   };
 
   return (
@@ -234,6 +242,14 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
           <ListItemText>Security</ListItemText>
         </MenuItem>
 
+        <MenuItem onClick={openPreferences}>
+          <ListItemIcon>
+            <SlidersHorizontal size={18} color={colors.secondary} />
+          </ListItemIcon>
+
+          <ListItemText>Preferences</ListItemText>
+        </MenuItem>
+
         <Divider />
 
         <MenuItem
@@ -249,6 +265,12 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
           <ListItemText>Logout</ListItemText>
         </MenuItem>
       </Menu>
+
+      {/* User Preferences Dialog */}
+      <UserPreferencesDialog
+        open={preferencesOpen}
+        onClose={() => setPreferencesOpen(false)}
+      />
     </>
   );
 }

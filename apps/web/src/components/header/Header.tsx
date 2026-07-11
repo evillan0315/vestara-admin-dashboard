@@ -12,13 +12,36 @@ import type { Message, Notification } from "./types";
 interface HeaderProps {
   title: string;
   subtitle: string;
-  onMenuToggle: () => void;
+  onMenuToggle?: () => void;
+  showSearch?: boolean;
+  showNotifications?: boolean;
+  showThemeToggle?: boolean;
+  showUserMenu?: boolean;
+  showSettings?: boolean;
+  _showSearch?: boolean;
+  _showNotifications?: boolean;
+  _showThemeToggle?: boolean;
+  _showUserMenu?: boolean;
+  _showSettings?: boolean;
+  notificationCount?: number;
+  refreshing?: boolean;
+  onRefresh?: () => Promise<void> | void;
+  onNotificationsClick?: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
 export default function Header({
   title,
   subtitle,
   onMenuToggle,
+  _showSearch = true,
+  _showNotifications = true,
+  _showThemeToggle = true,
+  _showUserMenu = true,
+  _showSettings = true,
+  notificationCount = 0,
+  refreshing = false,
+  onRefresh,
+  onNotificationsClick,
 }: HeaderProps): JSX.Element {
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
@@ -27,7 +50,6 @@ export default function Header({
   const [msgAnchor, setMsgAnchor] = useState<HTMLElement | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
   const [dateRange, setDateRange] = useState("May 18 – Jun 18, 2026");
 
   useEffect(() => {
@@ -43,6 +65,7 @@ export default function Header({
 
   const handleNotifClick = (e: React.MouseEvent<HTMLElement>) => {
     setNotifAnchor(e.currentTarget);
+    onNotificationsClick?.(e);
   };
 
   const handleNotifClose = () => setNotifAnchor(null);
@@ -54,9 +77,7 @@ export default function Header({
   const handleMsgClose = () => setMsgAnchor(null);
 
   const handleRefresh = async () => {
-    setRefreshing(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setRefreshing(false);
+    onRefresh?.();
   };
 
   const handleDateRangeClick = () => {
@@ -187,7 +208,7 @@ export default function Header({
           <>
             <HeaderActions
               dateRange={dateRange}
-              notificationCount={notifications.filter((n) => n.unread).length}
+              notificationCount={notificationCount}
               messageCount={messages.filter((m) => m.unread).length}
               refreshing={refreshing}
               onLogout={handleLogout}
