@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Box, Drawer } from "@mui/material";
+import { Box, Drawer, useTheme } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import type { ReactNode } from "react";
 import Sidebar from "../components/layout/Sidebar";
 import { Header } from "../components/layout/Header";
-import { colors } from "../theme/tokens";
+import { ThemeSettings } from "../theme/ThemeSettings";
+import { useThemeContext } from "../providers/ThemeProvider";
+import { densitySpacing } from "../theme/tokens";
 
 const SIDEBAR_MOBILE_WIDTH = 320;
 
@@ -19,7 +21,14 @@ export default function DashboardLayout({
   subtitle,
   children,
 }: DashboardLayoutProps) {
+  const theme = useTheme();
+  const themeCtx = useThemeContext();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const density = densitySpacing[themeCtx.density];
+  const sidebarWidth = themeCtx.sidebarCollapsed
+    ? density.sidebarCollapsedWidth
+    : density.sidebarWidth;
 
   const handleDrawerToggle = () => {
     setMobileOpen((prev) => !prev);
@@ -29,43 +38,51 @@ export default function DashboardLayout({
     setMobileOpen(false);
   };
 
+  const isHidden = themeCtx.sidebarVariant === "hidden";
+
   return (
     <Box
       sx={{
         display: "flex",
         minHeight: "100vh",
-        bgcolor: colors.background,
+        bgcolor: theme.palette.background.default,
       }}
     >
-      {/* Desktop Sidebar — permanent, collapsible */}
-      <Box
-        sx={{
-          display: { xs: "none", lg: "block" },
-          flexShrink: 0,
-        }}
-      >
-        <Sidebar />
-      </Box>
+      {/* Desktop Sidebar — permanent */}
+      {!isHidden && (
+        <>
+          <Box
+            sx={{
+              display: { xs: "none", lg: "block" },
+              flexShrink: 0,
+              width: sidebarWidth,
+              transition: "width 0.2s ease",
+            }}
+          >
+            <Sidebar />
+          </Box>
 
-      {/* Mobile Drawer — temporary overlay */}
-      <Drawer
-        variant="temporary"
-        open={mobileOpen}
-        onClose={handleDrawerToggle}
-        ModalProps={{ keepMounted: true }}
-        sx={{
-          display: { xs: "block", lg: "none" },
-          "& .MuiDrawer-paper": {
-            boxSizing: "border-box",
-            width: { xs: "100%", sm: SIDEBAR_MOBILE_WIDTH },
-            maxWidth: "100vw",
-            bgcolor: colors.sidebar,
-            borderRight: `1px solid ${colors.border}`,
-          },
-        }}
-      >
-        <Sidebar onClose={handleDrawerClose} />
-      </Drawer>
+          {/* Mobile Drawer */}
+          <Drawer
+            variant="temporary"
+            open={mobileOpen}
+            onClose={handleDrawerToggle}
+            ModalProps={{ keepMounted: true }}
+            sx={{
+              display: { xs: "block", lg: "none" },
+              "& .MuiDrawer-paper": {
+                boxSizing: "border-box",
+                width: { xs: "100%", sm: SIDEBAR_MOBILE_WIDTH },
+                maxWidth: "100vw",
+                bgcolor: theme.palette.background.paper,
+                borderRight: `1px solid ${theme.palette.divider}`,
+              },
+            }}
+          >
+            <Sidebar onClose={handleDrawerClose} />
+          </Drawer>
+        </>
+      )}
 
       {/* Main Content Area */}
       <Box
@@ -80,7 +97,7 @@ export default function DashboardLayout({
         <Header
           title={title}
           subtitle={subtitle}
-          onMenuClick={handleDrawerToggle}
+          onMenuClick={isHidden ? undefined : handleDrawerToggle}
         />
         <Box
           component="main"
@@ -96,6 +113,9 @@ export default function DashboardLayout({
           {children ?? <Outlet />}
         </Box>
       </Box>
+
+      {/* Theme Settings Drawer */}
+      <ThemeSettings />
     </Box>
   );
 }

@@ -1,49 +1,58 @@
-import { createContext, useContext, useState, useMemo, type ReactNode } from 'react';
+/**
+ * Root Theme Provider
+ *
+ * Wraps the app in:
+ *  1. ThemeContextProvider (state & logic)
+ *  2. MUI ThemeProvider (material theme derived from config)
+ *  3. CssBaseline (normalize + base styles)
+ *
+ * Re-exports useThemeContext for convenience.
+ */
+
+import { type ReactNode, useMemo } from 'react';
 import { ThemeProvider as MuiThemeProvider, CssBaseline } from '@mui/material';
-import { lightTheme, darkTheme } from '../styles/theme';
+import { ThemeContextProvider, useThemeContext } from '../theme/ThemeContext';
+import { createAppTheme } from '../styles/theme';
 
-type ThemeMode = 'light' | 'dark';
+// ── Inner component that reads context ──
 
-interface ThemeContextValue {
-  mode: ThemeMode;
-  toggleTheme: () => void;
-  setMode: (mode: ThemeMode) => void;
+interface InnerProps {
+  children: ReactNode;
 }
 
-const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
+function ThemedApp({ children }: InnerProps) {
+  const config = useThemeContext();
+
+  const theme = useMemo(() => createAppTheme(config), [
+    config.resolvedMode,
+    config.primaryColor,
+    config.density,
+    config.fontFamily,
+    config.fontSizeScale,
+    config.borderRadiusScale,
+    config.contrastLevel,
+  ]);
+
+  return (
+    <MuiThemeProvider theme={theme}>
+      <CssBaseline />
+      {children}
+    </MuiThemeProvider>
+  );
+}
+
+// ── Outer provider ──
 
 interface ThemeProviderProps {
   children: ReactNode;
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [mode, setMode] = useState<ThemeMode>('dark');
-
-  const theme = useMemo(() => (mode === 'light' ? lightTheme : darkTheme), [mode]);
-
-  const toggleTheme = (): void => {
-    setMode((prev) => (prev === 'light' ? 'dark' : 'light'));
-  };
-
-  const value = useMemo<ThemeContextValue>(
-    () => ({ mode, toggleTheme, setMode }),
-    [mode],
-  );
-
   return (
-    <ThemeContext.Provider value={value}>
-      <MuiThemeProvider theme={theme}>
-        <CssBaseline />
-        {children}
-      </MuiThemeProvider>
-    </ThemeContext.Provider>
+    <ThemeContextProvider>
+      <ThemedApp>{children}</ThemedApp>
+    </ThemeContextProvider>
   );
 }
 
-export function useThemeContext(): ThemeContextValue {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error('useThemeContext must be used within a ThemeProvider');
-  }
-  return context;
-}
+export { useThemeContext } from '../theme/ThemeContext';

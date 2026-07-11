@@ -1,5 +1,5 @@
 import { Box, Typography, IconButton, Avatar, Menu, MenuItem, styled, Tooltip, useTheme, Divider } from '@mui/material';
-import { Menu as MenuIcon, DarkMode, LightMode, Person, Settings, Logout, Search, Notifications } from '@mui/icons-material';
+import { Menu as MenuIcon, DarkMode, LightMode, Person, Settings, Logout, Search, Notifications, Settings as SettingsIcon } from '@mui/icons-material';
 import { useState, type ReactNode, type ReactElement } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../features/auth/AuthContext';
@@ -14,6 +14,7 @@ export interface HeaderProps {
   showNotifications?: boolean;
   showThemeToggle?: boolean;
   showUserMenu?: boolean;
+  showSettings?: boolean;
 }
 
 const StyledHeader = styled(Box)(({ theme }) => ({
@@ -62,6 +63,12 @@ const ActionContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: theme.spacing(1),
+}));
+
+const SettingsButton = styled(IconButton)(({ theme }) => ({
+  '&:hover': {
+    backgroundColor: theme.palette.action.hover,
+  },
 }));
 
 const SearchInput = styled('input')(({ theme }) => ({
@@ -157,11 +164,12 @@ export const Header = ({
   showNotifications = true,
   showThemeToggle = true,
   showUserMenu = true,
+  showSettings = true,
 }: HeaderProps): ReactElement => {
   const theme = useTheme();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const { mode, toggleTheme } = useThemeContext();
+  const { mode, toggleTheme, setSettingsOpen } = useThemeContext();
   const [notificationAnchor, setNotificationAnchor] = useState<HTMLElement | null>(null);
   const [userMenuAnchor, setUserMenuAnchor] = useState<HTMLElement | null>(null);
 
@@ -176,6 +184,10 @@ export const Header = ({
   const handleSettingsClick = () => {
     handleUserMenuClose();
     navigate('/settings');
+  };
+
+  const handleThemeSettingsClick = () => {
+    setSettingsOpen(true);
   };
 
   const handleLogoutClick = async () => {
@@ -248,6 +260,14 @@ export const Header = ({
               >
                 {mode === 'light' ? <DarkMode /> : <LightMode />}
               </IconButton>
+            </Tooltip>
+          )}
+
+          {showSettings && (
+            <Tooltip title="Theme settings">
+              <SettingsButton onClick={handleThemeSettingsClick}>
+                <SettingsIcon />
+              </SettingsButton>
             </Tooltip>
           )}
 
