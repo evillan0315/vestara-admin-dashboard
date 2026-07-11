@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Paper,
+  Drawer,
   Box,
   Typography,
   Button,
@@ -25,7 +25,7 @@ import { useThemeContext } from '../../providers/ThemeProvider';
 import { colors } from '../../theme/tokens';
 import type { ThemeDensity, SidebarVariant } from '../../theme/types';
 
-interface UserPreferencesDialogProps {
+interface UserPreferencesDrawerProps {
   open: boolean;
   onClose: () => void;
 }
@@ -141,7 +141,9 @@ const TABS = [
   { id: 'localization', label: 'Localization', icon: <Language fontSize="small" /> },
 ];
 
-export default function UserPreferencesDialog({ open, onClose }: UserPreferencesDialogProps) {
+const DRAWER_WIDTH = 480;
+
+export default function UserPreferencesDrawer({ open, onClose }: UserPreferencesDrawerProps) {
   const { preferences, savePreferences, resetPreferences } = useUserPreferences();
   const [activeTab, setActiveTab] = useState(0);
 
@@ -149,141 +151,124 @@ export default function UserPreferencesDialog({ open, onClose }: UserPreferences
     onClose();
   };
 
-  if (!open) return null;
-
   return (
-    <>
-      {/* Backdrop */}
-      <Box
-        onClick={onClose}
-        sx={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 1300,
-          bgcolor: 'rgba(0, 0, 0, 0.5)',
-          backdropFilter: 'blur(4px)',
-        }}
-      />
-
-      {/* Dialog */}
-      <Paper
-        elevation={24}
-        sx={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          zIndex: 1400,
-          width: { xs: '95%', sm: 700 },
-          maxHeight: '90vh',
+    <Drawer
+      variant="persistent"
+      anchor="right"
+      open={open}
+      onClose={onClose}
+      sx={{
+        zIndex: 1400,
+        '& .MuiDrawer-paper': {
+          width: DRAWER_WIDTH,
+          maxWidth: '100vw',
+          height: '100vh',
+          borderLeft: `1px solid ${colors.border}`,
           bgcolor: colors.card,
-          border: `1px solid ${colors.border}`,
-          borderRadius: 16,
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+          boxShadow: '-24px 0 40px -12px rgba(0, 0, 0, 0.5)',
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
+        },
+      }}
+    >
+      {/* Header */}
+      <Box
+        sx={{
+          p: 2.5,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          borderBottom: `1px solid ${colors.border}`,
         }}
       >
-        {/* Header */}
-        <Box
-          sx={{
-            p: 2.5,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            borderBottom: `1px solid ${colors.border}`,
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Settings sx={{ color: colors.gold, fontSize: 24 }} />
-            <Typography variant="h6" fontWeight={700} color={colors.text}>
-              Preferences
-            </Typography>
-          </Box>
-          <IconButton onClick={onClose} sx={{ color: colors.secondary }}>
-            <Restore fontSize="large" />
-          </IconButton>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Settings sx={{ color: colors.gold, fontSize: 24 }} />
+          <Typography variant="h6" fontWeight={700} color={colors.text}>
+            Preferences
+          </Typography>
         </Box>
+        <IconButton onClick={onClose} sx={{ color: colors.secondary }}>
+          <Restore fontSize="large" />
+        </IconButton>
+      </Box>
 
-        {/* Tabs */}
-        <Tabs
-          value={activeTab}
-          onChange={(_, value) => setActiveTab(TABS.findIndex((t) => t.id === value))}
-          variant="fullWidth"
-          sx={{
-            borderBottom: `1px solid ${colors.border}`,
-            '& .MuiTabs-indicator': {
-              backgroundColor: colors.gold,
-              height: 3,
-            },
-            minHeight: 52,
-          }}
-        >
-          {TABS.map((tab) => (
-            <Tab
-              key={tab.id}
-              value={tab.id}
-              icon={tab.icon}
-              label={tab.label}
-              sx={{
-                textTransform: 'none',
-                fontWeight: 600,
-                fontSize: 13,
-                minHeight: 52,
-                color: colors.secondary,
-                '&.Mui-selected': {
-                  color: colors.gold,
-                },
-              }}
-            />
-          ))}
-        </Tabs>
-
-        {/* Content */}
-        <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
-          {TABS[activeTab].id === 'appearance' && (
-            <AppearanceTab preferences={preferences} savePreferences={savePreferences} />
-          )}
-          {TABS[activeTab].id === 'notifications' && (
-            <NotificationsTab preferences={preferences} savePreferences={savePreferences} />
-          )}
-          {TABS[activeTab].id === 'localization' && (
-            <LocalizationTab preferences={preferences} savePreferences={savePreferences} />
-          )}
-        </Box>
-
-        {/* Footer */}
-        <Box
-          sx={{
-            p: 2,
-            borderTop: `1px solid ${colors.border}`,
-            display: 'flex',
-            justifyContent: 'flex-end',
-            gap: 2,
-          }}
-        >
-          <Button onClick={resetPreferences} variant="outlined" sx={{ color: colors.error, borderColor: colors.error }}>
-            Reset to Defaults
-          </Button>
-          <Button
-            onClick={handleSavePreferences}
-            variant="contained"
+      {/* Tabs */}
+      <Tabs
+        value={activeTab}
+        onChange={(_, value) => setActiveTab(TABS.findIndex((t) => t.id === value))}
+        variant="fullWidth"
+        sx={{
+          borderBottom: `1px solid ${colors.border}`,
+          '& .MuiTabs-indicator': {
+            backgroundColor: colors.gold,
+            height: 3,
+          },
+          minHeight: 52,
+          px: 1,
+        }}
+      >
+        {TABS.map((tab) => (
+          <Tab
+            key={tab.id}
+            value={tab.id}
+            icon={tab.icon}
+            label={tab.label}
             sx={{
-              bgcolor: colors.gold,
-              color: '#0A0F18',
-              fontWeight: 700,
               textTransform: 'none',
+              fontWeight: 600,
+              fontSize: 13,
+              minHeight: 52,
+              color: colors.secondary,
+              '&.Mui-selected': {
+                color: colors.gold,
+              },
             }}
-          >
-            Save Changes
-          </Button>
-        </Box>
-      </Paper>
-    </>
+          />
+        ))}
+      </Tabs>
+
+      {/* Content */}
+      <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
+        {TABS[activeTab].id === 'appearance' && (
+          <AppearanceTab preferences={preferences} savePreferences={savePreferences} />
+        )}
+        {TABS[activeTab].id === 'notifications' && (
+          <NotificationsTab preferences={preferences} savePreferences={savePreferences} />
+        )}
+        {TABS[activeTab].id === 'localization' && (
+          <LocalizationTab preferences={preferences} savePreferences={savePreferences} />
+        )}
+      </Box>
+
+      {/* Footer */}
+      <Box
+        sx={{
+          p: 2,
+          borderTop: `1px solid ${colors.border}`,
+          display: 'flex',
+          justifyContent: 'flex-end',
+          gap: 2,
+          px: 3,
+        }}
+      >
+        <Button onClick={resetPreferences} variant="outlined" sx={{ color: colors.error, borderColor: colors.error }}>
+          Reset to Defaults
+        </Button>
+        <Button
+          onClick={handleSavePreferences}
+          variant="contained"
+          sx={{
+            bgcolor: colors.gold,
+            color: '#0A0F18',
+            fontWeight: 700,
+            textTransform: 'none',
+          }}
+        >
+          Save Changes
+        </Button>
+      </Box>
+    </Drawer>
   );
 }
 
@@ -531,4 +516,9 @@ function LocalizationTab({
       </Box>
     </Box>
   );
+}
+
+interface UserPreferencesDrawerProps {
+  open: boolean;
+  onClose: () => void;
 }

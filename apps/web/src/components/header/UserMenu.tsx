@@ -24,7 +24,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../features/auth/AuthContext";
 import { colors } from "../../theme/tokens";
-import UserPreferencesDialog from "../layout/UserPreferencesDialog";
+import UserPreferencesDrawer from "../layout/UserPreferencesDialog";
 
 export interface UserMenuProps {
   onLogout?: () => Promise<void> | void;
@@ -266,8 +266,8 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
         </MenuItem>
       </Menu>
 
-      {/* User Preferences Dialog */}
-      <UserPreferencesDialog
+      {/* User Preferences Drawer */}
+      <UserPreferencesDrawer
         open={preferencesOpen}
         onClose={() => setPreferencesOpen(false)}
       />
