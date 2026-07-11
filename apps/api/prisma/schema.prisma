@@ -20,6 +20,23 @@ enum UserRole {
   support
 }
 
+model Organization {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  logoUrl   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users          User[]
+  settings       SystemSetting[]
+  auditLogs      AuditLog[]
+  sessions       Session[]
+  refreshTokens  RefreshToken[]
+
+  @@map("organizations")
+}
+
 model User {
   id           String   @id @default(uuid())
   email        String   @unique
@@ -32,14 +49,17 @@ model User {
   provider     String?  // "google" | "github" | null (email/password)
   providerId   String?  // OAuth provider's user ID
   lastLoginAt  DateTime?
+  organizationId String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  refreshTokens RefreshToken[]
-  auditLogs     AuditLog[]
-  sessions      Session[]
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  refreshTokens  RefreshToken[]
+  auditLogs      AuditLog[]
+  sessions       Session[]
 
   @@unique([provider, providerId])
+  @@index([organizationId])
   @@map("users")
 }
 
