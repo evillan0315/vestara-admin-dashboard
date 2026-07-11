@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { RootLayout } from '../layouts/RootLayout';
+import DashboardLayout from '../layouts/DashboardLayout';
 import { AuthLayout } from '../layouts/AuthLayout';
 import { ProtectedRoute } from '../components/ProtectedRoute';
 import { PublicRoute } from '../components/PublicRoute';
@@ -58,7 +58,7 @@ export function AppRoutes() {
 
       {/* Protected routes — require authentication */}
       <Route element={<ProtectedRoute />}>
-        <Route element={<RootLayout />}>
+        <Route element={<DashboardLayout />}>
           <Route path="/" element={<DashboardPage />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
           <Route path="/users" element={<UsersPage />} />
