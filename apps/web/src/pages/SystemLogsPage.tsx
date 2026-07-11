@@ -11,6 +11,7 @@ import {
   Block as SuspendIcon,
   Lock as LockIcon,
   Settings as SettingsIcon,
+  Error as ErrorIcon,
 } from '@mui/icons-material';
 import { useState, useCallback, type ReactElement } from 'react';
 import { DataTable, type Column, type SortState, type PaginationState } from '../components/data/DataTable';
@@ -39,6 +40,7 @@ const ActionChip = styled(Chip)<{ action: string }>(({ theme, action }) => {
     password_change: theme.palette.warning.main,
     settings_update: theme.palette.info.main,
     settings_delete: theme.palette.error.main,
+    error: theme.palette.error.main,
   };
   return {
     backgroundColor: colors[action] || theme.palette.grey[500],
@@ -66,6 +68,7 @@ function getActionIcon(action: string) {
     password_change: LockIcon,
     settings_update: SettingsIcon,
     settings_delete: SettingsIcon,
+    error: ErrorIcon,
   };
   return icons[action] || HistoryIcon;
 }

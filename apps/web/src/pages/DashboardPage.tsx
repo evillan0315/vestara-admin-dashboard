@@ -230,6 +230,7 @@ const ACTION_LABELS: Record<AuditAction, string> = {
   [AuditAction.PASSWORD_CHANGE]: 'Password',
   [AuditAction.SETTINGS_UPDATE]: 'Setting Update',
   [AuditAction.SETTINGS_DELETE]: 'Setting Delete',
+  [AuditAction.ERROR]: 'Error',
 };
 
 const ENTITY_LABELS: Record<EntityType, string> = {

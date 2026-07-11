@@ -43,6 +43,7 @@ export enum AuditAction {
   PASSWORD_CHANGE = 'password_change',
   SETTINGS_UPDATE = 'settings_update',
   SETTINGS_DELETE = 'settings_delete',
+  ERROR = 'error',
 }
 
 export enum EntityType {
