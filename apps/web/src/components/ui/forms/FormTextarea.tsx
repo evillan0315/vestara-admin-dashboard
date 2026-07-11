@@ -136,7 +136,7 @@ const FormTextareaComponent = <T extends FieldValues>({
   );
 };
 
-export const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaComponentProps<any>>(
+export const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaComponentProps<FieldValues>>(
   (props, ref) => <FormTextareaComponent {...props} inputRef={ref} />
 );
 

@@ -16,7 +16,7 @@
 <p align="center">
 
 ![License](https://img.shields.io/badge/license-Proprietary-gold?style=for-the-badge)
-![Status](https://img.shields.io/badge/status-Phase%201%20%E2%80%93%20Admin%20Dashboard%20%E2%80%93%20Phases%2011%2F19-success?style=for-the-badge)
+![Status](https://img.shields.io/badge/status-Phase%201%20%E2%80%93%20Admin%20Dashboard%20%E2%80%93%20Phases%20117%2F19-success?style=for-the-badge)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![Express](https://img.shields.io/badge/Express-5.x-000000?style=for-the-badge&logo=express)
@@ -1951,6 +1951,8 @@ Future licensing terms may change as the platform evolves.
 | Data Table | 🟢 Reusable, sort/filter/paginate/select |
 | Application Settings | 🟢 Complete (backend + frontend) |
 | User Profile (name, avatar, password) | 🟢 Complete (backend + frontend) |
+| User Preferences (Drawer) | 🟢 Complete (Appearance, Notifications, Localization) |
+| Global Search (Cmd/Ctrl+K) | 🟢 Complete |
 | Audit Logs / System Logs | 🟢 API + Frontend Page |
 | CI/CD (GitHub Actions) | 🟢 API Deploy Workflow |
 | Reusable Form Components | 🟢 Complete (14 components + Zod) |
@@ -1977,6 +1979,9 @@ Future licensing terms may change as the platform evolves.
 - ✅ Reusable Form Components (FormField, FormInput, FormSelect, FormTextarea, FormCheckbox, FormRadioGroup, FormSwitch, FormError, FormHelperText, FormSection, FormLayout, FormActions, FormSubmit, FormCancel)
 - ✅ Reusable Feedback Components (Toast queue, Loading, EmptyState, useConfirm)
 - ✅ Form Validation (react-hook-form + Zod via useFormWithZod)
+- ✅ User Preferences Drawer (Appearance, Notifications, Localization)
+- ✅ Global Search Dialog (Cmd/Ctrl+K with keyboard navigation)
+- ✅ Notifications (wired to audit-logs API, real-time unread count)
 - 🟡 Security Hardening (rate limiting, CSRF, password policies)
 - 📋 Reporting (CSV/Excel/PDF export)
 - 📋 Real-time features (WebSocket, live notifications)

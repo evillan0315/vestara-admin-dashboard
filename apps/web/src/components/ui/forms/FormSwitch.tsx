@@ -47,7 +47,7 @@ export function FormSwitch<T extends FieldValues>({
   helperText,
   control,
   rules,
-  defaultValue = false as any,
+  defaultValue = false as PathValue<T, FieldPath<T>>,
   checkedIcon,
 }: FormSwitchComponentProps<T>) {
   return (

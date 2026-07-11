@@ -1,5 +1,5 @@
 import { Checkbox as MuiCheckbox, FormControlLabel, FormGroup, FormControl, FormLabel, styled, type SxProps, type Theme } from '@mui/material';
-import { Controller, type ControllerProps, type FieldPath, type FieldValues, type ControllerRenderProps } from 'react-hook-form';
+import { Controller, type ControllerProps, type FieldPath, type FieldValues } from 'react-hook-form';
 import type { ReactNode } from 'react';
 
 export interface FormCheckboxProps<T extends FieldValues> extends Omit<ControllerProps<T>, 'render' | 'control' | 'name'> {
@@ -46,7 +46,7 @@ export const FormCheckbox = <T extends FieldValues>({
       control={control}
       rules={rules}
       defaultValue={defaultValue}
-      render={({ field, fieldState }: { field: ControllerRenderProps<T>; fieldState: any }) => {
+      render={({ field, fieldState }) => {
         const hasError = error || !!fieldState.error;
         return (
           <FormControl component="fieldset" sx={sx}>

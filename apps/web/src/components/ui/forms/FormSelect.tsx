@@ -56,7 +56,7 @@ interface FormSelectComponentProps<T extends FieldValues> extends FormSelectProp
   control: ControllerProps<T>['control'];
 }
 
-export const FormSelect = forwardRef<HTMLSelectElement, FormSelectComponentProps<any>>(
+export const FormSelect = forwardRef<HTMLSelectElement, FormSelectComponentProps<FieldValues>>(
   (props, ref) => {
     const {
       name,
