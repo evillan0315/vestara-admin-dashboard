@@ -13,7 +13,18 @@ export function validate(schema: ZodSchema, target: ValidationTarget = 'body') {
     try {
       const parsed = schema.parse(req[target]);
       // Replace with parsed (coerced/defaulted) values
-      (req as unknown as Record<string, unknown>)[target] = parsed;
+      // Express 5 makes req.query a getter-only property (no setter),
+      // so we need Object.defineProperty to shadow it on the instance.
+      if (target === 'query') {
+        Object.defineProperty(req, 'query', {
+          value: parsed,
+          writable: true,
+          configurable: true,
+          enumerable: true,
+        });
+      } else {
+        (req as unknown as Record<string, unknown>)[target] = parsed;
+      }
       next();
     } catch (error) {
       if (error instanceof ZodError) {
