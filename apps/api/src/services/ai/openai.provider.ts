@@ -1,6 +1,18 @@
 import type { AIProvider, AICompletionRequest, AICompletionResponse } from './types.js';
 
 /**
+ * Local type for the global `fetch` Response. The API tsconfig does not expose
+ * Node's global `fetch`/Response types, so `fetch` resolves to an empty `{}`.
+ * Casting to this interface restores `.ok`/`.status`/`.text()`/`.json()`.
+ */
+interface AIHttpResponse {
+  ok: boolean;
+  status: number;
+  text(): Promise<string>;
+  json(): Promise<unknown>;
+}
+
+/**
  * OpenAI API Provider
  *
  * Supports GPT-4, GPT-4o, GPT-4o-mini, and other OpenAI models.
@@ -40,7 +52,7 @@ export class OpenAIProvider implements AIProvider {
       messages.push({ role: msg.role, content: msg.content });
     }
 
-    const response = await fetch(`${this.baseUrl}/chat/completions`, {
+    const response = (await fetch(`${this.baseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -52,7 +64,7 @@ export class OpenAIProvider implements AIProvider {
         max_tokens: request.maxTokens ?? 2048,
         temperature: request.temperature ?? 0.7,
       }),
-    });
+    })) as AIHttpResponse;
 
     if (!response.ok) {
       const error = await response.text();

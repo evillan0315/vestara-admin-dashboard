@@ -1,6 +1,18 @@
 import type { AIProvider, AICompletionRequest, AICompletionResponse } from './types.js';
 
 /**
+ * Local type for the global `fetch` Response. The API tsconfig does not expose
+ * Node's global `fetch`/Response types, so `fetch` resolves to an empty `{}`.
+ * Casting to this interface restores `.ok`/`.status`/`.text()`/`.json()`.
+ */
+interface AIHttpResponse {
+  ok: boolean;
+  status: number;
+  text(): Promise<string>;
+  json(): Promise<unknown>;
+}
+
+/**
  * Anthropic Claude API Provider
  *
  * Supports Claude Sonnet, Claude Haiku, and other Anthropic models.
@@ -39,7 +51,7 @@ export class AnthropicProvider implements AIProvider {
         content: m.content,
       }));
 
-    const response = await fetch(`${this.baseUrl}/messages`, {
+    const response = (await fetch(`${this.baseUrl}/messages`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -52,7 +64,7 @@ export class AnthropicProvider implements AIProvider {
         system: systemPrompt,
         messages,
       }),
-    });
+    })) as AIHttpResponse;
 
     if (!response.ok) {
       const error = await response.text();
