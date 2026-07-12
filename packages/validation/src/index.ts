@@ -116,7 +116,7 @@ export const updateOrganizationSchema = z.object({
 });
 
 export const organizationIdParamSchema = z.object({
-  id: uuidField,
+  id: z.string().min(1, 'Organization ID is required'),
 });
 
 // ── Onboarding (first-time setup) ──────────────────
