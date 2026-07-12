@@ -910,20 +910,6 @@ export function ChatPage() {
               },
             }}
           />
-          <Typography
-            variant="caption"
-            color="text.disabled"
-            sx={{
-              mt: 0.5,
-              display: 'block',
-              textAlign: 'center',
-              fontSize: { xs: '0.65rem', sm: '0.75rem' },
-            }}
-          >
-            {isMobile
-              ? 'AI responses may not always be accurate.'
-              : `Powered by ${getModelDisplayName(conversationData?.model)} via OpenCode. Responses may not always be accurate.`}
-          </Typography>
         </Box>
       </Box>
 
