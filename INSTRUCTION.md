@@ -105,7 +105,7 @@ For every task:
 | 16 | Data Table | ✅ Complete | 100% |
 | 17 | Feedback Components | ✅ Complete | 100% |
 | 18 | File Manager | ✅ Complete | 100% |
-| 19 | Application Settings | ✅ Complete | ~95% |
+| 19 | Application Settings | ✅ Complete | 100% |
 | 20 | Reporting | ❌ Not Started | 0% |
 | 21 | WebSocket Integration | ❌ Not Started | 0% |
 | 22 | Live Features | ❌ Not Started | 0% |
@@ -492,7 +492,7 @@ For every task:
 
 ### 19. Application Settings
 
-**Status:** ✅ Complete (~95%)
+**Status:** ✅ Complete (100%)
 **Dependencies:** Phases 4–5, 12
 
 **Backend:**
@@ -500,6 +500,8 @@ For every task:
 * Validation via Zod schemas
 * Multi-tenancy: settings scoped per-organization via compound unique `[organizationId, key]`
 * Supported value types: string, number, boolean, JSON
+* Audit logging for all CRUD operations via SettingsService
+* Versioning via `previousValue` in audit metadata
 
 **Frontend:**
 * SettingsPage with DataTable (key-value editor)
@@ -507,8 +509,14 @@ For every task:
 * TanStack Query hooks for all operations
 * Toast notifications for success/error
 * Inline editing support
+* Export button (downloads versioned JSON with timestamps)
+* SettingsImportDialog (drag-and-drop JSON upload, format detection, preview)
+* SettingsAuditHistoryDialog (paginated change history with action icons and value previews)
 
-**Still missing:** Settings import/export, settings versioning, settings audit history UI.
+**Shared:**
+* `SETTINGS_IMPORT` AuditAction enum value
+* `SettingsExportDTO`, `SettingsImportRequestDTO`, `SettingsImportResultDTO` types
+* `importSettingsSchema` validation
 
 ---
 
