@@ -27,9 +27,11 @@ export type { CardComponentProps } from './Card';
 export { Modal, ConfirmDialog, default as ModalComponent } from './Modal';
 export type { ModalProps, ConfirmDialogProps } from './Modal';
 
-export { Drawer, default as DrawerComponent } from './Drawer';
-export { Sidebar as DrawerSidebar, default as DrawerSidebarComponent } from './Drawer';
-export type { CustomDrawerProps, SidebarDrawerProps } from './Drawer';
+export { SimpleDialog, ConfirmDialog as DialogConfirmDialog, AlertDialog, default as Dialog } from './Dialog';
+export type { DialogProps, ConfirmDialogProps as DialogConfirmDialogProps, AlertDialogProps } from './Dialog';
+
+export { Drawer, Sidebar, default as DrawerComponent } from './Drawer';
+export type { DrawerProps, BaseDrawerProps, TemporaryDrawerProps, PersistentDrawerProps, PermanentDrawerProps, DrawerVariant, DrawerAnchor } from './Drawer';
 
 // ── Data Display ──────────────────────────────────────
 export { Badge, default as BadgeComponent } from './Badge';
@@ -40,6 +42,10 @@ export type { AvatarProps, AvatarGroupProps } from './Avatar';
 
 export { Tooltip, default as TooltipComponent } from './Tooltip';
 export type { TooltipProps } from './Tooltip';
+
+// ── Feedback ──────────────────────────────────────────
+export { Alert, InlineAlert, default as AlertComponent } from './Alert';
+export type { AlertProps, InlineAlertProps } from './Alert';
 
 // ── Navigation ────────────────────────────────────────
 export { Tabs, TabPanel, default as TabsComponent } from './Tabs';

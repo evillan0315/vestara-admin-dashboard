@@ -1,31 +1,29 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Drawer,
   Box,
   Typography,
   Button,
   Switch,
   FormControlLabel,
   Divider,
-  IconButton,
   Tabs,
   Tab,
+  DialogActions,
 } from '@mui/material';
 import {
-  Restore,
   Palette,
   Notifications,
   Language,
   DarkMode,
   LightMode,
   BrightnessAuto,
-  Settings,
 } from '@mui/icons-material';
 import { useThemeContext } from '../../providers/ThemeProvider';
 import { colors } from '../../theme/tokens';
 import type { ThemeDensity, SidebarVariant } from '../../theme/types';
+import { Modal, type ModalProps } from '../ui/Modal';
 
-interface UserPreferencesDrawerProps {
+interface UserPreferencesModalProps extends Omit<ModalProps, 'children' | 'title' | 'actions'> {
   open: boolean;
   onClose: () => void;
 }
@@ -141,9 +139,7 @@ const TABS = [
   { id: 'localization', label: 'Localization', icon: <Language fontSize="small" /> },
 ];
 
-const DRAWER_WIDTH = 480;
-
-export default function UserPreferencesDrawer({ open, onClose }: UserPreferencesDrawerProps) {
+export default function UserPreferencesModal({ open, onClose, ...props }: UserPreferencesModalProps) {
   const { preferences, savePreferences, resetPreferences } = useUserPreferences();
   const [activeTab, setActiveTab] = useState(0);
 
@@ -152,50 +148,20 @@ export default function UserPreferencesDrawer({ open, onClose }: UserPreferences
   };
 
   return (
-    <Drawer
-      variant="persistent"
-      anchor="right"
+    <Modal
       open={open}
       onClose={onClose}
-      sx={{
-        zIndex: 1400,
-        '& .MuiDrawer-paper': {
-          width: DRAWER_WIDTH,
-          maxWidth: '100vw',
-          height: '100vh',
-          borderLeft: `1px solid ${colors.border}`,
-          bgcolor: colors.card,
-          boxShadow: '-24px 0 40px -12px rgba(0, 0, 0, 0.5)',
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-        },
-      }}
+      title="Preferences"
+      maxWidth="lg"
+      fullScreen="xs"
+      showCloseButton
+      disableBackdropClick={false}
+      disableEscapeKeyDown={false}
+      {...props}
     >
-      {/* Header */}
-      <Box
-        sx={{
-          p: 2.5,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          borderBottom: `1px solid ${colors.border}`,
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Settings sx={{ color: colors.gold, fontSize: 24 }} />
-          <Typography variant="h6" fontWeight={700} color={colors.text}>
-            Preferences
-          </Typography>
-        </Box>
-        <IconButton onClick={onClose} sx={{ color: colors.secondary }}>
-          <Restore fontSize="large" />
-        </IconButton>
-      </Box>
-
       {/* Tabs */}
       <Tabs
-        value={activeTab}
+        value={TABS[activeTab]?.id}
         onChange={(_, value) => setActiveTab(TABS.findIndex((t) => t.id === value))}
         variant="fullWidth"
         sx={{
@@ -230,29 +196,24 @@ export default function UserPreferencesDrawer({ open, onClose }: UserPreferences
 
       {/* Content */}
       <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
-        {TABS[activeTab].id === 'appearance' && (
+        {TABS[activeTab]?.id === 'appearance' && (
           <AppearanceTab preferences={preferences} savePreferences={savePreferences} />
         )}
-        {TABS[activeTab].id === 'notifications' && (
+        {TABS[activeTab]?.id === 'notifications' && (
           <NotificationsTab preferences={preferences} savePreferences={savePreferences} />
         )}
-        {TABS[activeTab].id === 'localization' && (
+        {TABS[activeTab]?.id === 'localization' && (
           <LocalizationTab preferences={preferences} savePreferences={savePreferences} />
         )}
       </Box>
 
       {/* Footer */}
-      <Box
-        sx={{
-          p: 2,
-          borderTop: `1px solid ${colors.border}`,
-          display: 'flex',
-          justifyContent: 'flex-end',
-          gap: 2,
-          px: 3,
-        }}
-      >
-        <Button onClick={resetPreferences} variant="outlined" sx={{ color: colors.error, borderColor: colors.error }}>
+      <DialogActions sx={{ px: 3, pb: 2, pt: 1 }}>
+        <Button
+          onClick={resetPreferences}
+          variant="outlined"
+          sx={{ color: colors.error, borderColor: colors.error }}
+        >
           Reset to Defaults
         </Button>
         <Button
@@ -267,8 +228,8 @@ export default function UserPreferencesDrawer({ open, onClose }: UserPreferences
         >
           Save Changes
         </Button>
-      </Box>
-    </Drawer>
+      </DialogActions>
+    </Modal>
   );
 }
 
@@ -516,9 +477,4 @@ function LocalizationTab({
       </Box>
     </Box>
   );
-}
-
-interface UserPreferencesDrawerProps {
-  open: boolean;
-  onClose: () => void;
 }
