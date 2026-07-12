@@ -45,6 +45,7 @@ export enum AuditAction {
   ACCOUNT_DELETION = 'account_deletion',
   SETTINGS_UPDATE = 'settings_update',
   SETTINGS_DELETE = 'settings_delete',
+  SETTINGS_IMPORT = 'settings_import',
   ERROR = 'error',
 }
 
@@ -220,6 +221,29 @@ export interface SystemSettingDTO {
 export interface UpdateSettingRequestDTO {
   key: string;
   value: Record<string, unknown>;
+}
+
+export interface SettingsExportDTO {
+  version: number;
+  exportedAt: string;
+  organizationId: string;
+  settings: {
+    key: string;
+    value: Record<string, unknown>;
+    updatedAt: string;
+    updatedBy?: string;
+  }[];
+}
+
+export interface SettingsImportRequestDTO {
+  settings: Record<string, unknown>;
+}
+
+export interface SettingsImportResultDTO {
+  imported: number;
+  created: number;
+  updated: number;
+  details: { key: string; action: 'created' | 'updated' }[];
 }
 
 // ── Domain: Organization (multi-tenancy) ───────

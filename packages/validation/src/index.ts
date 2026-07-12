@@ -96,6 +96,10 @@ export const updateSettingSchema = z.object({
   value: z.record(z.unknown()),
 });
 
+export const importSettingsSchema = z.object({
+  settings: z.record(z.unknown()),
+});
+
 // ── Organization (multi-tenancy) ──────────────
 
 export const slugField = z
@@ -214,6 +218,7 @@ export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type ChangeEmailInput = z.infer<typeof changeEmailSchema>;
 export type DeleteAccountInput = z.infer<typeof deleteAccountSchema>;
 export type UpdateSettingInput = z.infer<typeof updateSettingSchema>;
+export type ImportSettingsInput = z.infer<typeof importSettingsSchema>;
 export type IdsBodyInput = z.infer<typeof idsBodySchema>;
 export type BulkStatusInput = z.infer<typeof bulkStatusSchema>;
 export type BulkActionInput = z.infer<typeof bulkActionSchema>;

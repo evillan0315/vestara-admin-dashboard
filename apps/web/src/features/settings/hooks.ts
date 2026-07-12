@@ -6,6 +6,7 @@ export const settingKeys = {
   all: ['settings'] as const,
   list: () => ['settings', 'list'] as const,
   detail: (key: string) => ['settings', key] as const,
+  auditHistory: (params?: Record<string, unknown>) => ['settings', 'audit-history', params] as const,
 };
 
 export function useSettings() {
@@ -40,5 +41,46 @@ export function useDeleteSetting() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: settingKeys.all });
     },
+  });
+}
+
+export function useExportSettings() {
+  return useMutation({
+    mutationFn: async () => {
+      const data = await settingsApi.exportSettings();
+      // Handle blob download
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `vestara-settings-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      return data;
+    },
+  });
+}
+
+export function useImportSettings() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (settings: Record<string, unknown>) => settingsApi.importSettings(settings),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: settingKeys.all });
+    },
+  });
+}
+
+export function useSettingsAuditHistory(params?: {
+  page?: number;
+  perPage?: number;
+  startDate?: string;
+  endDate?: string;
+}) {
+  return useQuery({
+    queryKey: settingKeys.auditHistory(params),
+    queryFn: () => settingsApi.getAuditHistory(params),
   });
 }

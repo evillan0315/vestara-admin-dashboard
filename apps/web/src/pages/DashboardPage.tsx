@@ -233,6 +233,7 @@ const ACTION_LABELS: Record<AuditAction, string> = {
   [AuditAction.ACCOUNT_DELETION]: 'Account Deletion',
   [AuditAction.SETTINGS_UPDATE]: 'Setting Update',
   [AuditAction.SETTINGS_DELETE]: 'Setting Delete',
+  [AuditAction.SETTINGS_IMPORT]: 'Setting Import',
   [AuditAction.ERROR]: 'Error',
 };
 

@@ -85,6 +85,9 @@ export const ROUTES = {
   SETTINGS: {
     BASE: '/settings',
     DETAIL: (key: string) => `/settings/${key}`,
+    EXPORT: '/settings/export',
+    IMPORT: '/settings/import',
+    AUDIT_HISTORY: '/settings/audit-history',
   },
   AUDIT: {
     BASE: '/audit-logs',
@@ -160,6 +163,7 @@ export const AUDIT_ACTIONS = {
   ACCOUNT_DELETION: 'account_deletion',
   SETTINGS_UPDATE: 'settings_update',
   SETTINGS_DELETE: 'settings_delete',
+  SETTINGS_IMPORT: 'settings_import',
 } as const;
 
 export const ENTITY_TYPES = {

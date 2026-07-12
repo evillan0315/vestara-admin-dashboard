@@ -5,13 +5,18 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Refresh as RefreshIcon,
+  Download as ExportIcon,
+  Upload as ImportIcon,
+  History as HistoryIcon,
 } from '@mui/icons-material';
 import { useState, useCallback, type ReactElement } from 'react';
-import { useSettings, useUpsertSetting, useDeleteSetting } from '../features/settings/hooks';
+import { useSettings, useUpsertSetting, useDeleteSetting, useExportSettings } from '../features/settings/hooks';
 import { useToast } from '../components/feedback/Toast';
 import { Loading } from '../components/feedback/Loading';
 import { EmptyState } from '../components/feedback/EmptyState';
 import { SettingFormDialog } from '../features/settings/SettingFormDialog';
+import { SettingsImportDialog } from '../features/settings/SettingsImportDialog';
+import { SettingsAuditHistoryDialog } from '../features/settings/SettingsAuditHistoryDialog';
 import { ConfirmDialog } from '../components/ui/Modal';
 
 // ── Styled ──
@@ -76,11 +81,14 @@ export function SettingsPage(): ReactElement {
   const { data, isLoading, isError, error, refetch } = useSettings();
   const upsertMutation = useUpsertSetting();
   const deleteMutation = useDeleteSetting();
+  const exportMutation = useExportSettings();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editKey, setEditKey] = useState<string | null>(null);
   const [editValue, setEditValue] = useState<string>('');
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [importOpen, setImportOpen] = useState(false);
+  const [auditOpen, setAuditOpen] = useState(false);
 
   const settingsMap = data?.data?.settings as Record<string, unknown> | undefined;
   const settingsEntries = settingsMap ? Object.entries(settingsMap) : [];
@@ -134,6 +142,15 @@ export function SettingsPage(): ReactElement {
       showError(err instanceof Error ? err.message : 'Failed to delete setting');
     }
   }, [deleteTarget, deleteMutation, showSuccess, showError]);
+
+  const handleExport = useCallback(async () => {
+    try {
+      await exportMutation.mutateAsync();
+      showSuccess('Settings exported successfully');
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Failed to export settings');
+    }
+  }, [exportMutation, showSuccess, showError]);
 
   if (isLoading) {
     return (
@@ -191,6 +208,21 @@ export function SettingsPage(): ReactElement {
             System Settings ({settingsEntries.length})
           </Typography>
           <Box sx={{ display: 'flex', gap: 1 }}>
+            <Tooltip title="Change History">
+              <IconButton size="small" onClick={() => setAuditOpen(true)}>
+                <HistoryIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Export Settings">
+              <IconButton size="small" onClick={handleExport} disabled={exportMutation.isPending}>
+                <ExportIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Import Settings">
+              <IconButton size="small" onClick={() => setImportOpen(true)}>
+                <ImportIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
             <Tooltip title="Refresh">
               <IconButton size="small" onClick={() => refetch()}>
                 <RefreshIcon fontSize="small" />
@@ -260,6 +292,18 @@ export function SettingsPage(): ReactElement {
         onClose={handleDialogClose}
         onSubmit={handleDialogSubmit}
         loading={upsertMutation.isPending}
+      />
+
+      {/* Import Dialog */}
+      <SettingsImportDialog
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+      />
+
+      {/* Audit History Dialog */}
+      <SettingsAuditHistoryDialog
+        open={auditOpen}
+        onClose={() => setAuditOpen(false)}
       />
 
       {/* Delete Confirmation */}

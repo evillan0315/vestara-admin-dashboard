@@ -19,6 +19,16 @@ export class SettingsRepository extends BaseRepository {
   }
 
   /**
+   * Get all settings as full records within an organization.
+   */
+  async getAll(organizationId: string) {
+    return this.prisma.systemSetting.findMany({
+      where: { organizationId },
+      orderBy: { key: 'asc' },
+    });
+  }
+
+  /**
    * Get all settings as a key-value map within an organization.
    */
   async getAllAsMap(organizationId: string): Promise<Record<string, unknown>> {

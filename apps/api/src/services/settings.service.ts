@@ -17,7 +17,14 @@ export class SettingsService {
   }
 
   /**
-   * Create or update a setting.
+   * Get all settings as full records (with metadata).
+   */
+  async getAll(organizationId: string) {
+    return settingsRepository.getAll(organizationId);
+  }
+
+  /**
+   * Create or update a setting with audit logging and previous value tracking.
    */
   async upsert(
     key: string,
@@ -26,14 +33,51 @@ export class SettingsService {
     organizationId: string,
     action: AuditAction = AuditAction.SETTINGS_UPDATE,
   ) {
+    // Fetch existing setting to capture previous value for versioning
+    const existing = await settingsRepository.findByKey(key, organizationId);
+
     const setting = await settingsRepository.upsert(key, value, updatedBy, organizationId);
 
     await this.logAudit(action, 'setting', key, organizationId, {
       value,
+      previousValue: existing?.value ?? null,
       updatedBy,
+      isNew: !existing,
     });
 
     return setting;
+  }
+
+  /**
+   * Bulk upsert settings (for import) with audit logging.
+   */
+  async importSettings(
+    settings: Record<string, unknown>,
+    updatedBy: string | undefined,
+    organizationId: string,
+  ) {
+    const results: { key: string; action: 'created' | 'updated' }[] = [];
+
+    for (const [key, value] of Object.entries(settings)) {
+      if (typeof value !== 'object' || value === null) {
+        continue; // Skip non-object values
+      }
+
+      const existing = await settingsRepository.findByKey(key, organizationId);
+      await settingsRepository.upsert(key, value as Record<string, unknown>, updatedBy, organizationId);
+
+      await this.logAudit(AuditAction.SETTINGS_UPDATE, 'setting', key, organizationId, {
+        value,
+        previousValue: existing?.value ?? null,
+        updatedBy,
+        isNew: !existing,
+        source: 'import',
+      });
+
+      results.push({ key, action: existing ? 'updated' : 'created' });
+    }
+
+    return results;
   }
 
   /**
@@ -50,6 +94,27 @@ export class SettingsService {
     });
 
     return { success: true };
+  }
+
+  /**
+   * Get audit history for settings.
+   */
+  async getAuditHistory(
+    organizationId: string,
+    params?: {
+      page?: number;
+      perPage?: number;
+      startDate?: string;
+      endDate?: string;
+      sort?: string;
+      order?: 'asc' | 'desc';
+    },
+  ) {
+    return auditLogRepository.findAll({
+      ...params,
+      entity: 'setting',
+      organizationId,
+    });
   }
 
   /**
