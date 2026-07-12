@@ -10,6 +10,7 @@ import organizationsRouter from './organizations.js';
 import uploadRouter from './upload.js';
 import filesRouter from './files.js';
 import chatRouter from './chat.js';
+import docsRouter from './docs.js';
 
 const router = Router();
 
@@ -31,5 +32,8 @@ router.use('/organizations', organizationsRouter);
 router.use('/upload', uploadRouter);
 router.use('/files', filesRouter);
 router.use('/chat', chatRouter);
+
+// Documentation
+router.use('/docs', docsRouter);
 
 export default router;
