@@ -3,10 +3,13 @@ import type { JSX } from "react";
 import { Avatar, Box, Chip, Typography } from "@mui/material";
 
 import {
+  Activity,
   Bell,
   Calendar,
   CheckCircle2,
   CreditCard,
+  LogIn,
+  Settings,
   ShieldCheck,
   UserRound,
 } from "lucide-react";
@@ -31,10 +34,20 @@ function getNotificationIcon(type: NotificationType): JSX.Element {
       return <CheckCircle2 size={18} />;
 
     case "companion":
+    case "user":
       return <UserRound size={18} />;
 
     case "security":
       return <ShieldCheck size={18} />;
+
+    case "setting":
+      return <Settings size={18} />;
+
+    case "auth":
+      return <LogIn size={18} />;
+
+    case "activity":
+      return <Activity size={18} />;
 
     default:
       return <Bell size={18} />;
@@ -53,10 +66,20 @@ function getAvatarColor(type: NotificationType): string {
       return colors.gold;
 
     case "companion":
+    case "user":
       return "#8B5CF6";
 
     case "security":
       return "#EF4444";
+
+    case "setting":
+      return colors.gold;
+
+    case "auth":
+      return "#3B82F6";
+
+    case "activity":
+      return "#64748B";
 
     default:
       return "#64748B";

@@ -111,7 +111,7 @@ For every task:
 | — | Floating Chat Widget | ✅ Complete | 100% |
 | 20 | Reporting | ✅ Complete | 100% |
 | 21 | WebSocket Integration | ✅ Complete | 100% |
-| 22 | Live Features | ❌ Not Started | 0% |
+| 22 | Live Features | ✅ Complete | 100% |
 | 23 | Security Hardening | ⏳ In Progress | ~40% |
 | 24 | Monitoring | ⏳ In Progress | ~70% |
 | 25 | Testing | ⏳ In Progress | ~25% |
@@ -572,15 +572,22 @@ For every task:
 
 ### 22. Live Features
 
-**Status:** ❌ Not Started
+**Status:** ✅ Complete (100%)
 **Dependencies:** Phase 21
 
 **Deliverables:**
-* **Live notifications** — real-time push of audit events and alerts
-* **Dashboard live updates** — KPI cards and charts update without page refresh
-* **Presence indicators** — show online/offline status for users
-* **Live events** — broadcast system events (user changes, settings updates)
-* Typing indicators and real-time activity feed updates
+* **Live notifications** — `audit:created` WebSocket events are mapped to header notifications in real time via `LiveNotificationsProvider` (new `features/realtime` module). Replaces the old TanStack-Query-only / empty notification popover.
+* **Dashboard live updates** — `useLiveDashboard` hook invalidates `audit-logs`, `users`, and `settings` queries (throttled) on every org-scoped audit event, so KPI cards, charts, and the Activity Feed refresh without a manual reload.
+* **Presence indicators** — `PresenceIndicator` in the header subscribes to `presence:update` and shows online users (avatar stack + count + popover), color-coded by role.
+* **Live events** — every user/settings/system change already broadcasts `audit:created` (Phase 21); the dashboard and notifications now react to it live.
+* **LIVE badge** — `LiveBadge` on the dashboard reflects the current WebSocket connection status.
+
+**Implementation Notes (2026-07-22):**
+* New frontend module `apps/web/src/features/realtime/`: `LiveNotificationsProvider` (context + initial fetch + WebSocket subscription), `auditToNotification.ts` (audit → `Notification` mapping), `PresenceIndicator.tsx`, `LiveBadge.tsx`, `useLiveDashboard.ts`.
+* `AppProvider` now wraps the app in `LiveNotificationsProvider` (inside `WebSocketProvider`), so live notifications are available app-wide and scoped to the authenticated org.
+* Header is the single owner of the notification bell/popover (DashboardLayout's duplicate popover + manual fetch were removed to avoid double rendering).
+* Notifications are derived client-side from `audit:created` events; the server-side `notification` WS event type remains available but unused for now.
+* **Vercel limitation:** live features require a long-running Node host (persistent WebSocket) — they degrade to the periodic initial fetch on serverless.
 
 **Cross-reference:** Real-time notification complements Phase 10's notification popover. Live dashboard updates enhance Phase 9 widgets.
 

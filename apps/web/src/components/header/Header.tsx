@@ -1,13 +1,14 @@
-import { type JSX, useState, useEffect } from "react";
+import { type JSX, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, InputBase, Button, IconButton } from "@mui/material";
 import { Search, Menu } from "lucide-react";
 import { useAuth } from "../../features/auth/AuthContext";
+import { useLiveNotifications } from "../../features/realtime/LiveNotificationsProvider";
 import { colors } from "../../theme/tokens";
 import HeaderActions from "./HeaderActions";
 import NotificationPopover from "./NotificationPopover";
 import MessagePopover from "./MessagePopover";
-import type { Message, Notification } from "./types";
+import type { Message } from "./types";
 
 interface HeaderProps {
   title: string;
@@ -23,7 +24,6 @@ interface HeaderProps {
   _showThemeToggle?: boolean;
   _showUserMenu?: boolean;
   _showSettings?: boolean;
-  notificationCount?: number;
   refreshing?: boolean;
   onRefresh?: () => Promise<void> | void;
   onNotificationsClick?: (event: React.MouseEvent<HTMLElement>) => void;
@@ -38,25 +38,18 @@ export default function Header({
   _showThemeToggle = true,
   _showUserMenu = true,
   _showSettings = true,
-  notificationCount = 0,
   refreshing = false,
   onRefresh,
   onNotificationsClick,
 }: HeaderProps): JSX.Element {
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const { notifications, unreadCount, markAllRead, markRead } = useLiveNotifications();
 
   const [notifAnchor, setNotifAnchor] = useState<HTMLElement | null>(null);
   const [msgAnchor, setMsgAnchor] = useState<HTMLElement | null>(null);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [dateRange, setDateRange] = useState("May 18 – Jun 18, 2026");
-
-  useEffect(() => {
-    // Notifications will be wired to the API in a future phase.
-    // For now, start with an empty list.
-    setNotifications([]);
-  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -87,16 +80,6 @@ export default function Header({
         : "May 18 – Jun 18, 2026",
     );
   };
-
-  const handleMarkAllRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
-  };
-
-  async function handleNotificationClick(id: string) {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, unread: false } : n)),
-    );
-  }
 
   const handleMessageClick = (message: Message) => {
     setMessages((prev) =>
@@ -208,7 +191,7 @@ export default function Header({
           <>
             <HeaderActions
               dateRange={dateRange}
-              notificationCount={notificationCount}
+              notificationCount={unreadCount}
               messageCount={messages.filter((m) => m.unread).length}
               refreshing={refreshing}
               onLogout={handleLogout}
@@ -223,10 +206,8 @@ export default function Header({
               open={Boolean(notifAnchor)}
               notifications={notifications}
               onClose={handleNotifClose}
-              onMarkAllRead={handleMarkAllRead}
-              onNotificationClick={(notification) =>
-                handleNotificationClick(notification.id)
-              }
+              onMarkAllRead={markAllRead}
+              onNotificationClick={(notification) => markRead(notification.id)}
             />
 
             <MessagePopover

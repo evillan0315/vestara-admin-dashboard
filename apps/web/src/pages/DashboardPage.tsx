@@ -34,6 +34,8 @@ import { useUsers } from '../features/users/hooks';
 import { useSettings } from '../features/settings/hooks';
 import { useAuditLogs, useAuditLogsRange } from '../features/audit-logs/hooks';
 import { useAuth } from '../features/auth/AuthContext';
+import { useLiveDashboard } from '../features/realtime/useLiveDashboard';
+import LiveBadge from '../features/realtime/LiveBadge';
 import { AuditAction, EntityType, type AuditLogDTO } from '@vestara/types';
 
 const DashboardContainer = styled(Box)(() => ({
@@ -318,6 +320,9 @@ export function DashboardPage() {
   const [range, setRange] = useState<number>(14);
   const { user } = useAuth();
 
+  // Refresh dashboard data in real time as org-scoped audit events arrive.
+  useLiveDashboard();
+
   const usersAll = useUsers({ perPage: 1 });
   const usersActive = useUsers({ perPage: 1, isActive: true });
   const settingsQuery = useSettings();
@@ -365,7 +370,8 @@ export function DashboardPage() {
             </Typography>
           </Box>
           {user?.organizationId && (
-            <Box sx={{ ml: 'auto' }}>
+            <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <LiveBadge />
               <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
                 Organization: {user.organizationId}
               </Typography>

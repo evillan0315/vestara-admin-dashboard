@@ -5,6 +5,7 @@ import { QueryProvider } from './QueryProvider';
 import { AuthProvider } from '../features/auth/AuthContext';
 import { ToastProvider } from '../components/feedback/Toast';
 import { WebSocketProvider } from '../websocket/WebSocketProvider';
+import { LiveNotificationsProvider } from '../features/realtime/LiveNotificationsProvider';
 
 interface AppProviderProps {
   children: ReactNode;
@@ -17,7 +18,9 @@ export function AppProvider({ children }: AppProviderProps) {
         <AuthProvider>
           <ThemeProvider>
             <ToastProvider>
-              <WebSocketProvider>{children}</WebSocketProvider>
+              <WebSocketProvider>
+                <LiveNotificationsProvider>{children}</LiveNotificationsProvider>
+              </WebSocketProvider>
             </ToastProvider>
           </ThemeProvider>
         </AuthProvider>

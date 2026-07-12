@@ -13,7 +13,11 @@ export type NotificationType =
   | "membership"
   | "companion"
   | "security"
-  | "system";
+  | "system"
+  | "user"
+  | "setting"
+  | "auth"
+  | "activity";
 
 export interface Notification {
   id: string;

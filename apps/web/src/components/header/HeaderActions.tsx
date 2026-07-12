@@ -9,6 +9,7 @@ import DateRangeButton from "./DateRangeButton";
 import RefreshButton from "./RefreshButton";
 import UserMenu from "./UserMenu";
 import ConnectionStatus from "./ConnectionStatus";
+import PresenceIndicator from "../../features/realtime/PresenceIndicator";
 
 import { colors } from "../../theme/tokens";
 
@@ -68,6 +69,8 @@ export default function HeaderActions({
       </Box>
 
       <ConnectionStatus />
+
+      <PresenceIndicator />
 
       <HeaderIconButton
         tooltip="Notifications"
