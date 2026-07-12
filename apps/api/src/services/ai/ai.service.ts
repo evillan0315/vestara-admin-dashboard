@@ -2,6 +2,7 @@ import type { AIProvider, AICompletionRequest, AICompletionResponse } from './ty
 import { MockAIProvider } from './mock.provider.js';
 import { OpenAIProvider } from './openai.provider.js';
 import { AnthropicProvider } from './anthropic.provider.js';
+import { OpenCodeProvider } from './opencode.provider.js';
 
 /**
  * AI Service
@@ -10,9 +11,10 @@ import { AnthropicProvider } from './anthropic.provider.js';
  * Falls back to the mock provider if no API keys are configured.
  *
  * Provider priority:
- * 1. OpenAI (if OPENAI_API_KEY is set)
- * 2. Anthropic (if ANTHROPIC_API_KEY is set)
- * 3. Mock (always available as fallback)
+ * 1. OpenCode (if OPENCODE_API_KEY is set)
+ * 2. OpenAI (if OPENAI_API_KEY is set)
+ * 3. Anthropic (if ANTHROPIC_API_KEY is set)
+ * 4. Mock (always available as fallback)
  */
 export class AIService {
   private readonly providers = new Map<string, AIProvider>();
@@ -21,10 +23,14 @@ export class AIService {
   constructor() {
     // Initialize providers
     this.mockProvider = new MockAIProvider();
+    const openCodeProvider = new OpenCodeProvider();
     const openaiProvider = new OpenAIProvider();
     const anthropicProvider = new AnthropicProvider();
 
     this.providers.set('mock', this.mockProvider);
+    if (openCodeProvider.isAvailable()) {
+      this.providers.set('opencode', openCodeProvider);
+    }
     if (openaiProvider.isAvailable()) {
       this.providers.set('openai', openaiProvider);
     }
@@ -39,6 +45,10 @@ export class AIService {
   private getProviderForModel(model: string): AIProvider {
     // Map model IDs to provider names
     const modelProviderMap: Record<string, string> = {
+      'mimo-v2.5-free': 'opencode',
+      'deepseek-v4-flash-free': 'opencode',
+      'nemotron-3-ultra-free': 'opencode',
+      'north-mini-code-free': 'opencode',
       'gpt-4': 'openai',
       'gpt-4o': 'openai',
       'gpt-4o-mini': 'openai',
@@ -47,7 +57,7 @@ export class AIService {
       'mock': 'mock',
     };
 
-    const providerName = modelProviderMap[model] ?? 'mock';
+    const providerName = modelProviderMap[model] ?? 'opencode';
     const provider = this.providers.get(providerName);
 
     if (!provider) {
@@ -62,7 +72,7 @@ export class AIService {
    * Generate a completion using the appropriate provider.
    */
   async complete(request: AICompletionRequest): Promise<AICompletionResponse> {
-    const model = request.model ?? 'mock';
+    const model = request.model ?? 'mimo-v2.5-free';
     const provider = this.getProviderForModel(model);
 
     // If the resolved provider isn't available, fall back to mock

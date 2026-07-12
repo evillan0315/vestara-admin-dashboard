@@ -34,7 +34,7 @@ export class ChatService {
       title: data.title,
       userId,
       organizationId,
-      model: data.model ?? 'mock',
+      model: data.model ?? 'mimo-v2.5-free',
       systemPrompt: data.systemPrompt ?? DEFAULT_SYSTEM_PROMPT,
     });
 
