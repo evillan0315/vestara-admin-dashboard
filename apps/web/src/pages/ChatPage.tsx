@@ -82,7 +82,6 @@ interface ConversationSidebarProps {
   onNewConversation: () => void;
   conversations: ChatConversationDTO[];
   loading: boolean;
-  /** When true, rendered as a Drawer for mobile */
   isMobile?: boolean;
   drawerOpen?: boolean;
   onDrawerClose?: () => void;
@@ -207,7 +206,10 @@ function ConversationSidebar({
         </Typography>
         <Tooltip title="New conversation">
           <IconButton
-            onClick={onNewConversation}
+            onClick={() => {
+              onNewConversation();
+              onDrawerClose?.();
+            }}
             size="small"
             sx={{
               bgcolor: theme.palette.primary.main,
@@ -352,7 +354,6 @@ function ConversationSidebar({
     </Box>
   );
 
-  // Mobile: render inside a Drawer
   if (isMobile) {
     return (
       <Drawer
@@ -373,7 +374,6 @@ function ConversationSidebar({
     );
   }
 
-  // Desktop: render as a fixed-width flex child
   return sidebarContent;
 }
 
@@ -570,9 +570,9 @@ function TypingIndicator() {
   );
 }
 
-// ── Empty State ─────────────────────────────────────────────────────────────
+// ── Empty State (shown above the input when no conversation is active) ─────
 
-function EmptyState({ onNewConversation }: { onNewConversation: () => void }) {
+function EmptyState({ onSuggestionClick }: { onSuggestionClick: (text: string) => void }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -608,15 +608,6 @@ function EmptyState({ onNewConversation }: { onNewConversation: () => void }) {
         Powered by OpenCode AI. Ask questions about the dashboard,
         get help with user management, or explore system settings.
       </Typography>
-      <Button
-        variant="contained"
-        size={isMobile ? 'medium' : 'large'}
-        startIcon={<AddIcon />}
-        onClick={onNewConversation}
-        sx={{ mt: 1 }}
-      >
-        Start a Conversation
-      </Button>
       <Box sx={{ display: 'flex', gap: { xs: 0.5, sm: 1 }, mt: 1.5, flexWrap: 'wrap', justifyContent: 'center' }}>
         {['How do I manage users?', 'Explain the dashboard', 'Security best practices'].map((suggestion) => (
           <Chip
@@ -624,16 +615,7 @@ function EmptyState({ onNewConversation }: { onNewConversation: () => void }) {
             label={suggestion}
             variant="outlined"
             size="small"
-            onClick={() => {
-              onNewConversation();
-              setTimeout(() => {
-                const input = document.querySelector('[data-chat-input]') as HTMLInputElement;
-                if (input) {
-                  input.value = suggestion;
-                  input.dispatchEvent(new Event('input', { bubbles: true }));
-                }
-              }, 100);
-            }}
+            onClick={() => onSuggestionClick(suggestion)}
             sx={{
               cursor: 'pointer',
               '&:hover': {
@@ -691,12 +673,17 @@ export function ChatPage() {
     setActiveConversationId(null);
     setInputValue('');
     setMobileSidebarOpen(false);
-    inputRef.current?.focus();
+    setTimeout(() => inputRef.current?.focus(), 100);
   }, []);
 
   const handleSelectConversation = useCallback((id: string) => {
     setActiveConversationId(id);
     setInputValue('');
+  }, []);
+
+  const handleSuggestionClick = useCallback((text: string) => {
+    setInputValue(text);
+    setTimeout(() => inputRef.current?.focus(), 50);
   }, []);
 
   const handleSend = useCallback(async () => {
@@ -706,6 +693,7 @@ export function ChatPage() {
     setInputValue('');
 
     if (!activeConversationId) {
+      // Create a new conversation with the first message
       try {
         const conversation = await createConversation.mutateAsync({
           title: content.slice(0, 50) + (content.length > 50 ? '...' : ''),
@@ -716,6 +704,7 @@ export function ChatPage() {
         // Error handled by mutation
       }
     } else {
+      // Send message in existing conversation
       sendMessage.mutate({
         conversationId: activeConversationId,
         data: { content },
@@ -741,7 +730,7 @@ export function ChatPage() {
         bgcolor: theme.palette.background.paper,
       }}
     >
-      {/* Sidebar — desktop only as flex child */}
+      {/* Sidebar — desktop only */}
       {!isMobile && (
         <ConversationSidebar
           activeConversationId={activeConversationId}
@@ -775,165 +764,168 @@ export function ChatPage() {
           minWidth: 0,
         }}
       >
-        {!activeConversationId ? (
-          <EmptyState onNewConversation={handleNewConversation} />
-        ) : (
-          <>
-            {/* Chat Header */}
-            <Box
-              sx={{
-                px: { xs: 1.5, sm: 3 },
-                py: { xs: 1, sm: 1.5 },
-                borderBottom: `1px solid ${theme.palette.divider}`,
-                display: 'flex',
-                alignItems: 'center',
-                gap: { xs: 0.5, sm: 1 },
-              }}
-            >
-              {isMobile && (
-                <IconButton
-                  onClick={() => setMobileSidebarOpen(true)}
-                  size="small"
-                  sx={{ mr: 0.5 }}
-                >
-                  <MenuIcon fontSize="small" />
-                </IconButton>
-              )}
-              <SparkleIcon sx={{ color: theme.palette.primary.main, fontSize: { xs: 20, sm: 24 } }} />
-              <Typography
-                variant="subtitle1"
-                fontWeight={600}
-                noWrap
-                sx={{ flex: 1, fontSize: { xs: '0.875rem', sm: '1rem' } }}
-              >
-                {conversationData?.title ?? 'Loading...'}
-              </Typography>
-              <Chip
-                label={getModelDisplayName(conversationData?.model)}
+        {/* Chat Header — only when a conversation is active */}
+        {activeConversationId && (
+          <Box
+            sx={{
+              px: { xs: 1.5, sm: 3 },
+              py: { xs: 1, sm: 1.5 },
+              borderBottom: `1px solid ${theme.palette.divider}`,
+              display: 'flex',
+              alignItems: 'center',
+              gap: { xs: 0.5, sm: 1 },
+            }}
+          >
+            {isMobile && (
+              <IconButton
+                onClick={() => setMobileSidebarOpen(true)}
                 size="small"
-                variant="outlined"
-                color="primary"
-                sx={{ height: 24, display: { xs: 'none', sm: 'inline-flex' } }}
-              />
-            </Box>
-
-            {/* Messages */}
-            <Box
-              sx={{
-                flex: 1,
-                overflow: 'auto',
-                px: { xs: 1.5, sm: 3 },
-                py: { xs: 1.5, sm: 2 },
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              {messagesLoading ? (
-                Array.from({ length: 4 }).map((_, i) => (
-                  <Box key={i} sx={{ display: 'flex', gap: { xs: 1, sm: 1.5 }, mb: { xs: 1.5, sm: 2 } }}>
-                    <Skeleton variant="circular" width={32} height={32} />
-                    <Skeleton variant="rounded" width="60%" height={40} sx={{ borderRadius: 2 }} />
-                  </Box>
-                ))
-              ) : (
-                messages.map((message, index) => (
-                  <MessageBubbleComponent
-                    key={message.id}
-                    message={message}
-                    isLatest={index === messages.length - 1}
-                  />
-                ))
-              )}
-              {isSending && <TypingIndicator />}
-              <div ref={messagesEndRef} />
-            </Box>
-
-            {/* Input Area */}
-            <Box
-              sx={{
-                p: { xs: 1, sm: 2 },
-                borderTop: `1px solid ${theme.palette.divider}`,
-                bgcolor: theme.palette.background.paper,
-              }}
-            >
-              <TextField
-                inputRef={inputRef}
-                data-chat-input
-                fullWidth
-                multiline
-                maxRows={isMobile ? 3 : 4}
-                placeholder={isMobile ? 'Type a message...' : 'Type your message... (Enter to send, Shift+Enter for new line)'}
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={handleKeyDown}
-                disabled={isSending}
-                variant="outlined"
-                size={isMobile ? 'small' : 'medium'}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SparkleIcon sx={{ color: theme.palette.primary.main, fontSize: 20 }} />
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      {isSending ? (
-                        <CircularProgress size={20} />
-                      ) : (
-                        <IconButton
-                          onClick={handleSend}
-                          disabled={!inputValue.trim() || isSending}
-                          size="small"
-                          sx={{
-                            bgcolor: inputValue.trim()
-                              ? theme.palette.primary.main
-                              : theme.palette.action.disabledBackground,
-                            color: inputValue.trim()
-                              ? theme.palette.primary.contrastText
-                              : theme.palette.action.disabled,
-                            '&:hover': {
-                              bgcolor: inputValue.trim()
-                                ? theme.palette.primary.dark
-                                : undefined,
-                            },
-                          }}
-                        >
-                          <SendIcon fontSize="small" />
-                        </IconButton>
-                      )}
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    bgcolor: theme.palette.background.default,
-                    '& fieldset': {
-                      borderColor: theme.palette.divider,
-                    },
-                    '&:hover fieldset': {
-                      borderColor: theme.palette.primary.main,
-                    },
-                  },
-                }}
-              />
-              <Typography
-                variant="caption"
-                color="text.disabled"
-                sx={{
-                  mt: 0.5,
-                  display: 'block',
-                  textAlign: 'center',
-                  fontSize: { xs: '0.65rem', sm: '0.75rem' },
-                }}
+                sx={{ mr: 0.5 }}
               >
-                {isMobile
-                  ? 'AI responses may not always be accurate.'
-                  : `Powered by ${getModelDisplayName(conversationData?.model)} via OpenCode. Responses may not always be accurate.`}
-              </Typography>
-            </Box>
-          </>
+                <MenuIcon fontSize="small" />
+              </IconButton>
+            )}
+            <SparkleIcon sx={{ color: theme.palette.primary.main, fontSize: { xs: 20, sm: 24 } }} />
+            <Typography
+              variant="subtitle1"
+              fontWeight={600}
+              noWrap
+              sx={{ flex: 1, fontSize: { xs: '0.875rem', sm: '1rem' } }}
+            >
+              {conversationData?.title ?? 'Loading...'}
+            </Typography>
+            <Chip
+              label={getModelDisplayName(conversationData?.model)}
+              size="small"
+              variant="outlined"
+              color="primary"
+              sx={{ height: 24, display: { xs: 'none', sm: 'inline-flex' } }}
+            />
+          </Box>
         )}
+
+        {/* Messages — only when a conversation is active */}
+        {activeConversationId && (
+          <Box
+            sx={{
+              flex: 1,
+              overflow: 'auto',
+              px: { xs: 1.5, sm: 3 },
+              py: { xs: 1.5, sm: 2 },
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            {messagesLoading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <Box key={i} sx={{ display: 'flex', gap: { xs: 1, sm: 1.5 }, mb: { xs: 1.5, sm: 2 } }}>
+                  <Skeleton variant="circular" width={32} height={32} />
+                  <Skeleton variant="rounded" width="60%" height={40} sx={{ borderRadius: 2 }} />
+                </Box>
+              ))
+            ) : (
+              messages.map((message, index) => (
+                <MessageBubbleComponent
+                  key={message.id}
+                  message={message}
+                  isLatest={index === messages.length - 1}
+                />
+              ))
+            )}
+            {isSending && <TypingIndicator />}
+            <div ref={messagesEndRef} />
+          </Box>
+        )}
+
+        {/* Empty State — only when no conversation is active */}
+        {!activeConversationId && (
+          <EmptyState onSuggestionClick={handleSuggestionClick} />
+        )}
+
+        {/* Input Area — always visible */}
+        <Box
+          sx={{
+            p: { xs: 1, sm: 2 },
+            borderTop: `1px solid ${theme.palette.divider}`,
+            bgcolor: theme.palette.background.paper,
+          }}
+        >
+          <TextField
+            inputRef={inputRef}
+            data-chat-input
+            fullWidth
+            multiline
+            maxRows={isMobile ? 3 : 4}
+            placeholder={isMobile ? 'Type a message...' : 'Type your message... (Enter to send, Shift+Enter for new line)'}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            disabled={isSending}
+            variant="outlined"
+            size={isMobile ? 'small' : 'medium'}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SparkleIcon sx={{ color: theme.palette.primary.main, fontSize: 20 }} />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  {isSending ? (
+                    <CircularProgress size={20} />
+                  ) : (
+                    <IconButton
+                      onClick={handleSend}
+                      disabled={!inputValue.trim() || isSending}
+                      size="small"
+                      sx={{
+                        bgcolor: inputValue.trim()
+                          ? theme.palette.primary.main
+                          : theme.palette.action.disabledBackground,
+                        color: inputValue.trim()
+                          ? theme.palette.primary.contrastText
+                          : theme.palette.action.disabled,
+                        '&:hover': {
+                          bgcolor: inputValue.trim()
+                            ? theme.palette.primary.dark
+                            : undefined,
+                        },
+                      }}
+                    >
+                      <SendIcon fontSize="small" />
+                    </IconButton>
+                  )}
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
+                bgcolor: theme.palette.background.default,
+                '& fieldset': {
+                  borderColor: theme.palette.divider,
+                },
+                '&:hover fieldset': {
+                  borderColor: theme.palette.primary.main,
+                },
+              },
+            }}
+          />
+          <Typography
+            variant="caption"
+            color="text.disabled"
+            sx={{
+              mt: 0.5,
+              display: 'block',
+              textAlign: 'center',
+              fontSize: { xs: '0.65rem', sm: '0.75rem' },
+            }}
+          >
+            {isMobile
+              ? 'AI responses may not always be accurate.'
+              : `Powered by ${getModelDisplayName(conversationData?.model)} via OpenCode. Responses may not always be accurate.`}
+          </Typography>
+        </Box>
       </Box>
     </Box>
   );

@@ -5,7 +5,7 @@ import type { AIProvider, AICompletionRequest, AICompletionResponse } from './ty
  *
  * Uses OpenCode's OpenAI-compatible chat completions endpoint.
  * Requires OPENCODE_API_KEY environment variable.
- * Base URL defaults to https://opencode.ai/zen/go/v1 and can be overridden
+ * Base URL defaults to https://opencode.ai/zen/v1 and can be overridden
  * with OPENCODE_BASE_URL.
  *
  * @see https://opencode.ai
@@ -19,7 +19,7 @@ export class OpenCodeProvider implements AIProvider {
 
   constructor() {
     this.apiKey = process.env.OPENCODE_API_KEY ?? '';
-    this.baseUrl = process.env.OPENCODE_BASE_URL ?? 'https://opencode.ai/zen/go/v1';
+    this.baseUrl = process.env.OPENCODE_BASE_URL ?? 'https://opencode.ai/zen/v1';
   }
 
   isAvailable(): boolean {
@@ -63,7 +63,14 @@ export class OpenCodeProvider implements AIProvider {
     }
 
     const data = (await response.json()) as {
-      choices: Array<{ message: { content: string } }>;
+      choices: Array<{
+        message: {
+          content: string | null;
+          reasoning?: string;
+          reasoning_content?: string;
+          reasoning_details?: Array<{ text: string }>;
+        };
+      }>;
       usage: {
         prompt_tokens: number;
         completion_tokens: number;
@@ -77,8 +84,18 @@ export class OpenCodeProvider implements AIProvider {
       throw new Error('No response from OpenCode API');
     }
 
+    // Reasoning models may return content=null with the answer in reasoning fields.
+    // Different models use different field names: reasoning, reasoning_content, reasoning_details.
+    const msg = choice.message;
+    const content =
+      msg.content
+      ?? msg.reasoning
+      ?? msg.reasoning_content
+      ?? msg.reasoning_details?.[0]?.text
+      ?? '';
+
     return {
-      content: choice.message.content,
+      content,
       model: data.model,
       usage: {
         promptTokens: data.usage.prompt_tokens,
