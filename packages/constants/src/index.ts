@@ -156,6 +156,8 @@ export const AUDIT_ACTIONS = {
   SUSPEND: 'suspend',
   ACTIVATE: 'activate',
   PASSWORD_CHANGE: 'password_change',
+  EMAIL_CHANGE: 'email_change',
+  ACCOUNT_DELETION: 'account_deletion',
   SETTINGS_UPDATE: 'settings_update',
   SETTINGS_DELETE: 'settings_delete',
 } as const;

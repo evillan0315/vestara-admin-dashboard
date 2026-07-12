@@ -229,6 +229,8 @@ const ACTION_LABELS: Record<AuditAction, string> = {
   [AuditAction.SUSPEND]: 'Suspend',
   [AuditAction.ACTIVATE]: 'Activate',
   [AuditAction.PASSWORD_CHANGE]: 'Password',
+  [AuditAction.EMAIL_CHANGE]: 'Email Change',
+  [AuditAction.ACCOUNT_DELETION]: 'Account Deletion',
   [AuditAction.SETTINGS_UPDATE]: 'Setting Update',
   [AuditAction.SETTINGS_DELETE]: 'Setting Delete',
   [AuditAction.ERROR]: 'Error',

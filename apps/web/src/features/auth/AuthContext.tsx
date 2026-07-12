@@ -15,6 +15,7 @@ interface AuthContextValue extends AuthState {
   register: (data: { email: string; password: string; firstName: string; lastName: string }) => Promise<void>;
   logout: () => Promise<void>;
   updateUser: (user: UserDTO) => void;
+  deleteAccount: () => void;
   oauthRedirect: (provider: 'google' | 'github') => void;
   handleOAuthCallback: (accessToken: string, refreshToken: string) => Promise<void>;
 }
@@ -110,6 +111,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, [state.user?.id, setUser]);
 
+  const deleteAccount = useCallback(() => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    setUser(null);
+  }, [setUser]);
+
   /**
    * Redirect the browser to the backend OAuth authorization endpoint.
    * The backend will redirect to the provider's consent screen.
@@ -143,7 +150,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [setUser]);
 
   return (
-    <AuthContext.Provider value={{ ...state, login, register, logout, updateUser, oauthRedirect, handleOAuthCallback }}>
+    <AuthContext.Provider value={{ ...state, login, register, logout, updateUser, deleteAccount, oauthRedirect, handleOAuthCallback }}>
       {children}
     </AuthContext.Provider>
   );

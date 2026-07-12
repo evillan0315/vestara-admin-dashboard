@@ -217,6 +217,30 @@ export class UserRepository extends BaseRepository {
   }
 
   /**
+   * Update user email.
+   */
+  async updateEmail(id: string, email: string) {
+    return this.prisma.user.update({
+      where: { id },
+      data: { email },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        isActive: true,
+        avatarUrl: true,
+        provider: true,
+        providerId: true,
+        lastLoginAt: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
+  /**
    * Update the last login timestamp.
    */
   async updateLastLogin(id: string) {

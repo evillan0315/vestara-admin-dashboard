@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -11,6 +11,10 @@ import {
   Paper,
   Alert,
   CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import {
   User as UserIcon,
@@ -18,19 +22,32 @@ import {
   Camera,
   CheckCircle,
   AlertCircle,
+  Mail,
+  Trash2,
 } from 'lucide-react';
 import { useAuth } from '../features/auth/AuthContext';
-import { useProfile, useUpdateProfile, useChangePassword } from '../features/profile/hooks';
+import {
+  useProfile,
+  useUpdateProfile,
+  useChangePassword,
+  useChangeEmail,
+  useDeleteAccount,
+} from '../features/profile/hooks';
+import { uploadImage } from '../api/upload';
 import { colors } from '../theme/tokens';
 
 type TabValue = 'general' | 'security';
 
 export default function ProfilePage() {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, deleteAccount: clearAuth } = useAuth();
   const { data: profileData, isLoading: profileLoading } = useProfile();
   const updateProfileMutation = useUpdateProfile();
   const changePasswordMutation = useChangePassword();
+  const changeEmailMutation = useChangeEmail();
+  const deleteAccountMutation = useDeleteAccount();
   const location = useLocation();
+  const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Derive initial tab from path: /security → security tab
   const initialTab: TabValue = location.pathname === '/security' ? 'security' : 'general';
@@ -41,12 +58,29 @@ export default function ProfilePage() {
   const [lastName, setLastName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
 
+  // ── Email change dialog state ───────────────
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
+  const [emailPassword, setEmailPassword] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [emailSuccess, setEmailSuccess] = useState('');
+
   // ── Security form state ─────────────────────
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
+
+  // ── Delete account state ────────────────────
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState('');
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteError, setDeleteError] = useState('');
+
+  // ── Avatar upload state ─────────────────────
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarUploadError, setAvatarUploadError] = useState('');
 
   // Load profile data into form
   useEffect(() => {
@@ -90,6 +124,83 @@ export default function ProfilePage() {
     }
   };
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setAvatarUploading(true);
+    setAvatarUploadError('');
+
+    try {
+      const result = await uploadImage(file);
+      if (result.success && result.data?.url) {
+        setAvatarUrl(result.data.url);
+        // Auto-save the profile with the new avatar
+        await updateProfileMutation.mutateAsync({
+          firstName,
+          lastName,
+          avatarUrl: result.data.url,
+        });
+        if (profileData?.data?.user) {
+          updateUser({
+            ...profileData.data.user,
+            avatarUrl: result.data.url,
+          });
+        }
+      } else {
+        setAvatarUploadError(result.error || 'Failed to upload image');
+      }
+    } catch {
+      setAvatarUploadError('Failed to upload image');
+    } finally {
+      setAvatarUploading(false);
+      // Reset file input so the same file can be re-selected
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  // ── Email Change ────────────────────────────
+
+  const handleOpenEmailDialog = () => {
+    setNewEmail(user?.email ?? '');
+    setEmailPassword('');
+    setEmailError('');
+    setEmailSuccess('');
+    setEmailDialogOpen(true);
+  };
+
+  const handleChangeEmail = async () => {
+    setEmailError('');
+    setEmailSuccess('');
+
+    if (!newEmail || newEmail === user?.email) {
+      setEmailError('Please enter a different email address');
+      return;
+    }
+
+    try {
+      const result = await changeEmailMutation.mutateAsync({
+        newEmail,
+        ...(isOAuthAccount ? {} : { currentPassword: emailPassword }),
+      });
+      if (result.data?.user) {
+        updateUser({ ...user!, ...result.data.user });
+      }
+      setEmailSuccess('Email changed successfully');
+      setEmailPassword('');
+      setTimeout(() => {
+        setEmailDialogOpen(false);
+      }, 1500);
+    } catch (err: unknown) {
+      const apiErr = err as { message?: string };
+      setEmailError(apiErr?.message || 'Failed to change email');
+    }
+  };
+
+  // ── Password Change ─────────────────────────
+
   const handleChangePassword = async () => {
     setPasswordError('');
     setPasswordSuccess('');
@@ -104,8 +215,6 @@ export default function ProfilePage() {
       return;
     }
 
-    // For OAuth accounts, currentPassword is optional
-    // For non-OAuth accounts, it's required
     if (!isOAuthAccount && !currentPassword) {
       setPasswordError('Current password is required');
       return;
@@ -126,6 +235,32 @@ export default function ProfilePage() {
     }
   };
 
+  // ── Account Deletion ────────────────────────
+
+  const handleOpenDeleteDialog = () => {
+    setDeleteConfirmation('');
+    setDeletePassword('');
+    setDeleteError('');
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeleteError('');
+
+    try {
+      await deleteAccountMutation.mutateAsync({
+        confirmation: deleteConfirmation,
+        ...(isOAuthAccount ? {} : { currentPassword: deletePassword }),
+      });
+      setDeleteDialogOpen(false);
+      clearAuth();
+      navigate('/login');
+    } catch (err: unknown) {
+      const apiErr = err as { message?: string };
+      setDeleteError(apiErr?.message || 'Failed to delete account');
+    }
+  };
+
   const isOAuthAccount = !!(user?.provider);
 
   // ── Derived state ──────────────────────────
@@ -136,6 +271,8 @@ export default function ProfilePage() {
     .join('')
     .toUpperCase()
     .slice(0, 2) || 'U';
+
+  const canChangeEmail = !!(newEmail && newEmail !== user?.email && (!isOAuthAccount ? emailPassword : true));
 
   // ── Loading ─────────────────────────────────
 
@@ -149,6 +286,15 @@ export default function ProfilePage() {
 
   return (
     <Box sx={{ maxWidth: 800, mx: 'auto' }}>
+      {/* Hidden file input for avatar upload */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/svg+xml"
+        style={{ display: 'none' }}
+        onChange={handleAvatarUpload}
+      />
+
       {/* Page Header */}
       <Typography variant="h5" sx={{ fontWeight: 700, color: colors.text, mb: 0.5 }}>
         Profile Settings
@@ -201,6 +347,7 @@ export default function ProfilePage() {
                 {initials}
               </Avatar>
               <Box
+                onClick={() => fileInputRef.current?.click()}
                 sx={{
                   position: 'absolute',
                   bottom: -2,
@@ -213,9 +360,15 @@ export default function ProfilePage() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
+                  transition: 'opacity 0.2s',
+                  '&:hover': { opacity: 0.8 },
                 }}
               >
-                <Camera size={14} color="#0A0F18" />
+                {avatarUploading ? (
+                  <CircularProgress size={14} sx={{ color: '#0A0F18' }} />
+                ) : (
+                  <Camera size={14} color="#0A0F18" />
+                )}
               </Box>
             </Box>
             <Box>
@@ -227,6 +380,17 @@ export default function ProfilePage() {
               </Typography>
             </Box>
           </Box>
+
+          {/* Avatar upload error */}
+          {avatarUploadError && (
+            <Alert
+              icon={<AlertCircle size={18} />}
+              severity="error"
+              sx={{ borderRadius: 2, bgcolor: 'rgba(244,67,54,0.1)', color: colors.error, mb: 2 }}
+            >
+              {avatarUploadError}
+            </Alert>
+          )}
 
           {/* Form Fields */}
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
@@ -249,14 +413,37 @@ export default function ProfilePage() {
               />
             </Box>
 
-            <TextField
-              label="Email"
-              value={user?.email ?? ''}
-              fullWidth
-              size="small"
-              disabled
-              sx={textFieldStyles}
-            />
+            {/* Email field with change button */}
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+              <TextField
+                label="Email"
+                value={user?.email ?? ''}
+                fullWidth
+                size="small"
+                disabled
+                sx={{ ...textFieldStyles, flex: 1 }}
+              />
+              <Button
+                variant="outlined"
+                onClick={handleOpenEmailDialog}
+                startIcon={<Mail size={16} />}
+                sx={{
+                  mt: 0.5,
+                  minWidth: 120,
+                  height: 40,
+                  textTransform: 'none',
+                  borderRadius: '10px',
+                  borderColor: colors.gold,
+                  color: colors.gold,
+                  '&:hover': {
+                    borderColor: colors.goldHover,
+                    bgcolor: colors.goldSoft,
+                  },
+                }}
+              >
+                Change
+              </Button>
+            </Box>
 
             <TextField
               label="Avatar URL"
@@ -265,7 +452,7 @@ export default function ProfilePage() {
               fullWidth
               size="small"
               placeholder="https://example.com/avatar.jpg"
-              helperText="Enter a URL for your profile picture"
+              helperText="Enter a URL for your profile picture, or click the camera icon to upload"
               sx={textFieldStyles}
             />
 
@@ -317,57 +504,70 @@ export default function ProfilePage() {
 
       {/* ── Security Tab ──────────────────────── */}
       {tab === 'security' && (
-        <Paper
-          sx={{
-            p: { xs: 2.5, sm: 3.5 },
-            bgcolor: colors.card,
-            border: `1px solid ${colors.border}`,
-            borderRadius: 3,
-          }}
-        >
-          <Typography sx={{ fontWeight: 700, color: colors.text, fontSize: 16, mb: 0.5 }}>
-            Change Password
-          </Typography>
-          <Typography sx={{ color: colors.secondary, fontSize: 13, mb: 3 }}>
-            Update your password to keep your account secure
-          </Typography>
+        <>
+          {/* Change Password Section */}
+          <Paper
+            sx={{
+              p: { xs: 2.5, sm: 3.5 },
+              bgcolor: colors.card,
+              border: `1px solid ${colors.border}`,
+              borderRadius: 3,
+              mb: 3,
+            }}
+          >
+            <Typography sx={{ fontWeight: 700, color: colors.text, fontSize: 16, mb: 0.5 }}>
+              Change Password
+            </Typography>
+            <Typography sx={{ color: colors.secondary, fontSize: 13, mb: 3 }}>
+              Update your password to keep your account secure
+            </Typography>
 
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, maxWidth: 440 }}>
-            <TextField
-              label="Current Password"
-              type="password"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              fullWidth
-              size="small"
-              required={!isOAuthAccount}
-              helperText={isOAuthAccount ? 'Optional for OAuth accounts setting initial password' : 'Required'}
-              sx={textFieldStyles}
-            />
+            {isOAuthAccount ? (
+              <Alert
+                icon={<AlertCircle size={18} />}
+                severity="info"
+                sx={{ borderRadius: 2, bgcolor: 'rgba(59, 130, 246, 0.1)', color: colors.info, mb: 2 }}
+              >
+                You signed in with {user?.provider}. You can set a password here for email/password login.
+              </Alert>
+            ) : null}
 
-            <TextField
-              label="New Password"
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              fullWidth
-              size="small"
-              required
-              helperText="Min 8 characters, at least one uppercase, lowercase, and number"
-              sx={textFieldStyles}
-            />
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, maxWidth: 440 }}>
+              <TextField
+                label="Current Password"
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                fullWidth
+                size="small"
+                required={!isOAuthAccount}
+                helperText={isOAuthAccount ? 'Optional for OAuth accounts setting initial password' : 'Required'}
+                sx={textFieldStyles}
+              />
 
-            <TextField
-              label="Confirm New Password"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              fullWidth
-              size="small"
-              required
-              error={!!passwordError && passwordError === 'Passwords do not match'}
-              sx={textFieldStyles}
-            />
+              <TextField
+                label="New Password"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                fullWidth
+                size="small"
+                required
+                helperText="Min 8 characters, at least one uppercase, lowercase, and number"
+                sx={textFieldStyles}
+              />
+
+              <TextField
+                label="Confirm New Password"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                fullWidth
+                size="small"
+                required
+                error={!!passwordError && passwordError === 'Passwords do not match'}
+                sx={textFieldStyles}
+              />
 
               {/* Success */}
               {passwordSuccess && (
@@ -412,8 +612,246 @@ export default function ProfilePage() {
                 {changePasswordMutation.isPending ? 'Changing...' : 'Change Password'}
               </Button>
             </Box>
-        </Paper>
+          </Paper>
+
+          {/* ── Delete Account Danger Zone ────── */}
+          <Paper
+            sx={{
+              p: { xs: 2.5, sm: 3.5 },
+              bgcolor: colors.card,
+              border: `1px solid ${colors.error}40`,
+              borderRadius: 3,
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
+              <Trash2 size={18} color={colors.error} />
+              <Typography sx={{ fontWeight: 700, color: colors.error, fontSize: 16 }}>
+                Delete Account
+              </Typography>
+            </Box>
+            <Typography sx={{ color: colors.secondary, fontSize: 13, mb: 3 }}>
+              Permanently delete your account and all associated data. This action cannot be undone.
+            </Typography>
+
+            <Button
+              variant="outlined"
+              onClick={handleOpenDeleteDialog}
+              startIcon={<Trash2 size={16} />}
+              sx={{
+                textTransform: 'none',
+                borderRadius: '10px',
+                borderColor: colors.error,
+                color: colors.error,
+                '&:hover': {
+                  borderColor: colors.error,
+                  bgcolor: colors.errorSoft,
+                },
+              }}
+            >
+              Delete My Account
+            </Button>
+          </Paper>
+        </>
       )}
+
+      {/* ── Email Change Dialog ───────────────── */}
+      <Dialog
+        open={emailDialogOpen}
+        onClose={() => !changeEmailMutation.isPending && setEmailDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: colors.surface,
+            border: `1px solid ${colors.border}`,
+            borderRadius: 3,
+          },
+        }}
+      >
+        <DialogTitle sx={{ color: colors.text, fontWeight: 700 }}>
+          Change Email Address
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
+            <TextField
+              label="Current Email"
+              value={user?.email ?? ''}
+              fullWidth
+              size="small"
+              disabled
+              sx={textFieldStyles}
+            />
+            <TextField
+              label="New Email"
+              type="email"
+              value={newEmail}
+              onChange={(e) => setNewEmail(e.target.value)}
+              fullWidth
+              size="small"
+              autoFocus
+              sx={textFieldStyles}
+            />
+            {!isOAuthAccount && (
+              <TextField
+                label="Current Password"
+                type="password"
+                value={emailPassword}
+                onChange={(e) => setEmailPassword(e.target.value)}
+                fullWidth
+                size="small"
+                required
+                helperText="Enter your current password to confirm the email change"
+                sx={textFieldStyles}
+              />
+            )}
+
+            {emailSuccess && (
+              <Alert
+                icon={<CheckCircle size={18} />}
+                severity="success"
+                sx={{ borderRadius: 2, bgcolor: 'rgba(76, 175, 80, 0.1)', color: '#4caf50' }}
+              >
+                {emailSuccess}
+              </Alert>
+            )}
+
+            {emailError && (
+              <Alert
+                icon={<AlertCircle size={18} />}
+                severity="error"
+                sx={{ borderRadius: 2, bgcolor: 'rgba(244,67,54,0.1)', color: colors.error }}
+              >
+                {emailError}
+              </Alert>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, pt: 0 }}>
+          <Button
+            onClick={() => setEmailDialogOpen(false)}
+            disabled={changeEmailMutation.isPending}
+            sx={{
+              textTransform: 'none',
+              borderRadius: '10px',
+              color: colors.secondary,
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleChangeEmail}
+            disabled={changeEmailMutation.isPending || !canChangeEmail || !!emailSuccess}
+            sx={{
+              textTransform: 'none',
+              borderRadius: '10px',
+              bgcolor: colors.gold,
+              color: '#0A0F18',
+              fontWeight: 700,
+              '&:hover': { bgcolor: colors.goldHover },
+              '&.Mui-disabled': { bgcolor: colors.gold, opacity: 0.6, color: '#0A0F18' },
+            }}
+          >
+            {changeEmailMutation.isPending ? 'Changing...' : 'Change Email'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* ── Delete Account Confirmation Dialog ── */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => !deleteAccountMutation.isPending && setDeleteDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: colors.surface,
+            border: `1px solid ${colors.error}40`,
+            borderRadius: 3,
+          },
+        }}
+      >
+        <DialogTitle sx={{ color: colors.error, fontWeight: 700 }}>
+          Delete Your Account
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
+            <Alert
+              severity="warning"
+              icon={<AlertCircle size={18} />}
+              sx={{ borderRadius: 2, bgcolor: 'rgba(245, 158, 11, 0.1)', color: colors.warning }}
+            >
+              This will permanently delete your account and all associated data. This action cannot be undone.
+            </Alert>
+
+            <Typography sx={{ color: colors.text, fontSize: 14 }}>
+              Type <strong>DELETE</strong> to confirm:
+            </Typography>
+
+            <TextField
+              value={deleteConfirmation}
+              onChange={(e) => setDeleteConfirmation(e.target.value)}
+              fullWidth
+              size="small"
+              placeholder="DELETE"
+              sx={textFieldStyles}
+            />
+
+            {!isOAuthAccount && (
+              <TextField
+                label="Current Password"
+                type="password"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                fullWidth
+                size="small"
+                required
+                helperText="Enter your password to confirm deletion"
+                sx={textFieldStyles}
+              />
+            )}
+
+            {deleteError && (
+              <Alert
+                icon={<AlertCircle size={18} />}
+                severity="error"
+                sx={{ borderRadius: 2, bgcolor: 'rgba(244,67,54,0.1)', color: colors.error }}
+              >
+                {deleteError}
+              </Alert>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, pt: 0 }}>
+          <Button
+            onClick={() => setDeleteDialogOpen(false)}
+            disabled={deleteAccountMutation.isPending}
+            sx={{
+              textTransform: 'none',
+              borderRadius: '10px',
+              color: colors.secondary,
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleDeleteAccount}
+            disabled={deleteAccountMutation.isPending || deleteConfirmation !== 'DELETE'}
+            sx={{
+              textTransform: 'none',
+              borderRadius: '10px',
+              bgcolor: colors.error,
+              color: '#fff',
+              fontWeight: 700,
+              '&:hover': { bgcolor: '#DC2626' },
+              '&.Mui-disabled': { bgcolor: colors.error, opacity: 0.5, color: '#fff' },
+            }}
+          >
+            {deleteAccountMutation.isPending ? 'Deleting...' : 'Delete My Account'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

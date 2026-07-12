@@ -37,6 +37,8 @@ Also search for nested:
 
 inside directories that may be modified.
 
+**Analyze README contents** when found. If it contains sufficient project metadata (Project Name, Overview, Target Users, Features, Technology Stack, Architecture, Setup Instructions), treat the project as **already initialized** and use that metadata as authoritative context.
+
 ---
 
 ## Step 2 — Determine Active Instructions
@@ -50,6 +52,8 @@ Follow this precedence:
 5. Root README.md
 
 Summarize which documentation will govern the task.
+
+**Important:** If `README.md` already contains sufficient project metadata (name, overview, target users, features, tech stack, architecture, setup instructions), do **not** ask the user to provide project information. Use the existing README as the authoritative project context and proceed directly with implementation.
 
 ---
 
@@ -81,11 +85,21 @@ Do not duplicate functionality.
 
 Determine whether the repository is:
 
-- brand new
-- initial scaffold
-- existing application
-- production application
-- feature branch
+- **brand new** — no `README.md`, no `INSTRUCTION.md`, no `package.json`, minimal or no source code
+- **initial scaffold** — build tooling configured (e.g., `package.json`, Vite, tsconfig), but little to no business logic
+- **existing application** — source code, routes, components, and business logic present; database schema exists
+- **production application** — deployed to staging or production, has real users or seed data, CI/CD pipelines active
+- **feature branch** — branch name indicates a feature, bugfix, or hotfix relative to a base branch
+
+Use the following signals to classify:
+
+| Signal | Implies |
+|--------|---------|
+| `README.md` with comprehensive project metadata | Existing application with established context |
+| Multiple `package.json` files across `apps/` and `packages/` | Monorepo, likely existing application |
+| Prisma schema + migrations | Database-backed application |
+| CI/CD workflows (`.github/workflows/`) | Production or near-production |
+| Lock files (`pnpm-lock.yaml`, `package-lock.json`) | Dependencies already installed |
 
 Explain your reasoning briefly.
 
@@ -141,15 +155,19 @@ Inspect available scripts.
 
 Prefer existing project scripts over assumptions.
 
-Typical scripts include:
+Typical scripts include (when available):
 
-- dev
-- build
-- typecheck
-- lint
-- test
-- test:e2e
-- format
+- `install`
+- `dev`
+- `build`
+- `typecheck`
+- `lint`
+- `test`
+- `test:unit`
+- `test:e2e`
+- `format`
+
+Always prefer the scripts defined by the project rather than assuming command names. Use `pnpm <script>` for pnpm workspaces, `npm run <script>` for npm, etc. based on the detected package manager.
 
 ---
 

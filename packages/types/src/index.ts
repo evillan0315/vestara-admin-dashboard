@@ -41,6 +41,8 @@ export enum AuditAction {
   SUSPEND = 'suspend',
   ACTIVATE = 'activate',
   PASSWORD_CHANGE = 'password_change',
+  EMAIL_CHANGE = 'email_change',
+  ACCOUNT_DELETION = 'account_deletion',
   SETTINGS_UPDATE = 'settings_update',
   SETTINGS_DELETE = 'settings_delete',
   ERROR = 'error',
@@ -160,6 +162,16 @@ export interface UpdateUserRequestDTO {
 export interface ChangePasswordRequestDTO {
   currentPassword: string;
   newPassword: string;
+}
+
+export interface ChangeEmailRequestDTO {
+  newEmail: string;
+  currentPassword?: string;
+}
+
+export interface DeleteAccountRequestDTO {
+  currentPassword?: string;
+  confirmation: string;
 }
 
 // ── DTOs: Pagination ─────────────────────────

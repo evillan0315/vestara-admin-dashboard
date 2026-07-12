@@ -77,6 +77,18 @@ export const updateProfileSchema = z.object({
   avatarUrl: z.string().url().optional().or(z.literal('')),
 });
 
+export const changeEmailSchema = z.object({
+  newEmail: emailField,
+  currentPassword: z.string().optional(),
+});
+
+export const deleteAccountSchema = z.object({
+  currentPassword: z.string().optional(),
+  confirmation: z.literal('DELETE', {
+    errorMap: () => ({ message: 'Type DELETE to confirm account deletion' }),
+  }),
+});
+
 // ── Settings ──────────────────────────────────
 
 export const updateSettingSchema = z.object({
@@ -199,6 +211,8 @@ export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 export type PaginationInput = z.infer<typeof paginationSchema>;
 export type AuditLogQueryInput = z.infer<typeof auditLogQuerySchema>;
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+export type ChangeEmailInput = z.infer<typeof changeEmailSchema>;
+export type DeleteAccountInput = z.infer<typeof deleteAccountSchema>;
 export type UpdateSettingInput = z.infer<typeof updateSettingSchema>;
 export type IdsBodyInput = z.infer<typeof idsBodySchema>;
 export type BulkStatusInput = z.infer<typeof bulkStatusSchema>;

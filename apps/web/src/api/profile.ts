@@ -12,6 +12,16 @@ export interface ChangePasswordData {
   newPassword: string;
 }
 
+export interface ChangeEmailData {
+  newEmail: string;
+  currentPassword?: string;
+}
+
+export interface DeleteAccountData {
+  currentPassword?: string;
+  confirmation: string;
+}
+
 export const profileApi = {
   get() {
     return apiClient.get<{ user: UserDTO }>('/profile');
@@ -23,5 +33,13 @@ export const profileApi = {
 
   changePassword(data: ChangePasswordData) {
     return apiClient.put<{ message: string }>('/profile/password', data);
+  },
+
+  changeEmail(data: ChangeEmailData) {
+    return apiClient.put<{ user: UserDTO }>('/profile/email', data);
+  },
+
+  deleteAccount(data: DeleteAccountData) {
+    return apiClient.post<{ message: string }>('/profile/delete-account', data);
   },
 };
