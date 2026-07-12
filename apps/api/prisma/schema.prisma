@@ -33,6 +33,7 @@ model Organization {
   auditLogs      AuditLog[]
   sessions       Session[]
   refreshTokens  RefreshToken[]
+  files          File[]
 
   @@map("organizations")
 }
@@ -57,6 +58,7 @@ model User {
   refreshTokens  RefreshToken[]
   auditLogs      AuditLog[]
   sessions       Session[]
+  uploadedFiles  File[]          @relation("UploadedFiles")
 
   @@unique([provider, providerId])
   @@index([organizationId])
@@ -136,4 +138,40 @@ model SystemSetting {
   @@unique([organizationId, key])
   @@index([organizationId])
   @@map("system_settings")
+}
+
+// ── File Management ────────────────────────────
+
+enum StorageProvider {
+  LOCAL
+  CLOUDINARY
+  S3
+  GOOGLE_DRIVE
+}
+
+model File {
+  id            String   @id @default(uuid())
+  name          String
+  originalName  String
+  mimeType      String
+  size          BigInt
+  path          String   // Storage path/key
+  url           String?  // Public URL if available
+  provider      StorageProvider @default(LOCAL)
+  providerId    String?  // Provider-specific file ID
+  folderId      String?  // Parent folder
+  uploadedBy    String
+  organizationId String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  uploadedByUser User    @relation("UploadedFiles", fields: [uploadedBy], references: [id], onDelete: Restrict)
+  folder       File?     @relation("FileFolder", fields: [folderId], references: [id], onDelete: SetNull)
+  children     File[]    @relation("FileFolder")
+
+  @@index([organizationId])
+  @@index([folderId])
+  @@index([provider])
+  @@map("files")
 }

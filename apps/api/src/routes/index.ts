@@ -8,6 +8,7 @@ import auditLogsRouter from './audit-logs.js';
 import profileRouter from './profile.js';
 import organizationsRouter from './organizations.js';
 import uploadRouter from './upload.js';
+import filesRouter from './files.js';
 
 const router = Router();
 
@@ -27,5 +28,6 @@ router.use('/audit-logs', auditLogsRouter);
 router.use('/profile', profileRouter);
 router.use('/organizations', organizationsRouter);
 router.use('/upload', uploadRouter);
+router.use('/files', filesRouter);
 
 export default router;
