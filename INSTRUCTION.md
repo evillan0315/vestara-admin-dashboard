@@ -104,7 +104,7 @@ For every task:
 | 15 | Reusable Forms | ✅ Complete | 100% |
 | 16 | Data Table | ✅ Complete | 100% |
 | 17 | Feedback Components | ✅ Complete | 100% |
-| 18 | File Manager | ⏳ In Progress | ~15% |
+| 18 | File Manager | ✅ Complete | 100% |
 | 19 | Application Settings | ✅ Complete | ~95% |
 | 20 | Reporting | ❌ Not Started | 0% |
 | 21 | WebSocket Integration | ❌ Not Started | 0% |
@@ -464,28 +464,27 @@ For every task:
 
 ### 18. File Manager
 
-**Status:** ⏳ In Progress (~15%)
+**Status:** ✅ Complete (100%)
 **Dependencies:** Phases 4–5, 15–17
 
 **Backend:**
 * Image upload endpoint: `POST /upload/image` with multer middleware (5MB limit, JPEG/PNG/WebP/SVG), uploads to Vercel Blob storage
-* Storage provider abstraction (Factory pattern: Local, Cloudinary, S3, Google Drive)
+* Storage provider abstraction (Factory pattern: Local, Cloudinary, S3, Google Drive) with factory pattern
 * File model with org-scoped CRUD, folder hierarchy, metadata
+* Full REST API: `GET /files` (paginated/filtered), `GET /files/folder` (folder contents), `POST /files/upload` (multi-file, 100MB), `POST /files/folder` (create), `PUT /files/:id` (rename/move), `GET /files/:id/download` (signed URL), `POST /files/move` (bulk move), `DELETE /files/:id`, `POST /files/bulk-delete` (bulk delete), `GET /files/stats`
 * Org-level storage config via `SystemSetting` key `storage`
 * Audit logging for all file operations
 
 **Frontend:**
+* FileManagerPage with DataTable (sortable columns, row selection, search)
+* Folder cards with click-to-navigate into subdirectories
+* Clickable MUI breadcrumbs for upward navigation
+* Upload dialog with drag-and-drop zone and XHR progress bar (LinearProgress)
+* Create folder, rename, move, delete single/bulk, download, image preview dialogs
+* `filesApi` client (`apps/web/src/api/files.ts`) with XHR upload progress tracking
+* TanStack Query hooks (`apps/web/src/features/files/hooks.ts`) for all operations
+* `/files` route registered in SYSTEM nav group
 * Upload button in Organizations page for logo (auto-sets `logoUrl`)
-
-**Still missing:**
-* Full file browser UI (grid/list view)
-* Folder navigation / breadcrumbs
-* File preview (images, documents)
-* Multi-file upload with drag-and-drop
-* File listing with DataTable integration (pagination, sorting)
-* File rename, move, copy, delete
-* Download with signed URLs
-* Upload progress indicators
 
 ---
 
