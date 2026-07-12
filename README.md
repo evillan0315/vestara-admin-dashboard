@@ -189,6 +189,7 @@ Vestara combines multiple products into one ecosystem.
 | 👥 **User Profiles** | Identity management, personalization, and KYC preparation |
 | 📈 **Investments (Roadmap)** | Stocks, crypto, crowdfunding, and tokenized assets |
 | 🤖 **AI Chatbot** | In-app AI assistant powered by OpenCode (free models) with multi-provider fallback |
+| 🤖 **AI Assistant RAG** | Data-aware AI with real-time org context injection — answers questions about users, activity, settings, storage, and KPIs |
 
 ---
 
@@ -733,6 +734,15 @@ The admin dashboard includes a fully integrated AI chatbot accessible at `/chat`
 - **Responsive UI** — mobile-optimized chat interface with suggestion chips and typing indicators
 - **OpenAI-compatible API** — supports any provider exposing the `/chat/completions` endpoint
 - **Reasoning model support** — extracts answers from `reasoning`, `reasoning_content`, and `reasoning_details` fields
+- **RAG: Data-Aware AI (Priority 1 Complete)** — real-time organization context injection before each completion:
+  - Organization info (name, slug, member count)
+  - User summary (total, active, inactive, by role)
+  - Dashboard KPIs (users, activity, errors, storage)
+  - Recent audit logs (last 10 actions with timestamps and actors)
+  - System settings (non-sensitive, first 15)
+  - File storage stats (total files, size, by provider, recent uploads)
+  - Current user's recent activity (last 5 actions)
+  - 60-second per-conversation cache with token budget management
 
 ### Provider Priority
 
@@ -759,6 +769,10 @@ OpenCode → OpenAI → Anthropic → Mock (fallback)
 - Smart Search
 - Intelligent Notifications
 - Predictive Analytics
+- Tool Calling / Function Calling (Priority 2)
+- Streaming Responses (Priority 3)
+- Smart Suggestions & Contextual Awareness (Priority 4)
+- Feedback & Quality Loop (Priority 5)
 
 ---
 
