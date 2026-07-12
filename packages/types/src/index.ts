@@ -280,6 +280,69 @@ export interface NavItem {
   permissions?: Permission[];
 }
 
+// ── Domain: Chat & AI ─────────────────────────
+
+export enum ChatRole {
+  USER = 'user',
+  ASSISTANT = 'assistant',
+  SYSTEM = 'system',
+}
+
+export interface ChatMessageDTO {
+  id: string;
+  conversationId: string;
+  role: ChatRole;
+  content: string;
+  model?: string;
+  tokenCount?: number;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+}
+
+export interface ChatConversationDTO {
+  id: string;
+  title: string;
+  userId: string;
+  organizationId: string;
+  model: string;
+  systemPrompt?: string;
+  isArchived: boolean;
+  messageCount?: number;
+  lastMessage?: ChatMessageDTO;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateConversationRequestDTO {
+  title: string;
+  model?: string;
+  systemPrompt?: string;
+  firstMessage?: string;
+}
+
+export interface SendMessageRequestDTO {
+  content: string;
+  model?: string;
+}
+
+export interface ChatCompletionDTO {
+  message: ChatMessageDTO;
+  usage: {
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+  };
+}
+
+export interface ChatModelsDTO {
+  models: {
+    id: string;
+    name: string;
+    description: string;
+    maxTokens: number;
+  }[];
+}
+
 // ── Theme (legacy type alias for convenience) ──
 
 export type ThemeModeUnion = 'light' | 'dark' | 'system';

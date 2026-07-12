@@ -10,6 +10,7 @@ import { SettingsPage } from '../pages/SettingsPage';
 import { SystemLogsPage } from '../pages/SystemLogsPage';
 import { OrganizationsPage } from '../pages/OrganizationsPage';
 import { FileManagerPage } from '../pages/FileManagerPage';
+import { ChatPage } from '../pages/ChatPage';
 import DocsPage from '../pages/DocsPage';
 import ProfilePage from '../pages/ProfilePage';
 import { AdminPage } from '../pages/AdminPage';
@@ -70,6 +71,7 @@ export function AppRoutes() {
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/organizations" element={<OrganizationsPage />} />
           <Route path="/files" element={<FileManagerPage />} />
+          <Route path="/chat" element={<ChatPage />} />
           <Route path="/system-logs" element={<SystemLogsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/security" element={<ProfilePage />} />

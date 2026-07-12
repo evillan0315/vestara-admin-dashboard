@@ -34,6 +34,7 @@ model Organization {
   sessions       Session[]
   refreshTokens  RefreshToken[]
   files          File[]
+  chatConversations ChatConversation[]
 
   @@map("organizations")
 }
@@ -54,11 +55,13 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Restrict)
-  refreshTokens  RefreshToken[]
-  auditLogs      AuditLog[]
-  sessions       Session[]
-  uploadedFiles  File[]          @relation("UploadedFiles")
+  organization      Organization       @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  refreshTokens     RefreshToken[]
+  auditLogs         AuditLog[]
+  sessions          Session[]
+  uploadedFiles     File[]             @relation("UploadedFiles")
+  chatMessages      ChatMessage[]
+  chatConversations ChatConversation[]
 
   @@unique([provider, providerId])
   @@index([organizationId])
@@ -174,4 +177,52 @@ model File {
   @@index([folderId])
   @@index([provider])
   @@map("files")
+}
+
+// ── Chat & AI ────────────────────────────────
+
+enum ChatRole {
+  user
+  assistant
+  system
+}
+
+model ChatConversation {
+  id              String   @id @default(uuid())
+  title           String
+  userId          String
+  organizationId String
+  model           String   @default("gpt-4")  // AI model identifier
+  systemPrompt    String?  // Custom system prompt for this conversation
+  isArchived      Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  messages     ChatMessage[]
+
+  @@index([organizationId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("chat_conversations")
+}
+
+model ChatMessage {
+  id              String   @id @default(uuid())
+  conversationId String
+  role            ChatRole
+  content         String
+  model           String?  // Model used for this specific message
+  tokenCount      Int?     // Token usage for this message
+  metadata        Json?    // Additional metadata (tool calls, sources, etc.)
+  createdAt       DateTime @default(now())
+
+  conversation ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId       String?
+
+  @@index([conversationId])
+  @@index([createdAt])
+  @@map("chat_messages")
 }

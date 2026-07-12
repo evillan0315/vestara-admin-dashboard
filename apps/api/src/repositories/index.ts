@@ -5,6 +5,7 @@ export { SettingsRepository } from './settings.repository.js';
 export { RefreshTokenRepository } from './refresh-token.repository.js';
 export { OrganizationRepository } from './organization.repository.js';
 export { FileRepository } from './file.repository.js';
+export { ChatRepository } from './chat.repository.js';
 
 // Singleton repository instances
 import { UserRepository } from './user.repository.js';
@@ -14,6 +15,7 @@ import { SettingsRepository } from './settings.repository.js';
 import { RefreshTokenRepository } from './refresh-token.repository.js';
 import { OrganizationRepository } from './organization.repository.js';
 import { FileRepository } from './file.repository.js';
+import { ChatRepository } from './chat.repository.js';
 
 export const userRepository = new UserRepository();
 export const sessionRepository = new SessionRepository();
@@ -22,3 +24,4 @@ export const settingsRepository = new SettingsRepository();
 export const refreshTokenRepository = new RefreshTokenRepository();
 export const organizationRepository = new OrganizationRepository();
 export const fileRepository = new FileRepository();
+export const chatRepository = new ChatRepository();
