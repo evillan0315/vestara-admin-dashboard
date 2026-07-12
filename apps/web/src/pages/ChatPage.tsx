@@ -22,7 +22,9 @@ import {
   Button,
   Tooltip,
   Skeleton,
+  Drawer,
   useTheme,
+  useMediaQuery,
   alpha,
 } from '@mui/material';
 import {
@@ -39,6 +41,7 @@ import {
   ContentCopy as CopyIcon,
   Check as CheckIcon,
   AutoAwesome as SparkleIcon,
+  Menu as MenuIcon,
 } from '@mui/icons-material';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -54,17 +57,9 @@ import {
 } from '../features/chat/hooks';
 import type { ChatMessageDTO, ChatConversationDTO } from '@vestara/types';
 
-// ── Styles ──────────────────────────────────────────────────────────────────
+// ── Constants ───────────────────────────────────────────────────────────────
 
 const SIDEBAR_WIDTH = 320;
-
-const ChatContainer = Box;
-
-const SidebarContainer = Paper;
-
-const MessageContainer = Box;
-
-const MessageBubble = Paper;
 
 // ── Conversation Sidebar ────────────────────────────────────────────────────
 
@@ -74,6 +69,10 @@ interface ConversationSidebarProps {
   onNewConversation: () => void;
   conversations: ChatConversationDTO[];
   loading: boolean;
+  /** When true, rendered as a Drawer for mobile */
+  isMobile?: boolean;
+  drawerOpen?: boolean;
+  onDrawerClose?: () => void;
 }
 
 function ConversationSidebar({
@@ -82,6 +81,9 @@ function ConversationSidebar({
   onNewConversation,
   conversations,
   loading,
+  isMobile = false,
+  drawerOpen = false,
+  onDrawerClose,
 }: ConversationSidebarProps) {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -161,30 +163,33 @@ function ConversationSidebar({
     return date.toLocaleDateString();
   };
 
-  return (
-    <SidebarContainer
+  const handleSelect = (id: string) => {
+    onSelectConversation(id);
+    onDrawerClose?.();
+  };
+
+  const sidebarContent = (
+    <Box
       sx={{
-        width: SIDEBAR_WIDTH,
-        flexShrink: 0,
+        width: isMobile ? undefined : SIDEBAR_WIDTH,
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        borderRadius: 0,
-        borderRight: `1px solid ${theme.palette.divider}`,
         bgcolor: theme.palette.background.paper,
+        borderRight: isMobile ? 'none' : `1px solid ${theme.palette.divider}`,
       }}
     >
       {/* Header */}
       <Box
         sx={{
-          p: 2,
+          p: { xs: 1.5, sm: 2 },
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           borderBottom: `1px solid ${theme.palette.divider}`,
         }}
       >
-        <Typography variant="h6" fontWeight={700}>
+        <Typography variant="h6" fontWeight={700} sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}>
           Conversations
         </Typography>
         <Tooltip title="New conversation">
@@ -212,8 +217,8 @@ function ConversationSidebar({
             </Box>
           ))
         ) : conversations.length === 0 ? (
-          <Box sx={{ p: 4, textAlign: 'center' }}>
-            <ChatIcon sx={{ fontSize: 48, color: theme.palette.text.disabled, mb: 1 }} />
+          <Box sx={{ p: { xs: 3, sm: 4 }, textAlign: 'center' }}>
+            <ChatIcon sx={{ fontSize: { xs: 36, sm: 48 }, color: theme.palette.text.disabled, mb: 1 }} />
             <Typography variant="body2" color="text.secondary">
               No conversations yet
             </Typography>
@@ -226,9 +231,9 @@ function ConversationSidebar({
             <ListItemButton
               key={conversation.id}
               selected={activeConversationId === conversation.id}
-              onClick={() => onSelectConversation(conversation.id)}
+              onClick={() => handleSelect(conversation.id)}
               sx={{
-                px: 2,
+                px: { xs: 1.5, sm: 2 },
                 py: 1.5,
                 borderBottom: `1px solid ${theme.palette.divider}`,
                 '&.Mui-selected': {
@@ -321,7 +326,7 @@ function ConversationSidebar({
         <DialogTitle>Delete Conversation</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete "{selectedConversation?.title}"? This action cannot be undone.
+            Are you sure you want to delete &quot;{selectedConversation?.title}&quot;? This action cannot be undone.
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -331,8 +336,32 @@ function ConversationSidebar({
           </Button>
         </DialogActions>
       </Dialog>
-    </SidebarContainer>
+    </Box>
   );
+
+  // Mobile: render inside a Drawer
+  if (isMobile) {
+    return (
+      <Drawer
+        variant="temporary"
+        open={drawerOpen}
+        onClose={onDrawerClose}
+        ModalProps={{ keepMounted: true }}
+        sx={{
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: SIDEBAR_WIDTH },
+            maxWidth: '100vw',
+            bgcolor: theme.palette.background.paper,
+          },
+        }}
+      >
+        {sidebarContent}
+      </Drawer>
+    );
+  }
+
+  // Desktop: render as a fixed-width flex child
+  return sidebarContent;
 }
 
 // ── Message Bubble ──────────────────────────────────────────────────────────
@@ -346,6 +375,7 @@ function MessageBubbleComponent({ message, isLatest }: MessageBubbleProps) {
   const theme = useTheme();
   const isUser = message.role === 'user';
   const [copied, setCopied] = useState(false);
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleCopy = () => {
     navigator.clipboard.writeText(message.content);
@@ -357,28 +387,28 @@ function MessageBubbleComponent({ message, isLatest }: MessageBubbleProps) {
     <Box
       sx={{
         display: 'flex',
-        gap: 1.5,
+        gap: { xs: 1, sm: 1.5 },
         alignItems: 'flex-start',
         flexDirection: isUser ? 'row-reverse' : 'row',
-        mb: 2,
+        mb: { xs: 1.5, sm: 2 },
       }}
     >
       <Avatar
         sx={{
-          width: 32,
-          height: 32,
+          width: isMobile ? 28 : 32,
+          height: isMobile ? 28 : 32,
           bgcolor: isUser ? theme.palette.primary.main : theme.palette.secondary.main,
-          fontSize: 14,
+          fontSize: isMobile ? 12 : 14,
         }}
       >
         {isUser ? <PersonIcon fontSize="small" /> : <BotIcon fontSize="small" />}
       </Avatar>
 
-      <Box sx={{ maxWidth: '75%', minWidth: 60 }}>
-        <MessageBubble
+      <Box sx={{ maxWidth: { xs: '88%', sm: '75%' }, minWidth: { xs: 48, sm: 60 } }}>
+        <Paper
           elevation={0}
           sx={{
-            p: 1.5,
+            p: { xs: 1, sm: 1.5 },
             borderRadius: 2,
             bgcolor: isUser
               ? theme.palette.primary.main
@@ -389,7 +419,7 @@ function MessageBubbleComponent({ message, isLatest }: MessageBubbleProps) {
           }}
         >
           {isUser ? (
-            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: { xs: '0.875rem', sm: 'inherit' } }}>
               {message.content}
             </Typography>
           ) : (
@@ -400,7 +430,7 @@ function MessageBubbleComponent({ message, isLatest }: MessageBubbleProps) {
                 '& p:last-of-type': { mb: 0 },
                 '& pre': {
                   bgcolor: theme.palette.background.default,
-                  p: 1.5,
+                  p: { xs: 1, sm: 1.5 },
                   borderRadius: 1,
                   overflow: 'auto',
                   fontSize: '0.85em',
@@ -420,6 +450,8 @@ function MessageBubbleComponent({ message, isLatest }: MessageBubbleProps) {
                   width: '100%',
                   borderCollapse: 'collapse',
                   my: 1,
+                  display: { xs: 'block', sm: 'table' },
+                  overflowX: 'auto',
                 },
                 '& th, & td': {
                   border: `1px solid ${theme.palette.divider}`,
@@ -427,6 +459,7 @@ function MessageBubbleComponent({ message, isLatest }: MessageBubbleProps) {
                   py: 0.5,
                   textAlign: 'left',
                   fontSize: '0.85em',
+                  whiteSpace: 'nowrap',
                 },
                 '& th': {
                   bgcolor: alpha(theme.palette.primary.main, 0.04),
@@ -456,7 +489,7 @@ function MessageBubbleComponent({ message, isLatest }: MessageBubbleProps) {
               </ReactMarkdown>
             </Box>
           )}
-        </MessageBubble>
+        </Paper>
 
         <Box
           sx={{
@@ -467,7 +500,7 @@ function MessageBubbleComponent({ message, isLatest }: MessageBubbleProps) {
             justifyContent: isUser ? 'flex-end' : 'flex-start',
           }}
         >
-          <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.7rem' }}>
+          <Typography variant="caption" color="text.disabled" sx={{ fontSize: { xs: '0.65rem', sm: '0.7rem' } }}>
             {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </Typography>
           {!isUser && isLatest && (
@@ -489,14 +522,16 @@ function MessageBubbleComponent({ message, isLatest }: MessageBubbleProps) {
 
 function TypingIndicator() {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   return (
-    <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start', mb: 2 }}>
+    <Box sx={{ display: 'flex', gap: { xs: 1, sm: 1.5 }, alignItems: 'flex-start', mb: { xs: 1.5, sm: 2 } }}>
       <Avatar
         sx={{
-          width: 32,
-          height: 32,
+          width: isMobile ? 28 : 32,
+          height: isMobile ? 28 : 32,
           bgcolor: theme.palette.secondary.main,
-          fontSize: 14,
+          fontSize: isMobile ? 12 : 14,
         }}
       >
         <BotIcon fontSize="small" />
@@ -504,7 +539,7 @@ function TypingIndicator() {
       <Paper
         elevation={0}
         sx={{
-          p: 1.5,
+          p: { xs: 1, sm: 1.5 },
           borderRadius: 2,
           bgcolor: alpha(theme.palette.grey[500], 0.06),
           border: `1px solid ${theme.palette.divider}`,
@@ -526,6 +561,8 @@ function TypingIndicator() {
 
 function EmptyState({ onNewConversation }: { onNewConversation: () => void }) {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   return (
     <Box
       sx={{
@@ -534,14 +571,14 @@ function EmptyState({ onNewConversation }: { onNewConversation: () => void }) {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 2,
-        p: 4,
+        gap: { xs: 1.5, sm: 2 },
+        p: { xs: 2, sm: 4 },
       }}
     >
       <Box
         sx={{
-          width: 80,
-          height: 80,
+          width: { xs: 56, sm: 80 },
+          height: { xs: 56, sm: 80 },
           borderRadius: '50%',
           bgcolor: alpha(theme.palette.primary.main, 0.1),
           display: 'flex',
@@ -549,25 +586,25 @@ function EmptyState({ onNewConversation }: { onNewConversation: () => void }) {
           justifyContent: 'center',
         }}
       >
-        <SparkleIcon sx={{ fontSize: 40, color: theme.palette.primary.main }} />
+        <SparkleIcon sx={{ fontSize: { xs: 28, sm: 40 }, color: theme.palette.primary.main }} />
       </Box>
-      <Typography variant="h5" fontWeight={700}>
+      <Typography variant={isMobile ? 'h6' : 'h5'} fontWeight={700}>
         Vestara AI Assistant
       </Typography>
-      <Typography variant="body1" color="text.secondary" textAlign="center" sx={{ maxWidth: 400 }}>
+      <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ maxWidth: 400 }}>
         Your intelligent admin assistant. Ask questions about the dashboard,
         get help with user management, or explore system settings.
       </Typography>
       <Button
         variant="contained"
-        size="large"
+        size={isMobile ? 'medium' : 'large'}
         startIcon={<AddIcon />}
         onClick={onNewConversation}
-        sx={{ mt: 2 }}
+        sx={{ mt: 1 }}
       >
         Start a Conversation
       </Button>
-      <Box sx={{ display: 'flex', gap: 1, mt: 2, flexWrap: 'wrap', justifyContent: 'center' }}>
+      <Box sx={{ display: 'flex', gap: { xs: 0.5, sm: 1 }, mt: 1.5, flexWrap: 'wrap', justifyContent: 'center' }}>
         {['How do I manage users?', 'Explain the dashboard', 'Security best practices'].map((suggestion) => (
           <Chip
             key={suggestion}
@@ -576,7 +613,6 @@ function EmptyState({ onNewConversation }: { onNewConversation: () => void }) {
             size="small"
             onClick={() => {
               onNewConversation();
-              // Auto-send the suggestion as first message after a short delay
               setTimeout(() => {
                 const input = document.querySelector('[data-chat-input]') as HTMLInputElement;
                 if (input) {
@@ -602,6 +638,8 @@ function EmptyState({ onNewConversation }: { onNewConversation: () => void }) {
 
 export function ChatPage() {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -639,6 +677,7 @@ export function ChatPage() {
   const handleNewConversation = useCallback(() => {
     setActiveConversationId(null);
     setInputValue('');
+    setMobileSidebarOpen(false);
     inputRef.current?.focus();
   }, []);
 
@@ -654,7 +693,6 @@ export function ChatPage() {
     setInputValue('');
 
     if (!activeConversationId) {
-      // Create a new conversation with the first message
       try {
         const conversation = await createConversation.mutateAsync({
           title: content.slice(0, 50) + (content.length > 50 ? '...' : ''),
@@ -665,7 +703,6 @@ export function ChatPage() {
         // Error handled by mutation
       }
     } else {
-      // Send message in existing conversation
       sendMessage.mutate({
         conversationId: activeConversationId,
         data: { content },
@@ -681,27 +718,43 @@ export function ChatPage() {
   };
 
   return (
-    <ChatContainer
+    <Box
       sx={{
         display: 'flex',
-        height: 'calc(100vh - 120px)',
-        borderRadius: 2,
+        height: { xs: 'calc(100vh - 56px)', sm: 'calc(100vh - 64px)' },
+        borderRadius: { xs: 0, sm: 2 },
         overflow: 'hidden',
-        border: `1px solid ${theme.palette.divider}`,
+        border: { xs: 'none', sm: `1px solid ${theme.palette.divider}` },
         bgcolor: theme.palette.background.paper,
       }}
     >
-      {/* Sidebar */}
-      <ConversationSidebar
-        activeConversationId={activeConversationId}
-        onSelectConversation={handleSelectConversation}
-        onNewConversation={handleNewConversation}
-        conversations={conversations}
-        loading={conversationsLoading}
-      />
+      {/* Sidebar — desktop only as flex child */}
+      {!isMobile && (
+        <ConversationSidebar
+          activeConversationId={activeConversationId}
+          onSelectConversation={handleSelectConversation}
+          onNewConversation={handleNewConversation}
+          conversations={conversations}
+          loading={conversationsLoading}
+        />
+      )}
+
+      {/* Sidebar — mobile as Drawer */}
+      {isMobile && (
+        <ConversationSidebar
+          activeConversationId={activeConversationId}
+          onSelectConversation={handleSelectConversation}
+          onNewConversation={handleNewConversation}
+          conversations={conversations}
+          loading={conversationsLoading}
+          isMobile
+          drawerOpen={mobileSidebarOpen}
+          onDrawerClose={() => setMobileSidebarOpen(false)}
+        />
+      )}
 
       {/* Main Chat Area */}
-      <MessageContainer
+      <Box
         sx={{
           flex: 1,
           display: 'flex',
@@ -716,16 +769,30 @@ export function ChatPage() {
             {/* Chat Header */}
             <Box
               sx={{
-                px: 3,
-                py: 1.5,
+                px: { xs: 1.5, sm: 3 },
+                py: { xs: 1, sm: 1.5 },
                 borderBottom: `1px solid ${theme.palette.divider}`,
                 display: 'flex',
                 alignItems: 'center',
-                gap: 1,
+                gap: { xs: 0.5, sm: 1 },
               }}
             >
-              <SparkleIcon sx={{ color: theme.palette.primary.main }} />
-              <Typography variant="subtitle1" fontWeight={600} noWrap sx={{ flex: 1 }}>
+              {isMobile && (
+                <IconButton
+                  onClick={() => setMobileSidebarOpen(true)}
+                  size="small"
+                  sx={{ mr: 0.5 }}
+                >
+                  <MenuIcon fontSize="small" />
+                </IconButton>
+              )}
+              <SparkleIcon sx={{ color: theme.palette.primary.main, fontSize: { xs: 20, sm: 24 } }} />
+              <Typography
+                variant="subtitle1"
+                fontWeight={600}
+                noWrap
+                sx={{ flex: 1, fontSize: { xs: '0.875rem', sm: '1rem' } }}
+              >
                 {conversationData?.title ?? 'Loading...'}
               </Typography>
               <Chip
@@ -733,7 +800,7 @@ export function ChatPage() {
                 size="small"
                 variant="outlined"
                 color="primary"
-                sx={{ height: 24 }}
+                sx={{ height: 24, display: { xs: 'none', sm: 'inline-flex' } }}
               />
             </Box>
 
@@ -742,15 +809,15 @@ export function ChatPage() {
               sx={{
                 flex: 1,
                 overflow: 'auto',
-                px: 3,
-                py: 2,
+                px: { xs: 1.5, sm: 3 },
+                py: { xs: 1.5, sm: 2 },
                 display: 'flex',
                 flexDirection: 'column',
               }}
             >
               {messagesLoading ? (
                 Array.from({ length: 4 }).map((_, i) => (
-                  <Box key={i} sx={{ display: 'flex', gap: 1.5, mb: 2 }}>
+                  <Box key={i} sx={{ display: 'flex', gap: { xs: 1, sm: 1.5 }, mb: { xs: 1.5, sm: 2 } }}>
                     <Skeleton variant="circular" width={32} height={32} />
                     <Skeleton variant="rounded" width="60%" height={40} sx={{ borderRadius: 2 }} />
                   </Box>
@@ -771,7 +838,7 @@ export function ChatPage() {
             {/* Input Area */}
             <Box
               sx={{
-                p: 2,
+                p: { xs: 1, sm: 2 },
                 borderTop: `1px solid ${theme.palette.divider}`,
                 bgcolor: theme.palette.background.paper,
               }}
@@ -781,13 +848,14 @@ export function ChatPage() {
                 data-chat-input
                 fullWidth
                 multiline
-                maxRows={4}
-                placeholder="Type your message... (Enter to send, Shift+Enter for new line)"
+                maxRows={isMobile ? 3 : 4}
+                placeholder={isMobile ? 'Type a message...' : 'Type your message... (Enter to send, Shift+Enter for new line)'}
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
                 disabled={isSending}
                 variant="outlined"
+                size={isMobile ? 'small' : 'medium'}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -836,14 +904,25 @@ export function ChatPage() {
                   },
                 }}
               />
-              <Typography variant="caption" color="text.disabled" sx={{ mt: 0.5, display: 'block', textAlign: 'center' }}>
-                AI responses are generated by {conversationData?.model ?? 'the selected model'}. Responses may not always be accurate.
+              <Typography
+                variant="caption"
+                color="text.disabled"
+                sx={{
+                  mt: 0.5,
+                  display: 'block',
+                  textAlign: 'center',
+                  fontSize: { xs: '0.65rem', sm: '0.75rem' },
+                }}
+              >
+                {isMobile
+                  ? 'AI responses may not always be accurate.'
+                  : `AI responses are generated by ${conversationData?.model ?? 'the selected model'}. Responses may not always be accurate.`}
               </Typography>
             </Box>
           </>
         )}
-      </MessageContainer>
-    </ChatContainer>
+      </Box>
+    </Box>
   );
 }
 
