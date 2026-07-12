@@ -383,7 +383,8 @@ registry.register('ApiError', z.object({
 
 const generator = new OpenApiGeneratorV31(registry.definitions);
 
-export const openApiDocument = generator.generateDocument({
+export const openApiDocument: ReturnType<OpenApiGeneratorV31['generateDocument']> =
+  generator.generateDocument({
   openapi: '3.1.0',
   info: {
     title: 'Vestara Admin API',

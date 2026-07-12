@@ -357,7 +357,8 @@ export type WebSocketConnectionStatus =
   | 'connected'
   | 'disconnected'
   | 'reconnecting'
-  | 'error';
+  | 'error'
+  | 'unavailable';
 
 /**
  * Canonical WebSocket event type identifiers exchanged between server and client.

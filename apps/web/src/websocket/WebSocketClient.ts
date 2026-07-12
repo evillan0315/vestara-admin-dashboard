@@ -1,209 +1,175 @@
+/**
+ * Browser-side Socket.IO client for real-time features.
+ *
+ * Thin wrapper around `socket.io-client` that preserves the previous public
+ * API (`on`, `onStatus`, `connect`, `disconnect`, `send`, `subscribe`,
+ * `unsubscribe`) so the React `WebSocketProvider` and hooks require no changes.
+ *
+ * Vercel-compatible: the client forces the `websocket` transport and connects to
+ * the Socket.IO mount path under the API prefix. Reconnection with exponential
+ * backoff + jitter is handled by socket.io-client itself.
+ */
+import { io, type Socket } from 'socket.io-client';
+
 import {
   WS_EVENT,
   type ServerToClientMessage,
   type ClientToServerMessage,
+  type WsEventType,
   type WebSocketConnectionStatus,
 } from '@vestara/types';
 
-const ACCESS_TOKEN_KEY = 'accessToken';
-const BASE_DELAY_MS = 1_000;
-const MAX_DELAY_MS = 30_000;
-const HEARTBEAT_INTERVAL_MS = 25_000;
+/** Socket.IO mount path on the API server. */
+export const SOCKET_IO_PATH = '/socket.io';
 
-type MessageHandler<T extends ServerToClientMessage['type']> = (
-  message: Extract<ServerToClientMessage, { type: T }>,
-) => void;
-type StatusHandler = (status: WebSocketConnectionStatus) => void;
+/** Set of valid server→client event names (values of WS_EVENT). */
+const ALLOWED_EVENTS = new Set(Object.values(WS_EVENT));
 
-/**
- * Build the absolute WebSocket URL from the configured API base.
- * Supports both absolute (http/https) and relative (`/api/v1`) bases, and
- * upgrades the scheme to `ws`/`wss` accordingly.
- */
-function resolveWsUrl(): string {
+/** Resolve the Socket.IO connection origin from the configured API base URL. */
+function resolveSocketIoOrigin(): string {
   const base = import.meta.env.VITE_API_URL || '/api/v1';
-  const absolute = base.startsWith('http') ? base : `${window.location.origin}${base}`;
-  const wsBase = absolute.replace(/^http/, 'ws');
-  return `${wsBase.replace(/\/$/, '')}/ws`;
+  if (base.startsWith('http')) {
+    try {
+      return new URL(base).origin;
+    } catch {
+      // fall through
+    }
+  }
+  if (typeof window !== 'undefined') return window.location.origin;
+  return 'http://localhost:5173';
 }
 
-/**
- * Browser WebSocket client with:
- *  - JWT auth via query param
- *  - automatic reconnection with exponential backoff + jitter
- *  - application-level heartbeat (ping/pong)
- *  - typed publish/subscribe over a single connection
- */
 export class WebSocketClient {
-  private ws: WebSocket | null = null;
-  private readonly url: string;
+  private socket: Socket | null = null;
   private token: string | null = null;
-  private reconnectAttempts = 0;
-  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
-  private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
   private intentionalClose = false;
-  private readonly messageHandlers = new Map<string, Set<(message: ServerToClientMessage) => void>>();
-  private readonly statusHandlers = new Set<StatusHandler>();
-  private status: WebSocketConnectionStatus = 'disconnected';
+  private reconnectAttempts = 0;
 
-  constructor() {
-    this.url = resolveWsUrl();
-  }
+  private messageHandlers = new Map<WsEventType, Set<(msg: ServerToClientMessage) => void>>();
+  private statusHandlers = new Set<(status: WebSocketConnectionStatus) => void>();
 
-  onStatus(handler: StatusHandler): () => void {
-    this.statusHandlers.add(handler);
-    handler(this.status);
-    return () => {
-      this.statusHandlers.delete(handler);
-    };
-  }
-
-  on<T extends ServerToClientMessage['type']>(
+  /** Register a handler for a specific server-to-client event. */
+  on<T extends WsEventType>(
     type: T,
-    handler: MessageHandler<T>,
+    handler: (msg: Extract<ServerToClientMessage, { type: T }>) => void,
   ): () => void {
     let set = this.messageHandlers.get(type);
     if (!set) {
       set = new Set();
       this.messageHandlers.set(type, set);
     }
-    const wrapped = handler as (message: ServerToClientMessage) => void;
-    set.add(wrapped);
-    return () => {
-      this.messageHandlers.get(type)?.delete(wrapped);
-    };
+    const genericHandler = handler as (msg: ServerToClientMessage) => void;
+    set.add(genericHandler);
+    return () => set!.delete(genericHandler);
   }
 
+  /** Register a handler for connection-status changes. Returns an unsubscribe. */
+  onStatus(handler: (status: WebSocketConnectionStatus) => void): () => void {
+    this.statusHandlers.add(handler);
+    return () => this.statusHandlers.delete(handler);
+  }
+
+  /** Open the Socket.IO connection using a JWT access token. */
   connect(token: string): void {
+    if (typeof window === 'undefined') return;
+    if (this.socket?.connected) return;
+
     this.token = token;
     this.intentionalClose = false;
-    this.open();
+    const origin = resolveSocketIoOrigin();
+
+    this.socket = io(origin, {
+      path: SOCKET_IO_PATH,
+      // Vercel (and most serverless WS platforms) only support the websocket
+      // transport; forcing it avoids the polling handshake entirely.
+      transports: ['websocket'],
+      auth: { token },
+      query: { token },
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 15_000,
+      randomizationFactor: 0.5,
+      timeout: 20_000,
+    });
+
+    this.registerSocketHandlers();
+    this.setStatus('connecting');
   }
 
-  private open(): void {
-    if (typeof window === 'undefined') return;
-    if (
-      this.ws &&
-      (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)
-    ) {
-      return;
-    }
+  private registerSocketHandlers(): void {
+    const socket = this.socket;
+    if (!socket) return;
 
-    const token = this.token ?? localStorage.getItem(ACCESS_TOKEN_KEY);
-    if (!token) {
-      this.setStatus('disconnected');
-      return;
-    }
+    // Dispatch every known server event to registered type handlers.
+    socket.onAny((event, ...args) => {
+      if (!ALLOWED_EVENTS.has(event)) return;
+      const payload = args[0];
+      const handler = this.messageHandlers.get(event as WsEventType);
+      if (handler) {
+        const message = { type: event, payload } as ServerToClientMessage;
+        handler.forEach((h) => h(message));
+      }
+    });
 
-    this.setStatus(this.reconnectAttempts > 0 ? 'reconnecting' : 'connecting');
-
-    let ws: WebSocket;
-    try {
-      ws = new WebSocket(`${this.url}?token=${encodeURIComponent(token)}`);
-    } catch {
-      this.scheduleReconnect();
-      return;
-    }
-    this.ws = ws;
-
-    ws.onopen = () => {
+    socket.on('connect', () => {
       this.reconnectAttempts = 0;
       this.setStatus('connected');
-      this.startHeartbeat();
-    };
+    });
 
-    ws.onmessage = (event) => {
-      let message: ServerToClientMessage;
-      try {
-        message = JSON.parse(event.data as string) as ServerToClientMessage;
-      } catch {
-        return; // Ignore malformed frames.
-      }
-      this.dispatch(message);
-    };
-
-    ws.onclose = (event) => {
-      this.stopHeartbeat();
-      if (this.intentionalClose || event.code === 1000) {
+    socket.on('disconnect', () => {
+      if (this.intentionalClose) {
         this.setStatus('disconnected');
-        return;
+      } else {
+        this.setStatus('reconnecting');
       }
-      this.setStatus('error');
-      this.scheduleReconnect();
-    };
+    });
 
-    ws.onerror = () => {
-      // Reconnection is handled by the `onclose` handler.
+    socket.on('connect_error', () => {
       this.setStatus('error');
-    };
+    });
+
+    socket.io.on('reconnect_attempt', () => {
+      this.reconnectAttempts += 1;
+      this.setStatus('reconnecting');
+    });
+
+    socket.io.on('reconnect', () => {
+      this.reconnectAttempts = 0;
+      this.setStatus('connected');
+    });
+
+    socket.io.on('reconnect_failed', () => {
+      this.setStatus('error');
+    });
   }
 
-  private dispatch(message: ServerToClientMessage): void {
-    const set = this.messageHandlers.get(message.type);
-    if (!set) return;
-    for (const handler of set) handler(message);
+  /** Send a client-to-server message. */
+  send(message: ClientToServerMessage): void {
+    this.socket?.emit(message.type, message.payload);
+  }
+
+  /** Join an org-scoped room to receive broadcasts. */
+  subscribe(room: string): void {
+    this.socket?.emit(WS_EVENT.SUBSCRIBE, { room });
+  }
+
+  /** Leave a room. */
+  unsubscribe(room: string): void {
+    this.socket?.emit(WS_EVENT.UNSUBSCRIBE, { room });
+  }
+
+  /** Close the connection (considered intentional). */
+  disconnect(): void {
+    this.intentionalClose = true;
+    this.socket?.disconnect();
+    this.socket = null;
+    this.setStatus('disconnected');
   }
 
   private setStatus(status: WebSocketConnectionStatus): void {
-    this.status = status;
-    for (const handler of this.statusHandlers) handler(status);
-  }
-
-  private startHeartbeat(): void {
-    this.stopHeartbeat();
-    this.heartbeatTimer = setInterval(() => {
-      this.send({ type: WS_EVENT.PING, payload: { timestamp: Date.now() } });
-    }, HEARTBEAT_INTERVAL_MS);
-  }
-
-  private stopHeartbeat(): void {
-    if (this.heartbeatTimer) {
-      clearInterval(this.heartbeatTimer);
-      this.heartbeatTimer = null;
-    }
-  }
-
-  private scheduleReconnect(): void {
-    if (this.reconnectTimer) return;
-    const delay =
-      Math.min(MAX_DELAY_MS, BASE_DELAY_MS * 2 ** this.reconnectAttempts) +
-      Math.floor(Math.random() * 500);
-    this.reconnectAttempts += 1;
-    this.reconnectTimer = setTimeout(() => {
-      this.reconnectTimer = null;
-      this.open();
-    }, delay);
-  }
-
-  send(message: ClientToServerMessage): void {
-    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify(message));
-    }
-  }
-
-  subscribe(room: string): void {
-    this.send({ type: WS_EVENT.SUBSCRIBE, payload: { room } });
-  }
-
-  unsubscribe(room: string): void {
-    this.send({ type: WS_EVENT.UNSUBSCRIBE, payload: { room } });
-  }
-
-  disconnect(): void {
-    this.intentionalClose = true;
-    if (this.reconnectTimer) {
-      clearTimeout(this.reconnectTimer);
-      this.reconnectTimer = null;
-    }
-    this.stopHeartbeat();
-    if (this.ws) {
-      try {
-        this.ws.close(1000, 'Client disconnected');
-      } catch {
-        // ignore
-      }
-      this.ws = null;
-    }
-    this.setStatus('disconnected');
+    this.statusHandlers.forEach((h) => h(status));
   }
 }
+
+export default WebSocketClient;

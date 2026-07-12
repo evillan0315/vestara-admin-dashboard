@@ -15,6 +15,7 @@ import {
   type ClientToServerMessage,
   type WebSocketConnectionStatus,
 } from '@vestara/types';
+import { getWsCapability } from '../api/websocket';
 import { WebSocketClient } from './WebSocketClient';
 
 interface WebSocketContextValue {
@@ -36,7 +37,8 @@ const WebSocketContext = createContext<WebSocketContextValue | undefined>(undefi
  * automatically once the user is authenticated (using the current access
  * token from localStorage) and subscribes to the user's organization room.
  * Disconnects on logout. Degrades gracefully — the rest of the app keeps
- * working over REST if the connection cannot be established.
+ * working over REST if the connection cannot be established or if the
+ * deployment does not support WebSockets (e.g. Vercel serverless).
  */
 export function WebSocketProvider({ children }: { children: ReactNode }): ReactNode {
   const { isAuthenticated, user } = useAuth();
@@ -70,15 +72,32 @@ export function WebSocketProvider({ children }: { children: ReactNode }): ReactN
       return;
     }
 
-    client.connect(token);
+    let cancelled = false;
+    let offConnection: (() => void) | undefined;
 
-    // Once the connection is established, join the org room.
-    const off = client.on(WS_EVENT.CONNECTION_ESTABLISHED, () => {
-      client.subscribe(WS_ROOM.org(organizationId));
-    });
+    void (async () => {
+      // Probe whether this deployment actually serves WebSockets. On serverless
+      // hosts (Vercel) the WS server is never attached, so we must NOT attempt
+      // the upgrade handshake — it 404s at the edge and would be retried forever.
+      const capability = await getWsCapability();
+      if (cancelled) return;
+
+      if (!capability.available) {
+        setStatus('unavailable');
+        return;
+      }
+
+      client.connect(token);
+
+      // Once the connection is established, join the org room.
+      offConnection = client.on(WS_EVENT.CONNECTION_ESTABLISHED, () => {
+        client.subscribe(WS_ROOM.org(organizationId));
+      });
+    })();
 
     return () => {
-      off();
+      cancelled = true;
+      offConnection?.();
       client.disconnect();
     };
   }, [isAuthenticated, user?.organizationId, user?.id]);

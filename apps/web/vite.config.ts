@@ -112,6 +112,14 @@ export default defineConfig({
         changeOrigin: true,
         ws: true,
       },
+      // Socket.IO mounts at `/socket.io` on the API server. The browser client
+      // resolves its origin from `VITE_API_URL` (the web origin when unset), so
+      // dev traffic to `/socket.io` must be proxied to the API just like `/api`.
+      '/socket.io': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        ws: true,
+      },
     },
   },
   build: {

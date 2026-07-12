@@ -1,35 +1,27 @@
-import type { WebSocket } from 'ws';
-import type { UserRole } from '@vestara/types';
-
 /**
- * Represents a single authenticated WebSocket connection.
+ * Socket.IO-based real-time types.
+ *
+ * The manager uses socket.io `Socket.data` to store per-connection context
+ * (authenticated user + joined organization room).
  */
-export interface ClientConnection {
-  id: string;
-  socket: WebSocket;
+import type { Socket } from 'socket.io';
+
+/** A live Socket.IO connection with attached auth context. */
+export interface SocketConnection {
+  socket: Socket;
   userId: string;
   organizationId: string;
-  name: string;
-  email: string;
-  role: UserRole;
-  /** Rooms the client is subscribed to (e.g. `org:<organizationId>`). */
-  rooms: Set<string>;
-  /** Liveness flag used by the heartbeat probe. */
-  isAlive: boolean;
-  connectedAt: number;
+  role: string;
+  email: string | null;
+  name: string | null;
 }
 
-/**
- * Aggregate runtime statistics for health monitoring.
- */
+/** Runtime health/telemetry snapshot. */
 export interface WebSocketStats {
-  startedAt: number | null;
-  uptimeSeconds: number;
-  totalConnections: number;
+  startedAt: string | null;
+  attached: boolean;
   activeConnections: number;
-  messagesReceived: number;
-  messagesSent: number;
-  errorsTotal: number;
-  reconnectsTotal: number;
+  totalConnections: number;
+  totalMessages: number;
   byOrganization: Record<string, number>;
 }

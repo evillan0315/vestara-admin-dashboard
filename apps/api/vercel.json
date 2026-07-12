@@ -1,14 +1,5 @@
 {
-  "framework": null,
+  "framework": "express",
   "installCommand": "pnpm install",
-  "buildCommand": "pnpm turbo build --filter=@vestara/api",
-  "outputDirectory": ".",
-  "functions": {
-    "api/index.ts": {
-      "maxDuration": 30
-    }
-  },
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index" }
-  ]
+  "buildCommand": "pnpm turbo build --filter=@vestara/api"
 }

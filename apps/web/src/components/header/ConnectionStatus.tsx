@@ -8,6 +8,7 @@ const LABELS: Record<string, string> = {
   reconnecting: 'Reconnecting to real-time service…',
   disconnected: 'Real-time disconnected',
   error: 'Real-time connection error',
+  unavailable: 'Real-time unavailable on this deployment (serverless)',
 };
 
 const DOT_COLORS: Record<string, string> = {
@@ -16,6 +17,7 @@ const DOT_COLORS: Record<string, string> = {
   reconnecting: colors.warning,
   disconnected: colors.muted,
   error: colors.error,
+  unavailable: colors.muted,
 };
 
 const SHORT_LABEL: Record<string, string> = {
@@ -24,6 +26,7 @@ const SHORT_LABEL: Record<string, string> = {
   reconnecting: '…',
   disconnected: 'Offline',
   error: 'Error',
+  unavailable: 'Off',
 };
 
 /**
