@@ -18,6 +18,7 @@ Base URL: `/api/v1`
   - [Auth](#auth)
   - [Protected Routes](#protected-routes)
     - [Users](#get-users)
+    - [Organizations](#organizations)
     - [Settings](#settings)
     - [Audit Logs](#audit-logs)
 - [Data Models](#data-models)
@@ -871,6 +872,139 @@ Get a single audit log entry by ID.
 
 ---
 
+### Organizations
+
+All organization endpoints are prefixed with `/organizations` and require the `super_admin` role.
+
+#### `GET /organizations`
+
+Returns a list of all organizations with their member counts.
+
+**Response `200`**
+
+```json
+{
+  "success": true,
+  "data": {
+    "organizations": [
+      {
+        "id": "uuid",
+        "name": "Acme Corporation",
+        "slug": "acme-corp",
+        "logoUrl": "https://res.cloudinary.com/...",
+        "userCount": 12,
+        "createdAt": "2025-01-01T00:00:00.000Z",
+        "updatedAt": "2025-01-01T00:00:00.000Z"
+      }
+    ]
+  }
+}
+```
+
+#### `GET /organizations/:id`
+
+Get a single organization by ID or slug.
+
+**Response `200`**
+
+```json
+{
+  "success": true,
+  "data": {
+    "organization": {
+      "id": "uuid",
+      "name": "Acme Corporation",
+      "slug": "acme-corp",
+      "logoUrl": null,
+      "userCount": 12,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    }
+  }
+}
+```
+
+**Error Codes**
+
+| Code | Status | Condition |
+|------|--------|-----------|
+| `NOT_FOUND` | 404 | Organization not found |
+
+#### `POST /organizations`
+
+Create a new organization.
+
+**Request Body**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Organization name (2–100 chars) |
+| `slug` | string | Yes | URL-friendly identifier (lowercase, alphanumeric, hyphens) |
+| `logoUrl` | string | No | URL to organization logo |
+
+**Response `201`**
+
+```json
+{
+  "success": true,
+  "data": {
+    "organization": {
+      "id": "uuid",
+      "name": "New Org",
+      "slug": "new-org",
+      "logoUrl": null,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    }
+  }
+}
+```
+
+**Error Codes**
+
+| Code | Status | Condition |
+|------|--------|-----------|
+| `ORGANIZATION_SLUG_EXISTS` | 409 | An organization with this slug already exists |
+| `VALIDATION_ERROR` | 422 | Invalid input data |
+
+#### `PUT /organizations/:id`
+
+Update an organization's name or logo.
+
+**Request Body**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | No | Organization name |
+| `logoUrl` | string | No | Organization logo URL (set to `null` to clear) |
+
+**Response `200`**
+
+```json
+{
+  "success": true,
+  "data": {
+    "organization": {
+      "id": "uuid",
+      "name": "Updated Org",
+      "slug": "new-org",
+      "logoUrl": "https://res.cloudinary.com/...",
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    }
+  }
+}
+```
+
+**Error Codes**
+
+| Code | Status | Condition |
+|------|--------|-----------|
+| `NOT_FOUND` | 404 | Organization not found |
+| `VALIDATION_ERROR` | 422 | Invalid input data |
+
+---
+
 ## Data Models
 
 ### User
@@ -910,6 +1044,18 @@ Get a single audit log entry by ID.
 | `ipAddress` | string \| undefined | Client IP |
 | `userAgent` | string \| undefined | Client user agent |
 | `createdAt` | string | ISO timestamp |
+
+### Organization
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Unique identifier (UUID) |
+| `name` | string | Organization name |
+| `slug` | string | URL-friendly identifier (unique) |
+| `logoUrl` | string \| null | Organization logo URL |
+| `userCount` | number | Number of member users (computed) |
+| `createdAt` | string | ISO timestamp of creation |
+| `updatedAt` | string | ISO timestamp of last update |
 
 ### System Setting
 

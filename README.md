@@ -1949,6 +1949,7 @@ Future licensing terms may change as the platform evolves.
 | User Management (CRUD) | 🟢 Complete (backend + frontend) |
 | Roles & Permissions (RBAC) | 🟢 Implemented (enum-based) |
 | Data Table | 🟢 Reusable, sort/filter/paginate/select |
+| Organizations | 🟢 Complete (list/create/edit + DataTable UI) |
 | Application Settings | 🟢 Complete (backend + frontend) |
 | User Profile (name, avatar, password) | 🟢 Complete (backend + frontend) |
 | User Preferences (Drawer) | 🟢 Complete (Appearance, Notifications, Localization) |
