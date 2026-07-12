@@ -190,7 +190,7 @@ Vestara combines multiple products into one ecosystem.
 | 📈 **Investments (Roadmap)** | Stocks, crypto, crowdfunding, and tokenized assets |
 | 🤖 **AI Chatbot** | In-app AI assistant powered by OpenCode (free models) with multi-provider fallback |
 | 🤖 **AI Assistant RAG** | Data-aware AI with real-time org context injection — answers questions about users, activity, settings, storage, and KPIs |
-| 🤖 **Floating Chat Widget** | AI assistant accessible from every screen via a bottom-right floating action button with slide-up chat panel |
+| 🤖 **Floating Chat Widget** | AI assistant accessible from every screen via FAB, keyboard shortcut (`Cmd+Shift+K`), page-aware suggestions, minimized bar, and full-page navigation |
 
 ---
 
@@ -766,6 +766,10 @@ OpenCode → OpenAI → Anthropic → Mock (fallback)
 The AI Assistant is also accessible from every page through a floating chat widget:
 
 - **Floating Action Button (FAB)** — glow-shadowed chat icon fixed at the bottom-right corner of every screen
+- **Keyboard Shortcut** — press `Cmd+Shift+K` (Mac) / `Ctrl+Shift+K` (Windows/Linux) to toggle the widget from any page
+- **3-State View Modes** — FAB (closed), minimized bar showing the last assistant message preview, or full chat panel
+- **Page-Aware Suggestions** — shows context-relevant question chips based on the current route (e.g., user management, settings, files, analytics)
+- **Open in Full Page** — one-click navigation to the dedicated `/chat` page
 - **Chat Panel** — 400px wide / 620px max-height on desktop, full-screen on mobile, with `Fade` animation
 - **Auto-resumes** the most recent active conversation when opened
 - **Full chat functionality** — send messages, markdown rendering, suggestion chips, typing indicator, copy button
@@ -2021,7 +2025,7 @@ Future licensing terms may change as the platform evolves.
 | Mobile | 📋 Planned |
 | AI Chatbot | 🟢 Complete (OpenCode + multi-provider fallback) |
 | AI Assistant RAG | 🟢 Complete (data-aware, real-time org context) |
-| Floating Chat Widget | 🟢 Complete (FAB toggle, every-screen access) |
+| Floating Chat Widget | 🟢 Complete (FAB, keyboard shortcut, page-aware suggestions, minimized bar, full-page nav) |
 | Investment Platform | 📋 Planned |
 | Blockchain | 📋 Planned |
 
@@ -2051,7 +2055,7 @@ Future licensing terms may change as the platform evolves.
 - ✅ `deploy:api` NPM script for one-command Vercel deployment
 - ✅ AI Chatbot (OpenCode integration, multi-provider, conversation history, responsive UI)
 - ✅ AI Assistant RAG (data-aware, real-time org context injection)
-- ✅ Floating Chat Widget (FAB toggle, every-screen access via DashboardLayout)
+- ✅ Floating Chat Widget (FAB, keyboard shortcut `Cmd+Shift+K`, page-aware suggestions, minimized bar, full-page nav)
 - 🟡 Security Hardening (rate limiting, CSRF, password policies)
 - 📋 Reporting (CSV/Excel/PDF export)
 - 📋 Real-time features (WebSocket, live notifications)

@@ -185,7 +185,12 @@ OPENCODE_API_KEY=sk-your-opencode-key
 # No AI variables required
 ```
 
-The chat UI is accessible at `/chat` in the admin dashboard.
+The chat UI is accessible at `/chat` in the admin dashboard. The enhanced floating chat widget provides these additional features:
+
+- **Keyboard Shortcut**: `Cmd+Shift+K` (Mac) / `Ctrl+Shift+K` (Windows/Linux) to open the widget from any page
+- **3-State View**: FAB (collapsed), minimized bar with last assistant message preview, or full panel
+- **Page-Aware Suggestions**: Context-relevant question chips based on the current route (10 routes mapped)
+- **Open in Full Page**: One-click navigation to `/chat`
 
 ### Web variables
 

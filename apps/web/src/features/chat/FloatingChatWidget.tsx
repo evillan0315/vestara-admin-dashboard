@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
   IconButton,
@@ -15,6 +15,7 @@ import {
   Fade,
   Tooltip,
   Zoom,
+  Slide,
 } from '@mui/material';
 import type { Theme } from '@mui/material/styles';
 import {
@@ -27,7 +28,11 @@ import {
   Check as CheckIcon,
   Chat as ChatIcon,
   Add as AddIcon,
+  OpenInNew as OpenInNewIcon,
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon,
 } from '@mui/icons-material';
+import { useNavigate, useLocation } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {
@@ -43,6 +48,163 @@ import type { ChatMessageDTO } from '@vestara/types';
 
 const PANEL_WIDTH = 400;
 const PANEL_MAX_HEIGHT = 620;
+const MINIMIZED_BAR_HEIGHT = 64;
+
+// ── Page-aware suggestion chips ────────────────────────────────────────────
+
+interface RouteSuggestions {
+  primary: string[];
+  secondary: string[];
+}
+
+const DEFAULT_SUGGESTIONS: RouteSuggestions = {
+  primary: [
+    'How do I manage users?',
+    'Explain the dashboard',
+    'Security best practices',
+  ],
+  secondary: [
+    'What is Vestara?',
+    'How to export data?',
+    'Application settings guide',
+  ],
+};
+
+const ROUTE_SUGGESTIONS: Record<string, RouteSuggestions> = {
+  '/': {
+    primary: [
+      'Explain the dashboard KPIs',
+      'Show recent activity',
+      'What do the metrics mean?',
+    ],
+    secondary: [
+      'How many users are active?',
+      'Any errors recently?',
+      'Storage overview',
+    ],
+  },
+  '/users': {
+    primary: [
+      'How do I manage users?',
+      'Create a new admin user',
+      'Show active users',
+    ],
+    secondary: [
+      'What roles are available?',
+      'Export user list',
+      'Bulk user operations',
+    ],
+  },
+  '/settings': {
+    primary: [
+      'What settings are configured?',
+      'How to export settings?',
+      'Explain JSON values',
+    ],
+    secondary: [
+      'Import settings guide',
+      'Settings audit history',
+      'Security-related settings',
+    ],
+  },
+  '/files': {
+    primary: [
+      'Show file storage stats',
+      'Recent uploads',
+      'How to organize files?',
+    ],
+    secondary: [
+      'File size breakdown',
+      'Storage provider info',
+      'Upload best practices',
+    ],
+  },
+  '/chat': {
+    primary: [
+      'How does the AI work?',
+      'What models are available?',
+      'Change AI model',
+    ],
+    secondary: [
+      'Conversation management',
+      'Chat history tips',
+      'Keyboard shortcuts',
+    ],
+  },
+  '/system-logs': {
+    primary: [
+      'Explain audit logs',
+      'Filter by action type',
+      'Error log analysis',
+    ],
+    secondary: [
+      'Security events',
+      'User activity tracking',
+      'Log retention settings',
+    ],
+  },
+  '/analytics': {
+    primary: [
+      'Analytics overview',
+      'User growth trends',
+      'Platform metrics',
+    ],
+    secondary: [
+      'Revenue data',
+      'Engagement stats',
+      'Report generation',
+    ],
+  },
+  '/organizations': {
+    primary: [
+      'Organization management',
+      'Multi-tenancy overview',
+      'Organization settings',
+    ],
+    secondary: [
+      'Create organization',
+      'Member management',
+      'Org roles and permissions',
+    ],
+  },
+  '/profile': {
+    primary: [
+      'Update my profile',
+      'Change my password',
+      'Account security',
+    ],
+    secondary: [
+      'OAuth linked accounts',
+      'Profile settings',
+      'Notification preferences',
+    ],
+  },
+  '/docs': {
+    primary: [
+      'Find documentation',
+      'API reference',
+      'Developer guide',
+    ],
+    secondary: [
+      'Deployment guide',
+      'Architecture docs',
+      'Getting started',
+    ],
+  },
+};
+
+function getSuggestionsForPath(pathname: string): RouteSuggestions {
+  // Try exact match first
+  if (ROUTE_SUGGESTIONS[pathname]) {
+    return ROUTE_SUGGESTIONS[pathname];
+  }
+  // Fall back to prefix match (e.g., /users/123 -> /users)
+  const prefix = '/' + pathname.split('/')[1];
+  if (prefix !== '/' && ROUTE_SUGGESTIONS[prefix]) {
+    return ROUTE_SUGGESTIONS[prefix];
+  }
+  return DEFAULT_SUGGESTIONS;
+}
 
 // ── Typing Indicator ────────────────────────────────────────────────────────
 
@@ -232,9 +394,11 @@ function MiniMessageBubble({
 function MiniEmptyState({
   onSuggestionClick,
   theme,
+  suggestions,
 }: {
   onSuggestionClick: (text: string) => void;
   theme: Theme;
+  suggestions: RouteSuggestions;
 }) {
   return (
     <Box
@@ -273,9 +437,30 @@ function MiniEmptyState({
       >
         Ask questions about the dashboard, users, settings, or anything else.
       </Typography>
+      {/* Primary suggestions */}
       <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5, flexWrap: 'wrap', justifyContent: 'center' }}>
-        {['How do I manage users?', 'Explain the dashboard', 'Security best practices'].map(
-          (suggestion) => (
+        {suggestions.primary.slice(0, 3).map((suggestion) => (
+          <Chip
+            key={suggestion}
+            label={suggestion}
+            variant="outlined"
+            size="small"
+            onClick={() => onSuggestionClick(suggestion)}
+            sx={{
+              cursor: 'pointer',
+              height: 24,
+              fontSize: '0.7rem',
+              '&:hover': {
+                bgcolor: alpha(theme.palette.primary.main, 0.08),
+              },
+            }}
+          />
+        ))}
+      </Box>
+      {/* Secondary suggestions row */}
+      {suggestions.secondary.length > 0 && (
+        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', justifyContent: 'center' }}>
+          {suggestions.secondary.slice(0, 3).map((suggestion) => (
             <Chip
               key={suggestion}
               label={suggestion}
@@ -291,9 +476,9 @@ function MiniEmptyState({
                 },
               }}
             />
-          ),
-        )}
-      </Box>
+          ))}
+        </Box>
+      )}
     </Box>
   );
 }
@@ -303,11 +488,19 @@ function MiniEmptyState({
 export function FloatingChatWidget() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [open, setOpen] = useState(false);
+  const [minimized, setMinimized] = useState(false);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const minimizedInputRef = useRef<HTMLInputElement>(null);
+
+  // Compute page-aware suggestions
+  const suggestions = useMemo(() => getSuggestionsForPath(location.pathname), [location.pathname]);
 
   // Queries
   const { data: conversationsData } = useConversations({ perPage: 50 });
@@ -324,6 +517,34 @@ export function FloatingChatWidget() {
   const sendMessage = useSendMessage();
   const isSending = sendMessage.isPending;
 
+  // Last assistant message for minimized bar preview
+  const lastAssistantMessage = useMemo(() => {
+    const reversed = [...messages].reverse();
+    return reversed.find((m) => m.role === 'assistant');
+  }, [messages]);
+
+  const lastMessagePreview = lastAssistantMessage
+    ? lastAssistantMessage.content.replace(/[*#`>\[\]]/g, '').slice(0, 80) + (lastAssistantMessage.content.length > 80 ? '...' : '')
+    : null;
+
+  // ── Keyboard shortcut (Cmd/Ctrl + Shift + K) ────────────────────────────
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key === 'K') {
+        // Don't toggle if the user is typing in an input/textarea
+        const activeElement = document.activeElement;
+        if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA' || activeElement.getAttribute('contenteditable') === 'true')) {
+          return;
+        }
+        event.preventDefault();
+        setOpen((prev) => !prev);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   // Auto-scroll
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -333,17 +554,34 @@ export function FloatingChatWidget() {
 
   // Focus input when panel opens or conversation changes
   useEffect(() => {
-    if (open && activeConversationId) {
+    if (open && !minimized && activeConversationId) {
       setTimeout(() => inputRef.current?.focus(), 200);
     }
-  }, [open, activeConversationId]);
+  }, [open, minimized, activeConversationId]);
 
   const handleToggle = () => {
     setOpen((prev) => !prev);
+    setMinimized(false);
   };
 
   const handleClose = () => {
     setOpen(false);
+    setMinimized(false);
+  };
+
+  const handleMinimize = () => {
+    setMinimized(true);
+  };
+
+  const handleExpandFromBar = () => {
+    setMinimized(false);
+    setTimeout(() => inputRef.current?.focus(), 200);
+  };
+
+  const handleOpenFullPage = () => {
+    navigate('/chat');
+    setOpen(false);
+    setMinimized(false);
   };
 
   const handleNewConversation = useCallback(() => {
@@ -354,18 +592,24 @@ export function FloatingChatWidget() {
 
   // Pick the most recent non-archived conversation when opening
   useEffect(() => {
-    if (open && !activeConversationId && conversations.length > 0) {
+    if (open && !minimized && !activeConversationId && conversations.length > 0) {
       const active = conversations.find((c) => !c.isArchived);
       if (active) {
         setActiveConversationId(active.id);
       }
     }
-  }, [open, activeConversationId, conversations]);
+  }, [open, minimized, activeConversationId, conversations]);
 
   const handleSuggestionClick = useCallback((text: string) => {
     setInputValue(text);
-    setTimeout(() => inputRef.current?.focus(), 50);
-  }, []);
+    setTimeout(() => {
+      if (minimized) {
+        minimizedInputRef.current?.focus();
+      } else {
+        inputRef.current?.focus();
+      }
+    }, 50);
+  }, [minimized]);
 
   const handleSend = useCallback(async () => {
     const content = inputValue.trim();
@@ -380,6 +624,10 @@ export function FloatingChatWidget() {
           firstMessage: content,
         });
         setActiveConversationId(conversation.id);
+        // Expand if minimized when sending
+        if (minimized) {
+          setMinimized(false);
+        }
       } catch {
         // Error handled by mutation
       }
@@ -389,7 +637,7 @@ export function FloatingChatWidget() {
         data: { content },
       });
     }
-  }, [inputValue, isSending, activeConversationId, createConversation, sendMessage]);
+  }, [inputValue, isSending, activeConversationId, createConversation, sendMessage, minimized]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -398,11 +646,14 @@ export function FloatingChatWidget() {
     }
   };
 
+  const isFullPanel = open && !minimized;
+  const isMinimizedBar = open && minimized;
+
   return (
     <>
-      {/* Floating Action Button */}
+      {/* Floating Action Button — visible when panel is fully closed */}
       <Zoom in={!open} unmountOnExit>
-        <Tooltip title="AI Assistant" placement="left">
+        <Tooltip title="AI Assistant (⌘⇧K)" placement="left">
           <IconButton
             onClick={handleToggle}
             aria-label="Open AI Assistant"
@@ -429,8 +680,79 @@ export function FloatingChatWidget() {
         </Tooltip>
       </Zoom>
 
-      {/* Chat Panel */}
-      <Fade in={open} timeout={200}>
+      {/* Minimized Bar — visible when panel is minimized */}
+      <Slide direction="up" in={isMinimizedBar} mountOnEnter unmountOnExit>
+        <Paper
+          elevation={6}
+          onClick={handleExpandFromBar}
+          sx={{
+            position: 'fixed',
+            bottom: { xs: 0, sm: 24 },
+            right: { xs: 0, sm: 24 },
+            left: { xs: 0, sm: 'auto' },
+            zIndex: 1499,
+            width: { xs: '100%', sm: PANEL_WIDTH },
+            height: MINIMIZED_BAR_HEIGHT,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            px: 1.5,
+            py: 1,
+            borderRadius: { xs: 0, sm: 2 },
+            bgcolor: theme.palette.background.paper,
+            border: { xs: 'none', sm: `1px solid ${theme.palette.divider}` },
+            cursor: 'pointer',
+            '&:hover': {
+              bgcolor: alpha(theme.palette.primary.main, 0.04),
+            },
+          }}
+        >
+          <SparkleIcon sx={{ color: theme.palette.primary.main, fontSize: 18, flexShrink: 0 }} />
+          <Box sx={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+            <Typography variant="caption" fontWeight={700} noWrap sx={{ fontSize: '0.7rem', lineHeight: 1.2 }}>
+              {activeConversationId
+                ? (conversationData?.title ?? 'AI Assistant')
+                : 'AI Assistant'}
+            </Typography>
+            {lastMessagePreview ? (
+              <Typography variant="caption" color="text.secondary" noWrap sx={{ fontSize: '0.65rem', lineHeight: 1.2 }}>
+                {lastMessagePreview}
+              </Typography>
+            ) : (
+              <Typography variant="caption" color="text.disabled" noWrap sx={{ fontSize: '0.65rem', lineHeight: 1.2 }}>
+                Tap to open assistant...
+              </Typography>
+            )}
+          </Box>
+          <Tooltip title="Expand">
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleExpandFromBar();
+              }}
+              sx={{ width: 24, height: 24, flexShrink: 0 }}
+            >
+              <ExpandLessIcon sx={{ fontSize: 16 }} />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Close">
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleClose();
+              }}
+              sx={{ width: 24, height: 24, flexShrink: 0 }}
+            >
+              <CloseIcon sx={{ fontSize: 14 }} />
+            </IconButton>
+          </Tooltip>
+        </Paper>
+      </Slide>
+
+      {/* Full Chat Panel — visible when open and not minimized */}
+      <Fade in={isFullPanel} timeout={200}>
         <Box
           sx={{
             position: 'fixed',
@@ -460,16 +782,38 @@ export function FloatingChatWidget() {
               borderBottom: `1px solid ${theme.palette.divider}`,
               display: 'flex',
               alignItems: 'center',
-              gap: 1,
+              gap: 0.5,
               bgcolor: alpha(theme.palette.primary.main, 0.04),
             }}
           >
             <SparkleIcon sx={{ color: theme.palette.primary.main, fontSize: 18 }} />
-            <Typography variant="subtitle2" fontWeight={700} sx={{ flex: 1, fontSize: '0.85rem' }}>
+            <Typography variant="subtitle2" fontWeight={700} sx={{ flex: 1, fontSize: '0.85rem' }} noWrap>
               {activeConversationId
                 ? (conversationData?.title ?? 'Loading...')
                 : 'AI Assistant'}
             </Typography>
+
+            {/* Minimize to bar */}
+            <Tooltip title="Minimize (⌘⇧K)">
+              <IconButton
+                size="small"
+                onClick={handleMinimize}
+                sx={{ width: 28, height: 28 }}
+              >
+                <ExpandMoreIcon sx={{ fontSize: 16 }} />
+              </IconButton>
+            </Tooltip>
+
+            {/* Open in full page */}
+            <Tooltip title="Open in full page">
+              <IconButton
+                size="small"
+                onClick={handleOpenFullPage}
+                sx={{ width: 28, height: 28 }}
+              >
+                <OpenInNewIcon sx={{ fontSize: 14 }} />
+              </IconButton>
+            </Tooltip>
 
             {activeConversationId && (
               <Tooltip title="New conversation">
@@ -537,7 +881,11 @@ export function FloatingChatWidget() {
                 {isSending && <MiniTypingIndicator theme={theme} />}
               </>
             ) : (
-              <MiniEmptyState onSuggestionClick={handleSuggestionClick} theme={theme} />
+              <MiniEmptyState
+                onSuggestionClick={handleSuggestionClick}
+                theme={theme}
+                suggestions={suggestions}
+              />
             )}
             <div ref={messagesEndRef} />
           </Box>
