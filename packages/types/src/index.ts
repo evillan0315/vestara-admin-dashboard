@@ -347,4 +347,88 @@ export interface ChatModelsDTO {
 
 export type ThemeModeUnion = 'light' | 'dark' | 'system';
 
+// ── WebSocket (Real-Time) ─────────────────────
+
+/**
+ * Client-side connection lifecycle states surfaced to the UI.
+ */
+export type WebSocketConnectionStatus =
+  | 'connecting'
+  | 'connected'
+  | 'disconnected'
+  | 'reconnecting'
+  | 'error';
+
+/**
+ * Canonical WebSocket event type identifiers exchanged between server and client.
+ * Room names use the `org:<organizationId>` convention for org-scoped broadcasts.
+ */
+export const WS_EVENT = {
+  CONNECTION_ESTABLISHED: 'connection:established',
+  PRESENCE_UPDATE: 'presence:update',
+  AUDIT_CREATED: 'audit:created',
+  NOTIFICATION: 'notification',
+  PONG: 'pong',
+  ERROR: 'error',
+  SUBSCRIBE: 'subscribe',
+  UNSUBSCRIBE: 'unsubscribe',
+  PING: 'ping',
+} as const;
+
+export type WsEventType = (typeof WS_EVENT)[keyof typeof WS_EVENT];
+
+/**
+ * Org-scoped room name helper. All real-time broadcasts for a tenant are
+ * delivered to subscribers of this room.
+ */
+export const WS_ROOM = {
+  org: (organizationId: string) => `org:${organizationId}`,
+} as const;
+
+export interface WsPresenceUser {
+  userId: string;
+  name: string;
+  email: string;
+  role: UserRole;
+}
+
+export interface WsPresencePayload {
+  organizationId: string;
+  onlineCount: number;
+  users: WsPresenceUser[];
+}
+
+export interface WsNotificationPayload {
+  id: string;
+  title: string;
+  message: string;
+  level: 'info' | 'success' | 'warning' | 'error';
+  createdAt: string;
+}
+
+export interface WsConnectionEstablishedPayload {
+  clientId: string;
+  userId: string;
+  organizationId: string;
+}
+
+/**
+ * Messages pushed from the server to connected clients.
+ */
+export type ServerToClientMessage =
+  | { type: typeof WS_EVENT.CONNECTION_ESTABLISHED; payload: WsConnectionEstablishedPayload }
+  | { type: typeof WS_EVENT.PRESENCE_UPDATE; payload: WsPresencePayload }
+  | { type: typeof WS_EVENT.AUDIT_CREATED; payload: AuditLogDTO }
+  | { type: typeof WS_EVENT.NOTIFICATION; payload: WsNotificationPayload }
+  | { type: typeof WS_EVENT.PONG; payload: { timestamp: number } }
+  | { type: typeof WS_EVENT.ERROR; payload: { message: string } };
+
+/**
+ * Messages sent from clients to the server.
+ */
+export type ClientToServerMessage =
+  | { type: typeof WS_EVENT.SUBSCRIBE; payload: { room: string } }
+  | { type: typeof WS_EVENT.UNSUBSCRIBE; payload: { room: string } }
+  | { type: typeof WS_EVENT.PING; payload: { timestamp: number } };
+
 

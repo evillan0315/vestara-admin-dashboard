@@ -1,5 +1,6 @@
 import { Prisma } from '../../generated/prisma/client.js';
 import { BaseRepository } from './base.repository.js';
+import { getWebSocketManager } from '../websocket/index.js';
 
 export class AuditLogRepository extends BaseRepository {
   /**
@@ -15,7 +16,7 @@ export class AuditLogRepository extends BaseRepository {
     ipAddress?: string;
     userAgent?: string;
   }) {
-    return this.prisma.auditLog.create({
+    const audit = await this.prisma.auditLog.create({
       data: {
         action: data.action,
         entity: data.entity,
@@ -29,6 +30,17 @@ export class AuditLogRepository extends BaseRepository {
         userAgent: data.userAgent ?? null,
       },
     });
+
+    // Best-effort real-time broadcast. Never affects persistence — the
+    // WebSocket server may be unattached (e.g. serverless) and broadcasts
+    // are internally guarded against throwing.
+    try {
+      getWebSocketManager().broadcastAuditCreated(audit);
+    } catch {
+      // Real-time delivery is optional; ignore any failure.
+    }
+
+    return audit;
   }
 
   /**

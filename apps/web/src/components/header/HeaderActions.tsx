@@ -8,6 +8,7 @@ import HeaderIconButton from "./HeaderIconButton";
 import DateRangeButton from "./DateRangeButton";
 import RefreshButton from "./RefreshButton";
 import UserMenu from "./UserMenu";
+import ConnectionStatus from "./ConnectionStatus";
 
 import { colors } from "../../theme/tokens";
 
@@ -65,6 +66,8 @@ export default function HeaderActions({
 
         <RefreshButton loading={refreshing} onClick={onRefresh} />
       </Box>
+
+      <ConnectionStatus />
 
       <HeaderIconButton
         tooltip="Notifications"
