@@ -21,6 +21,7 @@ Base URL: `/api/v1`
     - [Organizations](#organizations)
     - [Settings](#settings)
     - [Audit Logs](#audit-logs)
+    - [Chat](#chat-ai-chatbot)
 - [Data Models](#data-models)
 - [Enums](#enums)
 - [Error Codes](#error-codes)
@@ -1005,6 +1006,320 @@ Update an organization's name or logo.
 
 ---
 
+### Chat (AI Chatbot)
+
+All chat endpoints are prefixed with `/chat` and require authentication. The chatbot uses a pluggable AI provider architecture with automatic fallback.
+
+#### Provider Priority
+
+```
+OpenCode → OpenAI → Anthropic → Mock (fallback)
+```
+
+#### Available Models
+
+| Model | Provider | Description |
+|-------|----------|-------------|
+| `mimo-v2.5-free` | OpenCode | Reasoning, text, and image support (default) |
+| `deepseek-v4-flash-free` | OpenCode | Fast coding and general tasks |
+| `nemotron-3-ultra-free` | OpenCode | NVIDIA 1M context |
+| `north-mini-code-free` | OpenCode | Compact coding specialist |
+| `gpt-4` | OpenAI | Most capable model for complex tasks |
+| `gpt-4o-mini` | OpenAI | Fast and cost-effective |
+| `claude-sonnet-4-20250514` | Anthropic | Balanced performance and speed |
+| `claude-haiku-3.5` | Anthropic | Fastest Claude model |
+| `mock` | Built-in | Demo mode — no API key required |
+
+---
+
+#### `GET /chat/models`
+
+List available AI models based on configured API keys.
+
+**Response `200`**
+
+```json
+{
+  "success": true,
+  "data": {
+    "models": [
+      {
+        "id": "mimo-v2.5-free",
+        "name": "MiMo V2.5",
+        "description": "OpenCode free model — reasoning, text, and image support",
+        "maxTokens": 8192,
+        "provider": "opencode"
+      }
+    ]
+  }
+}
+```
+
+---
+
+#### `GET /chat/conversations`
+
+List the authenticated user's conversations (org-scoped).
+
+**Query Parameters**
+
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `page` | number | 1 | Page number |
+| `perPage` | number | 20 | Results per page (max 100) |
+| `search` | string | — | Search by title |
+| `isArchived` | boolean | — | Filter by archive status |
+
+**Response `200`**
+
+```json
+{
+  "success": true,
+  "data": {
+    "conversations": [
+      {
+        "id": "uuid",
+        "title": "Help me with Prisma",
+        "model": "mimo-v2.5-free",
+        "messageCount": 12,
+        "isArchived": false,
+        "createdAt": "2025-01-01T00:00:00.000Z",
+        "updatedAt": "2025-01-01T00:00:00.000Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "perPage": 20,
+      "total": 5,
+      "totalPages": 1
+    }
+  }
+}
+```
+
+---
+
+#### `POST /chat/conversations`
+
+Create a new conversation.
+
+**Request Body**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `title` | string | no | Conversation title (default: "New Conversation") |
+| `model` | string | no | AI model ID (default: `mimo-v2.5-free`) |
+| `systemPrompt` | string | no | Custom system prompt |
+| `firstMessage` | string | no | Optional first user message to send immediately |
+
+**Response `201`**
+
+```json
+{
+  "success": true,
+  "data": {
+    "conversation": {
+      "id": "uuid",
+      "title": "Help me with Prisma",
+      "model": "mimo-v2.5-free",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    }
+  }
+}
+```
+
+---
+
+#### `GET /chat/conversations/:id`
+
+Get a conversation with all its messages.
+
+**Response `200`**
+
+```json
+{
+  "success": true,
+  "data": {
+    "conversation": {
+      "id": "uuid",
+      "title": "Help me with Prisma",
+      "model": "mimo-v2.5-free",
+      "messages": [
+        {
+          "id": "uuid",
+          "role": "user",
+          "content": "How do I create a Prisma migration?",
+          "createdAt": "2025-01-01T00:00:00.000Z"
+        },
+        {
+          "id": "uuid",
+          "role": "assistant",
+          "content": "To create a Prisma migration...",
+          "model": "mimo-v2.5-free",
+          "createdAt": "2025-01-01T00:00:00.000Z"
+        }
+      ]
+    }
+  }
+}
+```
+
+---
+
+#### `PUT /chat/conversations/:id`
+
+Rename a conversation.
+
+**Request Body**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `title` | string | yes | New conversation title |
+
+**Response `200`**
+
+```json
+{
+  "success": true,
+  "data": { "success": true }
+}
+```
+
+---
+
+#### `PATCH /chat/conversations/:id/archive`
+
+Toggle a conversation's archive status.
+
+**Response `200`**
+
+```json
+{
+  "success": true,
+  "data": { "isArchived": true }
+}
+```
+
+---
+
+#### `DELETE /chat/conversations/:id`
+
+Delete a conversation and all its messages.
+
+**Response `200`**
+
+```json
+{
+  "success": true,
+  "data": { "success": true }
+}
+```
+
+---
+
+#### `GET /chat/conversations/:id/messages`
+
+List messages in a conversation (paginated).
+
+**Query Parameters**
+
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `page` | number | 1 | Page number |
+| `perPage` | number | 50 | Results per page (max 100) |
+
+**Response `200`**
+
+```json
+{
+  "success": true,
+  "data": {
+    "messages": [
+      {
+        "id": "uuid",
+        "role": "user",
+        "content": "How do I create a Prisma migration?",
+        "createdAt": "2025-01-01T00:00:00.000Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "perPage": 50,
+      "total": 12,
+      "totalPages": 1
+    }
+  }
+}
+```
+
+---
+
+#### `POST /chat/conversations/:id/messages`
+
+Send a message to a conversation and receive an AI response. The AI provider falls back through the priority chain if the primary provider is unavailable.
+
+**Request Body**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `content` | string | yes | Message content (non-empty) |
+| `model` | string | no | Override model for this message |
+
+**Response `200`**
+
+```json
+{
+  "success": true,
+  "data": {
+    "userMessage": {
+      "id": "uuid",
+      "role": "user",
+      "content": "How do I create a Prisma migration?",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    "assistantMessage": {
+      "id": "uuid",
+      "role": "assistant",
+      "content": "To create a Prisma migration, run `pnpm prisma migrate dev`...",
+      "model": "mimo-v2.5-free",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    }
+  }
+}
+```
+
+**Error Codes**
+
+| Code | Status | Condition |
+|------|--------|-----------|
+| `VALIDATION_ERROR` | 400 | Empty message content |
+| `NOT_FOUND` | 404 | Conversation not found |
+| `TOKEN_INVALID` | 401 | Missing or invalid access token |
+
+---
+
+#### `GET /chat/stats`
+
+Get chat statistics for the current organization.
+
+**Response `200`**
+
+```json
+{
+  "success": true,
+  "data": {
+    "stats": {
+      "totalConversations": 15,
+      "totalMessages": 250,
+      "activeConversations": 8,
+      "archivedConversations": 7
+    }
+  }
+}
+```
+
+---
+
 ## Data Models
 
 ### User
@@ -1068,6 +1383,32 @@ Update an organization's name or logo.
 | `createdAt` | string | ISO timestamp |
 | `updatedAt` | string | ISO timestamp |
 
+### Chat Conversation
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string (uuid) | Unique identifier |
+| `title` | string | Conversation title |
+| `model` | string | AI model ID used |
+| `systemPrompt` | string \| null | Custom system prompt |
+| `userId` | string | Owner user ID |
+| `organizationId` | string | Organization scope |
+| `messageCount` | number | Total messages (computed) |
+| `isArchived` | boolean | Archive flag |
+| `createdAt` | string | ISO timestamp |
+| `updatedAt` | string | ISO timestamp |
+
+### Chat Message
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string (uuid) | Unique identifier |
+| `role` | enum (ChatRole) | `user`, `assistant`, or `system` |
+| `content` | string | Message content |
+| `model` | string \| null | Model used (for assistant messages) |
+| `conversationId` | string | Parent conversation ID |
+| `createdAt` | string | ISO timestamp |
+
 ---
 
 ## Enums
@@ -1113,6 +1454,14 @@ Update an organization's name or logo.
 |-------|-------------|
 | `asc` | Ascending |
 | `desc` | Descending |
+
+### ChatRole
+
+| Value | Description |
+|-------|-------------|
+| `user` | Human user message |
+| `assistant` | AI assistant response |
+| `system` | System-level prompt |
 
 ---
 
@@ -1183,6 +1532,8 @@ apps/api/
 │   ├── repositories/     # Data access layer (Prisma queries)
 │   ├── routes/           # HTTP route definitions
 │   ├── services/         # Business logic layer
+│   │   ├── ai/           # AI provider abstraction (OpenCode, OpenAI, Anthropic, Mock)
+│   │   └── index.ts      # Service singletons
 │   ├── utils/            # Shared utilities (JWT, errors, response helpers, pagination)
 │   ├── app.ts            # Express application factory
 │   └── index.ts          # Server entry point

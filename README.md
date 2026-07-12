@@ -16,7 +16,7 @@
 <p align="center">
 
 ![License](https://img.shields.io/badge/license-Proprietary-gold?style=for-the-badge)
-![Status](https://img.shields.io/badge/status-Phase%201%20%E2%80%93%20Admin%20Dashboard%20%E2%80%93%20Phases%2019%2F19%20Complete-success?style=for-the-badge)
+![Status](https://img.shields.io/badge/status-Phase%201%20%E2%80%93%20Admin%20Dashboard%20%E2%80%93%20Phases%2020%2F30%20Complete-success?style=for-the-badge)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![Express](https://img.shields.io/badge/Express-5.x-000000?style=for-the-badge&logo=express)
@@ -188,7 +188,7 @@ Vestara combines multiple products into one ecosystem.
 | 📅 **Bookings** | Reservation platform for premium experiences, hospitality, and future service marketplaces |
 | 👥 **User Profiles** | Identity management, personalization, and KYC preparation |
 | 📈 **Investments (Roadmap)** | Stocks, crypto, crowdfunding, and tokenized assets |
-| 🤖 **AI Services (Future)** | Intelligent recommendations, fraud detection, automation, and financial insights |
+| 🤖 **AI Chatbot** | In-app AI assistant powered by OpenCode (free models) with multi-provider fallback |
 
 ---
 
@@ -719,11 +719,38 @@ Designed for administrators, compliance teams, and operations personnel, it cent
 
 ---
 
-# 🤖 AI Services (Future)
+# 🤖 AI Services
 
-Artificial Intelligence will enhance user experience throughout the platform.
+Vestara integrates AI-powered features to enhance the user experience throughout the platform.
 
-## Planned Features
+## AI Chatbot (Implemented)
+
+The admin dashboard includes a fully integrated AI chatbot accessible at `/chat`. The chatbot features:
+
+- **Multi-provider architecture** — pluggable AI provider abstraction with automatic fallback
+- **OpenCode integration** — powered by free-tier models (`mimo-v2.5-free`, `deepseek-v4-flash-free`, `nemotron-3-ultra-free`, `north-mini-code-free`)
+- **Conversation management** — persistent chat history with org-scoped conversations
+- **Responsive UI** — mobile-optimized chat interface with suggestion chips and typing indicators
+- **OpenAI-compatible API** — supports any provider exposing the `/chat/completions` endpoint
+- **Reasoning model support** — extracts answers from `reasoning`, `reasoning_content`, and `reasoning_details` fields
+
+### Provider Priority
+
+```
+OpenCode → OpenAI → Anthropic → Mock (fallback)
+```
+
+### Environment Variables
+
+| Variable | Purpose |
+|----------|---------|
+| `OPENCODE_API_KEY` | OpenCode API key (required for OpenCode provider) |
+| `OPENCODE_BASE_URL` | OpenCode API base URL (default: `https://opencode.ai/zen/v1`) |
+| `OPENAI_API_KEY` | OpenAI API key (optional) |
+| `OPENAI_BASE_URL` | OpenAI-compatible base URL (optional) |
+| `ANTHROPIC_API_KEY` | Anthropic API key (optional) |
+
+## Planned AI Features
 
 - Financial Recommendations
 - Fraud Detection
@@ -731,7 +758,6 @@ Artificial Intelligence will enhance user experience throughout the platform.
 - Personalized Marketplace
 - Smart Search
 - Intelligent Notifications
-- Customer Support Assistant
 - Predictive Analytics
 
 ---
@@ -1191,6 +1217,10 @@ JWT_REFRESH_SECRET=replace-with-secure-secret
 JWT_EXPIRES_IN=15m
 
 JWT_REFRESH_EXPIRES_IN=30d
+
+OPENCODE_API_KEY=your-opencode-api-key
+
+OPENCODE_BASE_URL=https://opencode.ai/zen/v1
 
 SMTP_HOST=
 
@@ -1963,7 +1993,7 @@ Future licensing terms may change as the platform evolves.
 | Reusable Form Components | 🟢 Complete (14 components + Zod) |
 | Feedback Components | 🟢 Complete (Toast queue, Loading, EmptyState, useConfirm) |
 | Mobile | 📋 Planned |
-| AI Services | 📋 Planned |
+| AI Chatbot | 🟢 Complete (OpenCode + multi-provider fallback) |
 | Investment Platform | 📋 Planned |
 | Blockchain | 📋 Planned |
 
@@ -1991,6 +2021,7 @@ Future licensing terms may change as the platform evolves.
 - ✅ BigInt serialization fix (File Manager 500 error resolved)
 - ✅ Auth tests: 11/11 reliable (FK cleanup order, timeout adjusted)
 - ✅ `deploy:api` NPM script for one-command Vercel deployment
+- ✅ AI Chatbot (OpenCode integration, multi-provider, conversation history, responsive UI)
 - 🟡 Security Hardening (rate limiting, CSRF, password policies)
 - 📋 Reporting (CSV/Excel/PDF export)
 - 📋 Real-time features (WebSocket, live notifications)

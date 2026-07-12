@@ -161,6 +161,32 @@ See [`.env.example`](../../.env.example) for the full list. The most important:
 
 > **Never commit `.env`.** A `.env.example` is committed; real secrets live in the Vercel dashboard (see [Deployment Guide](./DEPLOYMENT.md)).
 
+### AI Chatbot Configuration
+
+The AI chatbot uses a pluggable provider architecture. At minimum, configure one provider API key (or use the built-in mock for development).
+
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `OPENCODE_API_KEY` | Recommended | OpenCode API key — enables free-tier models (`mimo-v2.5-free`, `deepseek-v4-flash-free`, `nemotron-3-ultra-free`, `north-mini-code-free`) |
+| `OPENCODE_BASE_URL` | No | OpenCode API base URL (default: `https://opencode.ai/zen/v1`) |
+| `OPENAI_API_KEY` | No | OpenAI API key — enables `gpt-4`, `gpt-4o-mini` |
+| `OPENAI_BASE_URL` | No | OpenAI-compatible base URL (for proxies or self-hosted endpoints) |
+| `ANTHROPIC_API_KEY` | No | Anthropic API key — enables `claude-sonnet-4-20250514`, `claude-haiku-3.5` |
+
+**Provider priority** (automatic fallback): OpenCode → OpenAI → Anthropic → Mock
+
+If no API keys are configured, the mock provider returns context-aware demo responses — useful for local development without API costs.
+
+```bash
+# Quick start with OpenCode free models
+OPENCODE_API_KEY=sk-your-opencode-key
+
+# Or use mock mode (no key needed — just works)
+# No AI variables required
+```
+
+The chat UI is accessible at `/chat` in the admin dashboard.
+
 ### Web variables
 
 | Variable | Purpose |
@@ -261,6 +287,7 @@ Example: a new admin page `Analytics`.
   - `useFormWithZod` hook from `@/hooks` for Zod schema validation
 - **Feedback**: Use the Toast system (`useToast()`) for notifications; `useConfirm()` for confirmation dialogs.
 - **Toast queue**: Max 5 concurrent toasts; auto-dismisses after 5s (7s for errors). Variants: `showSuccess`, `showError`, `showWarning`, `showInfo`, `showToast`, `hideAllToasts`.
+- **AI Chat**: The `/chat` page demonstrates a complete feature with API hooks, real-time message streaming, and conversation management. See `apps/web/src/features/chat/` for the hooks and `apps/web/src/pages/ChatPage.tsx` for the UI.
 
 ---
 

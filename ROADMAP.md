@@ -25,6 +25,7 @@ This roadmap defines the GitHub-based project structure, milestone organization,
 | **15–17** | Reusable UI | Forms, Data Table, Feedback Components | ✅ Complete |
 | **18** | File Management | File Manager | ✅ Complete (100%) |
 | **19** | Settings | Application Settings | ✅ Complete (100%) |
+| **19b** | AI Chatbot | AI Chatbot (OpenCode + multi-provider) | ✅ Complete (100%) |
 | **20** | Reporting | Dashboard Reports, CSV/Excel/PDF Export | ❌ Not Started |
 | **21–22** | Real-Time | WebSocket Integration, Live Features | ❌ Not Started |
 | **23–24** | Security & Monitoring | Security Hardening, Monitoring | ⏳ Partial (~55%) |
@@ -42,6 +43,7 @@ This roadmap defines the GitHub-based project structure, milestone organization,
 - `Phase:15-17` - Reusable UI
 - `Phase:18` - File Management
 - `Phase:19` - Settings
+- `Phase:19b` - AI Chatbot (Complete)
 - `Phase:20` - Reporting
 - `Phase:21-22` - Real-Time
 - `Phase:23-24` - Security & Monitoring
@@ -289,6 +291,7 @@ feature/phase-[1-30]-
    |__reusable-ui
    |__file-manager
    |__settings
+   |__ai-chatbot
    |__reporting
    |__real-time
    |__security-monitoring
@@ -331,6 +334,7 @@ Phases correspond to items in [`INSTRUCTION.md`](./INSTRUCTION.md). See the `doc
 | 17 | Feedback Components | ✅ Complete | 100% | **Built:** Toast/Snackbar with queue management (max 5 concurrent) via ToastProvider + useToast hook — showSuccess/showError/showWarning/showInfo. Loading (spinner/skeleton/overlay/inline + PageLoading, ContentLoading, ButtonLoading). EmptyState (NoData, NoSearchResults, EmptyFolder, ErrorState). **Added:** useConfirm hook for promise-based ConfirmDialog integration. **Modal/Dialog System:** Alert (4 variants: success/error/warning/info, 3 styles: standard/filled/outlined, dismissible), Modal (fullscreen, responsive, custom headers, scroll control), Dialog (SimpleDialog, ConfirmDialog, AlertDialog), enhanced Drawer (temporary/persistent/permanent, Sidebar, SlideOver). |
 | 18 | File Manager | ✅ Complete | 100% | **Backend:** Storage provider abstraction (Local, Cloudinary, S3, Google Drive) with factory pattern. File model with org-scoped CRUD, folder hierarchy, metadata. **API:** `/api/v1/files` — list (paginated/filtered), folder contents, upload (multi-file, 100MB), create folder, rename/move, signed download URLs, bulk move/delete. **Storage:** Org-level config via SystemSetting `storage` key — supports LOCAL (default), CLOUDINARY (with provided credentials: API 914425692112145), S3, GOOGLE_DRIVE. **Audit:** All operations logged. **Frontend (2026-07-12):** FileManagerPage with DataTable (sortable columns, row selection, search), folder cards with click-to-navigate, clickable MUI breadcrumbs, upload dialog with drag-and-drop zone and XHR progress bar (LinearProgress), create folder dialog, rename dialog, move dialog (select target folder), delete + bulk delete with ConfirmDialog, image preview dialog, download via URL, list/grid view toggle. **API client:** `apps/web/src/api/files.ts` with XHR upload progress. **Hooks:** `apps/web/src/features/files/hooks.ts` — TanStack Query hooks for folder contents, upload, create folder, rename, move, delete, bulk delete, stats. **Route:** `/files` in SYSTEM nav group. Build + typecheck + lint all pass. |
 | 19 | Application Settings | ✅ Complete | 100% | **Backend:** Full CRUD routes with auth middleware, repository pattern, validation. **Multi-tenancy (2026-07-13):** Settings now scoped per-organization via compound unique `[organizationId, key]`. **Frontend:** SettingsPage with DataTable (key-value editor), SettingFormDialog for create/edit with JSON validation, TanStack Query hooks, toast notifications for success/error. **New (2026-07-12):** Audit logging wired through SettingsService (was bypassing it). Versioning via `previousValue` in audit metadata. Export endpoint (`GET /settings/export`) downloads versioned JSON. Import endpoint (`POST /settings/import`) validates & upserts from JSON. Audit history endpoint (`GET /settings/audit-history`) with paginated, filtered change log. Frontend: Export button, SettingsImportDialog (drag-and-drop JSON upload), SettingsAuditHistoryDialog (paginated history with action icons). Shared: `SETTINGS_IMPORT` AuditAction, 3 new DTOs, import validation schema. All build, typecheck, lint, and tests pass. |
+| 19b | AI Chatbot | ✅ Complete | 100% | **Backend:** AI service abstraction with pluggable provider architecture (`AIProvider` interface). **OpenCode provider** (`opencode.provider.ts`) — free-tier models (`mimo-v2.5-free`, `deepseek-v4-flash-free`, `nemotron-3-ultra-free`, `north-mini-code-free`), OpenAI-compatible API (`/chat/completions`), reasoning model support (extracts from `reasoning`, `reasoning_content`, `reasoning_details` fields when `content` is null). Provider priority: OpenCode → OpenAI → Anthropic → Mock (fallback). **Database:** `ChatConversation` and `ChatMessage` models with Prisma, `ChatRole` enum, org-scoped conversations. **API:** 9 REST endpoints (`/chat/conversations`, `/chat/send`, `/chat/stream`, etc.). **Frontend:** Full ChatPage UI with responsive layout, conversation list in right-side drawer (toggle via `HistoryIcon`), suggestion chips, typing indicator, OpenCode branding. TanStack Query hooks for all operations. Route at `/chat` in nav. **Tests:** 19 integration tests passing against live OpenCode API. **Seed:** Idempotent `pnpm prisma:seed` with `deleteMany()` cleanup. **Maintenance:** Fixed `findDefaultOrCreate()` race condition (now uses `upsert`), corrected OpenCode base URL from `/zen/go/v1` to `/zen/v1` for free models. |
 | 20 | Reports | ❌ Not Started | 0% | No dashboard reports, CSV/Excel/PDF export |
 | 21 | WebSocket Integration | ❌ Not Started | 0% | No WebSocket support |
 | 22 | Live Features | ❌ Not Started | 0% | No live notifications, dashboard updates, presence |
