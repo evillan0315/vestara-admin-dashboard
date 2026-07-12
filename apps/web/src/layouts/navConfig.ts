@@ -24,6 +24,7 @@ import {
   ScrollText,
   BookText,
   Building2,
+  FolderOpen,
 } from "lucide-react";
 
 export interface NavItem {
@@ -87,6 +88,11 @@ export const navGroups: NavGroup[] = [
     title: "SYSTEM",
     items: [
       { label: "Settings", icon: Settings, path: "/settings" },
+      {
+        label: "File Manager",
+        icon: FolderOpen,
+        path: "/files",
+      },
       {
         label: "Organizations",
         icon: Building2,
