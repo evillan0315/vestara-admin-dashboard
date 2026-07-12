@@ -403,10 +403,10 @@ function MessageBubbleComponent({ message, isLatest }: MessageBubbleProps) {
     <Box
       sx={{
         display: 'flex',
-        gap: { xs: 1, sm: 1.5 },
+        gap: { xs: 0.75, sm: 1.5 },
         alignItems: 'flex-start',
         flexDirection: isUser ? 'row-reverse' : 'row',
-        mb: { xs: 1.5, sm: 2 },
+        mb: { xs: 1, sm: 2 },
       }}
     >
       <Avatar
@@ -420,7 +420,7 @@ function MessageBubbleComponent({ message, isLatest }: MessageBubbleProps) {
         {isUser ? <PersonIcon fontSize="small" /> : <BotIcon fontSize="small" />}
       </Avatar>
 
-      <Box sx={{ maxWidth: { xs: '88%', sm: '75%' }, minWidth: { xs: 48, sm: 60 } }}>
+      <Box sx={{ maxWidth: { xs: '92%', sm: '80%', md: '75%' }, minWidth: { xs: 40, sm: 60 }, width: '100%' }}>
         <Paper
           elevation={0}
           sx={{
@@ -432,16 +432,22 @@ function MessageBubbleComponent({ message, isLatest }: MessageBubbleProps) {
             color: isUser ? theme.palette.primary.contrastText : theme.palette.text.primary,
             border: isUser ? 'none' : `1px solid ${theme.palette.divider}`,
             position: 'relative',
+            maxWidth: '100%',
+            minWidth: 0,
           }}
         >
           {isUser ? (
-            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: { xs: '0.875rem', sm: 'inherit' } }}>
+            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: { xs: '0.8125rem', sm: '0.875rem' } }}>
               {message.content}
             </Typography>
           ) : (
             <Box
               sx={{
-                '& p': { my: 0.5 },
+                width: '100%',
+                minWidth: 0,
+                overflowWrap: 'break-word',
+                wordBreak: 'break-word',
+                '& p': { my: { xs: 0.25, sm: 0.5 } },
                 '& p:first-of-type': { mt: 0 },
                 '& p:last-of-type': { mb: 0 },
                 '& pre': {
@@ -449,49 +455,97 @@ function MessageBubbleComponent({ message, isLatest }: MessageBubbleProps) {
                   p: { xs: 1, sm: 1.5 },
                   borderRadius: 1,
                   overflow: 'auto',
-                  fontSize: '0.85em',
+                  fontSize: { xs: '0.75rem', sm: '0.85em' },
                   border: `1px solid ${theme.palette.divider}`,
+                  maxWidth: '100%',
+                  WebkitOverflowScrolling: 'touch',
                 },
                 '& code': {
                   bgcolor: alpha(theme.palette.primary.main, 0.08),
                   px: 0.5,
                   borderRadius: 0.5,
-                  fontSize: '0.9em',
+                  fontSize: { xs: '0.8em', sm: '0.9em' },
+                  wordBreak: 'break-word',
                 },
                 '& pre code': {
                   bgcolor: 'transparent',
                   px: 0,
+                  wordBreak: 'normal',
+                  whiteSpace: 'pre',
                 },
                 '& table': {
                   width: '100%',
                   borderCollapse: 'collapse',
                   my: 1,
-                  display: { xs: 'block', sm: 'table' },
+                  display: 'block',
                   overflowX: 'auto',
+                  WebkitOverflowScrolling: 'touch',
+                  border: `1px solid ${theme.palette.divider}`,
+                  borderRadius: 1,
+                },
+                '& thead': {
+                  display: { xs: 'table-header-group', sm: 'table-header-group' },
+                },
+                '& tbody': {
+                  display: { xs: 'block', sm: 'table-row-group' },
+                },
+                '& tr': {
+                  display: { xs: 'flex', sm: 'table-row' },
+                  flexDirection: { xs: 'column', sm: 'unset' },
+                  borderBottom: { xs: `1px solid ${theme.palette.divider}`, sm: 'none' },
+                  '&:last-child': { borderBottom: 'none' },
                 },
                 '& th, & td': {
-                  border: `1px solid ${theme.palette.divider}`,
-                  px: 1,
+                  border: { xs: 'none', sm: `1px solid ${theme.palette.divider}` },
+                  px: { xs: 1, sm: 1 },
                   py: 0.5,
                   textAlign: 'left',
-                  fontSize: '0.85em',
-                  whiteSpace: 'nowrap',
+                  fontSize: { xs: '0.75rem', sm: '0.85em' },
+                  whiteSpace: { xs: 'normal', sm: 'nowrap' },
+                  display: { xs: 'flex', sm: 'table-cell' },
+                  justifyContent: { xs: 'space-between', sm: 'unset' },
+                  '&:before': {
+                    content: { xs: 'attr(data-label)', sm: 'none' },
+                    fontWeight: 600,
+                    color: theme.palette.text.secondary,
+                    fontSize: '0.85em',
+                    minWidth: { xs: 80, sm: 'auto' },
+                  },
                 },
                 '& th': {
                   bgcolor: alpha(theme.palette.primary.main, 0.04),
                   fontWeight: 600,
+                  display: { xs: 'none', sm: 'table-cell' },
                 },
                 '& ul, & ol': {
-                  pl: 2,
+                  pl: { xs: 1.5, sm: 2 },
                   my: 0.5,
                 },
                 '& li': {
                   mb: 0.25,
                 },
                 '& h1, & h2, & h3, & h4': {
-                  mt: 1.5,
+                  mt: { xs: 1, sm: 1.5 },
                   mb: 0.5,
                   fontWeight: 600,
+                  fontSize: { xs: undefined, sm: undefined },
+                  wordBreak: 'break-word',
+                },
+                '& h1': { fontSize: { xs: '1.15rem', sm: '1.5rem' } },
+                '& h2': { fontSize: { xs: '1.05rem', sm: '1.3rem' } },
+                '& h3': { fontSize: { xs: '0.95rem', sm: '1.1rem' } },
+                '& h4': { fontSize: { xs: '0.9rem', sm: '1rem' } },
+                '& blockquote': {
+                  borderLeft: `3px solid ${theme.palette.primary.main}`,
+                  pl: 1.5,
+                  ml: 0,
+                  my: 1,
+                  color: theme.palette.text.secondary,
+                  fontStyle: 'italic',
+                },
+                '& a': {
+                  color: theme.palette.primary.main,
+                  wordBreak: 'break-all',
                 },
                 '& hr': {
                   border: 'none',
@@ -541,7 +595,7 @@ function TypingIndicator() {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
-    <Box sx={{ display: 'flex', gap: { xs: 1, sm: 1.5 }, alignItems: 'flex-start', mb: { xs: 1.5, sm: 2 } }}>
+    <Box sx={{ display: 'flex', gap: { xs: 0.75, sm: 1.5 }, alignItems: 'flex-start', mb: { xs: 1, sm: 2 } }}>
       <Avatar
         sx={{
           width: isMobile ? 28 : 32,
@@ -607,11 +661,11 @@ function EmptyState({ onSuggestionClick }: { onSuggestionClick: (text: string) =
       <Typography variant={isMobile ? 'h6' : 'h5'} fontWeight={700}>
         Vestara AI Assistant
       </Typography>
-      <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ maxWidth: 400 }}>
+      <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ maxWidth: { xs: 280, sm: 400 }, fontSize: { xs: '0.8125rem', sm: '0.875rem' } }}>
         Powered by OpenCode AI. Ask questions about the dashboard,
         get help with user management, or explore system settings.
       </Typography>
-      <Box sx={{ display: 'flex', gap: { xs: 0.5, sm: 1 }, mt: 1.5, flexWrap: 'wrap', justifyContent: 'center' }}>
+      <Box sx={{ display: 'flex', gap: { xs: 0.5, sm: 1 }, mt: 1.5, flexWrap: 'wrap', justifyContent: 'center', px: { xs: 1, sm: 0 } }}>
         {['How do I manage users?', 'Explain the dashboard', 'Security best practices'].map((suggestion) => (
           <Chip
             key={suggestion}
@@ -726,7 +780,7 @@ export function ChatPage() {
     <Box
       sx={{
         display: 'flex',
-        height: { xs: 'calc(100vh - 56px)', sm: 'calc(100vh - 64px)' },
+        height: { xs: 'calc(100dvh - 56px)', sm: 'calc(100dvh - 64px)' },
         borderRadius: { xs: 0, sm: 2 },
         overflow: 'hidden',
         border: { xs: 'none', sm: `1px solid ${theme.palette.divider}` },
@@ -745,8 +799,8 @@ export function ChatPage() {
         {/* Chat Header */}
         <Box
           sx={{
-            px: { xs: 1.5, sm: 3 },
-            py: { xs: 1, sm: 1.5 },
+            px: { xs: 1, sm: 3 },
+            py: { xs: 0.75, sm: 1.5 },
             borderBottom: `1px solid ${theme.palette.divider}`,
             display: 'flex',
             alignItems: 'center',
@@ -809,17 +863,17 @@ export function ChatPage() {
             sx={{
               flex: 1,
               overflow: 'auto',
-              px: { xs: 1.5, sm: 3 },
-              py: { xs: 1.5, sm: 2 },
+              px: { xs: 1, sm: 3 },
+              py: { xs: 1, sm: 2 },
               display: 'flex',
               flexDirection: 'column',
             }}
           >
             {messagesLoading ? (
               Array.from({ length: 4 }).map((_, i) => (
-                <Box key={i} sx={{ display: 'flex', gap: { xs: 1, sm: 1.5 }, mb: { xs: 1.5, sm: 2 } }}>
-                  <Skeleton variant="circular" width={32} height={32} />
-                  <Skeleton variant="rounded" width="60%" height={40} sx={{ borderRadius: 2 }} />
+                <Box key={i} sx={{ display: 'flex', gap: { xs: 0.75, sm: 1.5 }, mb: { xs: 1, sm: 2 } }}>
+                  <Skeleton variant="circular" width={isMobile ? 28 : 32} height={isMobile ? 28 : 32} />
+                  <Skeleton variant="rounded" width={`${50 + i * 5}%`} height={isMobile ? 32 : 40} sx={{ borderRadius: 2 }} />
                 </Box>
               ))
             ) : (
@@ -844,7 +898,7 @@ export function ChatPage() {
         {/* Input Area — always visible */}
         <Box
           sx={{
-            p: { xs: 1, sm: 2 },
+            p: { xs: 0.75, sm: 2 },
             borderTop: `1px solid ${theme.palette.divider}`,
             bgcolor: theme.palette.background.paper,
           }}
