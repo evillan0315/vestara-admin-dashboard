@@ -3,7 +3,7 @@
 set -euo pipefail
 
 ####################################################
-# Production Server Bootstrap
+# Production Server Setup
 # Ubuntu 22.04 / 24.04 LTS
 # Node.js 24 LTS
 ####################################################
@@ -21,13 +21,19 @@ NODE_VERSION="24"
 
 SSH_PORT="22"
 
+DOMAIN="meetlily.org"
+
+WWW_DOMAIN="www.meetlily.org"
+
+SSL_EMAIL="admin@meetlily.org"
+
 APP_DIR="/var/www/app"
 
 POSTGRES_DB="production_db"
 
 POSTGRES_USER="app_user"
 
-POSTGRES_PASSWORD="CHANGE_THIS_PASSWORD"
+POSTGRES_PASSWORD="CHANGE_ME"
 
 
 ############################
@@ -35,16 +41,17 @@ POSTGRES_PASSWORD="CHANGE_THIS_PASSWORD"
 ############################
 
 if [ "$EUID" -ne 0 ]; then
-    echo "Please run as root"
+    echo "Run this script as root"
     exit 1
 fi
 
 
-echo "Starting production server setup..."
+echo "Starting production setup..."
+
 
 
 ############################
-# System Update
+# Update System
 ############################
 
 apt update
@@ -71,6 +78,7 @@ gnupg \
 jq
 
 
+
 ############################
 # Timezone
 ############################
@@ -78,24 +86,26 @@ jq
 timedatectl set-timezone "$TIMEZONE"
 
 
+
 ############################
-# Create Deploy User
+# Deploy User
 ############################
 
 if ! id "$DEPLOY_USER" >/dev/null 2>&1
 then
 
-    adduser \
-    --disabled-password \
-    --gecos "" \
-    "$DEPLOY_USER"
+adduser \
+--disabled-password \
+--gecos "" \
+$DEPLOY_USER
 
 fi
 
 
 usermod \
 -aG sudo \
-"$DEPLOY_USER"
+$DEPLOY_USER
+
 
 
 mkdir -p \
@@ -131,9 +141,6 @@ cp \
 
 cat >> /etc/ssh/sshd_config <<EOF
 
-
-# Production Security
-
 PermitRootLogin no
 
 PasswordAuthentication no
@@ -144,7 +151,7 @@ MaxAuthTries 3
 
 LoginGraceTime 30
 
-AllowUsers $DEPLOY_USER
+AllowUsers ${DEPLOY_USER}
 
 EOF
 
@@ -194,11 +201,11 @@ maxretry = 5
 
 [sshd]
 
-enabled = true
+enabled=true
 
-port = ${SSH_PORT}
+port=${SSH_PORT}
 
-logpath = /var/log/auth.log
+logpath=/var/log/auth.log
 
 EOF
 
@@ -216,50 +223,62 @@ systemctl restart fail2ban
 apt install -y nginx
 
 
-cat > /etc/nginx/nginx.conf <<EOF
-
-user www-data;
-
-worker_processes auto;
+rm -f \
+/etc/nginx/sites-enabled/default
 
 
-events {
+cat > /etc/nginx/sites-available/app <<EOF
 
-    worker_connections 4096;
+server {
 
-    multi_accept on;
+listen 80;
+
+listen [::]:80;
+
+
+server_name ${DOMAIN} ${WWW_DOMAIN};
+
+
+
+location / {
+
+
+proxy_pass http://127.0.0.1:3000;
+
+
+proxy_http_version 1.1;
+
+
+proxy_set_header Upgrade \$http_upgrade;
+
+proxy_set_header Connection "upgrade";
+
+
+proxy_set_header Host \$host;
+
+
+proxy_set_header X-Real-IP \$remote_addr;
+
+
+proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+
+
+proxy_set_header X-Forwarded-Proto \$scheme;
+
 
 }
 
-
-http {
-
-    sendfile on;
-
-    tcp_nopush on;
-
-    tcp_nodelay on;
-
-
-    keepalive_timeout 65;
-
-
-    client_max_body_size 100M;
-
-
-    gzip on;
-
-
-    gzip_types
-        text/plain
-        text/css
-        application/json
-        application/javascript
-        application/xml;
 
 }
 
 EOF
+
+
+
+ln -sf \
+/etc/nginx/sites-available/app \
+/etc/nginx/sites-enabled/app
+
 
 
 nginx -t
@@ -272,7 +291,7 @@ systemctl restart nginx
 
 
 ############################
-# Node.js 24 LTS
+# Node.js 24
 ############################
 
 curl -fsSL \
@@ -283,9 +302,9 @@ https://deb.nodesource.com/setup_${NODE_VERSION}.x \
 apt install -y nodejs
 
 
-node --version
+node -v
 
-npm --version
+npm -v
 
 
 
@@ -299,10 +318,6 @@ npm install -g pm2
 sudo -u $DEPLOY_USER pm2 startup systemd \
 -u $DEPLOY_USER \
 --hp /home/$DEPLOY_USER
-
-
-systemctl enable \
-pm2-$DEPLOY_USER
 
 
 
@@ -333,6 +348,7 @@ TO ${POSTGRES_USER};
 EOF
 
 
+
 systemctl enable postgresql
 
 
@@ -356,85 +372,12 @@ sed -i \
 
 systemctl enable redis-server
 
-
 systemctl restart redis-server
 
 
 
 ############################
-# Kernel Tuning
-############################
-
-cat >> /etc/sysctl.conf <<EOF
-
-
-# Production Network Tuning
-
-net.core.somaxconn=65535
-
-net.ipv4.tcp_max_syn_backlog=65535
-
-net.ipv4.ip_local_port_range=1024 65535
-
-vm.swappiness=10
-
-EOF
-
-
-sysctl -p
-
-
-
-############################
-# Application Structure
-############################
-
-mkdir -p \
-$APP_DIR/backend \
-$APP_DIR/frontend \
-/var/www/logs \
-/var/www/backups
-
-
-chown -R \
-$DEPLOY_USER:$DEPLOY_USER \
-/var/www
-
-
-
-############################
-# Automatic Security Updates
-############################
-
-apt install -y \
-unattended-upgrades
-
-
-dpkg-reconfigure \
---priority=low \
-unattended-upgrades
-
-
-
-############################
-# PM2 Log Rotation
-############################
-
-sudo -u $DEPLOY_USER \
-pm2 install pm2-logrotate || true
-
-
-sudo -u $DEPLOY_USER \
-pm2 set pm2-logrotate:max_size 100M || true
-
-
-sudo -u $DEPLOY_USER \
-pm2 set pm2-logrotate:retain 14 || true
-
-
-
-############################
-# Docker Installation
+# Docker
 ############################
 
 curl -fsSL \
@@ -452,6 +395,106 @@ systemctl enable docker
 
 
 ############################
+# Certbot SSL
+############################
+
+apt install -y \
+certbot \
+python3-certbot-nginx
+
+
+
+certbot \
+--nginx \
+--non-interactive \
+--agree-tos \
+--email ${SSL_EMAIL} \
+-d ${DOMAIN} \
+-d ${WWW_DOMAIN} \
+--redirect
+
+
+
+systemctl enable certbot.timer
+
+systemctl start certbot.timer
+
+
+
+certbot renew --dry-run
+
+
+
+############################
+# Kernel Optimization
+############################
+
+cat >> /etc/sysctl.conf <<EOF
+
+
+net.core.somaxconn=65535
+
+net.ipv4.tcp_max_syn_backlog=65535
+
+net.ipv4.ip_local_port_range=1024 65535
+
+vm.swappiness=10
+
+EOF
+
+
+sysctl -p
+
+
+
+############################
+# App Structure
+############################
+
+mkdir -p \
+${APP_DIR}/backend \
+${APP_DIR}/frontend \
+/var/www/logs \
+/var/www/backups
+
+
+chown -R \
+${DEPLOY_USER}:${DEPLOY_USER} \
+/var/www
+
+
+
+############################
+# Auto Updates
+############################
+
+apt install -y unattended-upgrades
+
+
+dpkg-reconfigure \
+--priority=low \
+unattended-upgrades
+
+
+
+############################
+# PM2 Logs
+############################
+
+sudo -u $DEPLOY_USER \
+pm2 install pm2-logrotate || true
+
+
+sudo -u $DEPLOY_USER \
+pm2 set pm2-logrotate:max_size 100M || true
+
+
+sudo -u $DEPLOY_USER \
+pm2 set pm2-logrotate:retain 14 || true
+
+
+
+############################
 # Cleanup
 ############################
 
@@ -461,61 +504,37 @@ apt autoclean
 
 
 
-############################
-# Finished
-############################
-
 echo "
 
-================================================
+====================================
 
-Production Setup Completed
+Production Server Ready
 
-Server Stack:
+Stack:
 
 ✓ Ubuntu LTS
-✓ Node.js ${NODE_VERSION}
-✓ npm
+✓ Node.js 24
 ✓ PM2
 ✓ Nginx
+✓ HTTPS SSL
 ✓ PostgreSQL
 ✓ Redis
 ✓ Docker
-✓ UFW Firewall
+✓ Firewall
 ✓ Fail2Ban
-✓ SSH Hardening
-✓ Kernel Optimization
 ✓ Auto Updates
 
 
-Deploy User:
-
-${DEPLOY_USER}
-
-
-Application Path:
+Application:
 
 ${APP_DIR}
 
 
-Next:
+URL:
 
-1. Add SSH key:
-
-/home/${DEPLOY_USER}/.ssh/authorized_keys
+https://${DOMAIN}
 
 
-2. Configure DNS
-
-
-3. Install SSL:
-
-certbot --nginx -d yourdomain.com
-
-
-4. Deploy application
-
-
-================================================
+====================================
 
 "
