@@ -87,7 +87,7 @@ router.get('/stats', async (req, res, next) => {
  */
 router.get('/', validate(listFilesQuerySchema, 'query'), async (req, res, next) => {
   try {
-    const { folderId, mimeType, search, page, perPage, sort, order } = req.query as any;
+    const { folderId, mimeType, search, page, perPage, sort, order } = req.query as unknown as z.infer<typeof listFilesQuerySchema>;
     const result = await fileService.listFiles(req.user!.organizationId, {
       folderId: folderId || null,
       mimeType,

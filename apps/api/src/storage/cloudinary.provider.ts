@@ -15,6 +15,25 @@ import type {
   StorageProviderType,
 } from './types.js';
 
+interface CloudinaryResource {
+  public_id: string;
+  secure_url: string;
+  bytes: number;
+  format?: string;
+  created_at: string;
+  width?: number;
+  height?: number;
+}
+
+interface CloudinaryListResponse {
+  resources: CloudinaryResource[];
+  next_cursor?: string;
+}
+
+interface CloudinaryFoldersResponse {
+  folders: Array<{ name: string }>;
+}
+
 export class CloudinaryStorageProvider extends BaseStorageProvider {
   public readonly type: StorageProviderType = 'CLOUDINARY';
   public readonly config: StorageProviderConfig;
@@ -99,14 +118,14 @@ export class CloudinaryStorageProvider extends BaseStorageProvider {
   async list(options: ListOptions = {}): Promise<ListResult> {
     try {
       const folder = options.folder || '';
-      const result = await cloudinary.api.resources({
+      const result = (await cloudinary.api.resources({
         type: 'upload',
         prefix: folder ? `${folder}/` : undefined,
         max_results: options.maxKeys || 100,
         next_cursor: options.continuationToken,
-      });
+      })) as CloudinaryListResponse;
 
-      const files: FileMetadata[] = (result.resources as any[]).map((resource) => ({
+      const files: FileMetadata[] = result.resources.map((resource) => ({
         key: resource.public_id,
         url: resource.secure_url,
         size: resource.bytes,
@@ -120,8 +139,8 @@ export class CloudinaryStorageProvider extends BaseStorageProvider {
         },
       }));
 
-      const foldersResult = await cloudinary.api.sub_folders(folder);
-      const folders = (foldersResult.folders as any[]).map((f) => f.name);
+      const foldersResult = (await cloudinary.api.sub_folders(folder)) as CloudinaryFoldersResponse;
+      const folders = foldersResult.folders.map((f) => f.name);
 
       return {
         files,

@@ -3,9 +3,10 @@
 // ──────────────────────────────────────────────
 
 import { AuditAction } from '@vestara/types';
+import { StorageProvider } from '../../generated/prisma/client.js';
 import { fileRepository, auditLogRepository, settingsRepository } from '../repositories/index.js';
 import { storageProviderFactory } from '../storage/factory.js';
-import type { StorageProviderConfig } from '../storage/types.js';
+import type { StorageProviderConfig, StorageProviderConfigType } from '../storage/types.js';
 
 export interface FileUploadResult {
   id: string;
@@ -128,7 +129,7 @@ export class FileService {
    * Build provider config from settings
    */
   private buildProviderConfig(settings: StorageSettings): StorageProviderConfig {
-    const providerMap: Record<string, string> = {
+    const providerMap: Record<string, StorageProviderConfigType> = {
       'LOCAL': 'local',
       'CLOUDINARY': 'cloudinary',
       'S3': 's3',
@@ -136,7 +137,7 @@ export class FileService {
     };
 
     const baseConfig: StorageProviderConfig = {
-      provider: (providerMap[settings.provider] || 'local') as any,
+      provider: (providerMap[settings.provider] || 'local') as StorageProviderConfigType,
       ...settings.config,
     } as StorageProviderConfig;
 
@@ -204,7 +205,7 @@ export class FileService {
       size: BigInt(file.length),
       path: uploadResult.key,
       url: uploadResult.url,
-      provider: uploadResult.provider as any,
+      provider: uploadResult.provider,
       providerId: uploadResult.key,
       folderId,
       uploadedBy: userId,
@@ -262,7 +263,7 @@ export class FileService {
       mimeType: 'folder',
     });
 
-    if (existing.items.some((f: any) => f.name.toLowerCase() === name.toLowerCase())) {
+    if (existing.items.some((f: { name: string }) => f.name.toLowerCase() === name.toLowerCase())) {
       throw new Error('FOLDER_EXISTS');
     }
 
@@ -273,7 +274,7 @@ export class FileService {
       size: BigInt(0),
       path: '',
       url: null,
-      provider: 'LOCAL' as any,
+      provider: StorageProvider.LOCAL,
       providerId: null,
       folderId: parentFolderId,
       uploadedBy: userId,
@@ -325,7 +326,7 @@ export class FileService {
     const { items, total } = await fileRepository.findMany({ organizationId, ...params });
 
     return {
-      items: items.map((file: any) => ({
+      items: items.map((file: { id: string; name: string; originalName: string; mimeType: string; size: bigint; path: string; url: string | null; provider: string; folderId: string | null; createdAt: Date; updatedAt: Date }) => ({
         id: file.id,
         name: file.name,
         originalName: file.originalName,

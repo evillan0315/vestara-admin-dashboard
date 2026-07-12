@@ -1,3 +1,4 @@
+import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import { requestLogger } from './middleware/request-logger.js';
@@ -48,6 +49,17 @@ export function createApp(): express.Application {
   // Body parsing
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true }));
+
+  // Serve local uploaded files at /api/files/ (used by LocalStorageProvider in dev)
+  app.use(
+    '/api/files',
+    express.static(path.resolve(process.cwd(), 'uploads'), {
+      maxAge: '1d',
+      setHeaders: (res) => {
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+      },
+    }),
+  );
 
   // Request logging
   app.use(requestLogger);
