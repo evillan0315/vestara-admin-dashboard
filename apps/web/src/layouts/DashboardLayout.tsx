@@ -139,7 +139,7 @@ export default function DashboardLayout({
     <Box
       sx={{
         display: "flex",
-        minHeight: "100vh",
+        height: "100vh",
         bgcolor: theme.palette.background.default,
       }}
     >
