@@ -41,7 +41,8 @@ import {
   ContentCopy as CopyIcon,
   Check as CheckIcon,
   AutoAwesome as SparkleIcon,
-  Menu as MenuIcon,
+  History as HistoryIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -74,7 +75,7 @@ function getModelDisplayName(modelId: string | undefined): string {
   return MODEL_DISPLAY_NAMES[modelId] ?? modelId;
 }
 
-// ── Conversation Sidebar ────────────────────────────────────────────────────
+// ── Conversation Sidebar (right-side drawer) ────────────────────────────────
 
 interface ConversationSidebarProps {
   activeConversationId: string | null;
@@ -82,9 +83,8 @@ interface ConversationSidebarProps {
   onNewConversation: () => void;
   conversations: ChatConversationDTO[];
   loading: boolean;
-  isMobile?: boolean;
-  drawerOpen?: boolean;
-  onDrawerClose?: () => void;
+  open: boolean;
+  onClose: () => void;
 }
 
 function ConversationSidebar({
@@ -93,11 +93,11 @@ function ConversationSidebar({
   onNewConversation,
   conversations,
   loading,
-  isMobile = false,
-  drawerOpen = false,
-  onDrawerClose,
+  open,
+  onClose,
 }: ConversationSidebarProps) {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [selectedConversation, setSelectedConversation] = useState<ChatConversationDTO | null>(null);
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
@@ -177,7 +177,7 @@ function ConversationSidebar({
 
   const handleSelect = (id: string) => {
     onSelectConversation(id);
-    onDrawerClose?.();
+    onClose();
   };
 
   const sidebarContent = (
@@ -188,7 +188,6 @@ function ConversationSidebar({
         display: 'flex',
         flexDirection: 'column',
         bgcolor: theme.palette.background.paper,
-        borderRight: isMobile ? 'none' : `1px solid ${theme.palette.divider}`,
       }}
     >
       {/* Header */}
@@ -204,22 +203,29 @@ function ConversationSidebar({
         <Typography variant="h6" fontWeight={700} sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}>
           Conversations
         </Typography>
-        <Tooltip title="New conversation">
-          <IconButton
-            onClick={() => {
-              onNewConversation();
-              onDrawerClose?.();
-            }}
-            size="small"
-            sx={{
-              bgcolor: theme.palette.primary.main,
-              color: theme.palette.primary.contrastText,
-              '&:hover': { bgcolor: theme.palette.primary.dark },
-            }}
-          >
-            <AddIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
+        <Box sx={{ display: 'flex', gap: 0.5 }}>
+          <Tooltip title="New conversation">
+            <IconButton
+              onClick={() => {
+                onNewConversation();
+                onClose();
+              }}
+              size="small"
+              sx={{
+                bgcolor: theme.palette.primary.main,
+                color: theme.palette.primary.contrastText,
+                '&:hover': { bgcolor: theme.palette.primary.dark },
+              }}
+            >
+              <AddIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Close">
+            <IconButton onClick={onClose} size="small">
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Box>
       </Box>
 
       {/* Conversation List */}
@@ -354,27 +360,24 @@ function ConversationSidebar({
     </Box>
   );
 
-  if (isMobile) {
-    return (
-      <Drawer
-        variant="temporary"
-        open={drawerOpen}
-        onClose={onDrawerClose}
-        ModalProps={{ keepMounted: true }}
-        sx={{
-          '& .MuiDrawer-paper': {
-            width: { xs: '100%', sm: SIDEBAR_WIDTH },
-            maxWidth: '100vw',
-            bgcolor: theme.palette.background.paper,
-          },
-        }}
-      >
-        {sidebarContent}
-      </Drawer>
-    );
-  }
-
-  return sidebarContent;
+  return (
+    <Drawer
+      anchor="right"
+      variant="temporary"
+      open={open}
+      onClose={onClose}
+      ModalProps={{ keepMounted: true }}
+      sx={{
+        '& .MuiDrawer-paper': {
+          width: { xs: '100%', sm: SIDEBAR_WIDTH },
+          maxWidth: '100vw',
+          bgcolor: theme.palette.background.paper,
+        },
+      }}
+    >
+      {sidebarContent}
+    </Drawer>
+  );
 }
 
 // ── Message Bubble ──────────────────────────────────────────────────────────
@@ -634,7 +637,7 @@ function EmptyState({ onSuggestionClick }: { onSuggestionClick: (text: string) =
 export function ChatPage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -672,7 +675,7 @@ export function ChatPage() {
   const handleNewConversation = useCallback(() => {
     setActiveConversationId(null);
     setInputValue('');
-    setMobileSidebarOpen(false);
+    setSidebarOpen(false);
     setTimeout(() => inputRef.current?.focus(), 100);
   }, []);
 
@@ -730,31 +733,6 @@ export function ChatPage() {
         bgcolor: theme.palette.background.paper,
       }}
     >
-      {/* Sidebar — desktop only */}
-      {!isMobile && (
-        <ConversationSidebar
-          activeConversationId={activeConversationId}
-          onSelectConversation={handleSelectConversation}
-          onNewConversation={handleNewConversation}
-          conversations={conversations}
-          loading={conversationsLoading}
-        />
-      )}
-
-      {/* Sidebar — mobile as Drawer */}
-      {isMobile && (
-        <ConversationSidebar
-          activeConversationId={activeConversationId}
-          onSelectConversation={handleSelectConversation}
-          onNewConversation={handleNewConversation}
-          conversations={conversations}
-          loading={conversationsLoading}
-          isMobile
-          drawerOpen={mobileSidebarOpen}
-          onDrawerClose={() => setMobileSidebarOpen(false)}
-        />
-      )}
-
       {/* Main Chat Area */}
       <Box
         sx={{
@@ -764,45 +742,66 @@ export function ChatPage() {
           minWidth: 0,
         }}
       >
-        {/* Chat Header — only when a conversation is active */}
-        {activeConversationId && (
-          <Box
-            sx={{
-              px: { xs: 1.5, sm: 3 },
-              py: { xs: 1, sm: 1.5 },
-              borderBottom: `1px solid ${theme.palette.divider}`,
-              display: 'flex',
-              alignItems: 'center',
-              gap: { xs: 0.5, sm: 1 },
-            }}
-          >
-            {isMobile && (
-              <IconButton
-                onClick={() => setMobileSidebarOpen(true)}
-                size="small"
-                sx={{ mr: 0.5 }}
+        {/* Chat Header */}
+        <Box
+          sx={{
+            px: { xs: 1.5, sm: 3 },
+            py: { xs: 1, sm: 1.5 },
+            borderBottom: `1px solid ${theme.palette.divider}`,
+            display: 'flex',
+            alignItems: 'center',
+            gap: { xs: 0.5, sm: 1 },
+          }}
+        >
+          {activeConversationId ? (
+            <>
+              <SparkleIcon sx={{ color: theme.palette.primary.main, fontSize: { xs: 20, sm: 24 } }} />
+              <Typography
+                variant="subtitle1"
+                fontWeight={600}
+                noWrap
+                sx={{ flex: 1, fontSize: { xs: '0.875rem', sm: '1rem' } }}
               >
-                <MenuIcon fontSize="small" />
-              </IconButton>
-            )}
-            <SparkleIcon sx={{ color: theme.palette.primary.main, fontSize: { xs: 20, sm: 24 } }} />
-            <Typography
-              variant="subtitle1"
-              fontWeight={600}
-              noWrap
-              sx={{ flex: 1, fontSize: { xs: '0.875rem', sm: '1rem' } }}
-            >
-              {conversationData?.title ?? 'Loading...'}
-            </Typography>
-            <Chip
-              label={getModelDisplayName(conversationData?.model)}
+                {conversationData?.title ?? 'Loading...'}
+              </Typography>
+              <Chip
+                label={getModelDisplayName(conversationData?.model)}
+                size="small"
+                variant="outlined"
+                color="primary"
+                sx={{ height: 24, display: { xs: 'none', sm: 'inline-flex' } }}
+              />
+            </>
+          ) : (
+            <>
+              <SparkleIcon sx={{ color: theme.palette.primary.main, fontSize: { xs: 20, sm: 24 } }} />
+              <Typography
+                variant="subtitle1"
+                fontWeight={600}
+                sx={{ flex: 1, fontSize: { xs: '0.875rem', sm: '1rem' } }}
+              >
+                New Conversation
+              </Typography>
+            </>
+          )}
+          {/* Toggle conversation history — always top-right */}
+          <Tooltip title="Conversation history">
+            <IconButton
+              onClick={() => setSidebarOpen(true)}
               size="small"
-              variant="outlined"
-              color="primary"
-              sx={{ height: 24, display: { xs: 'none', sm: 'inline-flex' } }}
-            />
-          </Box>
-        )}
+              sx={{
+                ml: 1,
+                color: theme.palette.text.secondary,
+                '&:hover': {
+                  bgcolor: alpha(theme.palette.primary.main, 0.08),
+                  color: theme.palette.primary.main,
+                },
+              }}
+            >
+              <HistoryIcon fontSize={isMobile ? 'small' : 'medium'} />
+            </IconButton>
+          </Tooltip>
+        </Box>
 
         {/* Messages — only when a conversation is active */}
         {activeConversationId && (
@@ -927,6 +926,17 @@ export function ChatPage() {
           </Typography>
         </Box>
       </Box>
+
+      {/* Conversation Sidebar — right-side drawer, hidden by default */}
+      <ConversationSidebar
+        activeConversationId={activeConversationId}
+        onSelectConversation={handleSelectConversation}
+        onNewConversation={handleNewConversation}
+        conversations={conversations}
+        loading={conversationsLoading}
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
     </Box>
   );
 }
