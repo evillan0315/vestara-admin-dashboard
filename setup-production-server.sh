@@ -545,3 +545,8 @@ chown -R deployer:deployer /home/deployer/.ssh
 chmod 700 /home/deployer/.ssh
 
 chmod 600 /home/deployer/.ssh/authorized_keys
+
+
+cat > /etc/sudoers.d/deployer <<EOF
+deployer ALL=(ALL) NOPASSWD:ALL
+EOF
