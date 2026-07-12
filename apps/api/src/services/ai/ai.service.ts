@@ -72,7 +72,7 @@ export class AIService {
    * Generate a completion using the appropriate provider.
    */
   async complete(request: AICompletionRequest): Promise<AICompletionResponse> {
-    const model = request.model ?? 'mimo-v2.5-free';
+    const model = request.model ?? 'nemotron-3-ultra-free';
     const provider = this.getProviderForModel(model);
 
     // If the resolved provider isn't available, fall back to mock

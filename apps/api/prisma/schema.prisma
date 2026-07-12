@@ -28,13 +28,14 @@ model Organization {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  users          User[]
-  settings       SystemSetting[]
-  auditLogs      AuditLog[]
-  sessions       Session[]
-  refreshTokens  RefreshToken[]
-  files          File[]
-  chatConversations ChatConversation[]
+  users               User[]
+  settings            SystemSetting[]
+  auditLogs           AuditLog[]
+  sessions            Session[]
+  refreshTokens       RefreshToken[]
+  files               File[]
+  chatConversations   ChatConversation[]
+  reports             Report[]
 
   @@map("organizations")
 }
@@ -62,6 +63,7 @@ model User {
   uploadedFiles     File[]             @relation("UploadedFiles")
   chatMessages      ChatMessage[]
   chatConversations ChatConversation[]
+  createdReports    Report[]           @relation("ReportCreatedBy")
 
   @@unique([provider, providerId])
   @@index([organizationId])
@@ -143,6 +145,54 @@ model SystemSetting {
   @@map("system_settings")
 }
 
+// ── Reports ─────────────────────────────────────
+
+enum ReportType {
+  audit_logs
+  system_logs
+  users
+  activity
+}
+
+enum ReportFormat {
+  csv
+  excel
+  pdf
+}
+
+enum ReportStatus {
+  pending
+  generating
+  completed
+  failed
+}
+
+model Report {
+  id            String      @id @default(uuid())
+  name          String
+  description   String?
+  type          ReportType
+  format        ReportFormat
+  status        ReportStatus @default(pending)
+  params        Json
+  organizationId String
+  createdBy     String
+  fileUrl       String?
+  fileSize      BigInt?
+  error         String?
+  createdAt     DateTime    @default(now())
+  completedAt   DateTime?
+  updatedAt     DateTime    @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdByUser User        @relation("ReportCreatedBy", fields: [createdBy], references: [id], onDelete: Restrict)
+
+  @@index([organizationId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("reports")
+}
+
 // ── File Management ────────────────────────────
 
 enum StorageProvider {
@@ -192,7 +242,7 @@ model ChatConversation {
   title           String
   userId          String
   organizationId String
-  model           String   @default("gpt-4")  // AI model identifier
+  model           String   @default("nemotron-3-ultra-free")  // AI model identifier
   systemPrompt    String?  // Custom system prompt for this conversation
   isArchived      Boolean  @default(false)
   createdAt       DateTime @default(now())
