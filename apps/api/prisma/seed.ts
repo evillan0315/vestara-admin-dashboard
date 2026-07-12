@@ -1,7 +1,12 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+import { resolve } from "path";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient, UserRole } from '../generated/prisma/client';
 import bcrypt from 'bcryptjs';
+
+// Load env from root .env first, then apps/api/.env.local with override
+dotenv.config({ path: resolve(import.meta.dirname, '../../../.env') });
+dotenv.config({ path: resolve(import.meta.dirname, '../.env.local'), override: true });
 
 const connectionString = `${process.env.DATABASE_URL}`;
 const adapter = new PrismaPg({ connectionString });
