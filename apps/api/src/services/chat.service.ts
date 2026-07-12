@@ -1,5 +1,5 @@
 import { chatRepository } from '../repositories/index.js';
-import { aiService } from './ai/index.js';
+import { aiService, buildContext } from './ai/index.js';
 import { getAvailableModels } from './ai/types.js';
 import { NotFoundError, BadRequestError } from '../utils/errors.js';
 import type { AIMessage } from './ai/types.js';
@@ -175,11 +175,25 @@ export class ChatService {
       content: m.content,
     }));
 
+    // Build dynamic system prompt with real-time organization context
+    const contextData = await buildContext({ organizationId, userId });
+    const baseSystemPrompt = conversation.systemPrompt ?? DEFAULT_SYSTEM_PROMPT;
+    const enhancedSystemPrompt = `${baseSystemPrompt}
+
+=== CURRENT ORGANIZATION DATA ===
+${contextData}
+
+INSTRUCTIONS:
+- Use the above data to answer questions about the organization's actual state
+- Reference specific numbers, names, and timestamps when relevant
+- If data is not available in the context, say so clearly
+- Never fabricate or guess numbers`;
+    
     // Generate AI completion
     const completion = await aiService.complete({
       messages: aiMessages,
       model: data.model ?? conversation.model,
-      systemPrompt: conversation.systemPrompt ?? DEFAULT_SYSTEM_PROMPT,
+      systemPrompt: enhancedSystemPrompt,
       maxTokens: 2048,
       temperature: 0.7,
     });
