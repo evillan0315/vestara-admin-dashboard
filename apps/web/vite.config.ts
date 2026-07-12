@@ -13,7 +13,7 @@ export default defineConfig({
       includeAssets: ['favicon.svg', 'icon-192x192.png', 'icon-512x512.png'],
       manifest: {
         name: 'Vestara Admin Dashboard',
-        short_name: 'Vestara Admin',
+        short_name: 'Vestara',
         description: 'Enterprise administration platform for the Vestara digital ecosystem',
         theme_color: '#D8A441',
         background_color: '#060B12',
