@@ -11,13 +11,15 @@ export interface ReportParams {
 
 export interface Report {
   id: string;
-  type: 'audit-logs' | 'system-logs';
+  name: string;
+  type: 'audit-logs' | 'system-logs' | 'users' | 'activity';
   status: 'pending' | 'generating' | 'completed' | 'failed';
   params: ReportParams;
   createdAt: string;
   completedAt?: string;
   fileUrl?: string;
   fileSize?: number;
+  format: 'csv' | 'excel' | 'pdf';
 }
 
 export const reportsApi = {
