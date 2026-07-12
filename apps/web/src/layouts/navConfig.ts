@@ -25,7 +25,6 @@ import {
   BookText,
   Building2,
   FolderOpen,
-  Sparkles,
 } from "lucide-react";
 
 export interface NavItem {
@@ -89,7 +88,6 @@ export const navGroups: NavGroup[] = [
     title: "SYSTEM",
     items: [
       { label: "Settings", icon: Settings, path: "/settings" },
-      { label: "AI Assistant", icon: Sparkles, path: "/chat" },
       {
         label: "File Manager",
         icon: FolderOpen,

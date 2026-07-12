@@ -12,6 +12,7 @@ import { densitySpacing } from "../theme/tokens";
 import type { AuditLogDTO } from "@vestara/types";
 import NotificationPopover from "../components/header/NotificationPopover";
 import GlobalSearchDialog from "../components/layout/GlobalSearchDialog";
+import { FloatingChatWidget } from "../features/chat/FloatingChatWidget";
 import { auditLogsToNotifications, getUnreadCount } from "../utils/notifications";
 
 const SIDEBAR_MOBILE_WIDTH = 320;
@@ -240,6 +241,9 @@ export default function DashboardLayout({
         onClose={handleGlobalSearchClose}
         inputRef={searchInputRef}
       />
+
+      {/* Floating AI Assistant Chat Widget */}
+      <FloatingChatWidget />
     </Box>
   );
 }

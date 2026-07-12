@@ -2,13 +2,10 @@ import { type JSX, useState, useEffect } from "react";
 import {
   Box,
   Typography,
-  ListItemIcon,
-  ListItemText,
-  MenuItem,
   Chip,
   Skeleton,
 } from "@mui/material";
-import { LogOut, Activity } from "lucide-react";
+import { Activity } from "lucide-react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../features/auth/AuthContext";
 import { colors } from "../../theme/tokens";
@@ -46,7 +43,7 @@ export interface SidebarProps {
 export default function Sidebar({ onClose }: SidebarProps): JSX.Element {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   // API Status State
   const [apiStatus, setApiStatus] = useState<ApiStatus>({
@@ -113,11 +110,6 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element {
   const handleNavClick = (path: string) => {
     navigate(path);
     onClose?.();
-  };
-
-  const handleLogout = async () => {
-    await logout();
-    navigate("/login");
   };
 
   return (
@@ -411,37 +403,6 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element {
               </Box>
             </Box>
           )}
-        </Box>
-
-        {/* Logout Button */}
-        <Box>
-          <MenuItem
-            onClick={handleLogout}
-            disableRipple
-            sx={{
-              borderRadius: "10px",
-              px: 1.5,
-              py: 1,
-              color: colors.error,
-              backgroundColor: colors.errorSoft,
-              "&:hover": {
-                backgroundColor: colors.errorSoft,
-                opacity: 0.9,
-              },
-              transition: "all 0.2s ease",
-            }}
-          >
-            <ListItemIcon sx={{ minWidth: 30, color: "inherit" }}>
-              <LogOut size={16} strokeWidth={2} />
-            </ListItemIcon>
-            <ListItemText
-              primary="Logout"
-              primaryTypographyProps={{
-                fontSize: 13,
-                fontWeight: 600,
-              }}
-            />
-          </MenuItem>
         </Box>
       </Box>
     </Box>
