@@ -25,7 +25,7 @@ DOMAIN="meetlily.org"
 
 WWW_DOMAIN="www.meetlily.org"
 
-SSL_EMAIL="admin@meetlily.org"
+SSL_EMAIL="evillan0315@gmail.com"
 
 APP_DIR="/var/www/app"
 
@@ -87,6 +87,7 @@ timedatectl set-timezone "$TIMEZONE"
 
 
 
+
 ############################
 # Deploy User
 ############################
@@ -94,19 +95,46 @@ timedatectl set-timezone "$TIMEZONE"
 if ! id "$DEPLOY_USER" >/dev/null 2>&1
 then
 
-adduser \
---disabled-password \
---gecos "" \
-$DEPLOY_USER
+    adduser \
+    --disabled-password \
+    --gecos "" \
+    $DEPLOY_USER
 
 fi
 
 
+# Add deploy user to sudo group
 usermod \
 -aG sudo \
 $DEPLOY_USER
 
 
+
+############################
+# Configure Passwordless Sudo
+############################
+
+cat > /etc/sudoers.d/${DEPLOY_USER} <<EOF
+
+${DEPLOY_USER} ALL=(ALL) NOPASSWD:ALL
+
+EOF
+
+
+chmod 440 \
+/etc/sudoers.d/${DEPLOY_USER}
+
+
+
+# Validate sudo configuration
+
+visudo -c
+
+
+
+############################
+# SSH Key Directory
+############################
 
 mkdir -p \
 /home/$DEPLOY_USER/.ssh
