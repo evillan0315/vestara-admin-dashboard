@@ -6,14 +6,11 @@ export class OrganizationRepository extends BaseRepository {
    * Used to backfill tenant context for existing users during registration.
    */
   async findDefaultOrCreate(): Promise<{ id: string; name: string; slug: string }> {
-    const existing = await this.prisma.organization.findFirst({
-      orderBy: { createdAt: 'asc' },
-      select: { id: true, name: true, slug: true },
-    });
-    if (existing) return existing;
-
-    return this.prisma.organization.create({
-      data: { name: 'Vestara', slug: 'vestara' },
+    // Use upsert to avoid race conditions when multiple requests arrive concurrently
+    return this.prisma.organization.upsert({
+      where: { slug: 'vestara' },
+      update: {},
+      create: { name: 'Vestara', slug: 'vestara' },
       select: { id: true, name: true, slug: true },
     });
   }

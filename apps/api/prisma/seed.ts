@@ -15,6 +15,19 @@ const prisma = new PrismaClient({ adapter });
 async function main(): Promise<void> {
   console.log('🌱 Seeding database...');
 
+  // ── Clean existing seed data (idempotent re-runs) ────────────
+  console.log('  ↻ Cleaning existing data...');
+  await prisma.auditLog.deleteMany();
+  await prisma.chatMessage.deleteMany();
+  await prisma.chatConversation.deleteMany();
+  await prisma.session.deleteMany();
+  await prisma.refreshToken.deleteMany();
+  await prisma.file.deleteMany();
+  await prisma.systemSetting.deleteMany();
+  await prisma.user.deleteMany();
+  await prisma.organization.deleteMany();
+  console.log('  ✓ Clean');
+
   // ── Create Multiple Organizations ────────────
 
   const organizations = [
