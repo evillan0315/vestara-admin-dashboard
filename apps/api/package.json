@@ -22,7 +22,6 @@
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.0.0",
     "@types/multer": "^2.2.0",
-    "@vercel/blob": "^2.6.1",
     "@vestara/config": "workspace:*",
     "@vestara/constants": "workspace:*",
     "@vestara/types": "workspace:*",

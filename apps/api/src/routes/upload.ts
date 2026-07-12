@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { put } from '@vercel/blob';
-import path from 'path';
 import { authenticate } from '../middleware/authenticate.js';
 import { uploadSingle } from '../middleware/upload.js';
+import { CloudinaryStorageProvider } from '../storage/cloudinary.provider.js';
 import { LocalStorageProvider } from '../storage/local.provider.js';
+import type { UploadResult } from '../storage/types.js';
 
 const router = Router();
 
@@ -11,15 +11,35 @@ const router = Router();
 router.use(authenticate);
 
 /**
- * Check whether Vercel Blob credentials are available in this environment.
+ * Check whether Cloudinary credentials are available in this environment.
  */
-function hasVercelBlobCredentials(): boolean {
-  return !!(process.env.BLOB_READ_WRITE_TOKEN || process.env.VERCEL_OIDC_TOKEN);
+function hasCloudinaryCredentials(): boolean {
+  return !!(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET);
+}
+
+/**
+ * Get the appropriate storage provider based on available credentials.
+ */
+function getStorageProvider(): CloudinaryStorageProvider | LocalStorageProvider {
+  if (hasCloudinaryCredentials()) {
+    return new CloudinaryStorageProvider({
+      provider: 'cloudinary',
+      cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME!,
+      cloudinaryApiKey: process.env.CLOUDINARY_API_KEY!,
+      cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET!,
+    });
+  }
+
+  // Fallback to local storage (development without Cloudinary)
+  return new LocalStorageProvider({
+    provider: 'local',
+    localPath: './uploads',
+  });
 }
 
 /**
  * POST /upload/image
- * Upload an image to Vercel Blob storage (production) or local filesystem (dev).
+ * Upload an image to Cloudinary (production) or local filesystem (dev fallback).
  * Accepts multipart/form-data with field 'file'
  * Returns { url: string }
  */
@@ -44,35 +64,24 @@ router.post('/image', uploadSingle('file'), async (req, res, next) => {
       });
     }
 
-    if (hasVercelBlobCredentials()) {
-      // ── Vercel Blob (production/Vercel) ──────────────────────
-      const timestamp = Date.now();
-      const randomSuffix = Math.random().toString(36).substring(2, 10);
-      const extension = file.originalname.split('.').pop() || 'png';
-      const filename = `organizations/${timestamp}-${randomSuffix}.${extension}`;
+    const provider = getStorageProvider();
 
-      const blob = await put(filename, file.buffer, {
-        access: 'public',
-        addRandomSuffix: false,
+    let result: UploadResult;
+    if (provider instanceof CloudinaryStorageProvider) {
+      // ── Cloudinary ──────────────────────────────────────────
+      result = await provider.upload(file.buffer, {
+        filename: file.originalname,
+        contentType: file.mimetype,
+        folder: 'avatars',
       });
-
-      return res.json({
-        success: true,
-        data: { url: blob.url },
+    } else {
+      // ── Local filesystem fallback ───────────────────────────
+      result = await provider.upload(file.buffer, {
+        filename: file.originalname,
+        contentType: file.mimetype,
+        folder: 'avatars',
       });
     }
-
-    // ── Local filesystem fallback (development) ────────────────
-    const localProvider = new LocalStorageProvider({
-      provider: 'local',
-      localPath: path.resolve(process.cwd(), 'uploads'),
-    });
-
-    const result = await localProvider.upload(file.buffer, {
-      filename: file.originalname,
-      contentType: file.mimetype,
-      folder: 'avatars',
-    });
 
     res.json({
       success: true,

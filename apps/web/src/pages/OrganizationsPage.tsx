@@ -1,8 +1,30 @@
-import { useState } from 'react';
-import { Plus, Upload } from 'lucide-react';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import { useState, useRef } from 'react';
+import { Plus, Camera } from 'lucide-react';
+import {
+  Avatar,
+  Box,
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useOrganizations, useCreateOrganization, useUpdateOrganization } from '../features/organizations/hooks';
 import { uploadImage } from '../api/upload';
+import { useToast } from '../components/feedback/Toast';
+
 import type { OrganizationDTO } from '@vestara/types';
 import type { CreateOrganizationInput } from '@vestara/validation';
 
@@ -10,6 +32,8 @@ export function OrganizationsPage() {
   const { data: organizations = [], isLoading, refetch } = useOrganizations();
   const createMutation = useCreateOrganization();
   const updateMutation = useUpdateOrganization();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const toast = useToast();
 
   const [open, setOpen] = useState(false);
   const [editingOrg, setEditingOrg] = useState<OrganizationDTO | null>(null);
@@ -35,13 +59,13 @@ export function OrganizationsPage() {
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
     if (!allowedTypes.includes(file.type)) {
-      alert('Only JPEG, PNG, WebP, and SVG images are allowed');
+      toast.showError('Only JPEG, PNG, WebP, and SVG images are allowed');
       return;
     }
 
     // Validate file size (5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert('File size must be less than 5MB');
+      toast.showError('File size must be less than 5MB');
       return;
     }
 
@@ -52,11 +76,11 @@ export function OrganizationsPage() {
       if (result.success && result.data) {
         setFormData(prev => ({ ...prev, logoUrl: result.data!.url }));
       } else {
-        alert('Failed to upload logo');
+        toast.showError(result.error || 'Failed to upload logo');
       }
     } catch (error) {
       console.error('Logo upload failed:', error);
-      alert('Failed to upload logo');
+      toast.showError('Failed to upload logo');
     } finally {
       setUploadingLogo(false);
     }
@@ -72,8 +96,8 @@ export function OrganizationsPage() {
       }
       handleClose();
       refetch();
-    } catch {
-      // Error handled by mutation
+    } catch (error) {
+      toast.showError(error instanceof Error ? error.message : 'Failed to save organization');
     }
   };
 
@@ -169,31 +193,68 @@ export function OrganizationsPage() {
                 />
               </Grid>
               <Grid size={12}>
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>Organization Logo</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
+                  {/* Logo preview with camera overlay */}
+                  <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+                    <Avatar
+                      src={formData.logoUrl || undefined}
+                      alt="Organization logo"
+                      sx={{
+                        width: 96,
+                        height: 96,
+                        bgcolor: 'action.hover',
+                        border: '2px dashed',
+                        borderColor: 'divider',
+                        '& img': { objectFit: 'cover' },
+                      }}
+                    >
+                      {formData.name?.charAt(0)?.toUpperCase() || 'O'}
+                    </Avatar>
+                    <Box
+                      onClick={() => fileInputRef.current?.click()}
+                      sx={{
+                        position: 'absolute',
+                        bottom: 0,
+                        right: 0,
+                        bgcolor: 'primary.main',
+                        borderRadius: '50%',
+                        width: 32,
+                        height: 32,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        transition: 'opacity 0.2s',
+                        '&:hover': { opacity: 0.85 },
+                        boxShadow: 1,
+                      }}
+                    >
+                      {uploadingLogo ? (
+                        <CircularProgress size={18} sx={{ color: '#fff' }} />
+                      ) : (
+                        <Camera size={16} color="#fff" />
+                      )}
+                    </Box>
+                  </Box>
+
                   <TextField
-                    fullWidth
                     label="Logo URL"
+                    placeholder="Or paste a URL..."
+                    size="small"
                     value={formData.logoUrl}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData((prev) => ({ ...prev, logoUrl: e.target.value }))}
-                    sx={{ flex: '1 1 300px' }}
+                    sx={{ flex: '1 1 260px', minWidth: 200 }}
                   />
-                  <Box component="label" sx={{ cursor: 'pointer', mt: 1.5 }}>
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp,image/svg+xml"
-                      onChange={handleLogoChange}
-                      hidden
-                    />
-                    <Button
-                      variant="outlined"
-                      startIcon={uploadingLogo ? null : <Upload />}
-                      disabled={uploadingLogo}
-                      size="small"
-                    >
-                      {uploadingLogo ? 'Uploading...' : 'Upload Logo'}
-                    </Button>
-                  </Box>
                 </Box>
+                {/* Hidden file input */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/svg+xml"
+                  onChange={handleLogoChange}
+                  hidden
+                />
               </Grid>
             </Grid>
           </DialogContent>
