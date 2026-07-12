@@ -16,7 +16,7 @@
 <p align="center">
 
 ![License](https://img.shields.io/badge/license-Proprietary-gold?style=for-the-badge)
-![Status](https://img.shields.io/badge/status-Phase%201%20%E2%80%93%20Admin%20Dashboard%20%E2%80%93%20Phases%20117%2F19-success?style=for-the-badge)
+![Status](https://img.shields.io/badge/status-Phase%201%20%E2%80%93%20Admin%20Dashboard%20%E2%80%93%20Phases%2019%2F19%20Complete-success?style=for-the-badge)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![Express](https://img.shields.io/badge/Express-5.x-000000?style=for-the-badge&logo=express)
@@ -802,9 +802,10 @@ vestara/
 │   ├── utils/            # Shared utilities
 │   └── config/           # Shared configuration
 │
-├── prisma/
-│   ├── migrations/
+├── prisma.config.ts       # Prisma config (schema: apps/api/prisma/schema.prisma)
+├── apps/api/prisma/
 │   ├── schema.prisma
+│   ├── migrations/
 │   └── seed.ts
 │
 ├── docs/
@@ -926,9 +927,10 @@ vestara/
 │   ├── constants/               # Global constants
 │   └── utils/                   # Shared utilities
 │
-├── prisma/
-│   ├── migrations/
+├── prisma.config.ts            # Prisma config (schema: apps/api/prisma/schema.prisma)
+├── apps/api/prisma/
 │   ├── schema.prisma
+│   ├── migrations/
 │   └── seed.ts
 │
 ├── infrastructure/
@@ -1280,6 +1282,7 @@ pnpm dev:api
 | pnpm prisma:migrate | Run database migrations |
 | pnpm prisma:studio | Open Prisma Studio |
 | pnpm prisma:seed | Seed development data |
+| pnpm deploy:api | Deploy API to Vercel (production) |
 | pnpm clean | Clean all build artifacts |
 
 ---
@@ -1951,8 +1954,9 @@ Future licensing terms may change as the platform evolves.
 | Data Table | 🟢 Reusable, sort/filter/paginate/select |
 | Organizations | 🟢 Complete (list/create/edit + DataTable UI) |
 | Application Settings | 🟢 Complete (backend + frontend) |
-| User Profile (name, avatar, password) | 🟢 Complete (backend + frontend) |
-| User Preferences (Drawer) | 🟢 Complete (Appearance, Notifications, Localization) |
+| File Manager | 🟢 Complete (backend + frontend with upload, folders, preview) |
+| User Profile (name, avatar, password, email change, account deletion) | 🟢 Complete (backend + frontend) |
+| User Preferences (Modal) | 🟢 Complete (Appearance, Notifications, Localization) |
 | Global Search (Cmd/Ctrl+K) | 🟢 Complete |
 | Audit Logs / System Logs | 🟢 API + Frontend Page |
 | CI/CD (GitHub Actions) | 🟢 API Deploy Workflow |
@@ -1980,9 +1984,13 @@ Future licensing terms may change as the platform evolves.
 - ✅ Reusable Form Components (FormField, FormInput, FormSelect, FormTextarea, FormCheckbox, FormRadioGroup, FormSwitch, FormError, FormHelperText, FormSection, FormLayout, FormActions, FormSubmit, FormCancel)
 - ✅ Reusable Feedback Components (Toast queue, Loading, EmptyState, useConfirm)
 - ✅ Form Validation (react-hook-form + Zod via useFormWithZod)
-- ✅ User Preferences Drawer (Appearance, Notifications, Localization)
+- ✅ File Manager (browser, upload, folders, preview, rename, move, delete)
+- ✅ User Preferences Modal (Appearance, Notifications, Localization)
 - ✅ Global Search Dialog (Cmd/Ctrl+K with keyboard navigation)
 - ✅ Notifications (wired to audit-logs API, real-time unread count)
+- ✅ BigInt serialization fix (File Manager 500 error resolved)
+- ✅ Auth tests: 11/11 reliable (FK cleanup order, timeout adjusted)
+- ✅ `deploy:api` NPM script for one-command Vercel deployment
 - 🟡 Security Hardening (rate limiting, CSRF, password policies)
 - 📋 Reporting (CSV/Excel/PDF export)
 - 📋 Real-time features (WebSocket, live notifications)
