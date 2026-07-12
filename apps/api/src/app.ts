@@ -70,7 +70,7 @@ export function createApp(): express.Application {
     '/api/files',
     express.static(path.resolve(process.cwd(), 'uploads'), {
       maxAge: '1d',
-      setHeaders: (res) => {
+      setHeaders: (res: express.Response) => {
         res.setHeader('X-Content-Type-Options', 'nosniff');
       },
     }),
