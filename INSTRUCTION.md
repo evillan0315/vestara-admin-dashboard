@@ -110,7 +110,7 @@ For every task:
 | — | AI Assistant RAG | ✅ Complete | 100% |
 | — | Floating Chat Widget | ✅ Complete | 100% |
 | 20 | Reporting | ✅ Complete | 100% |
-| 21 | WebSocket Integration | ❌ Not Started | 0% |
+| 21 | WebSocket Integration | ✅ Complete | 100% |
 | 22 | Live Features | ❌ Not Started | 0% |
 | 23 | Security Hardening | ⏳ In Progress | ~40% |
 | 24 | Monitoring | ⏳ In Progress | ~70% |
@@ -551,15 +551,20 @@ For every task:
 
 ### 21. WebSocket Integration
 
-**Status:** ❌ Not Started
+**Status:** ✅ Complete
 **Dependencies:** Phase 4
 
 **Deliverables:**
-* WebSocket server setup (e.g., `ws` or `socket.io` alongside Express)
-* Connection management with authentication (JWT verification on connect)
-* Room/channel support for org-scoped broadcasts
-* Reconnection handling with exponential backoff
-* Health monitoring (connection count, message throughput)
+* WebSocket server setup (`ws` alongside Express, sharing the API port at `/api/v1/ws`)
+* Connection management with authentication (JWT verification on connect via query-param token)
+* Room/channel support for org-scoped broadcasts (`org:<organizationId>`)
+* Reconnection handling with exponential backoff + jitter (client-side)
+* Health monitoring (connection count, message throughput) via `GET /api/v1/ws/status`
+
+**Implementation Notes (2026-07-12):**
+* Backend: `apps/api/src/websocket/` — `WebSocketManager` (auth, org rooms, presence, 30s heartbeat, stats, broadcasts), singleton via `getWebSocketManager()`, attached in `apps/api/src/index.ts`. Every audit-log write broadcasts an org-scoped `audit:created` event through `AuditLogRepository.create` (best-effort, no-op when the server is unattached).
+* Frontend: `apps/web/src/websocket/` — `WebSocketClient` (typed pub/sub, auto-reconnect w/ backoff, app-level ping), `WebSocketProvider` (auto-connect on auth, subscribe to org room, disconnect on logout), `useConnectionStatus`/`useWebSocketEvent` hooks, and a `ConnectionStatus` indicator in the header. Vite dev proxy enables `/api` WS upgrades.
+* **Vercel limitation:** Serverless functions cannot host persistent WebSocket connections, so the manager degrades gracefully (broadcasts are no-ops) on Vercel; a long-running Node host is required for live features.
 
 **Cross-reference:** WebSocket infrastructure is a prerequisite for Phase 22 (Live Features).
 
