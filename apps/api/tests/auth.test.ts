@@ -24,9 +24,12 @@ describe('Authentication API', () => {
   });
 
   beforeEach(async () => {
+    // Delete in FK order: children before parents
     await prisma.session.deleteMany();
     await prisma.refreshToken.deleteMany();
     await prisma.auditLog.deleteMany();
+    await prisma.file.deleteMany();
+    await prisma.systemSetting.deleteMany();
     await prisma.user.deleteMany();
   });
 

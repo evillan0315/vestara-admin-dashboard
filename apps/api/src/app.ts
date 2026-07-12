@@ -7,6 +7,21 @@ import { notFoundHandler } from './middleware/not-found.js';
 import routes from './routes/index.js';
 import { API_PREFIX } from '@vestara/constants';
 
+// ── BigInt JSON Serialization ──────────────────────────────────────────────
+// Prisma returns `BigInt` for fields like File.size. Node's JSON.stringify
+// throws "Do not know how to serialize a BigInt" by default. This polyfill
+// converts BigInt to a number (or string for very large values) during
+// serialization so Express's res.json() works with Prisma BigInt fields.
+if (typeof (BigInt.prototype as unknown as Record<string, unknown>).toJSON !== 'function') {
+  (BigInt.prototype as unknown as Record<string, unknown>).toJSON = function () {
+    const n = BigInt(this as unknown as bigint);
+    // For files, size in bytes fits well within Number.MAX_SAFE_INTEGER
+    // (9 PB), so converting to number is safe. Fall back to string for
+    // truly astronomical values.
+    return n > Number.MAX_SAFE_INTEGER ? n.toString() : Number(n);
+  };
+}
+
 export function createApp(): express.Application {
   const app = express();
 
