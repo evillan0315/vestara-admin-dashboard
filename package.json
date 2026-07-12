@@ -19,7 +19,8 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "prisma:seed": "tsx prisma/seed.ts",
+    "prisma:seed": "tsx apps/api/prisma/seed.ts",
+    "deploy:api": "vercel deploy --prod --project=vestara-admin-api --local-config=apps/api/vercel.json --yes",
     "clean": "turbo clean && rm -rf node_modules"
   },
   "dependencies": {
