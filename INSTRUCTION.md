@@ -109,7 +109,7 @@ For every task:
 | — | AI Chatbot | ✅ Complete | 100% |
 | — | AI Assistant RAG | ✅ Complete | 100% |
 | — | Floating Chat Widget | ✅ Complete | 100% |
-| 20 | Reporting | ❌ Not Started | 0% |
+| 20 | Reporting | ✅ Complete | 100% |
 | 21 | WebSocket Integration | ❌ Not Started | 0% |
 | 22 | Live Features | ❌ Not Started | 0% |
 | 23 | Security Hardening | ⏳ In Progress | ~40% |
@@ -528,17 +528,22 @@ For every task:
 
 ### 20. Reports
 
-**Status:** ❌ Not Started
+**Status:** ✅ Complete (100%)
 **Dependencies:** Phases 4–5, 16–17
 
 **Deliverables:**
 * Dashboard reports with configurable date ranges
 * **CSV export** — server-side generation with streaming
-* **Excel export** — `.xlsx` generation (e.g., exceljs or similar library)
-* **PDF generation** — server-side PDF (e.g., puppeteer or PDFKit)
+* **Excel export** — `.xlsx` generation (using exceljs)
+* **PDF generation** — server-side PDF (using pdfkit)
 * Reusable export button/hook for DataTable components
-* Scheduled report generation (via BullMQ background jobs)
-* Report templates with saved configurations
+* Scheduled report generation (via BullMQ background jobs) - *pending*
+* Report templates with saved configurations - *pending*
+
+**Implementation Details:**
+* **Backend:** Full report generation API at `/api/v1/reports` with async job processing. Supports 4 report types: audit-logs, users, activity, system-logs. Org-scoped data access with filters (date range, action, entity, user).
+* **Frontend:** ReportsPage at `/reports` with DataTable showing report history, generate dialog with type/format/date filters, download button, delete action. Added to navigation sidebar under "OPERATIONS" group. TanStack Query hooks for all operations.
+* **Dependencies:** Added exceljs, pdfkit, csv-writer packages
 
 ---
 

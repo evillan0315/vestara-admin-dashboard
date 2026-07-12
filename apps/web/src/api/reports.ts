@@ -1,5 +1,4 @@
 import apiClient from './client';
-import type { AuditLogDTO } from '@vestara/types';
 
 export interface ReportParams {
   startDate: string;
@@ -37,9 +36,7 @@ export const reportsApi = {
 
   // Download report file
   download(reportId: string) {
-    return apiClient.get<Blob>(`/reports/${reportId}/download`, {
-      responseType: 'blob',
-    });
+    return apiClient.getBlob(`/reports/${reportId}/download`);
   },
 
   // Get user's report history

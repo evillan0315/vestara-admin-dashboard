@@ -1,8 +1,7 @@
 // Report backend API routes
 import express from 'express';
-import { authenticate, requireRole } from '../middleware/auth.js';
+import { authenticate } from '../middleware/authenticate.js';
 import { validate } from '../middleware/validate.js';
-import { auditLogService } from '../services/audit-log.service.js';
 import { reportService } from '../services/reports.service.js';
 import { z } from 'zod';
 
@@ -32,7 +31,8 @@ router.post('/generate', authenticate, validate(generateReportSchema), async (re
 // Get report status endpoint
 router.get('/:reportId/status', authenticate, async (req, res, next) => {
   try {
-    const report = await reportService.getStatus(req.params.reportId, req.user!.id);
+    const reportId = Array.isArray(req.params.reportId) ? req.params.reportId[0] : req.params.reportId;
+    const report = await reportService.getStatus(reportId, req.user!.id);
     res.json({ success: true, data: report });
   } catch (err) {
     next(err);
@@ -42,7 +42,8 @@ router.get('/:reportId/status', authenticate, async (req, res, next) => {
 // Download report endpoint
 router.get('/:reportId/download', authenticate, async (req, res, next) => {
   try {
-    const report = await reportService.getStatus(req.params.reportId, req.user!.id);
+    const reportId = Array.isArray(req.params.reportId) ? req.params.reportId[0] : req.params.reportId;
+    const report = await reportService.getStatus(reportId, req.user!.id);
     
     if (!report.fileUrl) {
       return res.status(404).json({ success: false, message: 'Report not available for download' });
@@ -82,7 +83,8 @@ router.get('/', authenticate, async (req, res, next) => {
 // Delete report endpoint
 router.delete('/:reportId', authenticate, async (req, res, next) => {
   try {
-    await reportService.delete(req.params.reportId, req.user!.id);
+    const reportId = Array.isArray(req.params.reportId) ? req.params.reportId[0] : req.params.reportId;
+    await reportService.delete(reportId, req.user!.id);
     res.json({ success: true, message: 'Report deleted successfully' });
   } catch (err) {
     next(err);

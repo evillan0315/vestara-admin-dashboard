@@ -26,7 +26,8 @@ class ApiClient {
   private async request<T>(
     endpoint: string,
     options: RequestInit = {},
-  ): Promise<ApiResponse<T>> {
+    isBlob = false,
+  ): Promise<ApiResponse<T> | Blob> {
     const url = `${this.baseUrl}${endpoint}`;
 
     const headers: HeadersInit = {
@@ -44,6 +45,19 @@ class ApiClient {
         ...options,
         headers,
       });
+
+      if (isBlob) {
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new ApiError(
+            errorData.error?.message || 'An unexpected error occurred',
+            response.status,
+            errorData.error?.code || 'UNKNOWN_ERROR',
+            errorData.error?.details,
+          );
+        }
+        return response.blob();
+      }
 
       const data: ApiResponse<T> = await response.json();
 
@@ -66,32 +80,36 @@ class ApiClient {
   }
 
   async get<T>(endpoint: string): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, { method: 'GET' });
+    return this.request<T>(endpoint, { method: 'GET' }) as Promise<ApiResponse<T>>;
+  }
+
+  async getBlob(endpoint: string): Promise<Blob> {
+    return this.request<never>(endpoint, { method: 'GET' }, true) as Promise<Blob>;
   }
 
   async post<T>(endpoint: string, body?: unknown): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: body ? JSON.stringify(body) : undefined,
-    });
+    }) as Promise<ApiResponse<T>>;
   }
 
   async put<T>(endpoint: string, body?: unknown): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'PUT',
       body: body ? JSON.stringify(body) : undefined,
-    });
+    }) as Promise<ApiResponse<T>>;
   }
 
   async patch<T>(endpoint: string, body?: unknown): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'PATCH',
       body: body ? JSON.stringify(body) : undefined,
-    });
+    }) as Promise<ApiResponse<T>>;
   }
 
   async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, { method: 'DELETE' });
+    return this.request<T>(endpoint, { method: 'DELETE' }) as Promise<ApiResponse<T>>;
   }
 }
 
