@@ -50,14 +50,15 @@ recommended topology for production.
 ## Architecture & Topology
 
 The simplest, most robust topology is a **single domain** where Nginx serves
-the SPA at `/` and reverse-proxies `/api` to the API process:
+the SPA at `/` and reverse-proxies `/api/v1` (and the `/socket.io/` path
+used by the real-time Socket.IO layer) to the API process:
 
 ```
                          ┌─────────────────────────────────────┐
-   Browser ── HTTPS ───► │  Nginx (admin.example.com)           │
+   Browser ── HTTPS ───► │  Nginx (vestara.meetlily.org)        │
                          │    /            → static SPA (dist)  │
-                         │    /api/*       → 127.0.0.1:5000     │
-                         │    /api/v1/ws   → 127.0.0.1:5000 (WS)│
+                         │    /api/v1/*     → 127.0.0.1:5000     │
+                         │    /socket.io/*  → 127.0.0.1:5000 (WS)│
                          └───────────────┬─────────────────────┘
                                          │
                          ┌───────────────▼─────────────────────┐
@@ -74,10 +75,10 @@ the SPA at `/` and reverse-proxies `/api` to the API process:
 
 | Path | Served by |
 |------|-----------|
-| `https://admin.example.com/` | SPA (`apps/web/dist`) |
-| `https://admin.example.com/api/v1/*` | API (`apps/api`) |
-| `https://admin.example.com/api/v1/ws` | WebSocket endpoint |
-| `https://admin.example.com/api/v1/health` | Health check |
+| `https://vestara.meetlily.org/` | SPA (`apps/web/dist`) |
+| `https://vestara.meetlily.org/api/v1/*` | API (`apps/api`) |
+| `https://vestara.meetlily.org/socket.io/*` | Real-time Socket.IO endpoint |
+| `https://vestara.meetlily.org/api/v1/health` | Health check |
 
 Because the frontend uses a **relative** API base (`/api/v1` by default), no
 frontend environment variable is required for the single-domain setup. OAuth
@@ -222,13 +223,13 @@ pnpm install --frozen-lockfile
 # ── Core ───────────────────────────────────────
 NODE_ENV=production
 
-# API listens on 0.0.0.0:5000; Nginx proxies /api to it.
+# API listens on 0.0.0.0:5000; Nginx proxies /api/v1 to it.
 PORT=5000
-API_URL=https://admin.example.com
+API_URL=https://vestara.meetlily.org
 
 # CORS / OAuth origin = your public frontend origin
-CORS_ORIGIN=https://admin.example.com
-CLIENT_URL=https://admin.example.com
+CORS_ORIGIN=https://vestara.meetlily.org
+CLIENT_URL=https://vestara.meetlily.org
 
 # ── Database ───────────────────────────────────
 DATABASE_URL=postgresql://vestara:CHANGE_ME_STRONG_PASSWORD@127.0.0.1:5432/vestara_admin?schema=public
@@ -245,10 +246,10 @@ JWT_REFRESH_EXPIRES_IN=30d
 # ── OAuth (optional; see §OAuth) ───────────────
 # GOOGLE_CLIENT_ID=
 # GOOGLE_CLIENT_SECRET=
-# GOOGLE_CALLBACK_URL=https://admin.example.com/api/v1/auth/oauth/google/callback
+# GOOGLE_CALLBACK_URL=https://vestara.meetlily.org/api/v1/auth/oauth/google/callback
 # GITHUB_CLIENT_ID=
 # GITHUB_CLIENT_SECRET=
-# GITHUB_CALLBACK_URL=https://admin.example.com/api/v1/auth/oauth/github/callback
+# GITHUB_CALLBACK_URL=https://vestara.meetlily.org/api/v1/auth/oauth/github/callback
 
 # ── AI / Integrations (optional) ───────────────
 # OPENCODE_API_KEY=
@@ -348,49 +349,56 @@ Create `/etc/nginx/sites-available/vestara`:
 
 ```nginx
 server {
-    listen 80;
-    server_name admin.example.com;
-    return 301 https://$host$request_uri;
-}
+    server_name vestara.meetlily.org;
 
-server {
-    listen 443 ssl http2;
-    server_name admin.example.com;
+    access_log /var/log/nginx/vestara.access.log;
+    error_log  /var/log/nginx/vestara.error.log;
 
-    # Certbot will populate these after §12
-    ssl_certificate     /etc/letsencrypt/live/admin.example.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/admin.example.com/privkey.pem;
+    # ── API backend (/api/v1/*) ───────────────────────────
+    location /api/v1/ {
+        client_max_body_size 100M;          # allow large uploads (files, avatars)
 
-    root /var/www/app/apps/web/dist;
-    index index.html;
-
-    # API + WebSocket reverse proxy
-    location /api/ {
         proxy_pass http://127.0.0.1:5000;
         proxy_http_version 1.1;
+
+        # WebSocket support (/api/v1/ws)
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
+
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_read_timeout 3600s;
-        proxy_send_timeout 3600s;
+
+        proxy_read_timeout 300;
+        proxy_connect_timeout 300;
     }
 
-    # Static assets with long cache
-    location /assets/ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-        try_files $uri =404;
+    # ── Real-time Socket.IO layer ────────────────────────
+    location /socket.io/ {
+        proxy_pass http://127.0.0.1:5000;
+        proxy_http_version 1.1;
+
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
     }
 
-    # SPA fallback (client-side routing)
+    # ── Static SPA (built by `pnpm --filter web build`) ───
     location / {
-        try_files $uri $uri/ /index.html;
+        root /var/www/vestara;
+        index index.html;
+        try_files $uri $uri/ /index.html;     # SPA fallback for client-side routing
     }
+
+    # Certbot appends the TLS block (listen 443 ssl; ssl_certificate …) here.
 }
 ```
+
+> This mirrors the **live** `/etc/nginx/sites-enabled/vestara` on the server:
+> the API is mounted at `/api/v1/`, real-time traffic uses Socket.IO at
+> `/socket.io/`, uploads up to 100 MB are allowed, and the SPA is served from
+> `/var/www/vestara` (the path `scripts/deploy.sh` deploys to).
 
 Enable and test:
 
@@ -401,30 +409,31 @@ sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-> Note: `/api/` is proxied **with** the `/api` prefix intact
+> Note: `/api/v1/` is proxied **with** the prefix intact
 > (`/api/v1/health` → `http://127.0.0.1:5000/api/v1/health`), which matches
 > the API's mount point. The `Upgrade`/`Connection` headers enable WebSocket
-> traffic on `/api/v1/ws`.
+> traffic on `/api/v1/ws`, while the dedicated `/socket.io/` location handles
+> the Socket.IO real-time layer.
 
 ### 12. TLS with Let's Encrypt
 
 ```bash
 sudo apt install -y certbot python3-certbot-nginx
-sudo certbot --nginx -d admin.example.com --agree-tos -m admin@example.com --redirect
+sudo certbot --nginx -d vestara.meetlily.org --agree-tos -m admin@example.com --redirect
 sudo systemctl enable --now certbot.timer
 ```
 
 Certbot auto-edits the Nginx config to add the certificate paths and HTTPS
-redirect. Reload Nginx once more, then visit `https://admin.example.com`.
+redirect. Reload Nginx once more, then visit `https://vestara.meetlily.org`.
 
 ---
 
 ## OAuth (Google / GitHub)
 
 1. Create an OAuth app in the provider console.
-2. Set the **Authorized redirect URI** to:
-   - Google: `https://admin.example.com/api/v1/auth/oauth/google/callback`
-   - GitHub: `https://admin.example.com/api/v1/auth/oauth/github/callback`
+   2. Set the **Authorized redirect URI** to:
+    - Google: `https://vestara.meetlily.org/api/v1/auth/oauth/google/callback`
+    - GitHub: `https://vestara.meetlily.org/api/v1/auth/oauth/github/callback`
 3. Paste the client ID/secret into the root `.env`
    (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_CALLBACK_URL`, and the
    GitHub equivalents).
@@ -567,14 +576,15 @@ set `DEPLOY_API=true` in `deploy.env`. The private key is written to a
 ## Health Checks & Logs
 
 - **API health:** `GET /api/v1/health` → `200 OK`.
-- **WebSocket status (admin):** `GET /api/v1/ws/status`.
+- **WebSocket status (admin):** `GET /api/v1/ws/status` (legacy WS) — real-time
+  traffic also flows over Socket.IO at `/socket.io/`.
 - **API logs:** `pnpm exec pm2 logs vestara-api` or `/var/www/logs/api-*.log`.
-- **Nginx logs:** `/var/log/nginx/access.log`, `/var/log/nginx/error.log`.
+- **Nginx logs:** `/var/log/nginx/vestara.access.log`, `/var/log/nginx/vestara.error.log`.
 - **PostgreSQL:** `sudo -u postgres psql -d vestara_admin -c "SELECT 1"`.
 - **Redis:** `redis-cli ping`.
 
 External monitoring (optional): point Uptime-Kuma / Healthchecks.io at
-`https://admin.example.com/api/v1/health`.
+`https://vestara.meetlily.org/api/v1/health`.
 
 ---
 
@@ -616,7 +626,7 @@ External monitoring (optional): point Uptime-Kuma / Healthchecks.io at
 |---------|--------------------|
 | `502 Bad Gateway` on `/api/*` | API not running or wrong port. Check `pm2 status` and that `PORT=5000` matches the Nginx `proxy_pass`. |
 | `502` only on first load after restart | Brief restart window; expected. Use `pm2 reload` for graceful restart. |
-| CORS error in browser console | `CORS_ORIGIN` doesn't match the browser origin. Set it to the exact `https://admin.example.com`. |
+| CORS error in browser console | `CORS_ORIGIN` doesn't match the browser origin. Set it to the exact `https://vestara.meetlily.org`. |
 | `401` immediately after login on reload | Access token expired and refresh failed. Ensure `JWT_REFRESH_SECRET` matches across restarts and `REDIS_URL` is reachable (refresh tokens/sessions may use Redis). |
 | `PrismaClientInitializationError` | `DATABASE_URL` missing or wrong. Run Prisma from repo root where `.env` lives. |
 | Migrations fail | Use `prisma migrate deploy` (not `dev`) in production; ensure DB user has DDL rights. |
