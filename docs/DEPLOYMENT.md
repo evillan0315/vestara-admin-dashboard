@@ -4,6 +4,8 @@
 
 This guide covers the currently used setup: both apps are deployed to **Vercel**. For local development, see the [Developer Guide](./DEVELOPER_GUIDE.md).
 
+> **Prefer to run it on your own server?** See the [Self-Hosted Deployment Guide](./SELF_HOSTED_DEPLOYMENT.md) for a full Ubuntu 24.04 walkthrough (Node + PM2 + Nginx + PostgreSQL + Redis + Let's Encrypt).
+
 ---
 
 ## Table of Contents

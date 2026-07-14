@@ -1998,6 +1998,7 @@ Project documentation lives in the [`/docs`](./docs) directory:
 - [Developer Guide](./docs/DEVELOPER_GUIDE.md) — setup, common commands, how to add backend/frontend features, testing, troubleshooting
 - [API Documentation](./docs/api/README.md) — endpoints, auth, error codes, data models, architecture
 - [Deployment Guide](./docs/DEPLOYMENT.md) — Vercel deployment (API + web), environment variables, OAuth, rollback, monitoring
+- [Self-Hosted Deployment Guide](./docs/SELF_HOSTED_DEPLOYMENT.md) — full Ubuntu 24.04 walkthrough (Node + PM2 + Nginx + PostgreSQL + Redis + Let's Encrypt)
 - [Architecture Decision Records](./docs/decisions/README.md) — key technology and design decisions (monorepo, React/MUI, Express/Prisma, JWT, Vercel, Zod, OAuth)
 - [Roadmap](./ROADMAP.md) — phased delivery plan and status
 

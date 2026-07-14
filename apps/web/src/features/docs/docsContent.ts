@@ -8,6 +8,7 @@
 
 import developerGuide from '../../../../../docs/DEVELOPER_GUIDE.md?raw';
 import deploymentGuide from '../../../../../docs/DEPLOYMENT.md?raw';
+import selfHostedGuide from '../../../../../docs/SELF_HOSTED_DEPLOYMENT.md?raw';
 import apiDocs from '../../../../../docs/api/README.md?raw';
 import adrIndex from '../../../../../docs/decisions/README.md?raw';
 import adrMonorepo from '../../../../../docs/decisions/0001-monorepo-pnpm-turbo.md?raw';
@@ -41,6 +42,12 @@ export const docsContent: DocEntry[] = [
     title: 'Deployment Guide',
     group: 'Getting Started',
     content: deploymentGuide,
+  },
+  {
+    id: 'self-hosted',
+    title: 'Self-Hosted Deployment',
+    group: 'Getting Started',
+    content: selfHostedGuide,
   },
   {
     id: 'api',

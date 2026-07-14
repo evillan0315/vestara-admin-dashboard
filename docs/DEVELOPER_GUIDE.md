@@ -475,5 +475,6 @@ export function UserFormDialog({ onClose, defaultValues }) {
 
 - [API Documentation](../api/README.md)
 - [Deployment Guide](./DEPLOYMENT.md)
+- [Self-Hosted Deployment Guide](./SELF_HOSTED_DEPLOYMENT.md)
 - [Architecture Decision Records](./decisions/README.md)
 - [Root README](../../README.md)
