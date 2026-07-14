@@ -192,6 +192,15 @@ The chat UI is accessible at `/chat` in the admin dashboard. The enhanced floati
 - **Page-Aware Suggestions**: Context-relevant question chips based on the current route (10 routes mapped)
 - **Open in Full Page**: One-click navigation to `/chat`
 
+### Integrations (AI Data Connector)
+
+The Integrations feature lets admins connect external REST APIs and auto-visualize their JSON. Configure a data source at `/integrations` (name, URL, method, headers, query params, and auth), then open `/data-explorer` to fetch the live response and render AI-assisted charts via `@mui/x-charts`.
+
+- Auth secrets (`authorization` header) are stored server-side and **never** returned to the client (masked with `••••` in the UI).
+- The heuristic analyzer always produces a chart spec; setting `OPENCODE_API_KEY` (see above) adds an AI pass that improves chart type, titles, and axis suggestions.
+- Write endpoints require `SUPER_ADMIN`/`ADMIN`/`MODERATOR`; read/fetch is open to any authenticated user.
+- All actions are audit-logged (`data_source_create`, `data_source_update`, `data_source_delete`, `data_source_fetch`).
+
 ### Web variables
 
 | Variable | Purpose |

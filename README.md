@@ -191,6 +191,7 @@ Vestara combines multiple products into one ecosystem.
 | 🤖 **AI Chatbot** | In-app AI assistant powered by OpenCode (free models) with multi-provider fallback |
 | 🤖 **AI Assistant RAG** | Data-aware AI with real-time org context injection — answers questions about users, activity, settings, storage, and KPIs |
 | 🤖 **Floating Chat Widget** | AI assistant accessible from every screen via FAB, keyboard shortcut (`Cmd+Shift+K`), page-aware suggestions, minimized bar, and full-page navigation |
+| 🔌 **AI Data Connector** | Configure external REST APIs, auto-fetch + analyze JSON, and render AI-assisted charts — secrets stored server-side, charts render via heuristic even without an AI key |
 
 ---
 
@@ -775,6 +776,37 @@ The AI Assistant is also accessible from every page through a floating chat widg
 - **Full chat functionality** — send messages, markdown rendering, suggestion chips, typing indicator, copy button
 - **Seamless integration** — rendered inside `DashboardLayout` so it appears across all routes without page refresh
 - **Reuses existing backend** — shares the same API, hooks, and conversation history as the full `/chat` page
+
+## Integrations — AI Data Connector (Implemented)
+
+Connect external REST APIs and visualize their JSON automatically. Admins configure a data source (URL, HTTP method, headers, query params, and auth) through a UI; the backend fetches the endpoint, normalizes the JSON, infers field types and chart suggestions, and the frontend renders auto-generated charts with AI-assisted enhancement.
+
+- **User-configurable sources** — create, edit, and delete data sources from the `Integrations` page (`/integrations`), org-scoped to the current organization
+- **Flexible auth** — `none`, `bearer` token, or `basic` credentials; secrets are stored server-side and **never** returned to the client (masked with `••••` in the UI)
+- **Auto visualization** — the `/data-explorer` page (`/data-explorer`) fetches the live response, runs the analyzer, and renders charts (bar, line, pie, etc.) using `@mui/x-charts`
+- **Heuristic + AI analysis** — a heuristic analyzer infers field types, dimensions, and measures to build a visualization spec; when `OPENCODE_API_KEY` is set, an AI pass improves the chart type, titles, and axis suggestions
+- **AI is an enhancement, not a dependency** — charts render from the heuristic spec even when no AI key is configured
+- **Audit logging** — all create/update/delete/fetch actions are recorded (`DATA_SOURCE_CREATE`, `DATA_SOURCE_UPDATE`, `DATA_SOURCE_DELETE`, `DATA_SOURCE_FETCH`)
+- **Access control** — write endpoints require `SUPER_ADMIN`/`ADMIN`/`MODERATOR`; read/fetch is open to any authenticated user
+
+### Endpoints
+
+Routes are mounted under `/api/v1/integrations`:
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `GET` | `/integrations` | user | List data sources for the current org |
+| `POST` | `/integrations` | admin+ | Create a data source |
+| `GET` | `/integrations/:id` | user | Get a data source by id |
+| `PUT` | `/integrations/:id` | admin+ | Update a data source |
+| `DELETE` | `/integrations/:id` | admin+ | Delete a data source |
+| `POST` | `/integrations/:id/fetch` | user | Fetch the external API and return analyzed data |
+
+### Environment Variables
+
+| Variable | Purpose |
+|----------|---------|
+| `OPENCODE_API_KEY` | Optional — enables AI-assisted chart enhancement for the connector |
 
 ## Planned AI Features
 

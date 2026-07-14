@@ -20,8 +20,9 @@ Base URL: `/api/v1`
     - [Users](#get-users)
     - [Organizations](#organizations)
     - [Settings](#settings)
-    - [Audit Logs](#audit-logs)
-    - [Chat](#chat-ai-chatbot)
+     - [Audit Logs](#audit-logs)
+     - [Integrations](#integrations-ai-data-connector)
+     - [Chat](#chat-ai-chatbot)
 - [Data Models](#data-models)
 - [Enums](#enums)
 - [Error Codes](#error-codes)
@@ -1006,6 +1007,107 @@ Update an organization's name or logo.
 
 ---
 
+### Integrations (AI Data Connector)
+
+All integrations endpoints are prefixed with `/integrations`. Read/fetch endpoints are open to any authenticated user; write endpoints (`POST`, `PUT`, `DELETE`) require `SUPER_ADMIN`, `ADMIN`, or `MODERATOR`. All actions are scoped to the current organization and audit-logged (`DATA_SOURCE_CREATE`, `DATA_SOURCE_UPDATE`, `DATA_SOURCE_DELETE`, `DATA_SOURCE_FETCH`).
+
+Auth secrets (`authorization` header value) are stored server-side and are **never** returned in data source DTOs — they are masked with `••••`.
+
+#### `GET /integrations`
+
+List data sources for the current organization.
+
+**Response (Success):**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "clxxx",
+      "name": "Public Users API",
+      "url": "https://jsonplaceholder.typicode.com/users",
+      "method": "GET",
+      "authType": "none",
+      "isActive": true,
+      "createdAt": "2026-07-15T10:00:00.000Z",
+      "updatedAt": "2026-07-15T10:00:00.000Z"
+    }
+  ]
+}
+```
+
+#### `POST /integrations`
+
+Create a data source. Requires `SUPER_ADMIN`/`ADMIN`/`MODERATOR`.
+
+**Request Body:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | yes | Display name |
+| `url` | string (URL) | yes | External API endpoint |
+| `method` | `GET` \| `POST` | no (default `GET`) | HTTP method |
+| `headers` | object | no | Additional request headers |
+| `queryParams` | object | no | Query string params |
+| `authType` | `none` \| `bearer` \| `basic` | no (default `none`) | Auth scheme |
+| `authorization` | string | conditional | Token/credentials (required when `authType` ≠ `none`) |
+| `body` | object | no | JSON body (for `POST`) |
+| `isActive` | boolean | no (default `true`) | Whether the source is enabled |
+
+**Response (Success — `201`):** the created `DataSource` DTO (without `authorization`).
+
+#### `GET /integrations/:id`
+
+Get a single data source by id.
+
+**Response (Success):** the `DataSource` DTO. `404` if not found or not in the current org.
+
+#### `PUT /integrations/:id`
+
+Update a data source. Requires `SUPER_ADMIN`/`ADMIN`/`MODERATOR`. Provide any subset of the create fields; omit `authorization` to keep the existing secret.
+
+**Response (Success):** the updated `DataSource` DTO.
+
+#### `DELETE /integrations/:id`
+
+Delete a data source. Requires `SUPER_ADMIN`/`ADMIN`/`MODERATOR`. Cascades to related records.
+
+**Response (Success):** `{ "success": true, "data": null }`.
+
+#### `POST /integrations/:id/fetch`
+
+Fetch the external API, normalize the JSON, and return an analysis (field types, inferred visualization spec, and AI-enhanced suggestions when `OPENCODE_API_KEY` is configured). Open to any authenticated user.
+
+**Response (Success):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "dataSourceId": "clxxx",
+    "data": [ { "id": 1, "name": "Leanne", "...": "..." } ],
+    "recordCount": 10,
+    "fields": [
+      { "name": "id", "type": "number", "sample": 1 },
+      { "name": "name", "type": "string", "sample": "Leanne" }
+    ],
+    "visualization": {
+      "chartType": "bar",
+      "title": "name by id",
+      "xAxis": "name",
+      "yAxis": "id",
+      "series": [ { "name": "id", "dataKeys": ["id"] } ],
+      "insight": "AI-enhanced summary of the dataset (when available)"
+    }
+  }
+}
+```
+
+**Errors:** `404` if not found; `502` if the upstream API is unreachable or returns non-JSON.
+
+---
+
 ### Chat (AI Chatbot)
 
 All chat endpoints are prefixed with `/chat` and require authentication. The chatbot uses a pluggable AI provider architecture with automatic fallback.
@@ -1409,6 +1511,25 @@ Get chat statistics for the current organization.
 | `conversationId` | string | Parent conversation ID |
 | `createdAt` | string | ISO timestamp |
 
+### Data Source
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string (uuid) | Unique identifier |
+| `name` | string | Display name |
+| `url` | string | External API endpoint |
+| `method` | `GET` \| `POST` | HTTP method |
+| `headers` | object | Additional request headers |
+| `queryParams` | object | Query string params |
+| `authType` | `none` \| `bearer` \| `basic` | Auth scheme |
+| `authorization` | string \| null | Secret (never serialized to the client) |
+| `body` | object \| null | JSON body (for `POST`) |
+| `isActive` | boolean | Whether the source is enabled |
+| `organizationId` | string | Organization scope |
+| `createdById` | string \| null | Creator user ID |
+| `createdAt` | string | ISO timestamp |
+| `updatedAt` | string | ISO timestamp |
+
 ---
 
 ## Enums
@@ -1438,6 +1559,10 @@ Get chat statistics for the current organization.
 | `password_change` | Password change |
 | `settings_update` | Settings modification |
 | `settings_delete` | Settings deletion |
+| `data_source_create` | Data source creation |
+| `data_source_update` | Data source update |
+| `data_source_delete` | Data source deletion |
+| `data_source_fetch` | Data source external fetch |
 
 ### EntityType
 
