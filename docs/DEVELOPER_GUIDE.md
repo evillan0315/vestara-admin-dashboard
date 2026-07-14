@@ -284,7 +284,7 @@ Example: a new admin page `Analytics`.
 
 3. **Route** — register it in the router (typically `apps/web/src/App.tsx` or the routes module) wrapped in `<ProtectedRoute>`.
 
-4. **Nav** — add an entry to `apps/web/src/layouts/navConfig.ts` if it should appear in the sidebar.
+4. **Nav** — add an entry to `apps/web/src/layouts/navConfig.ts` if it should appear in the sidebar. Sidebar items are grouped into platform-domain categories (MAIN MENU, WALLET & PAYMENTS, MARKETPLACE, BOOKINGS, REWARDS, AI SERVICES, MANAGEMENT, SYSTEM, SECURITY). Set `allowedRoles` to restrict by role, and set `soon: true` for documented-but-not-yet-built modules (rendered dimmed with a "Soon" badge and non-clickable).
 
 ### Conventions
 

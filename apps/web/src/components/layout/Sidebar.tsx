@@ -10,7 +10,7 @@ import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../features/auth/AuthContext";
 import { colors } from "../../theme/tokens";
 import Logo from "../common/Logo";
-import { navGroups } from "../../layouts/navConfig";
+import { navGroups, type NavItem } from "../../layouts/navConfig";
 
 // API Status types
 interface ApiStatus {
@@ -107,8 +107,9 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element {
     }))
     .filter((group) => group.items.length > 0);
 
-  const handleNavClick = (path: string) => {
-    navigate(path);
+  const handleNavClick = (item: NavItem) => {
+    if (item.soon) return;
+    navigate(item.path);
     onClose?.();
   };
 
@@ -176,7 +177,7 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element {
               return (
                 <Box
                   key={item.path}
-                  onClick={() => handleNavClick(item.path)}
+                  onClick={() => handleNavClick(item)}
                   sx={{
                     display: "flex",
                     alignItems: "center",
@@ -184,17 +185,28 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element {
                     px: 1.25,
                     py: 1,
                     borderRadius: "10px",
-                    cursor: "pointer",
+                    cursor: item.soon ? "default" : "pointer",
                     mb: 0.25,
-                    color: active ? "#0A0F18" : colors.secondary,
+                    color: item.soon
+                      ? colors.muted
+                      : active
+                        ? "#0A0F18"
+                        : colors.secondary,
                     bgcolor: active ? colors.gold : "transparent",
                     fontWeight: active ? 700 : 500,
+                    opacity: item.soon ? 0.6 : 1,
                     transition: "background-color .15s ease, color .15s ease",
                     "&:hover": {
-                      bgcolor: active
-                        ? colors.gold
-                        : "rgba(255,255,255,0.05)",
-                      color: active ? "#0A0F18" : colors.text,
+                      bgcolor: item.soon
+                        ? "transparent"
+                        : active
+                          ? colors.gold
+                          : "rgba(255,255,255,0.05)",
+                      color: item.soon
+                        ? colors.muted
+                        : active
+                          ? "#0A0F18"
+                          : colors.text,
                     },
                   }}
                 >
@@ -204,24 +216,43 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element {
                   >
                     {item.label}
                   </Typography>
-                  {item.badge !== undefined && (
+                  {item.soon ? (
                     <Box
                       sx={{
-                        fontSize: 11,
+                        fontSize: 9.5,
                         fontWeight: 700,
-                        minWidth: 20,
-                        textAlign: "center",
+                        letterSpacing: "0.04em",
+                        textTransform: "uppercase",
                         borderRadius: "999px",
-                        px: 0.6,
-                        py: 0.1,
-                        bgcolor: active
-                          ? "rgba(10,15,24,0.2)"
-                          : "rgba(216,164,65,0.15)",
-                        color: active ? "#0A0F18" : colors.gold,
+                        px: 0.8,
+                        py: 0.2,
+                        bgcolor: "rgba(255,255,255,0.06)",
+                        color: colors.muted,
+                        border: `1px solid ${colors.border}`,
                       }}
                     >
-                      {item.badge}
+                      Soon
                     </Box>
+                  ) : (
+                    item.badge !== undefined && (
+                      <Box
+                        sx={{
+                          fontSize: 11,
+                          fontWeight: 700,
+                          minWidth: 20,
+                          textAlign: "center",
+                          borderRadius: "999px",
+                          px: 0.6,
+                          py: 0.1,
+                          bgcolor: active
+                            ? "rgba(10,15,24,0.2)"
+                            : "rgba(216,164,65,0.15)",
+                          color: active ? "#0A0F18" : colors.gold,
+                        }}
+                      >
+                        {item.badge}
+                      </Box>
+                    )
                   )}
                 </Box>
               );

@@ -195,6 +195,26 @@ Vestara combines multiple products into one ecosystem.
 
 ---
 
+## 🧭 Sidebar Navigation
+
+The admin dashboard sidebar is organized into domain groups that mirror the platform highlights above. Implemented modules are fully navigable; documented roadmap modules are shown with a **Soon** badge and do not navigate until built.
+
+| Group | Items |
+|-------|-------|
+| **MAIN MENU** | Dashboard (`/`), Analytics (`/analytics`), Reports (`/reports`) |
+| **WALLET & PAYMENTS** | Digital Wallet *(Soon)*, Payments *(Soon)*, Transactions *(Soon)* |
+| **MARKETPLACE** | Marketplace *(Soon)*, Orders *(Soon)* |
+| **BOOKINGS** | Bookings *(Soon)* |
+| **REWARDS** | Vestara Points *(Soon)* |
+| **AI SERVICES** | AI Chat (`/chat`), Integrations (`/integrations`), Data Explorer (`/integrations`) |
+| **MANAGEMENT** | Users & Roles (`/users`), Organizations (`/organizations`) |
+| **SYSTEM** | Settings (`/settings`), File Manager (`/files`), System Logs (`/system-logs`), Admin (`/admin`), Documentation (`/docs`) |
+| **SECURITY** | Security Center *(Soon)* |
+
+Navigation items respect role-based access control (`requireRole`): administrative and organization-scoped entries are restricted to `SUPER_ADMIN` / `ADMIN` (and `MODERATOR` for integrations), while roadmap items are visible to all authenticated users but disabled.
+
+---
+
 ## 🖥️ Platform Experience
 
 Vestara delivers a consistent premium experience across every module.
@@ -2051,6 +2071,7 @@ Future licensing terms may change as the platform evolves.
 | User Profile (name, avatar, password, email change, account deletion) | 🟢 Complete (backend + frontend) |
 | User Preferences (Modal) | 🟢 Complete (Appearance, Notifications, Localization) |
 | Global Search (Cmd/Ctrl+K) | 🟢 Complete |
+| Sidebar Navigation (platform-domain categories) | 🟢 Complete (Wallet & Payments, Marketplace, Bookings, Rewards, AI Services, Management, System, Security; roadmap modules marked "Soon") |
 | Audit Logs / System Logs | 🟢 API + Frontend Page |
 | CI/CD (GitHub Actions) | 🟢 API Deploy Workflow |
 | Reusable Form Components | 🟢 Complete (14 components + Zod) |
@@ -2089,6 +2110,7 @@ Future licensing terms may change as the platform evolves.
 - ✅ AI Chatbot (OpenCode integration, multi-provider, conversation history, responsive UI)
 - ✅ AI Assistant RAG (data-aware, real-time org context injection)
 - ✅ Floating Chat Widget (FAB, keyboard shortcut `Cmd+Shift+K`, page-aware suggestions, minimized bar, full-page nav)
+- ✅ Sidebar Navigation (reorganized into platform-domain categories: Wallet & Payments, Marketplace, Bookings, Rewards, AI Services, Management, System, Security; roadmap modules marked "Soon")
 - 🟡 Security Hardening (rate limiting, CSRF, password policies)
 - 📋 Reporting (CSV/Excel/PDF export)
 - 📋 Real-time features (WebSocket, live notifications)
