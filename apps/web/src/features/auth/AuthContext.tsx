@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import type { UserDTO, AuthResponseDTO } from '@vestara/types';
-import { apiClient } from '../../api/client';
+import { apiClient, setAuthInterceptors, type TokenRefreshResult } from '../../api/client';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
 
@@ -36,6 +36,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isLoading: false,
     });
   }, []);
+
+  const handleSessionExpired = useCallback(() => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    setUser(null);
+  }, [setUser]);
+
+  /**
+   * Attempt to exchange the stored refresh token for a new access/refresh
+   * pair. Returns `null` when no refresh token is available or the refresh
+   * fails (e.g. the refresh token has also expired). The current user in
+   * state is preserved — the backend refresh response does not include the
+   * user payload, and the existing user remains valid after a token renewal.
+   */
+  const refreshSession = useCallback(async (): Promise<TokenRefreshResult | null> => {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) {
+      return null;
+    }
+    try {
+      const res = await apiClient.post<{
+        tokens: { accessToken: string; refreshToken: string; expiresIn: number };
+      }>('/auth/refresh', { refreshToken });
+      if (res.data?.tokens) {
+        localStorage.setItem('accessToken', res.data.tokens.accessToken);
+        localStorage.setItem('refreshToken', res.data.tokens.refreshToken);
+        return {
+          accessToken: res.data.tokens.accessToken,
+          refreshToken: res.data.tokens.refreshToken,
+        };
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  useEffect(() => {
+    setAuthInterceptors({
+      refresh: refreshSession,
+      onUnauthorized: handleSessionExpired,
+    });
+  }, [refreshSession, handleSessionExpired]);
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');

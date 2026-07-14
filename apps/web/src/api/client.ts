@@ -16,6 +16,49 @@ interface ApiResponse<T = unknown> {
   };
 }
 
+export interface TokenRefreshResult {
+  accessToken: string;
+  refreshToken: string;
+}
+
+type RefreshHandler = () => Promise<TokenRefreshResult | null>;
+type UnauthorizedHandler = () => void;
+
+let refreshHandler: RefreshHandler | null = null;
+let unauthorizedHandler: UnauthorizedHandler | null = null;
+let refreshPromise: Promise<TokenRefreshResult | null> | null = null;
+
+/**
+ * Register the authentication interceptors used to recover from expired
+ * sessions. The `refresh` handler should attempt to obtain a new token pair
+ * (returning `null` on failure); `onUnauthorized` is invoked when the session
+ * can no longer be recovered and the user must be sent back to login.
+ */
+export function setAuthInterceptors(handlers: {
+  refresh: RefreshHandler;
+  onUnauthorized: UnauthorizedHandler;
+}): void {
+  refreshHandler = handlers.refresh;
+  unauthorizedHandler = handlers.onUnauthorized;
+}
+
+function buildHeaders(options: RequestInit): HeadersInit {
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    ...options.headers,
+  };
+  const token = localStorage.getItem('accessToken');
+  if (token) {
+    (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
+/** Endpoints that must never trigger the refresh/redirect interceptor. */
+function shouldAutoRefresh(endpoint: string): boolean {
+  return !/^\/auth\/(login|register|refresh)(\/|$)/.test(endpoint);
+}
+
 class ApiClient {
   private baseUrl: string;
 
@@ -27,55 +70,78 @@ class ApiClient {
     endpoint: string,
     options: RequestInit = {},
     isBlob = false,
+    attemptedRefresh = false,
   ): Promise<ApiResponse<T> | Blob> {
     const url = `${this.baseUrl}${endpoint}`;
+    const hadAuth =
+      !!localStorage.getItem('accessToken') || !!localStorage.getItem('refreshToken');
 
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    };
+    const attempt = (): Promise<Response> =>
+      fetch(url, { ...options, headers: buildHeaders(options) });
 
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+    let response = await attempt();
+
+    if (response.status === 401 && !attemptedRefresh && shouldAutoRefresh(endpoint)) {
+      const refreshed = await this.handleUnauthorizedAccess();
+      if (refreshed) {
+        response = await attempt();
+      }
     }
 
-    try {
-      const response = await fetch(url, {
-        ...options,
-        headers,
-      });
+    // If we still have an auth failure after a recovery attempt (or none was
+    // possible), the session is genuinely expired — notify the app so it can
+    // redirect the user to the login page.
+    if (response.status === 401 && hadAuth) {
+      unauthorizedHandler?.();
+    }
 
-      if (isBlob) {
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new ApiError(
-            errorData.error?.message || 'An unexpected error occurred',
-            response.status,
-            errorData.error?.code || 'UNKNOWN_ERROR',
-            errorData.error?.details,
-          );
-        }
-        return response.blob();
-      }
-
-      const data: ApiResponse<T> = await response.json();
-
+    if (isBlob) {
       if (!response.ok) {
+        const errorData = await response.json();
         throw new ApiError(
-          data.error?.message || 'An unexpected error occurred',
+          errorData.error?.message || 'An unexpected error occurred',
           response.status,
-          data.error?.code || 'UNKNOWN_ERROR',
-          data.error?.details,
+          errorData.error?.code || 'UNKNOWN_ERROR',
+          errorData.error?.details,
         );
       }
+      return response.blob();
+    }
 
-      return data;
-    } catch (error) {
-      if (error instanceof ApiError) {
-        throw error;
+    const data: ApiResponse<T> = await response.json();
+
+    if (!response.ok) {
+      throw new ApiError(
+        data.error?.message || 'An unexpected error occurred',
+        response.status,
+        data.error?.code || 'UNKNOWN_ERROR',
+        data.error?.details,
+      );
+    }
+
+    return data;
+  }
+
+  /**
+   * Attempt a single-flight token refresh. Returns the new token pair on
+   * success, or `null` when no refresh token is available / refresh failed.
+   */
+  private async handleUnauthorizedAccess(): Promise<TokenRefreshResult | null> {
+    if (!refreshHandler) {
+      return null;
+    }
+    if (!localStorage.getItem('refreshToken')) {
+      return null;
+    }
+    try {
+      if (!refreshPromise) {
+        refreshPromise = refreshHandler().finally(() => {
+          refreshPromise = null;
+        });
       }
-      throw new ApiError('Network error', 0, 'NETWORK_ERROR');
+      return await refreshPromise;
+    } catch {
+      return null;
     }
   }
 
