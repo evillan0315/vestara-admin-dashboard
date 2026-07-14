@@ -115,7 +115,7 @@ For every task:
 | 23 | Security Hardening | ⏳ In Progress | ~40% |
 | 24 | Monitoring | ⏳ In Progress | ~70% |
 | 25 | Testing | ⏳ In Progress | ~25% |
-| 26 | Performance Optimization | ❌ Not Started | 0% |
+| 26 | Performance Optimization | ⏳ In Progress | ~60% |
 | — | PWA Support | ✅ Complete | 100% |
 | 27 | Documentation | ✅ Complete | 100% |
 | 28 | Deployment | ✅ Complete | 100% |
@@ -669,17 +669,26 @@ For every task:
 
 ### 26. Performance Optimization
 
-**Status:** ❌ Not Started
+**Status:** ⏳ In Progress (~60%)
 **Dependencies:** Phases 6–7, 16
 
+**Implemented (2026-07-15):**
+* **Lazy loading** — route-based code splitting with `React.lazy()` + `<Suspense>` (per-page chunks, `PageLoading` fallback) in `routes/index.tsx`.
+* **Code splitting** — vendor chunk splitting via `manualChunks` in `vite.config.ts` (react, mui, tanstack-query, markdown, socket.io vendors split out — initial `index` chunk dropped from ~1.7 MB to ~304 KB; pages become on-demand chunks).
+* **Query optimization** — TanStack Query defaults tuned in `QueryProvider` (`staleTime` 5 min, `gcTime` 30 min, `refetchOnReconnect`).
+* **Memoization** — `React.memo` applied to `StatCard` and `ActivityFeed` presentational components.
+* **Image optimization** — lazy/async image loading (`loading="lazy"`, `decoding="async"`) for rendered markdown docs in `DocsPage`.
+
+**Still pending:** list/table virtualization (react-window) for large `DataTable` datasets; formal bundle-visualizer audit; deeper `useMemo`/`useCallback` pass on expensive renders.
+
 **Deliverables:**
-* **Lazy loading** — route-based code splitting with `React.lazy()` + `Suspense`
-* **Code splitting** — vendor chunk splitting, dynamic imports for heavy components
+* **Lazy loading** — route-based code splitting with `React.lazy()` + `Suspense` ✅
+* **Code splitting** — vendor chunk splitting, dynamic imports for heavy components ✅
 * **Virtualization** — virtualized lists/tables for large datasets (e.g., `react-window`)
-* **Query optimization** — TanStack Query stale time / cache time tuning, prefetching
+* **Query optimization** — TanStack Query stale time / cache time tuning, prefetching ✅ (defaults tuned)
 * **Bundle optimization** — analyse bundle with `vite-bundle-visualizer`, tree shaking audit
-* **Image optimization** — lazy loading, responsive images, WebP format
-* **Memoization** — `React.memo`, `useMemo`, `useCallback` audit on expensive renders
+* **Image optimization** — lazy loading, responsive images, WebP format ✅ (lazy images)
+* **Memoization** — `React.memo`, `useMemo`, `useCallback` audit on expensive renders (partial)
 
 ---
 

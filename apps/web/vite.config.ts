@@ -119,5 +119,26 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    chunkSizeWarningLimit: 900,
+    rollupOptions: {
+      output: {
+        // Split heavy, independently-cacheable vendor libraries into their own
+        // chunks so the initial bundle is smaller and vendors are cached
+        // separately from application code.
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'mui-vendor': [
+            '@mui/material',
+            '@mui/icons-material',
+            '@mui/x-charts',
+            '@emotion/react',
+            '@emotion/styled',
+          ],
+          'query-vendor': ['@tanstack/react-query'],
+          'markdown-vendor': ['react-markdown', 'remark-gfm'],
+          'socket-vendor': ['socket.io-client'],
+        },
+      },
+    },
   },
 });

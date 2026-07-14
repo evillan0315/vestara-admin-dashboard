@@ -122,6 +122,17 @@ export default function DocsPage() {
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
+                img({ alt, ...props }) {
+                  return (
+                    <img
+                      alt={alt}
+                      loading="lazy"
+                      decoding="async"
+                      style={{ maxWidth: '100%', height: 'auto' }}
+                      {...props}
+                    />
+                  );
+                },
                 a({ href, children, ...props }) {
                   const docId = href ? resolveDocHref(href) : null;
                   if (docId) {

@@ -1,6 +1,6 @@
 import { Box, Typography, Card, CardContent, styled, type SxProps, type Theme } from '@mui/material';
 import { TrendingUp, TrendingDown, TrendingFlat } from '@mui/icons-material';
-import { type ReactElement, type ReactNode } from 'react';
+import { memo, type ReactElement, type ReactNode } from 'react';
 
 export interface StatCardProps {
   title: string;
@@ -99,16 +99,17 @@ const ChangeText = styled(Typography, {
       : theme.palette.grey[500],
 }));
 
-export const StatCard = ({
-  title,
-  value,
-  change,
-  changeLabel,
-  icon,
-  iconColor = 'primary',
-  sx,
-  loading = false,
-}: StatCardProps): ReactElement => {
+export const StatCard = memo(
+  ({
+    title,
+    value,
+    change,
+    changeLabel,
+    icon,
+    iconColor = 'primary',
+    sx,
+    loading = false,
+  }: StatCardProps): ReactElement => {
   const isPositive = change !== undefined ? change > 0 : null;
 
   return (
@@ -147,6 +148,7 @@ export const StatCard = ({
       </CardContent>
     </StyledCard>
   );
-};
+},
+);
 
 export default StatCard;

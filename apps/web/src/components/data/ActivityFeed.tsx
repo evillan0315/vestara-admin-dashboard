@@ -1,5 +1,5 @@
 import { Box, Typography, Avatar, styled, type SxProps, type Theme } from '@mui/material';
-import { type ReactElement, type ReactNode } from 'react';
+import { memo, type ReactElement, type ReactNode } from 'react';
 
 export interface ActivityItem {
   id: string;
@@ -121,12 +121,13 @@ const IconBadge = styled(Box, {
   },
 }));
 
-export const ActivityFeed = ({
-  items,
-  title = 'Recent Activity',
-  maxItems = 10,
-  sx,
-}: ActivityFeedProps): ReactElement => {
+export const ActivityFeed = memo(
+  ({
+    items,
+    title = 'Recent Activity',
+    maxItems = 10,
+    sx,
+  }: ActivityFeedProps): ReactElement => {
   const displayItems = items.slice(0, maxItems);
 
   return (
@@ -175,6 +176,7 @@ export const ActivityFeed = ({
       </FeedList>
     </FeedContainer>
   );
-};
+},
+);
 
 export default ActivityFeed;
