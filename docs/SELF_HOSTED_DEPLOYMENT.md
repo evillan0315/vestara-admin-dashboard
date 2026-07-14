@@ -39,6 +39,7 @@ recommended topology for production.
   - [12. TLS with Let's Encrypt](#12-tls-with-let-s-encrypt)
 - [OAuth (Google / GitHub)](#oauth-google--github)
 - [Updating / Redeploying](#updating--redeploying)
+- [Automated Deployment (SSH)](#automated-deployment-ssh)
 - [Health Checks & Logs](#health-checks--logs)
 - [Scaling Notes](#scaling-notes)
 - [Security Checklist](#security-checklist)
@@ -454,6 +455,112 @@ sudo systemctl reload nginx
 For zero-downtime API restarts, PM2 restarts the single forked process
 quickly; the Nginx proxy will briefly return 502 during the restart window
 (typically < 1s).
+
+---
+
+## Automated Deployment (SSH)
+
+Instead of running the manual steps above on every change, `scripts/deploy.sh`
+pushes the built frontend to the server over **SSH with public-key
+authentication** (no passwords) and swaps it in atomically. A GitHub Actions
+workflow runs it automatically on every push to `main`.
+
+### 1. SSH key setup (public key on the server)
+
+On the machine that will run the deploy (your laptop, or the CI runner),
+generate a key pair if you don't have one:
+
+```bash
+ssh-keygen -t ed25519 -C "deploy@vestara" -f ~/.ssh/vestara_deploy
+```
+
+Copy the **public** key to the server's `deployer` account (the private key
+stays local / in CI secrets):
+
+```bash
+ssh-copy-id -i ~/.ssh/vestara_deploy.pub deployer@your-server.example.com
+# or manually:
+cat ~/.ssh/vestara_deploy.pub | ssh deployer@your-server.example.com \
+  'mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys'
+```
+
+The server must allow `PubkeyAuthentication` (the `setup-production-server.sh`
+script already hardens SSH to key-only). Test the connection:
+
+```bash
+ssh -i ~/.ssh/vestara_deploy deployer@your-server.example.com 'echo ok'
+```
+
+### 2. Configure the deploy
+
+Copy the template and fill in your values (this file is git-ignored):
+
+```bash
+cp deploy.env.example deploy.env
+$EDITOR deploy.env
+```
+
+| Variable | Meaning |
+|----------|---------|
+| `DEPLOY_HOST` | Server IP or domain (required) |
+| `DEPLOY_USER` | SSH user (default `deployer`) |
+| `DEPLOY_SSH_KEY` | Path to the **private** key used for auth |
+| `DEPLOY_REMOTE_PORT` | SSH port (default `22`) |
+| `DEPLOY_WEB_PATH` | Remote Nginx web root (default `/var/www/vestara`) |
+| `DEPLOY_RELEASES_DIR` | Where timestamped releases are stored (default `/var/www/releases`) |
+| `DEPLOY_KEEP_RELEASES` | How many past releases to keep (default `5`) |
+| `DEPLOY_WEB_ROOT_GROUP` | Group that should own web files (default `www-data`) |
+| `DEPLOY_API` / `DEPLOY_API_PATH` | Also pull/build/restart the API remotely |
+
+### 3. Deploy
+
+```bash
+# Build web locally, then deploy (default):
+./scripts/deploy.sh
+
+# Deploy an already-built dist/ (e.g. from CI):
+./scripts/deploy.sh --no-build
+
+# Also redeploy the API on the server:
+./scripts/deploy.sh --api
+
+# Override any setting via flags:
+./scripts/deploy.sh --host example.com --user deployer --key ~/.ssh/vestara_deploy
+```
+
+What the script does:
+
+1. Optionally builds `apps/web`.
+2. Uploads `apps/web/dist/` to a new timestamped release dir
+   (`/var/www/releases/vestara-<timestamp>`) via `rsync` over SSH.
+3. Fixes ownership/permissions for the web server user.
+4. Atomically swaps the web root symlink to the new release
+   (`ln -sfn … && mv -Tf`) — Nginx never serves a half-written build.
+5. Prunes old releases beyond `DEPLOY_KEEP_RELEASES`.
+6. Runs `nginx -t && systemctl reload nginx`.
+7. Optionally (`--api`) pulls, installs, migrates, builds, and restarts the API
+   via PM2 on the remote server.
+8. Runs a `/api/v1/health` check.
+
+### 4. GitHub Actions (zero-click on push)
+
+`.github/workflows/deploy-selfhosted.yml` builds the web app and runs
+`scripts/deploy.sh --no-build` on every push to `main` (for web-relevant
+changes). Add these **repository secrets** (Settings → Secrets → Actions):
+
+| Secret | Value |
+|--------|-------|
+| `DEPLOY_HOST` | Server host |
+| `DEPLOY_USER` | SSH user (`deployer`) |
+| `DEPLOY_WEB_PATH` | Remote web root (`/var/www/vestara`) |
+| `DEPLOY_SSH_KEY` | The **private** key contents (`vestara_deploy`) |
+
+Trigger an API redeploy from a workflow run with the **API** input enabled, or
+set `DEPLOY_API=true` in `deploy.env`. The private key is written to a
+`chmod 600` file on the runner and removed afterwards.
+
+> The deploy user needs passwordless sudo for `chown`/`nginx`/`systemctl`
+> (the bootstrap script grants `deployer ALL=(ALL) NOPASSWD:ALL`).
 
 ---
 

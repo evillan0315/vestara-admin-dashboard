@@ -116,7 +116,7 @@ jobs:
         env:
           DATABASE_URL: "postgresql://localhost:5432/vestara"
 
-- name: Run tests
+      - name: Run tests
         run: pnpm turbo test --filter=@vestara/${{ matrix.app }}
         env:
           DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/vestara"
