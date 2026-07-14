@@ -2135,9 +2135,15 @@ Your support helps shape the future of the Vestara ecosystem.
 
 ### Opencode one liner command
 
+#### Starting prompt
+
 ```bash
 opencode run --agent developer --model opencode/deepseek-v4-flash-free --auto --print-logs --log-level INFO "Before performing any work, search for and read AGENTS.md, INSTRUCTION.md, and README.md from the project root, as well as any applicable nested AGENTS.md or INSTRUCTION.md files within the directories you modify. Treat AGENTS.md as the highest-priority source of agent behavior, workflows, coding standards, and project conventions. Treat INSTRUCTION.md as the authoritative source for feature-specific, module-specific, or implementation-specific instructions. Treat README.md as the primary source for the project overview, architecture, setup, requirements, and development guidelines. When instructions conflict, follow this precedence: (1) the most specific nested AGENTS.md, (2) the most specific nested INSTRUCTION.md, (3) the root AGENTS.md, (4) the root INSTRUCTION.md, and (5) the README.md. Report any missing files that are expected, summarize the applicable instructions before making changes, and ensure every implementation fully complies with them before executing the requested task."
 ```
 
+#### Continues prompt
 
+```bash
+opencode run --agent developer --model opencode/deepseek-v4-flash-free --auto --print-logs --log-level INFO "Enter your message" --session your_session_id
+```
 
