@@ -56,6 +56,12 @@ Whether users are purchasing products, transferring funds, earning rewards, book
 |--------------------|-------------------|
 | <img src="./assets/Vestara  Dashboard Elite.png" width="100%" alt="Vestara Admin Dashboard"> | <img src="./assets/Vestara Full HD Dashboard Elite.png" width="100%" alt="Vestara Full HD Dashboard"> |
 
+The admin dashboard is fully data-driven and real-time:
+
+- **Dashboard (`/`)** — KPI cards (Total Users, Active Users, System Settings, Audit Events with trend vs. previous period), Audit Activity area chart, User Status donut, Activity-by-Action / Activity-by-Entity bar charts, and a Recent Activity feed. The organization **name** is shown (not the raw id), and all data refreshes live via WebSocket events.
+- **Analytics (`/analytics`)** — a dedicated live analytics page backed by real API data with a 7/14/30/90-day range selector, KPI trend deltas, the same chart suite, and a Recent Activity feed. Refreshes in real time through `useLiveDashboard()`.
+- Shared chart/activity aggregation logic lives in the `apps/web/src/features/analytics` module, reused by both pages.
+
 ---
 
 ## Elite Companion Dashboard

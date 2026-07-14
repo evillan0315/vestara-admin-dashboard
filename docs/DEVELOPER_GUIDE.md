@@ -271,20 +271,23 @@ Example: a new resource `reports`.
 
 ## Adding a Frontend Feature
 
-Example: a new admin page `Analytics`.
+ Example: a new admin page `Analytics`.
 
-1. **API hook** — add a typed query/mutation in `apps/web/src/api/` (axios client + TanStack Query):
+ 1. **API hook** — add a typed query/mutation in `apps/web/src/api/` (axios client + TanStack Query). The Analytics page has no dedicated endpoint; it derives everything from existing audit-logs, users, and settings endpoints via the shared `apps/web/src/features/analytics` module (`useAuditActivity`, `useAuditCount`, `getPreviousRange`, plus chart/activity mapping helpers).
 
-   ```ts
-   export const useAnalytics = () =>
-     useQuery({ queryKey: ['analytics'], queryFn: () => apiClient.get('/analytics').then(r => r.data.data) });
-   ```
+    ```ts
+    import { useAuditActivity, useAuditCount, getPreviousRange } from '@/features/analytics';
 
-2. **Page** — create `apps/web/src/pages/AnalyticsPage.tsx`.
+    const { startDate, endDate } = getRangeWindow(30);
+    const { daily, byAction, byEntity, loading } = useAuditActivity(startDate, endDate, 30);
+    const { data: prevEvents } = useAuditCount(...getPreviousRange(30, endDate));
+    ```
 
-3. **Route** — register it in the router (typically `apps/web/src/App.tsx` or the routes module) wrapped in `<ProtectedRoute>`.
+ 2. **Page** — create `apps/web/src/pages/AnalyticsPage.tsx`. Call `useLiveDashboard()` to refresh on org-scoped WebSocket events.
 
-4. **Nav** — add an entry to `apps/web/src/layouts/navConfig.ts` if it should appear in the sidebar. Sidebar items are grouped into platform-domain categories (MAIN MENU, WALLET & PAYMENTS, MARKETPLACE, BOOKINGS, REWARDS, AI SERVICES, MANAGEMENT, SYSTEM, SECURITY). Set `allowedRoles` to restrict by role, and set `soon: true` for documented-but-not-yet-built modules (rendered dimmed with a "Soon" badge and non-clickable).
+ 3. **Route** — register it in `apps/web/src/routes/index.tsx` wrapped in `<ProtectedRoute>`.
+
+ 4. **Nav** — add an entry to `apps/web/src/layouts/navConfig.ts` if it should appear in the sidebar. Sidebar items are grouped into platform-domain categories (MAIN MENU, WALLET & PAYMENTS, MARKETPLACE, BOOKINGS, REWARDS, AI SERVICES, MANAGEMENT, SYSTEM, SECURITY). Set `allowedRoles` to restrict by role, and set `soon: true` for documented-but-not-yet-built modules (rendered dimmed with a "Soon" badge and non-clickable).
 
 ### Conventions
 
