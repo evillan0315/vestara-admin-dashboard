@@ -11,6 +11,7 @@ import {
   Wrench,
   BookText,
   FileBarChart,
+  Plug,
 } from "lucide-react";
 
 export interface NavItem {
@@ -53,6 +54,12 @@ export const navGroups: NavGroup[] = [
         icon: Users,
         path: "/users",
         allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
+      },
+      {
+        label: "Integrations",
+        icon: Plug,
+        path: "/integrations",
+        allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR],
       },
     ],
   },

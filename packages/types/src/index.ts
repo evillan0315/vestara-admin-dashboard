@@ -409,6 +409,14 @@ export interface DataSourceFetchResultDTO {
   fetchedAt: string;
 }
 
+export interface DataSourceAnalysisDTO {
+  recordCount: number;
+  fields: FieldMetaDTO[];
+  sample: Record<string, unknown>[];
+  vizSpec: VisualizationSpecDTO;
+  summary: string;
+}
+
 export interface CreateDataSourceRequestDTO {
   name: string;
   description?: string;

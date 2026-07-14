@@ -236,6 +236,10 @@ const ACTION_LABELS: Record<AuditAction, string> = {
   [AuditAction.SETTINGS_UPDATE]: 'Setting Update',
   [AuditAction.SETTINGS_DELETE]: 'Setting Delete',
   [AuditAction.SETTINGS_IMPORT]: 'Setting Import',
+  [AuditAction.DATA_SOURCE_CREATE]: 'Data Source Create',
+  [AuditAction.DATA_SOURCE_UPDATE]: 'Data Source Update',
+  [AuditAction.DATA_SOURCE_DELETE]: 'Data Source Delete',
+  [AuditAction.DATA_SOURCE_FETCH]: 'Data Source Fetch',
   [AuditAction.ERROR]: 'Error',
 };
 
