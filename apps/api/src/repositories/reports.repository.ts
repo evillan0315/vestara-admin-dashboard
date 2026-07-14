@@ -1,6 +1,6 @@
 import { prisma } from '../utils/prisma.js';
-import { ReportType, ReportFormat, ReportStatus } from '../../generated/prisma/enums.js';
-import { Prisma } from '../../generated/prisma/client.js';
+import { ReportType, ReportFormat, ReportStatus } from '../generated/prisma/enums.js';
+import { Prisma } from '../generated/prisma/client.js';
 
 export class ReportsRepository {
   async create(data: {

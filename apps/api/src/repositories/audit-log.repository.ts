@@ -1,4 +1,4 @@
-import { Prisma } from '../../generated/prisma/client.js';
+import { Prisma } from '../generated/prisma/client.js';
 import { BaseRepository } from './base.repository.js';
 import { getWebSocketManager } from '../websocket/index.js';
 

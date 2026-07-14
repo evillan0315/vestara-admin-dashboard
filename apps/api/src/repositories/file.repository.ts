@@ -4,7 +4,7 @@
 
 import prisma from '../utils/prisma.js';
 import { BaseRepository } from './base.repository.js';
-import type { Prisma, StorageProvider } from '../../generated/prisma/client.js';
+import type { Prisma, StorageProvider } from '../generated/prisma/client.js';
 
 type GroupByProvider = { provider: StorageProvider; _count: { id: number } };
 type GroupByMimeType = { mimeType: string; _count: { id: number } };

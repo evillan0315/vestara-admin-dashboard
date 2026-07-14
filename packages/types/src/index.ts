@@ -46,6 +46,10 @@ export enum AuditAction {
   SETTINGS_UPDATE = 'settings_update',
   SETTINGS_DELETE = 'settings_delete',
   SETTINGS_IMPORT = 'settings_import',
+  DATA_SOURCE_CREATE = 'data_source_create',
+  DATA_SOURCE_UPDATE = 'data_source_update',
+  DATA_SOURCE_DELETE = 'data_source_delete',
+  DATA_SOURCE_FETCH = 'data_source_fetch',
   ERROR = 'error',
 }
 
@@ -341,6 +345,94 @@ export interface ChatModelsDTO {
     description: string;
     maxTokens: number;
   }[];
+}
+
+// ── Integrations: External REST Data Sources ──
+
+export type DataSourceAuthType = 'none' | 'bearer' | 'basic' | 'apiKey';
+
+export interface DataSourceAuthConfigDTO {
+  // bearer: { token: string }
+  // basic:  { username: string; password: string }
+  // apiKey: { key: string; value: string; addTo: 'header' | 'query' }
+  [key: string]: unknown;
+}
+
+export interface DataSourceDTO {
+  id: string;
+  name: string;
+  description?: string;
+  method: 'GET' | 'POST';
+  baseUrl: string;
+  path: string;
+  authType: DataSourceAuthType;
+  hasAuthSecret: boolean;
+  headers: Record<string, string>;
+  refreshInterval?: number;
+  lastFetchedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface FieldMetaDTO {
+  name: string;
+  type: 'number' | 'date' | 'boolean' | 'string';
+}
+
+export interface KpiSpecDTO {
+  title: string;
+  aggregation: 'count' | 'sum' | 'avg' | 'distinct';
+  field?: string;
+}
+
+export interface ChartSpecDTO {
+  type: 'line' | 'bar' | 'pie' | 'table';
+  title: string;
+  xField?: string;
+  yField?: string;
+  groupByField?: string;
+  limit?: number;
+}
+
+export interface VisualizationSpecDTO {
+  kpis: KpiSpecDTO[];
+  charts: ChartSpecDTO[];
+}
+
+export interface DataSourceFetchResultDTO {
+  dataSourceId: string;
+  recordCount: number;
+  fields: FieldMetaDTO[];
+  sample: Record<string, unknown>[];
+  vizSpec: VisualizationSpecDTO;
+  summary: string;
+  fetchedAt: string;
+}
+
+export interface CreateDataSourceRequestDTO {
+  name: string;
+  description?: string;
+  method: 'GET' | 'POST';
+  baseUrl: string;
+  path?: string;
+  headers?: Record<string, string>;
+  body?: Record<string, unknown>;
+  authType: DataSourceAuthType;
+  authConfig?: DataSourceAuthConfigDTO;
+  refreshInterval?: number;
+}
+
+export interface UpdateDataSourceRequestDTO {
+  name?: string;
+  description?: string;
+  method?: 'GET' | 'POST';
+  baseUrl?: string;
+  path?: string;
+  headers?: Record<string, string>;
+  body?: Record<string, unknown>;
+  authType?: DataSourceAuthType;
+  authConfig?: DataSourceAuthConfigDTO;
+  refreshInterval?: number;
 }
 
 // ── Theme (legacy type alias for convenience) ──

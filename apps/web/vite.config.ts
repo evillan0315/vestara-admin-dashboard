@@ -5,6 +5,10 @@ import { VitePWA } from 'vite-plugin-pwa';
 import { resolve } from 'path';
 
 export default defineConfig({
+  // Load .env from the monorepo root, where the shared config lives.
+  // Vite defaults envDir to the project root (apps/web), which has no .env,
+  // so without this the VITE_* variables are never picked up.
+  envDir: resolve(__dirname, '../../'),
   plugins: [
     react(),
     tailwindcss(),
@@ -100,27 +104,17 @@ export default defineConfig({
     },
   },
   server: {
+    host: true,
     port: 5173,
+    allowedHosts: [
+      'vestara.meetlily.org',
+    ],
     // Allow the dev server to read the repo-root `docs/` folder that the
     // documentation page imports at build time via `?raw` imports.
     fs: {
       allow: [resolve(__dirname, '../../..')],
     },
-    proxy: {
-      '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-        ws: true,
-      },
-      // Socket.IO mounts at `/socket.io` on the API server. The browser client
-      // resolves its origin from `VITE_API_URL` (the web origin when unset), so
-      // dev traffic to `/socket.io` must be proxied to the API just like `/api`.
-      '/socket.io': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-        ws: true,
-      },
-    },
+   
   },
   build: {
     outDir: 'dist',

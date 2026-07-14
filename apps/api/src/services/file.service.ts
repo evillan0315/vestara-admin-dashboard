@@ -3,7 +3,7 @@
 // ──────────────────────────────────────────────
 
 import { AuditAction } from '@vestara/types';
-import { StorageProvider } from '../../generated/prisma/client.js';
+import { StorageProvider } from '../generated/prisma/client.js';
 import { fileRepository, auditLogRepository, settingsRepository } from '../repositories/index.js';
 import { storageProviderFactory } from '../storage/factory.js';
 import type { StorageProviderConfig, StorageProviderConfigType } from '../storage/types.js';

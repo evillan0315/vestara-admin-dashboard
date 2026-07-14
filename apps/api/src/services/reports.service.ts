@@ -1,7 +1,7 @@
 // Reports service for Phase 20 - Report Generation with CSV/Excel/PDF export
 import { prisma } from '../utils/prisma.js';
-import { ReportType, ReportFormat, ReportStatus } from '../../generated/prisma/enums.js';
-import { Prisma } from '../../generated/prisma/client.js';
+import { ReportType, ReportFormat, ReportStatus } from '../generated/prisma/enums.js';
+import { Prisma } from '../generated/prisma/client.js';
 import { AuditAction } from '@vestara/types';
 import * as ExcelJS from 'exceljs';
 import PDFDocument from 'pdfkit';

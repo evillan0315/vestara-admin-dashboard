@@ -2,7 +2,7 @@
 // Storage Provider Types
 // ──────────────────────────────────────────────
 
-import type { StorageProvider as PrismaStorageProvider } from '../../generated/prisma/client.js';
+import type { StorageProvider as PrismaStorageProvider } from '../generated/prisma/client.js';
 
 // Prisma uses uppercase: LOCAL, CLOUDINARY, S3, GOOGLE_DRIVE
 export type StorageProviderType = PrismaStorageProvider;

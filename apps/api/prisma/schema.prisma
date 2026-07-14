@@ -4,7 +4,7 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -36,6 +36,7 @@ model Organization {
   files               File[]
   chatConversations   ChatConversation[]
   reports             Report[]
+  dataSources         DataSource[]
 
   @@map("organizations")
 }
@@ -64,6 +65,7 @@ model User {
   chatMessages      ChatMessage[]
   chatConversations ChatConversation[]
   createdReports    Report[]           @relation("ReportCreatedBy")
+  dataSources       DataSource[]       @relation("DataSourceCreatedBy")
 
   @@unique([provider, providerId])
   @@index([organizationId])
@@ -275,4 +277,33 @@ model ChatMessage {
   @@index([conversationId])
   @@index([createdAt])
   @@map("chat_messages")
+}
+
+// ── Integrations: External REST Data Sources ──
+
+model DataSource {
+  id             String   @id @default(uuid())
+  name           String
+  description    String?
+  method         String   @default("GET") // GET | POST
+  baseUrl        String
+  path           String   @default("")
+  headers        Json?    // Record<string, string>
+  body           Json?    // Request body for POST
+  authType       String   @default("none") // none | bearer | basic | apiKey
+  authConfig     Json?    // { token } | { username, password } | { key, value, addTo }
+  lastResult     Json?    // Cached last successful fetch + analysis
+  lastFetchedAt  DateTime?
+  refreshInterval Int?    // seconds
+  organizationId String
+  createdBy      String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization  Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdByUser User        @relation("DataSourceCreatedBy", fields: [createdBy], references: [id], onDelete: Restrict)
+
+  @@index([organizationId])
+  @@index([createdBy])
+  @@map("data_sources")
 }

@@ -7,8 +7,7 @@
     "module": "nodenext",
     "declaration": false,
     "declarationMap": false,
-    "composite": false,
-    "noEmit": true
+    "composite": false
   },
   "include": ["src/**/*.ts", "api/**/*.ts"],
   "exclude": ["node_modules", "dist"]

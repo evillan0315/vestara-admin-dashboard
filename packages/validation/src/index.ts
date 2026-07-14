@@ -179,6 +179,29 @@ export const bulkActionSchema = z.object({
   action: z.string().min(1),
 });
 
+// ── Integrations: External REST Data Sources ──
+
+const dataSourceAuthConfigSchema = z.record(z.unknown()).optional();
+
+export const createDataSourceSchema = z.object({
+  name: nameField('Name').max(100),
+  description: z.string().max(500, 'Description must be at most 500 characters').optional(),
+  method: z.enum(['GET', 'POST']).default('GET'),
+  baseUrl: z.string().url('Base URL must be a valid URL'),
+  path: z.string().max(500, 'Path must be at most 500 characters').optional(),
+  headers: z.record(z.string()).optional(),
+  body: z.record(z.unknown()).optional(),
+  authType: z.enum(['none', 'bearer', 'basic', 'apiKey']).default('none'),
+  authConfig: dataSourceAuthConfigSchema,
+  refreshInterval: z.number().int().min(0, 'Refresh interval must be non-negative').max(86400, 'Refresh interval must be at most 86400 seconds').optional(),
+});
+
+export const updateDataSourceSchema = createDataSourceSchema.partial();
+
+export const dataSourceIdParamSchema = z.object({
+  id: z.string().min(1, 'Data source ID is required'),
+});
+
 // ── Error Formatting ─────────────────────────
 
 export interface FormattedValidationError {
@@ -226,3 +249,5 @@ export type CreateOrganizationInput = z.infer<typeof createOrganizationSchema>;
 export type UpdateOrganizationInput = z.infer<typeof updateOrganizationSchema>;
 export type OrganizationIdParamInput = z.infer<typeof organizationIdParamSchema>;
 export type OnboardInput = z.infer<typeof onboardSchema>;
+export type CreateDataSourceInput = z.infer<typeof createDataSourceSchema>;
+export type UpdateDataSourceInput = z.infer<typeof updateDataSourceSchema>;

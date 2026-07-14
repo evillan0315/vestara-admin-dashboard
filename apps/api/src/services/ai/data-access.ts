@@ -1,5 +1,5 @@
 import { userRepository, auditLogRepository, settingsRepository, fileRepository, organizationRepository, chatRepository } from '../../repositories/index.js';
-import type { UserRole } from '../../../generated/prisma/client.js';
+import type { UserRole } from '../../generated/prisma/client.js';
 
 /**
  * Data Access Layer for AI Assistant

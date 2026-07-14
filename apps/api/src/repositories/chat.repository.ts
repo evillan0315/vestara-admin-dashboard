@@ -1,5 +1,5 @@
 import { BaseRepository } from './base.repository.js';
-import type { Prisma } from '../../generated/prisma/client.js';
+import type { Prisma } from '../generated/prisma/client.js';
 
 export interface CreateConversationData {
   title: string;

@@ -13,6 +13,7 @@ import chatRouter from './chat.js';
 import docsRouter from './docs.js';
 import reportsRouter from './reports.js';
 import websocketRouter from './websocket.js';
+import agentRouter from './agent.js';
 
 const router = Router();
 
@@ -35,6 +36,7 @@ router.use('/upload', uploadRouter);
 router.use('/files', filesRouter);
 router.use('/chat', chatRouter);
 router.use('/reports', reportsRouter);
+router.use('/integrations', agentRouter);
 router.use('/ws', websocketRouter);
 
 // Documentation
