@@ -70,7 +70,6 @@ export default function Header({
         bgcolor: alpha(background.default, 0.85),
         backdropFilter: "blur(10px)",
         borderBottom: `1px solid ${divider}`,
-        px: { xs: 2, sm: 3.5 },
         py: 2.25,
         display: "flex",
         alignItems: "center",
@@ -79,24 +78,31 @@ export default function Header({
       }}
     >
       <Box
-        sx={{ display: "flex", alignItems: "center", gap: 1.5, minWidth: 0 }}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1.5,
+          minWidth: 0,
+          pl: { xs: 2, sm: 0 },
+        }}
       >
+        {/* Mobile hamburger — flush left */}
         <IconButton
           color="inherit"
           aria-label="open drawer"
           edge="start"
           onClick={onMenuToggle}
-          sx={{ mr: 0.5, display: { lg: "none" }, color: text.primary }}
+          sx={{ mr: 0.5, display: { lg: "none" }, color: text.primary, ml: { xs: 0, sm: 0 } }}
         >
           <Menu size={22} />
         </IconButton>
 
+        {/* Desktop collapse button — aligned with sidebar edge */}
         <IconButton
           color="inherit"
           aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           onClick={toggleSidebar}
           sx={{
-            mr: 0.5,
             display: { xs: "none", lg: "inline-flex" },
             color: text.primary,
             transition: "transform .2s ease",
@@ -138,7 +144,7 @@ export default function Header({
 
       {/* Removed search box and date range picker from here */}
 
-      <Box sx={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 1.5 }}>
+      <Box sx={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 1.5, pr: { xs: 2, sm: 3.5 } }}>
         {isAuthenticated ? (
           <>
             <HeaderActions

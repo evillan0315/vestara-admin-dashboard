@@ -400,6 +400,10 @@ export function PreferencesTab({ profile }: PreferencesTabProps) {
   const onSidebarVariantChange = (v: 'default' | 'compact' | 'hidden') => {
     setSidebarVariant(v);
     themeCtx.setSidebarVariant(v);
+    // Compact is already icon-only mode, so uncollapse if collapsed
+    if (v === 'compact' && themeCtx.sidebarCollapsed) {
+      themeCtx.setSidebarCollapsed(false);
+    }
   };
 
   return (

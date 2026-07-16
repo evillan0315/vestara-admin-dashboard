@@ -68,8 +68,9 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element | null {
   const navItemSx = (item: NavItem, active: boolean) => ({
     display: 'flex',
     alignItems: 'center',
-    gap: cfg.iconOnly ? 0 : 1.5,
-    px: cfg.iconOnly ? 1.25 : 1.25,
+    justifyContent: cfg.iconOnly ? 'center' : 'flex-start',
+    gap: cfg.iconOnly ? 0 : 1.75,
+    px: cfg.iconOnly ? 0.5 : 1.75,
     py: cfg.iconOnly ? 1 : 1,
     borderRadius: `${Math.round(10 * cfg.borderRadiusScale)}px`,
     cursor: item.soon ? 'default' : 'pointer',
@@ -153,7 +154,7 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element | null {
         sx={{
           flex: 1,
           overflowY: 'auto',
-          px: cfg.iconOnly ? 0.75 : 1.75,
+          px: cfg.iconOnly ? 0.5 : 1.75,
           pb: 2,
         }}
       >
