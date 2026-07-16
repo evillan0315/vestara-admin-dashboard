@@ -1,11 +1,12 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
   Grid,
-  Paper,
   styled,
-  Skeleton,
+  Chip,
+  Button,
   useTheme,
 } from '@mui/material';
 import { LineChart, PieChart, BarChart } from '@mui/x-charts';
@@ -14,17 +15,22 @@ import {
   CheckCircle as CheckCircleIcon,
   Settings as SettingsIcon,
   Assessment as AssessmentIcon,
+  TrendingUp as TrendingUpIcon,
+  PersonAdd as PersonAddIcon,
+  UploadFile as UploadFileIcon,
+  AssessmentOutlined as ReportIcon,
+  SmartToy as ChatIcon,
+  NavigateNext as NavigateNextIcon,
 } from '@mui/icons-material';
+import { ChartCard, ChartSkeleton, EmptyChart } from '../components/charts';
 import { StatCard } from '../components/data/StatCard';
 import { ActivityFeed } from '../components/data/ActivityFeed';
 import { useUsers } from '../features/users/hooks';
 import { useSettings } from '../features/settings/hooks';
 import { useAuditLogs } from '../features/audit-logs/hooks';
-import { useAuth } from '../features/auth/AuthContext';
 import { useLiveDashboard } from '../features/realtime/useLiveDashboard';
 import LiveBadge from '../features/realtime/LiveBadge';
 import { ReportsDashboardWidget } from '../features/reports/components/ReportsDashboardWidget';
-import { useOrganization } from '../features/organizations/hooks';
 import { DateRangePicker, useDateRange } from '../features/calendar';
 import {
   toActivityItem,
@@ -34,7 +40,6 @@ import {
   useAuditCount,
   getPreviousRange,
   actionLabelLookup,
-  entityLabelLookup,
 } from '../features/analytics';
 
 const DashboardContainer = styled(Box)(() => ({
@@ -43,68 +48,86 @@ const DashboardContainer = styled(Box)(() => ({
   gap: 24,
 }));
 
-const WelcomeSection = styled(Box)(({ theme }) => ({
-  marginBottom: theme.spacing(1),
-}));
-
-const StatsGrid = styled(Grid)(() => ({
-  '& .MuiGrid-item': {
-    display: 'flex',
-  },
-}));
-
-const ChartCard = styled(Paper)(({ theme }) => ({
-  borderRadius: 12,
-  border: `1px solid ${theme.palette.divider}`,
-  boxShadow: 'none',
-  padding: theme.spacing(2),
-  [theme.breakpoints.up('sm')]: {
-    padding: theme.spacing(3),
-  },
-  height: '100%',
-}));
-
-const ChartTitleRow = styled(Box)({
+const PresetRow = styled(Box)(() => ({
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: 12,
-  marginBottom: 8,
-});
+  gap: 8,
+  '& .MuiChip-root': {
+    fontWeight: 600,
+    fontSize: '0.75rem',
+  },
+}));
 
-function ChartSkeleton({ height = 280 }: { height?: number }) {
-  return <Skeleton variant="rectangular" height={height} sx={{ borderRadius: 2 }} />;
+const RANGE_PRESETS = [7, 14, 30, 90] as const;
+
+// ── Quick Action Card ──────────────────────────────
+
+const QUICK_ACTIONS = [
+  { label: 'Create User', icon: <PersonAddIcon />, path: '/users', color: 'primary' as const },
+  { label: 'Upload File', icon: <UploadFileIcon />, path: '/files', color: 'warning' as const },
+  { label: 'Generate Report', icon: <ReportIcon />, path: '/reports', color: 'info' as const },
+  { label: 'Open AI Chat', icon: <ChatIcon />, path: '/chat', color: 'secondary' as const },
+];
+
+function QuickActionsCard() {
+  const navigate = useNavigate();
+  return (
+    <ChartCard title="Quick Actions" subtitle="Common tasks">
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1 }}>
+        {QUICK_ACTIONS.map((action) => (
+          <Button
+            key={action.path}
+            variant="outlined"
+            color={action.color}
+            size="small"
+            startIcon={action.icon}
+            endIcon={<NavigateNextIcon />}
+            onClick={() => navigate(action.path)}
+            sx={{ justifyContent: 'flex-start', textTransform: 'none', fontWeight: 600 }}
+          >
+            {action.label}
+          </Button>
+        ))}
+      </Box>
+    </ChartCard>
+  );
 }
 
-function EmptyChart({ height = 280 }: { height?: number }) {
+// ── Inline Sparkline ──────────────────────────────
+
+function SparklineBar({ values, color }: { values: number[]; color: string }) {
+  if (values.length === 0) return null;
+  const max = Math.max(...values, 1);
   return (
-    <Box
-      sx={{
-        height,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'text.secondary',
-      }}
-    >
-      <Typography variant="body2">No activity in this period</Typography>
+    <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: '1px', height: 28, mt: 0.5 }}>
+      {values.slice(-14).map((v, i) => (
+        <Box
+          key={i}
+          sx={{
+            flex: 1,
+            height: `${(v / max) * 100}%`,
+            minHeight: 2,
+            borderRadius: '1px 1px 0 0',
+            bgcolor: color,
+            opacity: 0.6,
+            transition: 'opacity 0.2s',
+            '&:hover': { opacity: 1 },
+          }}
+        />
+      ))}
     </Box>
   );
 }
 
-// ── Page ──────────────────────────────────────────────
+// ── Page ──────────────────────────────────────────
 
 export function DashboardPage() {
   const theme = useTheme();
-  const { user } = useAuth();
+  const navigate = useNavigate();
   const { range: dateRange, rangeDays, setRange } = useDateRange();
 
   // Refresh dashboard data in real time as org-scoped audit events arrive.
   useLiveDashboard();
-
-  // Fetch the current organization to display its name (not the raw id).
-  const organizationQuery = useOrganization(user?.organizationId ?? '');
-  const organizationName = organizationQuery.data?.name;
 
   const usersAll = useUsers({ perPage: 1 });
   const usersActive = useUsers({ perPage: 1, isActive: true });
@@ -136,37 +159,67 @@ export function DashboardPage() {
 
   const daily = useDailySeries(logs, rangeDays, endDate);
   const byAction = useDistribution(logs, (l) => l.action, actionLabelLookup, 6);
-  const byEntity = useDistribution(logs, (l) => l.entity, entityLabelLookup);
 
   const chartsLoading = analytics.loading;
 
+  // ── Chart click handlers ──────────────────────
+  const handlePieClick = useCallback(
+    (_event: unknown, _item: { dataIndex?: number }) => {
+      navigate('/users');
+    },
+    [navigate],
+  );
+
+  const handleActionBarClick = useCallback(
+    (_event: unknown, _item: { dataIndex?: number }) => {
+      // Navigate to system logs page for deeper inspection
+      navigate('/system-logs');
+    },
+    [navigate],
+  );
+
   return (
     <DashboardContainer>
-      <WelcomeSection>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', mb: 1 }}>
-          <Box>
+      {/* ── Header ────────────────────────── */}
+      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, flexWrap: 'wrap' }}>
+        <Box sx={{ flex: 1, minWidth: 220 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             <Typography variant="h4" fontWeight={700}>
               Dashboard
             </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>
-              Welcome back! Here's what's happening with your platform.
-            </Typography>
+            <LiveBadge />
           </Box>
-          {user?.organizationId && (
-            <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              <LiveBadge />
-              <DateRangePicker dateRange={dateRange} onDateRangeChange={setRange} />
-              {organizationName && (
-                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                  Organization: {organizationName}
-                </Typography>
-              )}
-            </Box>
-          )}
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>
+            Welcome back! Here's what's happening with your platform.
+          </Typography>
         </Box>
-      </WelcomeSection>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+          <PresetRow>
+            {RANGE_PRESETS.map((days) => (
+              <Chip
+                key={days}
+                label={`${days}d`}
+                size="small"
+                variant={rangeDays === days ? 'filled' : 'outlined'}
+                color={rangeDays === days ? 'primary' : 'default'}
+                onClick={() => {
+                  const end = new Date();
+                  end.setHours(23, 59, 59, 999);
+                  const start = new Date();
+                  start.setDate(start.getDate() - (days - 1));
+                  start.setHours(0, 0, 0, 0);
+                  setRange({ startDate: start.toISOString(), endDate: end.toISOString() });
+                }}
+                sx={{ cursor: 'pointer' }}
+              />
+            ))}
+          </PresetRow>
+          <DateRangePicker dateRange={dateRange} onDateRangeChange={setRange} />
+        </Box>
+      </Box>
 
-      <StatsGrid container spacing={3}>
+      {/* ── KPI Stats ──────────────────────── */}
+      <Grid container spacing={3}>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
             title="Total Users"
@@ -205,32 +258,79 @@ export function DashboardPage() {
             loading={chartsLoading}
           />
         </Grid>
-      </StatsGrid>
+      </Grid>
 
+      {/* ── Trend sparklines row ────────────── */}
+      {!chartsLoading && daily.values.length > 0 && (
+        <Grid container spacing={3}>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+            <ChartCard sx={{ p: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                <TrendingUpIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                <Typography variant="caption" fontWeight={600} color="text.secondary">
+                  Activity Trend ({rangeDays}d)
+                </Typography>
+              </Box>
+              <SparklineBar values={daily.values} color={theme.palette.primary.main} />
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                {daily.values.reduce((a, b) => a + b, 0)} total events
+              </Typography>
+            </ChartCard>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+            <ChartCard sx={{ p: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                <CheckCircleIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                <Typography variant="caption" fontWeight={600} color="text.secondary">
+                  User Composition
+                </Typography>
+              </Box>
+              <Typography variant="h5" fontWeight={700}>
+                {activeUsers}
+                <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 0.5 }}>
+                  / {totalUsers} active
+                </Typography>
+              </Typography>
+              <Box
+                sx={{
+                  height: 8,
+                  borderRadius: 4,
+                  bgcolor: 'action.hover',
+                  overflow: 'hidden',
+                  mt: 1,
+                }}
+              >
+                <Box
+                  sx={{
+                    height: '100%',
+                    width: `${totalUsers > 0 ? (activeUsers / totalUsers) * 100 : 0}%`,
+                    borderRadius: 4,
+                    bgcolor: theme.palette.success.main,
+                    transition: 'width 0.3s ease',
+                  }}
+                />
+              </Box>
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                {totalUsers > 0 ? `${Math.round((activeUsers / totalUsers) * 100)}% active` : 'No users'}
+              </Typography>
+            </ChartCard>
+          </Grid>
+        </Grid>
+      )}
+
+      {/* ── Audit Activity + Recent Activity ── */}
       <Grid container spacing={3}>
         {/* Analytics time-series */}
         <Grid size={{ xs: 12, lg: 8 }}>
-          <ChartCard>
-            <ChartTitleRow>
-              <Box>
-                <Typography variant="h6" fontWeight={600}>
-                  Audit Activity
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Events per day across the selected period
-                </Typography>
-              </Box>
-              <Box
-                sx={{
-                  fontSize: 12.5,
-                  fontWeight: 600,
-                  color: 'text.secondary',
-                  px: 1,
-                }}
-              >
+          <ChartCard
+            title="Audit Activity"
+            subtitle="Events per day across the selected period"
+            action={
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
                 Last {rangeDays} {rangeDays === 1 ? 'day' : 'days'}
-              </Box>
-            </ChartTitleRow>
+              </Typography>
+            }
+          >
             {chartsLoading ? (
               <ChartSkeleton height={300} />
             ) : (
@@ -257,16 +357,11 @@ export function DashboardPage() {
         </Grid>
       </Grid>
 
+      {/* ── Charts Row ──────────────────────── */}
       <Grid container spacing={3}>
-        {/* User status distribution */}
+        {/* User status distribution — click to navigate */}
         <Grid size={{ xs: 12, md: 4 }}>
-          <ChartCard>
-            <Typography variant="h6" fontWeight={600} gutterBottom>
-              User Status
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              Active vs. inactive accounts
-            </Typography>
+          <ChartCard title="User Status" subtitle="Click to manage users">
             {usersAll.isLoading || usersActive.isLoading ? (
               <ChartSkeleton height={240} />
             ) : (
@@ -291,20 +386,15 @@ export function DashboardPage() {
                 slotProps={{
                   legend: { direction: 'horizontal', position: { vertical: 'bottom', horizontal: 'center' } },
                 }}
+                onItemClick={handlePieClick}
               />
             )}
           </ChartCard>
         </Grid>
 
-        {/* Activity by action type */}
+        {/* Activity by action type — click to inspect */}
         <Grid size={{ xs: 12, md: 4 }}>
-          <ChartCard>
-            <Typography variant="h6" fontWeight={600} gutterBottom>
-              Activity by Action
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              Most frequent audit actions
-            </Typography>
+          <ChartCard title="Activity by Action" subtitle="Click to inspect in System Logs">
             {chartsLoading ? (
               <ChartSkeleton height={240} />
             ) : byAction.length === 0 ? (
@@ -313,39 +403,25 @@ export function DashboardPage() {
               <BarChart
                 layout="horizontal"
                 height={260}
-                series={[{ data: byAction.map((entry) => entry.value), color: theme.palette.primary.main }]}
+                series={[
+                  {
+                    data: byAction.map((entry) => entry.value),
+                    color: theme.palette.primary.main,
+                    highlightScope: { highlight: 'item', fade: 'global' },
+                  },
+                ]}
                 yAxis={[{ scaleType: 'band', data: byAction.map((entry) => entry.label) }]}
                 xAxis={[{ min: 0 }]}
                 margin={{ top: 8, right: 24, bottom: 24, left: 100 }}
+                onItemClick={handleActionBarClick}
               />
             )}
           </ChartCard>
         </Grid>
 
-        {/* Activity by entity */}
+        {/* Quick Actions */}
         <Grid size={{ xs: 12, md: 4 }}>
-          <ChartCard>
-            <Typography variant="h6" fontWeight={600} gutterBottom>
-              Activity by Entity
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              Events grouped by affected entity
-            </Typography>
-            {chartsLoading ? (
-              <ChartSkeleton height={240} />
-            ) : byEntity.length === 0 ? (
-              <EmptyChart height={260} />
-            ) : (
-              <BarChart
-                layout="horizontal"
-                height={260}
-                series={[{ data: byEntity.map((entry) => entry.value), color: theme.palette.secondary.main }]}
-                yAxis={[{ scaleType: 'band', data: byEntity.map((entry) => entry.label) }]}
-                xAxis={[{ min: 0 }]}
-                margin={{ top: 8, right: 24, bottom: 24, left: 100 }}
-              />
-            )}
-          </ChartCard>
+          <QuickActionsCard />
         </Grid>
 
         {/* Reports Overview Widget */}

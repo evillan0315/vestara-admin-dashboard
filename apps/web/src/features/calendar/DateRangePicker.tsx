@@ -66,7 +66,9 @@ export function DateRangePicker({ dateRange, onDateRangeChange }: DateRangePicke
             value={dateRange}
             onChange={(range) => {
               onDateRangeChange(range);
-              setAnchorEl(null);
+              // Don't close on every change — the calendar needs two clicks
+              // to complete a range (start + end). The popover closes when
+              // the user clicks outside or presses Escape.
             }}
           />
         </Box>

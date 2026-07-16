@@ -49,13 +49,15 @@ export interface AuditActivity {
   daily: DailySeries;
   byAction: DistributionEntry[];
   byEntity: DistributionEntry[];
+  /** Top users by activity count */
+  byUser: DistributionEntry[];
   total: number;
   loading: boolean;
 }
 
 /**
- * Aggregates audit logs within a window into the daily time-series and
- * action/entity distributions used by the dashboard and analytics charts.
+ * Aggregates audit logs within a window into the daily time-series,
+ * action/entity distributions, and top-user distribution.
  */
 export function useAuditActivity(startDate: string, endDate: string, rangeDays: number): AuditActivity {
   const query = useAuditLogsRange(startDate, endDate);
@@ -81,13 +83,67 @@ export function useAuditActivity(startDate: string, endDate: string, rangeDays: 
       ),
     [logs],
   );
+  const byUser = useMemo(
+    () =>
+      buildDistribution(
+        logs,
+        (l) => l.userName || 'System',
+        (k) => k,
+        8,
+      ),
+    [logs],
+  );
 
   return {
     logs,
     daily,
     byAction,
     byEntity,
+    byUser,
     total: logs.length,
     loading: query.isLoading,
+  };
+}
+
+// ── Dual-Period Hooks ─────────────────────────────
+
+export interface DualAuditSeries {
+  /** Current period daily series */
+  current: DailySeries;
+  /** Previous period daily series */
+  previous: DailySeries;
+  /** Loading state (true while either is loading) */
+  loading: boolean;
+}
+
+/**
+ * Fetches audit logs for both the current and previous equal-length windows,
+ * returning two daily series suitable for overlay comparison charts.
+ */
+export function useDualAuditActivity(
+  startDate: string,
+  endDate: string,
+  rangeDays: number,
+): DualAuditSeries {
+  const currentQuery = useAuditLogsRange(startDate, endDate);
+  const prevRange = useMemo(() => getPreviousRange(rangeDays, endDate), [rangeDays, endDate]);
+  const previousQuery = useAuditLogsRange(prevRange.startDate, prevRange.endDate);
+
+  const currentLogs = currentQuery.data ?? [];
+  const previousLogs = previousQuery.data ?? [];
+
+  const current = useMemo(
+    () => buildDailySeries(currentLogs, rangeDays, endDate),
+    [currentLogs, rangeDays, endDate],
+  );
+  const previous = useMemo(
+    () => buildDailySeries(previousLogs, rangeDays, prevRange.endDate),
+    [previousLogs, rangeDays, prevRange.endDate],
+  );
+
+  return {
+    current,
+    previous,
+    loading: currentQuery.isLoading || previousQuery.isLoading,
   };
 }
