@@ -535,14 +535,20 @@ For every task:
 * Dashboard reports with configurable date ranges
 * **CSV export** — server-side generation with streaming
 * **Excel export** — `.xlsx` generation (using exceljs)
-* **PDF generation** — server-side PDF (using pdfkit)
+* **PDF generation** — server-side PDF (using pdfkit) with org logo branding
 * Reusable export button/hook for DataTable components
-* Scheduled report generation (via BullMQ background jobs) - *pending*
-* Report templates with saved configurations - *pending*
+* Scheduled report generation (cron expression + email delivery)
+* Report templates with saved configurations
+* Column selection per report type
+* Report comparison (side-by-side)
+* Inline data preview (first 10 rows)
+* Real-time status updates via WebSocket
+* Dashboard reports widget
+* Row selection + bulk actions
 
 **Implementation Details:**
-* **Backend:** Full report generation API at `/api/v1/reports` with async job processing. Supports 4 report types: audit-logs, users, activity, system-logs. Org-scoped data access with filters (date range, action, entity, user).
-* **Frontend:** ReportsPage at `/reports` with DataTable showing report history, generate dialog with type/format/date filters, download button, delete action. Added to navigation sidebar under "OPERATIONS" group. TanStack Query hooks for all operations.
+* **Backend:** Full report generation API at `/api/v1/reports` with async job processing. Supports 4 report types: audit-logs, users, activity, system-logs. Org-scoped data access with filters (date range, action, entity, user). Added search/sort to list endpoint, stats endpoint, column definitions endpoint, preview endpoint, templates CRUD, comparison endpoint. WebSocket `report:status` events broadcast on status changes. PDF generation accepts org logo URL for branding.
+* **Frontend:** ReportsPage at `/reports` with DataTable showing report history, generate dialog with type/format/date filters, download button, delete action. Added to navigation sidebar under "OPERATIONS" group. TanStack Query hooks for all operations. MUI-ified generate dialog with date preset chips (Today/This Week/This Month/Last Month/Last 90 Days/Custom), column picker, schedule and email fields. Templates tab with card grid and CRUD dialog. Compare dialog with side-by-side attribute table. Dashboard widget showing stats and recent reports.
 * **Dependencies:** Added exceljs, pdfkit, csv-writer packages
 
 ---

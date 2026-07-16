@@ -1,11 +1,13 @@
 import { useState, useCallback, useMemo } from 'react';
 import type { SortState, PaginationState } from '../../../components/data/DataTable';
-import { useReports, useGenerateReport, useDownloadReport, useDeleteReport } from '../hooks';
+import { useReports, useGenerateReport, useDownloadReport, useDeleteReport, useReportStats } from '../hooks';
 import type { Report, ReportParams } from '../../../api/reports';
 import { useToast } from '../../../components/feedback/Toast';
+import { useConfirm } from '../../../hooks/useConfirm';
 
 export function useReportsPage() {
   const { showSuccess, showError } = useToast();
+  const { confirm } = useConfirm();
 
   const [sort, setSort] = useState<SortState>({ field: 'createdAt', direction: 'desc' });
   const [page, setPage] = useState(1);
@@ -16,20 +18,35 @@ export function useReportsPage() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [menuReport, setMenuReport] = useState<Report | null>(null);
 
-  const { data, isLoading, isError, error, refetch } = useReports({ page, perPage });
+  const query = useReports({
+    page,
+    perPage,
+    search: search || undefined,
+    sortField: sort.field,
+    sortDirection: sort.direction,
+  });
+
+  const statsQuery = useReportStats();
   const generateMutation = useGenerateReport();
   const downloadMutation = useDownloadReport();
   const deleteMutation = useDeleteReport();
 
-  const reports = data?.data?.reports ?? [];
-  const paginationMeta = data?.meta;
+  type ApiData<T> = { success: boolean; data?: T; meta?: { page: number; perPage: number; total: number } };
+  const response = query.data as ApiData<Report[]> | undefined;
+  const statsResponse = statsQuery.data as ApiData<{ total: number; completed: number; generating: number; failed: number }> | undefined;
+
+  const { isLoading, isError, error } = query;
+  const refetch = query.refetch;
+
+  const reports: Report[] = response?.data ?? [];
+  const paginationMeta = response?.meta;
 
   const stats = useMemo(() => ({
-    total: data?.meta?.total ?? 0,
-    completed: reports.filter((r) => r.status === 'completed').length,
-    inProgress: reports.filter((r) => r.status === 'generating' || r.status === 'pending').length,
-    failed: reports.filter((r) => r.status === 'failed').length,
-  }), [reports, data?.meta?.total]);
+    total: statsResponse?.data?.total ?? paginationMeta?.total ?? 0,
+    completed: statsResponse?.data?.completed ?? 0,
+    inProgress: statsResponse?.data?.generating ?? 0,
+    failed: statsResponse?.data?.failed ?? 0,
+  }), [statsResponse, paginationMeta]);
 
   const paginationState: PaginationState | undefined = paginationMeta
     ? { page: paginationMeta.page, perPage: paginationMeta.perPage, total: paginationMeta.total }
@@ -50,7 +67,7 @@ export function useReportsPage() {
   }, []);
 
   const handleGenerate = useCallback(
-    async (params: ReportParams, type: 'audit_logs' | 'system_logs' | 'users' | 'activity') => {
+    async (params: ReportParams, type: Report['type']) => {
       try {
         await generateMutation.mutateAsync({ params, type });
         showSuccess('Report generation started');
@@ -68,8 +85,9 @@ export function useReportsPage() {
         const blob = await downloadMutation.mutateAsync(report.id);
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
+        const ext = report.format === 'csv' ? 'csv' : report.format === 'excel' ? 'xlsx' : 'pdf';
         a.href = url;
-        a.download = `${report.name || 'report'}.${report.format}`;
+        a.download = `${report.name || 'report'}.${ext}`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -117,6 +135,26 @@ export function useReportsPage() {
     }
   }, [menuReport, handleMenuClose]);
 
+  // Bulk delete
+  const handleBulkDelete = useCallback(
+    async (selected: Report[]) => {
+      const confirmed = await confirm({
+        title: 'Delete Reports',
+        message: `Are you sure you want to delete ${selected.length} report(s)? This action cannot be undone.`,
+        confirmText: 'Delete',
+        variant: 'danger',
+      });
+      if (!confirmed) return;
+      try {
+        await Promise.all(selected.map((r) => deleteMutation.mutateAsync(r.id)));
+        showSuccess(`Deleted ${selected.length} report(s)`);
+      } catch (err) {
+        showError(err instanceof Error ? err.message : 'Bulk delete failed');
+      }
+    },
+    [deleteMutation, showSuccess, showError, confirm],
+  );
+
   return {
     sort,
     page,
@@ -146,6 +184,7 @@ export function useReportsPage() {
     handleMenuClose,
     handleDownloadClick,
     handleDeleteClick,
+    handleBulkDelete,
     setGenerateDialogOpen,
     setDeleteTarget,
     setPerPage,

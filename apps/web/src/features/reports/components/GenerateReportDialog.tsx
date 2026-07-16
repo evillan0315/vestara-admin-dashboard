@@ -1,175 +1,307 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  TextField,
+  MenuItem,
   Grid,
   Typography,
+  Chip,
+  Box,
+  IconButton,
+  CircularProgress,
 } from '@mui/material';
-import { Assessment as AssessmentIcon } from '@mui/icons-material';
-import type { ReportParams } from '../../../api/reports';
+import {
+  Assessment as AssessmentIcon,
+  Close as CloseIcon,
+} from '@mui/icons-material';
+import { useAvailableColumns } from '../hooks';
+import type { Report, ReportParams } from '../../../api/reports';
 
 interface GenerateReportDialogProps {
   open: boolean;
   onClose: () => void;
-  onGenerate: (params: ReportParams, type: 'audit_logs' | 'system_logs' | 'users' | 'activity') => void;
+  onGenerate: (params: ReportParams, type: Report['type']) => void;
   generating: boolean;
 }
 
+const REPORT_TYPES: { value: Report['type']; label: string }[] = [
+  { value: 'audit_logs', label: 'Audit Logs' },
+  { value: 'system_logs', label: 'System Logs' },
+  { value: 'users', label: 'Users' },
+  { value: 'activity', label: 'Activity' },
+];
+
+const FORMATS: { value: Report['format']; label: string }[] = [
+  { value: 'csv', label: 'CSV' },
+  { value: 'excel', label: 'Excel (.xlsx)' },
+  { value: 'pdf', label: 'PDF' },
+];
+
+const PRESETS = [
+  { label: 'Today', days: 0 },
+  { label: 'This Week', days: 7 },
+  { label: 'This Month', days: 30 },
+  { label: 'Last Month', days: 60 },
+  { label: 'Last 90 Days', days: 90 },
+];
+
+function formatDate(d: Date): string {
+  return d.toISOString().slice(0, 10);
+}
+
 export function GenerateReportDialog({ open, onClose, onGenerate, generating }: GenerateReportDialogProps) {
-  const [formData, setFormData] = useState<ReportParams & { type: 'audit_logs' | 'system_logs' | 'users' | 'activity'; name: string }>({
-    startDate: '',
-    endDate: '',
-    type: 'audit_logs',
-    format: 'csv',
-    name: '',
-  });
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [type, setType] = useState<Report['type']>('audit_logs');
+  const [format, setFormat] = useState<Report['format']>('csv');
+  const [preset, setPreset] = useState(30);
+  const [customStart, setCustomStart] = useState('');
+  const [customEnd, setCustomEnd] = useState('');
+  const [showCustom, setShowCustom] = useState(false);
+  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
+  const [schedule, setSchedule] = useState('');
+  const [emailTo, setEmailTo] = useState('');
+
+  const { data: columnsData } = useAvailableColumns(type);
+  type ColumnDef = { id: string; label: string };
+  const availableColumns: ColumnDef[] = (columnsData as { data?: ColumnDef[] } | undefined)?.data ?? [];
+
+  // Initialize columns on type change
+  useEffect(() => {
+    if (availableColumns.length > 0 && selectedColumns.length === 0) {
+      setSelectedColumns(availableColumns.map((c) => c.id));
+    }
+  }, [type, availableColumns.length]);
+
+  const toggleColumn = (colId: string) => {
+    setSelectedColumns((prev) =>
+      prev.includes(colId) ? prev.filter((c) => c !== colId) : [...prev, colId],
+    );
+  };
+
+  const selectAllColumns = () => {
+    setSelectedColumns(availableColumns.map((c) => c.id));
+  };
+
+  const handlePresetClick = (days: number) => {
+    setPreset(days);
+    setShowCustom(false);
+  };
+
+  const getDateRange = (): { startDate: string; endDate: string } => {
+    if (showCustom && customStart && customEnd) {
+      return { startDate: customStart, endDate: customEnd };
+    }
+    const end = new Date();
+    const start = new Date();
+    start.setDate(start.getDate() - preset);
+    return { startDate: formatDate(start), endDate: formatDate(end) };
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const { type, ...params } = formData;
-    onGenerate(params as ReportParams, type);
+    const range = getDateRange();
+    onGenerate(
+      {
+        name: name || undefined,
+        description: description || undefined,
+        ...range,
+        format,
+        selectedColumns: selectedColumns.length < availableColumns.length ? selectedColumns : undefined,
+        schedule: schedule || undefined,
+        emailTo: emailTo || undefined,
+      },
+      type,
+    );
   };
 
+  const canSubmit = generating || (!showCustom && true) || (showCustom && !!customStart && !!customEnd);
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>Generate Report</DialogTitle>
+    <Dialog open={open} onClose={generating ? undefined : onClose} maxWidth="md" fullWidth>
+      <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Typography variant="h6" fontWeight={700}>
+          Generate Report
+        </Typography>
+        <IconButton size="small" onClick={onClose} disabled={generating}>
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
       <form onSubmit={handleSubmit}>
-        <DialogContent dividers>
-          <Grid container spacing={3} sx={{ pt: 1 }}>
+        <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          {/* Basic Info */}
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                label="Report Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g., Monthly Audit Report"
+                fullWidth
+                size="small"
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                label="Description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Optional description"
+                fullWidth
+                size="small"
+              />
+            </Grid>
+            <Grid size={{ xs: 6, md: 3 }}>
+              <TextField
+                select
+                label="Type"
+                value={type}
+                onChange={(e) => setType(e.target.value as Report['type'])}
+                fullWidth
+                size="small"
+              >
+                {REPORT_TYPES.map((t) => (
+                  <MenuItem key={t.value} value={t.value}>
+                    {t.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid size={{ xs: 6, md: 3 }}>
+              <TextField
+                select
+                label="Format"
+                value={format}
+                onChange={(e) => setFormat(e.target.value as Report['format'])}
+                fullWidth
+                size="small"
+              >
+                {FORMATS.map((f) => (
+                  <MenuItem key={f.value} value={f.value}>
+                    {f.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            {/* Date Range */}
             <Grid size={12}>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                Report Configuration
+              <Typography variant="body2" fontWeight={600} gutterBottom>
+                Date Range
               </Typography>
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
+                {PRESETS.map((p) => (
+                  <Chip
+                    key={p.days}
+                    label={p.label}
+                    onClick={() => handlePresetClick(p.days)}
+                    color={!showCustom && preset === p.days ? 'primary' : 'default'}
+                    variant={!showCustom && preset === p.days ? 'filled' : 'outlined'}
+                    size="small"
+                  />
+                ))}
+                <Chip
+                  label="Custom"
+                  onClick={() => setShowCustom(true)}
+                  color={showCustom ? 'primary' : 'default'}
+                  variant={showCustom ? 'filled' : 'outlined'}
+                  size="small"
+                />
+              </Box>
+              {showCustom && (
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 6 }}>
+                    <TextField
+                      type="date"
+                      label="Start Date"
+                      value={customStart}
+                      onChange={(e) => setCustomStart(e.target.value)}
+                      fullWidth
+                      size="small"
+                      InputLabelProps={{ shrink: true }}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 6 }}>
+                    <TextField
+                      type="date"
+                      label="End Date"
+                      value={customEnd}
+                      onChange={(e) => setCustomEnd(e.target.value)}
+                      fullWidth
+                      size="small"
+                      InputLabelProps={{ shrink: true }}
+                    />
+                  </Grid>
+                </Grid>
+              )}
             </Grid>
+
+            {/* Column Selection */}
             <Grid size={12}>
-              <label style={{ display: 'block', marginBottom: 8 }}>
-                <Typography variant="body2" fontWeight={500}>
-                  Report Name
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
+                <Typography variant="body2" fontWeight={600}>
+                  Columns ({selectedColumns.length}/{availableColumns.length})
                 </Typography>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="e.g., Monthly Audit Report"
-                  required
-                  style={{
-                    width: '100%',
-                    marginTop: 4,
-                    padding: '8px 12px',
-                    borderRadius: 8,
-                    border: '1px solid var(--mui-palette-divider)',
-                    backgroundColor: 'var(--mui-palette-background-paper)',
-                    color: 'var(--mui-palette-text-primary)',
-                    fontSize: '0.875rem',
-                  }}
-                />
-              </label>
+                <Button size="small" onClick={selectAllColumns} sx={{ textTransform: 'none', fontSize: 12 }}>
+                  Select All
+                </Button>
+              </Box>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                {availableColumns.map((col) => (
+                  <Chip
+                    key={col.id}
+                    label={col.label}
+                    onClick={() => toggleColumn(col.id)}
+                    color={selectedColumns.includes(col.id) ? 'primary' : 'default'}
+                    variant={selectedColumns.includes(col.id) ? 'filled' : 'outlined'}
+                    size="small"
+                    icon={selectedColumns.includes(col.id) ? undefined : undefined}
+                    sx={{
+                      cursor: 'pointer',
+                      '&:hover': {
+                        opacity: 0.8,
+                      },
+                    }}
+                  />
+                ))}
+              </Box>
             </Grid>
-            <Grid size={6}>
-              <label style={{ display: 'block', marginBottom: 8 }}>
-                <Typography variant="body2" fontWeight={500}>
-                  Report Type
-                </Typography>
-                <select
-                  value={formData.type}
-                   onChange={(e) => setFormData({ ...formData, type: e.target.value as 'audit_logs' | 'system_logs' | 'users' | 'activity' })}
-                  style={{
-                    width: '100%',
-                    marginTop: 4,
-                    padding: '8px 12px',
-                    borderRadius: 8,
-                    border: '1px solid var(--mui-palette-divider)',
-                    backgroundColor: 'var(--mui-palette-background-paper)',
-                    color: 'var(--mui-palette-text-primary)',
-                    fontSize: '0.875rem',
-                  }}
-                >
-                  <option value="audit_logs">Audit Logs</option>
-                  <option value="system_logs">System Logs</option>
-                  <option value="users">Users</option>
-                  <option value="activity">Activity</option>
-                </select>
-              </label>
+
+            {/* Scheduling */}
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                label="Schedule (cron expression)"
+                value={schedule}
+                onChange={(e) => setSchedule(e.target.value)}
+                placeholder="e.g., 0 8 * * 1 (every Monday 8AM)"
+                fullWidth
+                size="small"
+                helperText="Leave empty for one-time report"
+              />
             </Grid>
-            <Grid size={6}>
-              <label style={{ display: 'block', marginBottom: 8 }}>
-                <Typography variant="body2" fontWeight={500}>
-                  Format
-                </Typography>
-                <select
-                  value={formData.format}
-                  onChange={(e) => setFormData({ ...formData, format: e.target.value as 'csv' | 'excel' | 'pdf' })}
-                  style={{
-                    width: '100%',
-                    marginTop: 4,
-                    padding: '8px 12px',
-                    borderRadius: 8,
-                    border: '1px solid var(--mui-palette-divider)',
-                    backgroundColor: 'var(--mui-palette-background-paper)',
-                    color: 'var(--mui-palette-text-primary)',
-                    fontSize: '0.875rem',
-                  }}
-                >
-                  <option value="csv">CSV</option>
-                  <option value="excel">Excel (.xlsx)</option>
-                  <option value="pdf">PDF</option>
-                </select>
-              </label>
-            </Grid>
-            <Grid size={6}>
-              <label style={{ display: 'block', marginBottom: 8 }}>
-                <Typography variant="body2" fontWeight={500}>
-                  Start Date
-                </Typography>
-                <input
-                  type="date"
-                  value={formData.startDate}
-                  onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                  required
-                  style={{
-                    width: '100%',
-                    marginTop: 4,
-                    padding: '8px 12px',
-                    borderRadius: 8,
-                    border: '1px solid var(--mui-palette-divider)',
-                    backgroundColor: 'var(--mui-palette-background-paper)',
-                    color: 'var(--mui-palette-text-primary)',
-                    fontSize: '0.875rem',
-                  }}
-                />
-              </label>
-            </Grid>
-            <Grid size={6}>
-              <label style={{ display: 'block', marginBottom: 8 }}>
-                <Typography variant="body2" fontWeight={500}>
-                  End Date
-                </Typography>
-                <input
-                  type="date"
-                  value={formData.endDate}
-                  onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                  required
-                  style={{
-                    width: '100%',
-                    marginTop: 4,
-                    padding: '8px 12px',
-                    borderRadius: 8,
-                    border: '1px solid var(--mui-palette-divider)',
-                    backgroundColor: 'var(--mui-palette-background-paper)',
-                    color: 'var(--mui-palette-text-primary)',
-                    fontSize: '0.875rem',
-                  }}
-                />
-              </label>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                label="Email Delivery"
+                type="email"
+                value={emailTo}
+                onChange={(e) => setEmailTo(e.target.value)}
+                placeholder="admin@example.com"
+                fullWidth
+                size="small"
+                helperText="Send report via email when completed"
+              />
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions sx={{ gap: 2 }}>
-          <Button onClick={onClose} disabled={generating}>Cancel</Button>
-          <Button type="submit" variant="contained" startIcon={<AssessmentIcon />} disabled={generating}>
+        <DialogActions sx={{ gap: 2, px: 3, py: 2 }}>
+          <Button onClick={onClose} disabled={generating}>
+            Cancel
+          </Button>
+          <Button type="submit" variant="contained" startIcon={generating ? <CircularProgress size={16} /> : <AssessmentIcon />} disabled={!canSubmit}>
             {generating ? 'Generating...' : 'Generate Report'}
           </Button>
         </DialogActions>

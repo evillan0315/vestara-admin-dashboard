@@ -44,6 +44,7 @@ model Organization {
   files               File[]
   chatConversations   ChatConversation[]
   reports             Report[]
+  reportTemplates     ReportTemplate[]
   dataSources         DataSource[]
   userProfiles        UserProfile[]
   kycDocuments        KycDocument[]
@@ -74,8 +75,9 @@ model User {
   uploadedFiles     File[]             @relation("UploadedFiles")
   chatMessages      ChatMessage[]
   chatConversations ChatConversation[]
-  createdReports    Report[]           @relation("ReportCreatedBy")
-  dataSources       DataSource[]       @relation("DataSourceCreatedBy")
+  createdReports       Report[]           @relation("ReportCreatedBy")
+  createdReportTemplates ReportTemplate[] @relation("ReportTemplateCreatedBy")
+  dataSources          DataSource[]       @relation("DataSourceCreatedBy")
   profile           UserProfile?
   kycDocuments      KycDocument[]
 
@@ -297,6 +299,27 @@ model Report {
   @@index([status])
   @@index([createdAt])
   @@map("reports")
+}
+
+// ── Report Templates ────────────────────────────
+
+model ReportTemplate {
+  id            String      @id @default(uuid())
+  name          String
+  description   String?
+  type          ReportType
+  format        ReportFormat
+  config        Json        @default("{}")
+  organizationId String
+  createdBy     String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdByUser User        @relation("ReportTemplateCreatedBy", fields: [createdBy], references: [id], onDelete: Restrict)
+
+  @@index([organizationId])
+  @@map("report_templates")
 }
 
 // ── File Management ────────────────────────────

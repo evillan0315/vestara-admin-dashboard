@@ -26,6 +26,7 @@ import {
   type WsPresencePayload,
   type WsPresenceUser,
   type WsNotificationPayload,
+  type WsReportStatusPayload,
   type AuditLogDTO,
 } from '@vestara/types';
 import type { SocketConnection, WebSocketStats } from './types.js';
@@ -209,8 +210,8 @@ class SocketIoManager {
 
   broadcastToOrganization(
     organizationId: string,
-    event: typeof WS_EVENT.AUDIT_CREATED | typeof WS_EVENT.PRESENCE_UPDATE | typeof WS_EVENT.NOTIFICATION,
-    payload: AuditLogDTO | WsPresencePayload | WsNotificationPayload,
+    event: typeof WS_EVENT.AUDIT_CREATED | typeof WS_EVENT.PRESENCE_UPDATE | typeof WS_EVENT.NOTIFICATION | typeof WS_EVENT.REPORT_STATUS,
+    payload: AuditLogDTO | WsPresencePayload | WsNotificationPayload | WsReportStatusPayload,
   ): void {
     if (!this.io) return;
     this.io.to(WS_ROOM.org(organizationId)).emit(event, payload);
@@ -255,6 +256,11 @@ class SocketIoManager {
   /** Broadcast a notification to a specific organization (best-effort). */
   broadcastNotification(organizationId: string, notification: WsNotificationPayload): void {
     this.broadcastToOrganization(organizationId, WS_EVENT.NOTIFICATION, notification);
+  }
+
+  /** Broadcast a report status update to its organization (best-effort). */
+  broadcastReportStatus(organizationId: string, status: WsReportStatusPayload): void {
+    this.broadcastToOrganization(organizationId, WS_EVENT.REPORT_STATUS, status);
   }
 
   /** Graceful shutdown (closes sockets and adapter). */

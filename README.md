@@ -2162,7 +2162,7 @@ Future licensing terms may change as the platform evolves.
 | CI/CD (GitHub Actions) | 🟢 API Deploy Workflow |
 | AvatarUpload Reusable Component | 🟢 Complete (view-only + editable modes, camera overlay, initials fallback, custom sizes, SVG support; integrated into ProfilePage, UserFormDialog, OrganizationsDialog, table columns, user menus) |
 | Sidebar Logo Customization | 🟢 Complete (useAppLogo hook via app_logo_url SystemSetting; Logo component accepts src prop; admin camera overlay upload in sidebar) |
-| Reporting (CSV/Excel/PDF) | 🟢 Complete (backend + frontend, 4 report types) |
+| Reporting (CSV/Excel/PDF) | 🟢 Complete (backend + frontend, 4 report types, MUI-ified dialog, date presets, column selection, scheduling, email delivery, templates, comparison, WebSocket progress, dashboard widget, PDF branding) |
 | Real-time Features (WebSocket, live notifications) | 🟢 Complete (Phases 21-22 — WebSocket + live dashboard + presence) |
 | Reusable Form Components | 🟢 Complete (14 components + Zod) |
 | Feedback Components | 🟢 Complete (Toast queue, Loading, EmptyState, useConfirm) |
@@ -2203,7 +2203,7 @@ Future licensing terms may change as the platform evolves.
 - ✅ Floating Chat Widget (FAB, keyboard shortcut `Cmd+Shift+K`, page-aware suggestions, minimized bar, full-page nav)
 - ✅ Sidebar Navigation (reorganized into platform-domain categories: Wallet & Payments, Marketplace, Bookings, Rewards, AI Services, Management, System, Security; roadmap modules marked "Soon")
 - 🟡 Security Hardening (rate limiting, CSRF, password policies)
-- ✅ Reporting (CSV/Excel/PDF export)
+- ✅ Reporting (CSV/Excel/PDF export, MUI-ified dialog with date presets, column selection, scheduling/email, templates CRUD, comparison, WebSocket real-time progress, dashboard widget, PDF branding with org logo, row selection + bulk delete)
 - ✅ Real-time features (WebSocket, live notifications)
 - ✅ Testing & Performance optimization with optimistic updates for improved user experience
 - ✅ Large page refactoring (UsersPage 790→149, FileManagerPage 1,231→187, ReportsPage 627→111, OrganizationsPage 420→74, SystemLogsPage 234→56 lines) — all pages <600 lines with extracted hooks + sub-components

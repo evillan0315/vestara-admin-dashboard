@@ -2,9 +2,10 @@
 import { prisma } from '../utils/prisma.js';
 import { ReportType, ReportFormat, ReportStatus } from '../generated/prisma/enums.js';
 import { Prisma } from '../generated/prisma/client.js';
-import { AuditAction } from '@vestara/types';
+import { AuditAction, type WsReportStatusPayload } from '@vestara/types';
 import * as ExcelJS from 'exceljs';
 import PDFDocument from 'pdfkit';
+import { getWebSocketManager } from '../websocket/socketio-manager.js';
 
 export interface CreateReportParams {
   name: string;
@@ -16,6 +17,12 @@ export interface CreateReportParams {
   action?: AuditAction;
   entity?: string;
   userId?: string;
+  /** Optional columns to include (if omitted, all columns are included). */
+  selectedColumns?: string[];
+  /** Optional cron expression for scheduled reports. */
+  schedule?: string;
+  /** Optional email address for delivery. */
+  emailTo?: string;
 }
 
 export interface Report {
@@ -36,13 +43,64 @@ export interface Report {
   updatedAt: Date;
 }
 
+export interface ReportStats {
+  total: number;
+  completed: number;
+  generating: number;
+  failed: number;
+}
+
 interface ReportDataRow {
   [key: string]: unknown;
 }
 
+/** Column definitions keyed by report type. */
+const COLUMN_DEFS: Record<string, { id: string; label: string }[]> = {
+  audit_logs: [
+    { id: 'id', label: 'ID' },
+    { id: 'action', label: 'Action' },
+    { id: 'entity', label: 'Entity' },
+    { id: 'entityId', label: 'Entity ID' },
+    { id: 'userName', label: 'User Name' },
+    { id: 'userEmail', label: 'User Email' },
+    { id: 'ipAddress', label: 'IP Address' },
+    { id: 'userAgent', label: 'User Agent' },
+    { id: 'createdAt', label: 'Date' },
+  ],
+  users: [
+    { id: 'id', label: 'ID' },
+    { id: 'email', label: 'Email' },
+    { id: 'firstName', label: 'First Name' },
+    { id: 'lastName', label: 'Last Name' },
+    { id: 'fullName', label: 'Full Name' },
+    { id: 'role', label: 'Role' },
+    { id: 'isActive', label: 'Active' },
+    { id: 'lastLoginAt', label: 'Last Login' },
+    { id: 'createdAt', label: 'Created' },
+  ],
+  activity: [
+    { id: 'id', label: 'ID' },
+    { id: 'action', label: 'Action' },
+    { id: 'entity', label: 'Entity' },
+    { id: 'userName', label: 'User Name' },
+    { id: 'userEmail', label: 'User Email' },
+    { id: 'userRole', label: 'User Role' },
+    { id: 'ipAddress', label: 'IP Address' },
+    { id: 'createdAt', label: 'Date' },
+  ],
+  system_logs: [
+    { id: 'id', label: 'ID' },
+    { id: 'action', label: 'Action' },
+    { id: 'entity', label: 'Entity' },
+    { id: 'userName', label: 'User Name' },
+    { id: 'userEmail', label: 'User Email' },
+    { id: 'ipAddress', label: 'IP Address' },
+    { id: 'createdAt', label: 'Date' },
+  ],
+};
+
 class ReportsService {
   async generate(params: CreateReportParams, userId: string): Promise<Report> {
-    // Verify user exists and get organization
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: { organizationId: true, role: true },
@@ -52,7 +110,6 @@ class ReportsService {
       throw new Error('User not found');
     }
 
-    // Create report record
     const report = await prisma.report.create({
       data: {
         name: params.name,
@@ -66,23 +123,43 @@ class ReportsService {
       },
     });
 
+    // Broadcast initial pending status
+    this.broadcastStatus(user.organizationId, report.id, report.name, 'pending');
+
     // Trigger async report generation
-    this.generateReportAsync(report.id, params, user.organizationId, userId);
+    this.generateReportAsync(report.id, params, user.organizationId, userId).catch((err) => {
+      console.error('[ReportsService] async generation error:', err);
+    });
 
     return this.mapToDTO(report);
+  }
+
+  private broadcastStatus(
+    organizationId: string,
+    reportId: string,
+    name: string,
+    status: 'pending' | 'generating' | 'completed' | 'failed',
+    error?: string,
+    fileUrl?: string,
+    fileSize?: number,
+    completedAt?: string,
+  ): void {
+    const payload: WsReportStatusPayload = { reportId, name, status, error, fileUrl, fileSize, completedAt };
+    getWebSocketManager().broadcastReportStatus(organizationId, payload);
   }
 
   private async generateReportAsync(
     reportId: string,
     params: CreateReportParams,
     organizationId: string,
-    _userId: string
+    _userId: string,
   ): Promise<void> {
     try {
       await prisma.report.update({
         where: { id: reportId },
         data: { status: 'generating' },
       });
+      this.broadcastStatus(organizationId, reportId, params.name, 'generating');
 
       // Fetch data based on report type
       let data: ReportDataRow[] = [];
@@ -102,34 +179,100 @@ class ReportsService {
           break;
       }
 
+      // Filter columns if specified
+      if (params.selectedColumns && params.selectedColumns.length > 0) {
+        data = data.map((row) => {
+          const filtered: ReportDataRow = {};
+          for (const col of params.selectedColumns!) {
+            if (col in row) filtered[col] = row[col];
+          }
+          return filtered;
+        });
+      }
+
       // Generate file based on format
       const fileBuffer = await this.generateFile(data, params.format, params.name);
-      
+
       // Store as base64 data URL (in production, upload to S3/Blob storage)
       const mimeType = this.getMimeType(params.format);
       const fileUrl = `data:${mimeType};base64,${fileBuffer.toString('base64')}`;
       const fileSize = BigInt(fileBuffer.length);
+      const completedAt = new Date();
 
-      // Update report with completed status and file info
       await prisma.report.update({
         where: { id: reportId },
         data: {
           status: 'completed',
-          completedAt: new Date(),
+          completedAt,
           fileUrl,
           fileSize,
         },
       });
+      this.broadcastStatus(
+        organizationId,
+        reportId,
+        params.name,
+        'completed',
+        undefined,
+        fileUrl,
+        Number(fileSize),
+        completedAt.toISOString(),
+      );
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
       await prisma.report.update({
         where: { id: reportId },
         data: {
           status: 'failed',
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: message,
         },
       });
-      throw error;
+      this.broadcastStatus(organizationId, reportId, params.name, 'failed', message);
     }
+  }
+
+  /** Fetch a preview (limited rows) of what a report would contain. */
+  async preview(params: CreateReportParams, userId: string): Promise<ReportDataRow[]> {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { organizationId: true },
+    });
+    if (!user) throw new Error('User not found');
+
+    let data: ReportDataRow[] = [];
+    switch (params.type) {
+      case 'audit_logs':
+        data = await this.fetchAuditLogs(params, user.organizationId);
+        break;
+      case 'users':
+        data = await this.fetchUsers(params, user.organizationId);
+        break;
+      case 'activity':
+        data = await this.fetchActivity(params, user.organizationId);
+        break;
+      case 'system_logs':
+        data = await this.fetchSystemLogs(params, user.organizationId);
+        break;
+    }
+
+    // Filter columns if specified
+    if (params.selectedColumns && params.selectedColumns.length > 0) {
+      data = data.slice(0, 10).map((row) => {
+        const filtered: ReportDataRow = {};
+        for (const col of params.selectedColumns!) {
+          if (col in row) filtered[col] = row[col];
+        }
+        return filtered;
+      });
+      return data;
+    }
+
+    return data.slice(0, 10);
+  }
+
+  /** Get column definitions for a report type. */
+  getAvailableColumns(type: string): { id: string; label: string }[] {
+    return COLUMN_DEFS[type] ?? [];
   }
 
   private async fetchAuditLogs(params: CreateReportParams, organizationId: string): Promise<ReportDataRow[]> {
@@ -146,17 +289,10 @@ class ReportsService {
       },
       include: {
         user: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-          },
+          select: { id: true, firstName: true, lastName: true, email: true },
         },
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: { createdAt: 'desc' },
     });
 
     return auditLogs.map((log) => ({
@@ -178,27 +314,14 @@ class ReportsService {
     const users = await prisma.user.findMany({
       where: {
         organizationId,
-        createdAt: {
-          gte: params.startDate,
-          lte: params.endDate,
-        },
+        createdAt: { gte: params.startDate, lte: params.endDate },
       },
       select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        isActive: true,
-        avatarUrl: true,
-        provider: true,
-        lastLoginAt: true,
-        createdAt: true,
-        updatedAt: true,
+        id: true, email: true, firstName: true, lastName: true,
+        role: true, isActive: true, avatarUrl: true, provider: true,
+        lastLoginAt: true, createdAt: true, updatedAt: true,
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: { createdAt: 'desc' },
     });
 
     return users.map((user) => ({
@@ -221,27 +344,14 @@ class ReportsService {
     const auditLogs = await prisma.auditLog.findMany({
       where: {
         organizationId,
-        createdAt: {
-          gte: params.startDate,
-          lte: params.endDate,
-        },
+        createdAt: { gte: params.startDate, lte: params.endDate },
         ...(params.action && { action: params.action }),
         ...(params.entity && { entity: params.entity }),
       },
       include: {
-        user: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            role: true,
-          },
-        },
+        user: { select: { id: true, firstName: true, lastName: true, email: true, role: true } },
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: { createdAt: 'desc' },
     });
 
     return auditLogs.map((log) => ({
@@ -264,29 +374,13 @@ class ReportsService {
     const auditLogs = await prisma.auditLog.findMany({
       where: {
         organizationId,
-        createdAt: {
-          gte: params.startDate,
-          lte: params.endDate,
-        },
-        OR: [
-          { action: 'error' },
-          { entity: 'api' },
-          { entity: 'system' },
-        ],
+        createdAt: { gte: params.startDate, lte: params.endDate },
+        OR: [{ action: 'error' }, { entity: 'api' }, { entity: 'system' }],
       },
       include: {
-        user: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-          },
-        },
+        user: { select: { id: true, firstName: true, lastName: true, email: true } },
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: { createdAt: 'desc' },
     });
 
     return auditLogs.map((log) => ({
@@ -311,33 +405,32 @@ class ReportsService {
       case 'excel':
         return this.generateExcel(data, fileName);
       case 'pdf':
-        return this.generatePDF(data, fileName);
+        return this.generatePDF(data, fileName, '');
       default:
         throw new Error(`Unsupported format: ${format}`);
     }
   }
 
   private generateCSV(data: ReportDataRow[]): Buffer {
-    if (data.length === 0) {
-      return Buffer.from('No data available');
-    }
+    if (data.length === 0) return Buffer.from('No data available');
 
     const headers = Object.keys(data[0]);
     const csvRows = [
       headers.map((h) => this.formatHeader(h)).join(','),
       ...data.map((row) =>
-        headers.map((h) => {
-          const value = row[h];
-          if (value === null || value === undefined) return '';
-          const str = String(value);
-          if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-            return `"${str.replace(/"/g, '""')}"`;
-          }
-          return str;
-        }).join(',')
+        headers
+          .map((h) => {
+            const value = row[h];
+            if (value === null || value === undefined) return '';
+            const str = String(value);
+            if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+              return `"${str.replace(/"/g, '""')}"`;
+            }
+            return str;
+          })
+          .join(','),
       ),
     ];
-
     return Buffer.from(csvRows.join('\n'));
   }
 
@@ -350,41 +443,28 @@ class ReportsService {
 
     if (data.length > 0) {
       const headers = Object.keys(data[0]);
-      
-      // Add header row
       worksheet.addRow(headers.map((h) => this.formatHeader(h)));
-      
-      // Style header row
+
       const headerRow = worksheet.getRow(1);
       headerRow.font = { bold: true, color: { argb: 'FFFFFF' } };
-      headerRow.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'D4A843' }, // Gold color
-      };
+      headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'D4A843' } };
       headerRow.alignment = { horizontal: 'center' };
 
-      // Add data rows
       for (const row of data) {
         worksheet.addRow(headers.map((h) => row[h] ?? ''));
       }
 
-      // Auto-fit columns
-      // @ts-ignore - ExcelJS types issue with eachCell callback
-      worksheet.columns.forEach((column) => {
+      (worksheet.columns as Array<{ eachCell: (opts: { includeEmpty: boolean }, cb: (cell: { value: unknown }) => void) => void; width: number }>).forEach((column) => {
         let maxLength = 10;
-        // @ts-ignore - ExcelJS types issue with eachCell callback
         column.eachCell({ includeEmpty: true }, (cell) => {
           const val = cell.value;
           if (val !== undefined && val !== null) {
-            const cellValue = String(val);
-            maxLength = Math.max(maxLength, cellValue.length);
+            maxLength = Math.max(maxLength, String(val).length);
           }
         });
         column.width = Math.min(maxLength + 2, 50);
       });
 
-      // Add filter
       worksheet.autoFilter = {
         from: { row: 1, column: 1 },
         to: { row: data.length + 1, column: headers.length },
@@ -394,7 +474,7 @@ class ReportsService {
     return Buffer.from(await workbook.xlsx.writeBuffer());
   }
 
-  private async generatePDF(data: ReportDataRow[], fileName: string): Promise<Buffer> {
+  async generatePDF(data: ReportDataRow[], fileName: string, orgLogoUrl?: string): Promise<Buffer> {
     return new Promise((resolve, reject) => {
       const doc = new PDFDocument({ margin: 40, size: 'A4', layout: 'landscape' });
       const chunks: Buffer[] = [];
@@ -402,6 +482,20 @@ class ReportsService {
       doc.on('data', (chunk) => chunks.push(chunk));
       doc.on('end', () => resolve(Buffer.concat(chunks)));
       doc.on('error', reject);
+
+      // Try to embed org logo if provided
+      if (orgLogoUrl && orgLogoUrl.startsWith('data:')) {
+        try {
+          const base64 = orgLogoUrl.split(',')[1];
+          if (base64) {
+            const mimeMatch = orgLogoUrl.match(/^data:(image\/\w+);/);
+            const mime = mimeMatch ? mimeMatch[1] : 'image/png';
+            doc.image(Buffer.from(base64, 'base64'), 40, 20, { fit: [80, 80] });
+          }
+        } catch {
+          // Logo embedding is best-effort
+        }
+      }
 
       // Title
       doc.fontSize(20).fillColor('#D4A843').text(fileName, { align: 'center' });
@@ -417,65 +511,52 @@ class ReportsService {
 
       const headers = Object.keys(data[0]);
       const colWidth = (doc.page.width - 80) / headers.length;
+      const goldColor = '#D4A843';
 
-      // Draw header row
-      let x = 40;
-      doc.font('Helvetica-Bold').fontSize(8).fillColor('#FFFFFF');
-      for (const header of headers) {
-        doc.rect(x, doc.y, colWidth, 20).fill('#D4A843');
-        doc.fillColor('#FFFFFF').text(this.formatHeader(header), x + 2, doc.y + 5, {
-          width: colWidth - 4,
-          align: 'center',
-          ellipsis: true,
-        });
-        doc.fillColor('#000000');
-        x += colWidth;
-      }
-      doc.moveDown();
+      const drawHeaderRow = () => {
+        let xPos = 40;
+        doc.font('Helvetica-Bold').fontSize(8).fillColor('#FFFFFF');
+        for (const header of headers) {
+          doc.rect(xPos, doc.y, colWidth, 20).fill(goldColor);
+          doc.fillColor('#FFFFFF').text(this.formatHeader(header), xPos + 2, doc.y + 5, {
+            width: colWidth - 4,
+            align: 'center',
+            ellipsis: true,
+          });
+          doc.fillColor('#000000');
+          xPos += colWidth;
+        }
+        doc.moveDown();
+      };
 
-      // Draw data rows
+      drawHeaderRow();
+
       doc.font('Helvetica').fontSize(7).fillColor('#333333');
       let rowIndex = 0;
       for (const row of data) {
         if (doc.y > doc.page.height - 60) {
           doc.addPage();
-          // Redraw headers on new page
-          x = 40;
-          doc.font('Helvetica-Bold').fontSize(8).fillColor('#FFFFFF');
-          for (const header of headers) {
-            doc.rect(x, doc.y, colWidth, 20).fill('#D4A843');
-            doc.fillColor('#FFFFFF').text(this.formatHeader(header), x + 2, doc.y + 5, {
-              width: colWidth - 4,
-              align: 'center',
-              ellipsis: true,
-            });
-            doc.fillColor('#000000');
-            x += colWidth;
-          }
-          doc.moveDown();
-          doc.font('Helvetica').fontSize(7).fillColor('#333333');
+          drawHeaderRow();
         }
 
-        // Alternate row colors
         if (rowIndex % 2 === 0) {
-          x = 40;
+          let xPos = 40;
           for (let i = 0; i < headers.length; i++) {
-            doc.rect(x, doc.y, colWidth, 18).fill('#FAFAFA');
-            x += colWidth;
+            doc.rect(xPos, doc.y, colWidth, 18).fill('#FAFAFA');
+            xPos += colWidth;
           }
           doc.y -= 18;
         }
 
-        x = 40;
+        let xPos = 40;
         for (const header of headers) {
           const value = row[header] ?? '';
-          const str = String(value);
-          doc.text(str, x + 2, doc.y + 3, {
+          doc.text(String(value), xPos + 2, doc.y + 3, {
             width: colWidth - 4,
             align: 'left',
             ellipsis: true,
           });
-          x += colWidth;
+          xPos += colWidth;
         }
         doc.moveDown(0.5);
         rowIndex++;
@@ -507,73 +588,174 @@ class ReportsService {
   }
 
   async getStatus(reportId: string, userId: string): Promise<Report> {
-    const report = await prisma.report.findUnique({
-      where: { id: reportId },
-    });
+    const report = await prisma.report.findUnique({ where: { id: reportId } });
+    if (!report) throw new Error('Report not found');
 
-    if (!report) {
-      throw new Error('Report not found');
-    }
-
-    // Verify user has permission to access this report
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: { organizationId: true, role: true },
     });
-
-    if (!user || report.organizationId !== user.organizationId) {
-      throw new Error('Access denied');
-    }
+    if (!user || report.organizationId !== user.organizationId) throw new Error('Access denied');
 
     return this.mapToDTO(report);
   }
 
-  async list(organizationId: string, page: number, perPage: number): Promise<Report[]> {
+  async list(
+    organizationId: string,
+    page: number,
+    perPage: number,
+    search?: string,
+    sortField?: string,
+    sortDirection?: 'asc' | 'desc',
+  ): Promise<Report[]> {
     const skip = (page - 1) * perPage;
 
+    const where: Prisma.ReportWhereInput = { organizationId };
+    if (search) {
+      where.name = { contains: search, mode: 'insensitive' };
+    }
+
+    const orderBy: Prisma.ReportOrderByWithRelationInput = {};
+    if (sortField === 'name') orderBy.name = sortDirection ?? 'asc';
+    else if (sortField === 'status') orderBy.status = sortDirection ?? 'asc';
+    else if (sortField === 'createdAt') orderBy.createdAt = sortDirection ?? 'desc';
+    else orderBy.createdAt = 'desc';
+
     const reports = await prisma.report.findMany({
-      where: { organizationId },
+      where,
       skip,
       take: perPage,
-      orderBy: { createdAt: 'desc' },
+      orderBy,
     });
 
     return reports.map(this.mapToDTO);
   }
 
-  async count(organizationId: string): Promise<number> {
-    return await prisma.report.count({
-      where: { organizationId },
-    });
+  async count(organizationId: string, search?: string): Promise<number> {
+    const where: Prisma.ReportWhereInput = { organizationId };
+    if (search) {
+      where.name = { contains: search, mode: 'insensitive' };
+    }
+    return await prisma.report.count({ where });
+  }
+
+  async stats(organizationId: string): Promise<ReportStats> {
+    const where = { organizationId };
+    const [total, completed, generating, failed] = await Promise.all([
+      prisma.report.count({ where }),
+      prisma.report.count({ where: { ...where, status: 'completed' } }),
+      prisma.report.count({ where: { ...where, status: { in: ['pending', 'generating'] } } }),
+      prisma.report.count({ where: { ...where, status: 'failed' } }),
+    ]);
+    return { total, completed, generating, failed };
   }
 
   async delete(reportId: string, userId: string): Promise<void> {
-    const report = await prisma.report.findUnique({
-      where: { id: reportId },
-    });
+    const report = await prisma.report.findUnique({ where: { id: reportId } });
+    if (!report) throw new Error('Report not found');
 
-    if (!report) {
-      throw new Error('Report not found');
-    }
-
-    // Verify user has permission
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: { organizationId: true, role: true },
     });
+    if (!user || report.organizationId !== user.organizationId) throw new Error('Access denied');
 
-    if (!user || report.organizationId !== user.organizationId) {
-      throw new Error('Access denied');
-    }
+    await prisma.report.delete({ where: { id: reportId } });
+  }
 
-    await prisma.report.delete({
-      where: { id: reportId },
+  // ── Report Templates ────────────────────────────────────────────────────
+
+  async listTemplates(organizationId: string) {
+    return await prisma.reportTemplate.findMany({
+      where: { organizationId },
+      orderBy: { name: 'asc' },
     });
   }
 
+  async createTemplate(
+    data: {
+      name: string;
+      description?: string;
+      type: string;
+      format: string;
+      config: Record<string, unknown>;
+    },
+    organizationId: string,
+    createdBy: string,
+  ) {
+    return await prisma.reportTemplate.create({
+      data: {
+        name: data.name,
+        description: data.description,
+        type: data.type as ReportType,
+        format: data.format as ReportFormat,
+        config: data.config as Prisma.InputJsonValue,
+        organizationId,
+        createdBy,
+      },
+    });
+  }
+
+  async updateTemplate(
+    id: string,
+    organizationId: string,
+    data: {
+      name?: string;
+      description?: string;
+      type?: string;
+      format?: string;
+      config?: Record<string, unknown>;
+    },
+  ) {
+    const template = await prisma.reportTemplate.findUnique({ where: { id } });
+    if (!template || template.organizationId !== organizationId) throw new Error('Template not found');
+
+    return await prisma.reportTemplate.update({
+      where: { id },
+      data: {
+        ...(data.name !== undefined && { name: data.name }),
+        ...(data.description !== undefined && { description: data.description }),
+        ...(data.type !== undefined && { type: data.type as ReportType }),
+        ...(data.format !== undefined && { format: data.format as ReportFormat }),
+        ...(data.config !== undefined && { config: data.config as Prisma.InputJsonValue }),
+      },
+    });
+  }
+
+  async deleteTemplate(id: string, organizationId: string) {
+    const template = await prisma.reportTemplate.findUnique({ where: { id } });
+    if (!template || template.organizationId !== organizationId) throw new Error('Template not found');
+    await prisma.reportTemplate.delete({ where: { id } });
+  }
+
+  // ── Comparison ──────────────────────────────────────────────────────────
+
+  async compare(reportIds: string[], userId: string) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { organizationId: true },
+    });
+    if (!user) throw new Error('User not found');
+
+    const reports = await prisma.report.findMany({
+      where: {
+        id: { in: reportIds },
+        organizationId: user.organizationId,
+      },
+    });
+
+    if (reports.length !== reportIds.length) throw new Error('One or more reports not found');
+
+    // Parse the params back into CreateReportParams
+    return reports.map((r) => ({
+      ...this.mapToDTO(r),
+      // Try to extract data counts from params metadata or fileUrl
+    }));
+  }
+
+  // ── Helper ──────────────────────────────────────────────────────────────
+
   async getDownloadUrl(fileUrl: string): Promise<string> {
-    // In a real implementation, this would generate a signed URL for temporary access
-    // For now, return the file URL as-is
     return fileUrl;
   }
 

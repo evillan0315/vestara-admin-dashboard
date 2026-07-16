@@ -1,12 +1,34 @@
-import { Box, Typography, Button, Menu, MenuItem, styled } from '@mui/material';
-import { Add as AddIcon, Download as DownloadIcon, Delete as DeleteIcon, Assessment as AssessmentIcon } from '@mui/icons-material';
-import { useMemo, useEffect, type ReactElement } from 'react';
+import { useState, useMemo, useEffect, useCallback, type ReactElement } from 'react';
+import {
+  Box,
+  Typography,
+  Button,
+  Menu,
+  MenuItem,
+  Tabs,
+  Tab,
+  styled,
+  alpha,
+} from '@mui/material';
+import {
+  Add as AddIcon,
+  Download as DownloadIcon,
+  Delete as DeleteIcon,
+  Assessment as AssessmentIcon,
+  CompareArrows as CompareIcon,
+  AutoAwesome as TemplateIcon,
+  Refresh as RefreshIcon,
+} from '@mui/icons-material';
 import { DataTable } from '../components/data/DataTable';
 import { ConfirmDialog } from '../components/ui/Dialog';
 import { useReportsPage } from '../features/reports/hooks/useReportsPage';
 import { createReportsColumns } from '../features/reports/components/ReportsTableColumns';
 import { ReportsStatsCards } from '../features/reports/components/ReportsStatsCards';
 import { GenerateReportDialog } from '../features/reports/components/GenerateReportDialog';
+import { ReportsTemplatesPanel } from '../features/reports/components/ReportsTemplatesPanel';
+import { ReportsCompareDialog } from '../features/reports/components/ReportsCompareDialog';
+import { useWebSocketEvent } from '../websocket/hooks';
+import { WS_EVENT, type WsReportStatusPayload } from '@vestara/types';
 import type { Report } from '../api/reports';
 
 const PageContainer = styled(Box)(() => ({
@@ -17,6 +39,21 @@ const PageContainer = styled(Box)(() => ({
 
 export function ReportsPage(): ReactElement {
   const ctx = useReportsPage();
+  const [tab, setTab] = useState(0);
+  const [compareOpen, setCompareOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const selectedReports = useMemo(() => ctx.reports.filter((r) => selectedIds.includes(r.id)), [ctx.reports, selectedIds]);
+
+  // Live WebSocket updates for report status
+  const handleReportStatus = useCallback(
+    (msg: { type: string; payload: WsReportStatusPayload }) => {
+      if (msg.payload.status === 'completed' || msg.payload.status === 'failed') {
+        ctx.refetch();
+      }
+    },
+    [ctx.refetch],
+  );
+  useWebSocketEvent(WS_EVENT.REPORT_STATUS, handleReportStatus);
 
   const columns = useMemo(
     () => createReportsColumns({ onMenuOpen: ctx.handleMenuOpen }),
@@ -31,15 +68,27 @@ export function ReportsPage(): ReactElement {
     }
   }, [hasPendingReports, ctx.refetch]);
 
+  const handleTabChange = (_: unknown, newValue: number) => setTab(newValue);
+
   return (
     <PageContainer>
-      <Box>
-        <Typography variant="h4" fontWeight={700}>
-          Reports
-        </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>
-          Generate and manage data export reports.
-        </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box>
+          <Typography variant="h4" fontWeight={700}>
+            Reports
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>
+            Generate and manage data export reports.
+          </Typography>
+        </Box>
+        <Button
+          variant="outlined"
+          startIcon={<RefreshIcon />}
+          onClick={() => ctx.refetch()}
+          sx={{ textTransform: 'none' }}
+        >
+          Refresh
+        </Button>
       </Box>
 
       <ReportsStatsCards
@@ -49,38 +98,82 @@ export function ReportsPage(): ReactElement {
         failed={ctx.stats.failed}
       />
 
-      <DataTable<Report>
-        columns={columns}
-        rows={ctx.reports}
-        keyExtractor={(row) => row.id}
-        loading={ctx.isLoading}
-        error={ctx.isError ? (ctx.error instanceof Error ? ctx.error.message : 'Failed to load reports') : null}
-        onRetry={() => ctx.refetch()}
-        sortState={ctx.sort}
-        onSortChange={ctx.handleSortChange}
-        pagination={ctx.paginationState}
-        onPageChange={ctx.handlePageChange}
-        onPerPageChange={ctx.setPerPage}
-        searchable
-        searchValue={ctx.search}
-        onSearchChange={ctx.handleSearchChange}
-        searchPlaceholder="Search reports by name..."
-        title="All Reports"
-        emptyIcon={<AssessmentIcon sx={{ fontSize: 48 }} />}
-        emptyTitle="No reports found"
-        emptyDescription="Generate your first report to get started."
-        actions={
-          <Button variant="contained" startIcon={<AddIcon />} onClick={() => ctx.setGenerateDialogOpen(true)}>
-            Generate Report
-          </Button>
-        }
-      />
+      <Tabs value={tab} onChange={handleTabChange} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tab label="Report History" icon={<AssessmentIcon />} iconPosition="start" />
+        <Tab label="Templates" icon={<TemplateIcon />} iconPosition="start" />
+      </Tabs>
+
+      {tab === 0 && (
+        <>
+          <DataTable<Report>
+            columns={columns}
+            rows={ctx.reports}
+            keyExtractor={(row) => row.id}
+            loading={ctx.isLoading}
+            error={ctx.isError ? (ctx.error instanceof Error ? ctx.error.message : 'Failed to load reports') : null}
+            onRetry={() => ctx.refetch()}
+            sortState={ctx.sort}
+            onSortChange={ctx.handleSortChange}
+            pagination={ctx.paginationState}
+            onPageChange={ctx.handlePageChange}
+            onPerPageChange={ctx.setPerPage}
+            searchable
+            searchValue={ctx.search}
+            onSearchChange={ctx.handleSearchChange}
+            searchPlaceholder="Search reports by name..."
+            title="All Reports"
+            emptyIcon={<AssessmentIcon sx={{ fontSize: 48 }} />}
+            emptyTitle="No reports found"
+            emptyDescription="Generate your first report to get started."
+            selectable
+            selectedIds={selectedIds}
+            onSelectionChange={setSelectedIds}
+            actions={
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                {selectedIds.length >= 2 && (
+                  <Button
+                    variant="outlined"
+                    startIcon={<CompareIcon />}
+                    onClick={() => setCompareOpen(true)}
+                    sx={{ textTransform: 'none' }}
+                  >
+                    Compare ({selectedIds.length})
+                  </Button>
+                )}
+                {selectedIds.length > 0 && (
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    startIcon={<DeleteIcon />}
+                    onClick={() => ctx.handleBulkDelete(selectedIds.map((id) => ctx.reports.find((r) => r.id === id)!))}
+                    sx={{ textTransform: 'none' }}
+                  >
+                    Delete ({selectedIds.length})
+                  </Button>
+                )}
+                <Button variant="contained" startIcon={<AddIcon />} onClick={() => ctx.setGenerateDialogOpen(true)}>
+                  Generate Report
+                </Button>
+              </Box>
+            }
+          />
+        </>
+      )}
+
+      {tab === 1 && <ReportsTemplatesPanel />}
 
       <GenerateReportDialog
         open={ctx.generateDialogOpen}
         onClose={() => ctx.setGenerateDialogOpen(false)}
         onGenerate={ctx.handleGenerate}
         generating={ctx.generateMutation.isPending}
+      />
+
+      <ReportsCompareDialog
+        open={compareOpen}
+        reportIds={selectedIds}
+        reports={selectedReports}
+        onClose={() => setCompareOpen(false)}
       />
 
       <Menu anchorEl={ctx.anchorEl} open={Boolean(ctx.anchorEl)} onClose={ctx.handleMenuClose}>

@@ -23,6 +23,7 @@ import { useAuditLogs } from '../features/audit-logs/hooks';
 import { useAuth } from '../features/auth/AuthContext';
 import { useLiveDashboard } from '../features/realtime/useLiveDashboard';
 import LiveBadge from '../features/realtime/LiveBadge';
+import { ReportsDashboardWidget } from '../features/reports/components/ReportsDashboardWidget';
 import { useOrganization } from '../features/organizations/hooks';
 import { DateRangePicker, useDateRange } from '../features/calendar';
 import {
@@ -345,6 +346,11 @@ export function DashboardPage() {
               />
             )}
           </ChartCard>
+        </Grid>
+
+        {/* Reports Overview Widget */}
+        <Grid size={{ xs: 12, md: 4 }}>
+          <ReportsDashboardWidget />
         </Grid>
       </Grid>
     </DashboardContainer>

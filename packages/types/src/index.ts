@@ -610,6 +610,7 @@ export const WS_EVENT = {
   PRESENCE_UPDATE: 'presence:update',
   AUDIT_CREATED: 'audit:created',
   NOTIFICATION: 'notification',
+  REPORT_STATUS: 'report:status',
   PONG: 'pong',
   ERROR: 'error',
   SUBSCRIBE: 'subscribe',
@@ -654,6 +655,16 @@ export interface WsConnectionEstablishedPayload {
   organizationId: string;
 }
 
+export interface WsReportStatusPayload {
+  reportId: string;
+  name: string;
+  status: 'pending' | 'generating' | 'completed' | 'failed';
+  error?: string;
+  fileUrl?: string;
+  fileSize?: number;
+  completedAt?: string;
+}
+
 /**
  * Messages pushed from the server to connected clients.
  */
@@ -662,6 +673,7 @@ export type ServerToClientMessage =
   | { type: typeof WS_EVENT.PRESENCE_UPDATE; payload: WsPresencePayload }
   | { type: typeof WS_EVENT.AUDIT_CREATED; payload: AuditLogDTO }
   | { type: typeof WS_EVENT.NOTIFICATION; payload: WsNotificationPayload }
+  | { type: typeof WS_EVENT.REPORT_STATUS; payload: WsReportStatusPayload }
   | { type: typeof WS_EVENT.PONG; payload: { timestamp: number } }
   | { type: typeof WS_EVENT.ERROR; payload: { message: string } };
 
