@@ -191,6 +191,11 @@ export const paginationSchema = z.object({
   sort: z.string().optional(),
   order: z.enum(['asc', 'desc']).default('asc'),
   search: z.string().optional(),
+  role: z.string().optional(),
+  isActive: z
+    .string()
+    .optional()
+    .transform((val) => (val === undefined ? undefined : val === 'true')),
 });
 
 // ── Generic ───────────────────────────────────

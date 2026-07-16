@@ -49,12 +49,14 @@ router.get(
   validate(paginationSchema, 'query'),
   async (req, res, next) => {
     try {
-      const { page, perPage, sort, order, search } = req.query as unknown as {
+      const { page, perPage, sort, order, search, role, isActive } = req.query as unknown as {
         page: number;
         perPage: number;
         sort?: string;
         order?: 'asc' | 'desc';
         search?: string;
+        role?: string;
+        isActive?: string;
       };
 
       const result = await userRepository.findAll({
@@ -63,6 +65,8 @@ router.get(
         sort,
         order,
         search,
+        role: role as UserRole | undefined,
+        isActive: isActive === undefined ? undefined : isActive === 'true',
         // SUPER_ADMIN sees all users across all organizations; others scoped to their org
         organizationId: req.user!.role === UserRole.SUPER_ADMIN ? undefined : req.user!.organizationId,
       });
