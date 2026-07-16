@@ -1,10 +1,12 @@
-import { Card as MuiCard, CardHeader, CardContent, CardActions, CardMedia, styled } from '@mui/material';
+import { Card as MuiCard, CardHeader, CardContent, CardActions, CardMedia, styled, type SxProps, type Theme } from '@mui/material';
 import { type ReactNode, forwardRef, type HTMLAttributes } from 'react';
 
 export interface CardComponentProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   cardVariant?: 'elevated' | 'outlined' | 'filled';
   hoverable?: boolean;
   padding?: 'none' | 'normal' | 'comfortable';
+  /** Theme-aware style overrides (forwarded to the underlying MUI Card). */
+  sx?: SxProps<Theme>;
   header?: {
     title: ReactNode;
     subheader?: ReactNode;
