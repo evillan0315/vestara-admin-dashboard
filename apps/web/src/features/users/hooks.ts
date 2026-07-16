@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { usersApi, type UserListParams, type UserStats } from '../../api/users';
+import { usersApi, type UserListParams } from '../../api/users';
 import type { CreateUserRequestDTO, UpdateUserRequestDTO } from '@vestara/types';
 
 export const userKeys = {

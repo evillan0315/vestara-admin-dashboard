@@ -1,4 +1,4 @@
-import { Box, Typography, Button, Chip, IconButton, styled, Avatar, Tooltip, Paper, Grid } from '@mui/material';
+import { Box, Typography, Button, Chip, IconButton, styled, Avatar, Tooltip, Paper } from '@mui/material';
 import {
   People as PeopleIcon,
   Add as AddIcon,
@@ -8,13 +8,11 @@ import {
   CheckCircle as CheckCircleIcon,
   Download as DownloadIcon,
   Business as BusinessIcon,
-  Person as PersonIcon,
-  TrendingUp as TrendingUpIcon,
-  Security as SecurityIcon,
 } from '@mui/icons-material';
 import { useState, useCallback, type ReactElement } from 'react';
 import { DataTable, type Column, type SortState, type PaginationState } from '../components/data/DataTable';
-import { useUsers, useUserStats,
+import {
+  useUsers,
   useCreateUser,
   useUpdateUser,
   useDeleteUser,
@@ -29,10 +27,8 @@ import { useToast } from '../components/feedback/Toast';
 import { ConfirmDialog } from '../components/ui/Modal';
 import { useAuth } from '../features/auth/AuthContext';
 import type { UserDTO, UserRole } from '@vestara/types';
-import { StatCard } from '../components/data/StatCard';
-import { Loading } from '../components/feedback/Loading';
 
-// Styled
+// ── Styled ──
 
 const PageContainer = styled(Box)(() => ({
   display: 'flex',
@@ -57,7 +53,22 @@ const RoleChip = styled(Chip)<{ role: string }>(({ theme, role }) => {
   };
 });
 
-// Component
+// ── Helpers ──
+
+function formatDate(dateStr?: string): string {
+  if (!dateStr) return '—';
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+}
+
+function getInitials(firstName: string, lastName: string): string {
+  return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+}
+
+// ── Component ──
 
 export function UsersPage(): ReactElement {
   const { showSuccess, showError } = useToast();
@@ -91,8 +102,6 @@ export function UsersPage(): ReactElement {
     sort: sort.field,
     order: sort.direction,
   });
-
-  const { data: stats, isLoading: statsLoading } = useUserStats();
 
   const { data: organizations = [] } = useOrganizations();
   const { user } = useAuth();
@@ -196,6 +205,38 @@ export function UsersPage(): ReactElement {
     [toggleStatusMutation, showSuccess, showError],
   );
 
+  // Bulk actions
+  const openBulkConfirm = useCallback((action: 'delete' | 'activate' | 'deactivate') => {
+    setBulkAction(action);
+    setBulkConfirmOpen(true);
+  }, []);
+
+  const handleBulkConfirm = useCallback(async () => {
+    if (!bulkAction || selectedIds.length === 0) return;
+    try {
+      if (bulkAction === 'delete') {
+        await bulkDeleteMutation.mutateAsync(selectedIds);
+        showSuccess(`Deleted ${selectedIds.length} user${selectedIds.length === 1 ? '' : 's'}`);
+      } else {
+        await bulkStatusMutation.mutateAsync({
+          ids: selectedIds,
+          status: bulkAction === 'activate' ? 'active' : 'inactive',
+        });
+        showSuccess(
+          `${bulkAction === 'activate' ? 'Activated' : 'Deactivated'} ${
+            selectedIds.length
+          } user${selectedIds.length === 1 ? '' : 's'}`,
+        );
+      }
+      setSelectedIds([]);
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Bulk action failed');
+    } finally {
+      setBulkConfirmOpen(false);
+      setBulkAction(null);
+    }
+  }, [bulkAction, selectedIds, bulkDeleteMutation, bulkStatusMutation, showSuccess, showError]);
+
   // CSV export
   const handleExport = useCallback(async () => {
     try {
@@ -221,7 +262,7 @@ export function UsersPage(): ReactElement {
             src={row.avatarUrl}
             sx={{ width: 32, height: 32, fontSize: '0.8125rem', fontWeight: 600 }}
           >
-            {row.firstName.charAt(0)}{row.lastName.charAt(0)}
+            {getInitials(row.firstName, row.lastName)}
           </Avatar>
           <Box>
             <Typography variant="body2" fontWeight={600}>
@@ -320,10 +361,6 @@ export function UsersPage(): ReactElement {
     },
   ];
 
-  if (statsLoading || isLoading) {
-    return <Loading fullScreen />;
-  }
-
   return (
     <PageContainer>
       <Box>
@@ -333,21 +370,6 @@ export function UsersPage(): ReactElement {
         <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>
           Manage user accounts and permissions.
         </Typography>
-      </Box>
-
-      <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', mb: 3 }}>
-        {kpiCards.map((kpi, idx) => (
-          <StatCard
-            key={idx}
-            title={kpi.title}
-            value={kpi.value}
-            icon={kpi.icon}
-            iconColor={kpi.iconColor}
-            trend={kpi.trend}
-            loading={statsLoading}
-            sx={{ minWidth: 200, flex: 1 }}
-          />
-        ))}
       </Box>
 
       {selectedIds.length > 0 && (
@@ -433,6 +455,7 @@ export function UsersPage(): ReactElement {
         }
       />
 
+      {/* Create / Edit Dialog */}
       <UserFormDialog
         open={dialogOpen}
         user={editUser}
@@ -443,6 +466,7 @@ export function UsersPage(): ReactElement {
         currentUserRole={user?.role}
       />
 
+      {/* Delete Confirmation */}
       <ConfirmDialog
         open={!!deleteTarget}
         title="Delete User"
@@ -458,18 +482,21 @@ export function UsersPage(): ReactElement {
         loading={deleteMutation.isPending}
       />
 
+      {/* Bulk action confirmation */}
       <ConfirmDialog
         open={bulkConfirmOpen}
         title={
           bulkAction === 'delete'
             ? 'Delete Users'
             : bulkAction === 'activate'
-            ? 'Activate Users'
-            : 'Deactivate Users'
+              ? 'Activate Users'
+              : 'Deactivate Users'
         }
         message={
           bulkAction === 'delete'
-            ? `Are you sure you want to delete ${selectedIds.length} selected user${selectedIds.length === 1 ? '' : 's'}? This action cannot be undone.`
+            ? `Are you sure you want to delete ${selectedIds.length} selected user${
+                selectedIds.length === 1 ? '' : 's'
+              }? This action cannot be undone.`
             : `Are you sure you want to ${
                 bulkAction === 'activate' ? 'activate' : 'deactivate'
               } ${selectedIds.length} selected user${selectedIds.length === 1 ? '' : 's'}?`
