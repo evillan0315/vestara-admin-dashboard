@@ -46,19 +46,24 @@ pnpm install
 
 # 3. Configure environment
 cp .env.example .env
-# Fill in DATABASE_URL (from `prisma postgres link`) and JWT secrets.
+# A git-ignored .env (localhost) is already provided; docker-compose.yml sets
+# Postgres + Redis with credentials matching that .env.
 
-# 4. Apply database migrations + seed
-pnpm prisma migrate dev
-pnpm prisma db seed
+# 4. One-command local bootstrap (Docker + migrate + seed + dev servers)
+pnpm dev:local
 
-# 5. Run everything (web + api)
-pnpm dev
+# Or, manual flow:
+#   docker compose up -d            # Postgres 17 + Redis 8
+#   pnpm prisma migrate dev
+#   pnpm prisma db seed
+#   pnpm dev
 ```
 
 - Web: http://localhost:5173
 - API: http://localhost:5000 (`/api/v1` base path)
-- API health: http://localhost:5000/health
+- API health: http://localhost:5000/api/v1/health
+
+> In dev, `vite.config.ts` proxies `/api` → `http://localhost:5000`, so local frontend calls work without `VITE_API_URL`. See `infrastructure/local/README.md` for the full local runbook.
 
 ---
 
