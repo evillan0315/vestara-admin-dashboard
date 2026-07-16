@@ -255,7 +255,18 @@ JWT_REFRESH_EXPIRES_IN=30d
 # OPENCODE_API_KEY=
 
 # ── File storage (optional; LOCAL is default) ──
-# S3_ENDPOINT=  S3_BUCKET=  S3_ACCESS_KEY=  S3_SECRET_KEY=  S3_REGION=us-east-1
+UPLOAD_PATH=./uploads
+CLOUDINARY_CLOUD_NAME=  CLOUDINARY_API_KEY=  CLOUDINARY_API_SECRET=
+# NOTE: two naming variants exist — `config/index.ts` reads S3_ACCESS_KEY /
+# S3_SECRET_KEY, while `services/file.service.ts` reads S3_ACCESS_KEY_ID /
+# S3_SECRET_ACCESS_KEY. Provide both for compatibility.
+S3_ENDPOINT=  S3_BUCKET=  S3_REGION=us-east-1
+S3_ACCESS_KEY=  S3_SECRET_KEY=  S3_ACCESS_KEY_ID=  S3_SECRET_ACCESS_KEY=
+
+# ── AI / Integrations (optional) ───────────────
+# OPENCODE_API_KEY=
+# VERCEL_AI_GATEWAY_API_KEY=
+OPENCODE_BASE_URL=https://opencode.ai/zen/v1
 
 # ── Email (optional) ───────────────────────────
 # SMTP_HOST=  SMTP_PORT=587  SMTP_USER=  SMTP_PASSWORD=  SMTP_FROM=noreply@example.com
@@ -264,13 +275,19 @@ LOG_LEVEL=info
 ```
 
 > Never commit `.env`. It is git-ignored. Keep backups of secrets in a password manager.
+>
+> A complete, copy-ready template of every production variable (including SMTP,
+> Cloudinary, S3, AI keys, and the web `VITE_*` build vars) is provided at
+> **`.env.deploy.example`** in the repo root — copy it to `.env.deploy` and
+> fill in values, then export them into the API's environment at launch.
 
 **Frontend — `/var/www/app/apps/web/.env`** (optional for single-domain):
 
 ```bash
 # Defaults to "/api/v1" (relative) — only set if using a separate API domain.
-# VITE_API_URL=/api/v1
-VITE_APP_NAME=Vestara Admin
+# With a separate API domain, point it at the API base URL:
+VITE_API_URL=https://vestara.meetlily.org/api/v1
+VITE_APP_NAME=Vestara
 ```
 
 ### 8. Database migration & seed
@@ -306,9 +323,13 @@ This builds both apps via Turborepo:
 
 ### 10. Run the API (PM2)
 
-Create `ecosystem.config.cjs` in the repo root:
+The process definition is version-controlled at
+**`infrastructure/pm2/ecosystem.config.cjs`**. It runs a single forked instance
+(required for in-process WebSocket + BullMQ state) and **auto-loads
+`.env.deploy`** at startup, so runtime secrets stay in one git-ignored place.
 
 ```js
+// infrastructure/pm2/ecosystem.config.cjs (excerpt)
 module.exports = {
   apps: [{
     name: 'vestara-api',
@@ -316,9 +337,7 @@ module.exports = {
     script: 'apps/api/dist/index.js',
     exec_mode: 'fork',     // single instance: WebSocket + BullMQ share in-process state
     instances: 1,
-    env_production: {
-      NODE_ENV: 'production',
-    },
+    env: { /* merged from .env.deploy */ NODE_ENV: 'production' },
     error_file: '/var/www/logs/api-error.log',
     out_file: '/var/www/logs/api-out.log',
     log_date_format: 'YYYY-MM-DD HH:mm:ss',
@@ -331,7 +350,7 @@ Start and persist across reboots:
 ```bash
 cd /var/www/app
 mkdir -p /var/www/logs
-pnpm exec pm2 start ecosystem.config.cjs --env production
+pnpm exec pm2 start infrastructure/pm2/ecosystem.config.cjs --env production
 pnpm exec pm2 save
 pnpm exec pm2 startup   # follow the printed command to enable the systemd unit
 ```
@@ -345,69 +364,27 @@ curl -i http://127.0.0.1:5000/api/v1/health
 
 ### 11. Serve the frontend + proxy the API (Nginx)
 
-Create `/etc/nginx/sites-available/vestara`:
-
-```nginx
-server {
-    server_name vestara.meetlily.org;
-
-    access_log /var/log/nginx/vestara.access.log;
-    error_log  /var/log/nginx/vestara.error.log;
-
-    # ── API backend (/api/v1/*) ───────────────────────────
-    location /api/v1/ {
-        client_max_body_size 100M;          # allow large uploads (files, avatars)
-
-        proxy_pass http://127.0.0.1:5000;
-        proxy_http_version 1.1;
-
-        # WebSocket support (/api/v1/ws)
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-
-        proxy_read_timeout 300;
-        proxy_connect_timeout 300;
-    }
-
-    # ── Real-time Socket.IO layer ────────────────────────
-    location /socket.io/ {
-        proxy_pass http://127.0.0.1:5000;
-        proxy_http_version 1.1;
-
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
-    }
-
-    # ── Static SPA (built by `pnpm --filter web build`) ───
-    location / {
-        root /var/www/vestara;
-        index index.html;
-        try_files $uri $uri/ /index.html;     # SPA fallback for client-side routing
-    }
-
-    # Certbot appends the TLS block (listen 443 ssl; ssl_certificate …) here.
-}
-```
-
-> This mirrors the **live** `/etc/nginx/sites-enabled/vestara` on the server:
-> the API is mounted at `/api/v1/`, real-time traffic uses Socket.IO at
-> `/socket.io/`, uploads up to 100 MB are allowed, and the SPA is served from
-> `/var/www/vestara` (the path `scripts/deploy.sh` deploys to).
-
-Enable and test:
+The canonical, production-ready Nginx site config lives at
+**`infrastructure/nginx/vestara.meetlily.org.conf`** in the repo. It implements
+the single-domain topology: SPA at `/`, API reverse-proxied at `/api/v1`,
+WebSocket upgrades on `/api/v1/ws` and `/socket.io/`, 100 MB upload limit, TLS
+hardening, and security headers. Copy it into place:
 
 ```bash
+sudo cp infrastructure/nginx/vestara.meetlily.org.conf \
+         /etc/nginx/sites-available/vestara
 sudo ln -sf /etc/nginx/sites-available/vestara /etc/nginx/sites-enabled/vestara
 sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t
 sudo systemctl reload nginx
 ```
+
+> This mirrors the **live** `/etc/nginx/sites-enabled/vestara` on the server:
+> the API is mounted at `/api/v1/`, real-time traffic uses Socket.IO at
+> `/socket.io/`, uploads up to 100 MB are allowed, and the SPA is served from
+> `/var/www/vestara` (the path `scripts/deploy.sh` deploys to). The config
+> already contains the HTTP→HTTPS redirect server block; Certbot adds the
+> certificate paths and the `listen 443 ssl;` lines on first issuance.
 
 > Note: `/api/v1/` is proxied **with** the prefix intact
 > (`/api/v1/health` → `http://127.0.0.1:5000/api/v1/health`), which matches
@@ -437,7 +414,7 @@ redirect. Reload Nginx once more, then visit `https://vestara.meetlily.org`.
 3. Paste the client ID/secret into the root `.env`
    (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_CALLBACK_URL`, and the
    GitHub equivalents).
-4. Restart the API: `pnpm exec pm2 restart vestara-api`.
+4. Restart the API: `pnpm exec pm2 start infrastructure/pm2/ecosystem.config.cjs --env production --update-env || pnpm exec pm2 restart vestara-api`.
 
 If you change `API_URL` or use a separate API domain, make sure each
 `*_CALLBACK_URL` matches the exact origin the browser uses — the backend
@@ -456,7 +433,7 @@ pnpm exec prisma generate --schema apps/api/prisma/schema.prisma
 pnpm exec prisma migrate deploy --schema apps/api/prisma/schema.prisma
 pnpm build
 
-pnpm exec pm2 restart vestara-api
+pnpm exec pm2 start infrastructure/pm2/ecosystem.config.cjs --env production --update-env || pnpm exec pm2 restart vestara-api
 # Frontend is static — Nginx already serves the new dist/ after build
 sudo systemctl reload nginx
 ```
@@ -519,7 +496,7 @@ $EDITOR deploy.env
 | `DEPLOY_RELEASES_DIR` | Where timestamped releases are stored (default `/var/www/releases`) |
 | `DEPLOY_KEEP_RELEASES` | How many past releases to keep (default `5`) |
 | `DEPLOY_WEB_ROOT_GROUP` | Group that should own web files (default `www-data`) |
-| `DEPLOY_API` / `DEPLOY_API_PATH` | Also pull/build/restart the API remotely |
+| `DEPLOY_API` / `DEPLOY_API_PATH` | Also copy `.env.deploy` + pull/build/restart the API remotely via `infrastructure/pm2/ecosystem.config.cjs` |
 
 ### 3. Deploy
 
