@@ -488,8 +488,6 @@ class ReportsService {
         try {
           const base64 = orgLogoUrl.split(',')[1];
           if (base64) {
-            const mimeMatch = orgLogoUrl.match(/^data:(image\/\w+);/);
-            const mime = mimeMatch ? mimeMatch[1] : 'image/png';
             doc.image(Buffer.from(base64, 'base64'), 40, 20, { fit: [80, 80] });
           }
         } catch {

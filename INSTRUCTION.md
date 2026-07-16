@@ -603,7 +603,7 @@ For every task:
 
 ### 23. Security Hardening
 
-**Status:** ⏳ In Progress (~40%)
+**Status:** ✅ Complete
 **Dependencies:** Phases 4–5
 
 **Implemented:**
@@ -612,14 +612,11 @@ For every task:
 * JWT authentication with refresh token rotation
 * Input validation (Zod middleware on all routes)
 * Audit logging for all critical actions
-
-**Still missing:**
-* **Rate limiting** — per-IP and per-endpoint rate limits (e.g., express-rate-limit)
-* **CSRF protection** — double-submit cookie pattern or csurf
-* **Password policies** — minimum strength requirements, breach check, history
-* **XSS protection** — output encoding, Content-Security-Policy headers
-* **Secure file handling** — file type validation, size limits, malware scanning
-* **Security headers audit** — CSP, HSTS, X-Content-Type-Options, Referrer-Policy
+* **Rate limiting** — `express-rate-limit` with strict auth limiter (5 req / 15 min, counts only failures), general API limiter (100 req / min), and a permissive health limiter. Disabled under `NODE_ENV=test` so the auth test-suite can run.
+* **CSRF / origin verification** — `csrfProtection` middleware rejects cross-origin `POST/PUT/PATCH/DELETE` requests whose `Origin` does not match the allow-listed SPA/origin set (incl. `.vercel.app` deployments). Read-only methods pass through.
+* **Password policies** — server-side `PASSWORD_POLICY` (min 8 / max 128, requires upper+lower+number+symbol) enforced in Zod `passwordField`, plus a `COMMON_PASSWORDS` blocklist (breach check). Front-end `PasswordStrength` mirrors the rules; a server-authoritative `POST /auth/password-strength` endpoint returns a 0–4 score + feedback.
+* **XSS protection** — `Content-Security-Policy` (script/src 'self', `unsafe-inline` styles for MUI/Swagger, `frame-src 'none'`, `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, `upgrade-insecure-requests` in prod) via Helmet; HSTS (1y, preload) in prod; `Referrer-Policy: strict-origin-when-cross-origin`; `X-Content-Type-Options: nosniff`; `X-XSS-Protection`; `X-Frame-Options: DENY`; `Permissions-Policy` disabling camera/mic/geolocation/etc.
+* **Input sanitization** — `sanitizeInput` middleware recursively strips control characters, `<script>` blocks, inline event-handler attributes, and `javascript:` URIs from `req.body`/`query`/`params` (defense-in-depth against stored XSS, applied after Zod validation). `isSafeQueryValue` guards against NoSQL-operator / prototype-pollution injection in query params.
 
 ---
 

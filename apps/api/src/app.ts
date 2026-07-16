@@ -4,6 +4,10 @@ import cors from 'cors';
 import { requestLogger } from './middleware/request-logger.js';
 import { errorHandler } from './middleware/error-handler.js';
 import { notFoundHandler } from './middleware/not-found.js';
+import { securityHeaders, permissionsPolicy } from './middleware/security-headers.js';
+import { apiRateLimiter } from './middleware/rate-limit.js';
+import { csrfProtection } from './middleware/csrf.js';
+import { sanitizeInput } from './middleware/sanitize.middleware.js';
 import routes from './routes/index.js';
 import { API_PREFIX } from '@vestara/constants';
 
@@ -25,13 +29,9 @@ if (typeof (BigInt.prototype as unknown as Record<string, unknown>).toJSON !== '
 export function createApp(): express.Application {
   const app = express();
 
-  // Security headers
-  app.use((_req, res, next) => {
-    res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('X-Frame-Options', 'DENY');
-    res.setHeader('X-XSS-Protection', '1; mode=block');
-    next();
-  });
+  // ── Security headers (Helmet: CSP, HSTS, Referrer-Policy, etc.) ──
+  app.use(securityHeaders);
+  app.use(permissionsPolicy);
 
   // CORS — allow known origins + any Vercel deployment
   const allowedOrigins = [
@@ -78,6 +78,18 @@ export function createApp(): express.Application {
 
   // Request logging
   app.use(requestLogger);
+
+  // CSRF / origin verification for all state-changing requests.
+  app.use(csrfProtection);
+
+  // Global API rate limiter (per IP). Auth + health mount their own stricter
+  // or more permissive limiters inside routes/index.ts; this is the default
+  // ceiling for every other route.
+  app.use(apiRateLimiter);
+
+  // Defense-in-depth content sanitization (stored-XSS / injection guard).
+  // Runs after validation so parsed values are cleaned before reaching services.
+  app.use(sanitizeInput);
 
   // Routes
   app.use(API_PREFIX, routes);

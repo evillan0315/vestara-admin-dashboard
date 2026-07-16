@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { authRateLimiter, healthRateLimiter } from '../middleware/rate-limit.js';
 import healthRouter from './health.js';
 import authRouter from './auth.js';
 import oauthRouter from './oauth.js';
@@ -18,13 +19,14 @@ import agentRouter from './agent.js';
 const router = Router();
 
 // Mount feature routes
+router.use(healthRateLimiter);
 router.use(healthRouter);
 
-// Auth routes
-router.use('/auth', authRouter);
+// Auth routes — strict brute-force protection (counts only failures).
+router.use('/auth', authRateLimiter, authRouter);
 
-// OAuth routes (Google, GitHub)
-router.use('/auth', oauthRouter);
+// OAuth routes (Google, GitHub) — same strict limiter as auth.
+router.use('/auth', authRateLimiter, oauthRouter);
 
 // Protected API routes
 router.use('/users', usersRouter);

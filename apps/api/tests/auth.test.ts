@@ -30,6 +30,9 @@ describe('Authentication API', () => {
     await prisma.auditLog.deleteMany();
     await prisma.file.deleteMany();
     await prisma.systemSetting.deleteMany();
+    await prisma.report.deleteMany();
+    await prisma.reportTemplate.deleteMany();
+    await prisma.dataSource.deleteMany();
     await prisma.user.deleteMany();
   });
 
@@ -37,7 +40,7 @@ describe('Authentication API', () => {
     it('should register a new user successfully', async () => {
       const userData = {
         email: 'test@example.com',
-        password: 'Password123',
+        password: 'Password123!',
         firstName: 'John',
         lastName: 'Doe',
         role: UserRole.ADMIN,
@@ -70,7 +73,7 @@ describe('Authentication API', () => {
     it('should not allow duplicate email registration', async () => {
       const userData = {
         email: 'duplicate@example.com',
-        password: 'Password123',
+        password: 'Password123!',
         firstName: 'John',
         lastName: 'Doe',
         role: UserRole.ADMIN,
@@ -96,7 +99,7 @@ describe('Authentication API', () => {
     beforeEach(async () => {
       const userData = {
         email: 'loginuser@example.com',
-        password: 'Password123',
+        password: 'Password123!',
         firstName: 'Jane',
         lastName: 'Smith',
         role: UserRole.ADMIN,
@@ -113,7 +116,7 @@ describe('Authentication API', () => {
         .post('/api/v1/auth/login')
         .send({
           email: user.email,
-          password: 'Password123',
+          password: 'Password123!',
         })
         .expect(200);
 
@@ -135,7 +138,7 @@ describe('Authentication API', () => {
         .post('/api/v1/auth/login')
         .send({
           email: user.email,
-          password: 'WrongPassword',
+          password: 'Password999!',
         })
         .expect(401);
 
@@ -154,7 +157,7 @@ describe('Authentication API', () => {
         .post('/api/v1/auth/login')
         .send({
           email: user.email,
-          password: 'Password123',
+          password: 'Password123!',
         })
         .expect(401);
 
@@ -170,7 +173,7 @@ describe('Authentication API', () => {
     beforeEach(async () => {
       const userData = {
         email: 'refreshuser@example.com',
-        password: 'Password123',
+        password: 'Password123!',
         firstName: 'Bob',
         lastName: 'Johnson',
         role: UserRole.ADMIN,
@@ -220,7 +223,7 @@ describe('Authentication API', () => {
     beforeEach(async () => {
       const userData = {
         email: 'logoutuser@example.com',
-        password: 'Password123',
+        password: 'Password123!',
         firstName: 'Alice',
         lastName: 'Brown',
         role: UserRole.ADMIN,
@@ -260,7 +263,7 @@ describe('Authentication API', () => {
     beforeEach(async () => {
       const userData = {
         email: 'meuser@example.com',
-        password: 'Password123',
+        password: 'Password123!',
         firstName: 'Charlie',
         lastName: 'Davis',
         role: UserRole.ADMIN,

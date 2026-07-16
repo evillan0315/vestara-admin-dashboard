@@ -190,6 +190,61 @@ export const REGEX = {
   PHONE: /^\+?[\d\s()-]{7,20}$/,
 } as const;
 
+// ── Password Policy ─────────────────────────
+
+/**
+ * Server-side password strength policy. Mirrors the Zod `passwordField` in
+ * `@vestara/validation` so the API rejects weak passwords even if a client
+ * bypasses front-end validation.
+ */
+export const PASSWORD_POLICY = {
+  MIN_LENGTH: 8,
+  MAX_LENGTH: 128,
+  /** Require at least one of each character class below. */
+  REQUIRE_UPPERCASE: true,
+  REQUIRE_LOWERCASE: true,
+  REQUIRE_NUMBER: true,
+  REQUIRE_SYMBOL: true,
+  /** Reject the top-N most common passwords (basic breach check). */
+  BLOCK_COMMON_PASSWORDS: true,
+} as const;
+
+/**
+ * A small blocklist of the most frequently leaked passwords. In production
+ * this would be backed by an external breach corpus (e.g. HaveIBeenPwned
+ * k-anonymity API); this in-repo list covers the obvious low-hanging fruit
+ * without a network dependency.
+ */
+export const COMMON_PASSWORDS = new Set<string>([
+  'password',
+  'password123',
+  '123456',
+  '12345678',
+  '123456789',
+  'qwerty',
+  'abc123',
+  'letmein',
+  'welcome',
+  'admin',
+  'iloveyou',
+  'monkey',
+  'dragon',
+  'sunshine',
+  'princess',
+  'football',
+  'baseball',
+  'master',
+  'superman',
+  'batman',
+  'trustno1',
+  'whatever',
+  'qwerty123',
+  'administrator',
+  'root',
+  'passw0rd',
+  'p@ssw0rd',
+]);
+
 // ── User Constants ─────────────────────────────
 
 export const USER_ROLES = {

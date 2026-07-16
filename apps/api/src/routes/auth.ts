@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { validate } from '../middleware/validate.js';
 import { AuthResponseDTO, UserRole } from '@vestara/types';
-import { createUserSchema, loginSchema } from '@vestara/validation';
+import { createUserSchema, loginSchema, scorePasswordStrength } from '@vestara/validation';
+import { PASSWORD_POLICY, COMMON_PASSWORDS } from '@vestara/constants';
 import { authService } from '../services/index.js';
 import { JwtService } from '../utils/jwt.js';
 import { userRepository } from '../repositories/index.js';
@@ -186,6 +187,40 @@ router.get('/me', async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+});
+
+/**
+ * POST /auth/password-strength - Server-authoritative password strength check.
+ *
+ * The SPA's `PasswordStrength` component estimates strength client-side, but
+ * this endpoint lets the UI confirm against the same policy the server enforces
+ * on registration (length, character classes, common-password blocklist) and
+ * returns a 0–4 score plus human-readable feedback. It performs no persistence
+ * and requires no authentication.
+ */
+router.post('/password-strength', (req, res) => {
+  const password = typeof req.body?.password === 'string' ? req.body.password : '';
+
+  const score = scorePasswordStrength(password);
+  const feedback: string[] = [];
+
+  if (password.length < PASSWORD_POLICY.MIN_LENGTH) {
+    feedback.push(`Use at least ${PASSWORD_POLICY.MIN_LENGTH} characters`);
+  }
+  if (!/[a-z]/.test(password)) feedback.push('Add a lowercase letter');
+  if (!/[A-Z]/.test(password)) feedback.push('Add an uppercase letter');
+  if (!/[0-9]/.test(password)) feedback.push('Add a number');
+  if (!/[^A-Za-z0-9]/.test(password)) feedback.push('Add a symbol (e.g. !@#$%)');
+  if (PASSWORD_POLICY.BLOCK_COMMON_PASSWORDS && COMMON_PASSWORDS.has(password.toLowerCase())) {
+    feedback.push('This password is too common or has appeared in a known breach');
+  }
+
+  const strength = password.length === 0 ? 'none' : score < 3 ? 'weak' : score === 3 ? 'medium' : 'strong';
+
+  res.json({
+    success: true,
+    data: { score, strength, feedback },
+  });
 });
 
 export default router;

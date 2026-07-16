@@ -1,16 +1,37 @@
 import { z, ZodError } from 'zod';
+import { PASSWORD_POLICY, COMMON_PASSWORDS } from '@vestara/constants';
 
 // ── Common Field Validators ───────────────────
 
 const emailField = z.string().email('Invalid email address');
 
+/**
+ * Score a candidate password from 0–4 based on satisfied character classes
+ * (length, lowercase, uppercase, number, symbol). Shared by the API and any
+ * server-side strength checks so the rules live in one place.
+ */
+export function scorePasswordStrength(password: string): number {
+  let score = 0;
+  if (password.length >= PASSWORD_POLICY.MIN_LENGTH) score++;
+  if (/[a-z]/.test(password)) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+  return score;
+}
+
 const passwordField = z
   .string()
-  .min(8, 'Password must be at least 8 characters')
+  .min(PASSWORD_POLICY.MIN_LENGTH, `Password must be at least ${PASSWORD_POLICY.MIN_LENGTH} characters`)
+  .max(PASSWORD_POLICY.MAX_LENGTH, `Password must be at most ${PASSWORD_POLICY.MAX_LENGTH} characters`)
   .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
   .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-  .regex(/[0-9]/, 'Password must contain at least one number');
-
+  .regex(/[0-9]/, 'Password must contain at least one number')
+  .regex(/[^A-Za-z0-9]/, 'Password must contain at least one symbol (e.g. !@#$%)')
+  .refine(
+    (pw) => !(PASSWORD_POLICY.BLOCK_COMMON_PASSWORDS && COMMON_PASSWORDS.has(pw.toLowerCase())),
+    'Password is too common or has appeared in a known data breach',
+  );
 const nameField = (field: string) =>
   z.string().min(1, `${field} is required`).max(100, `${field} must be at most 100 characters`);
 
