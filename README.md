@@ -2160,6 +2160,8 @@ Future licensing terms may change as the platform evolves.
 | Global Search (Cmd/Ctrl+K) | 🟢 Complete (data-driven, live user search, route-scoped) |
 | Sidebar Navigation (platform-domain categories) | 🟢 Complete (Wallet & Payments, Marketplace, Bookings, Rewards, AI Services, Management, System, Security; roadmap modules marked "Soon") |
 | CI/CD (GitHub Actions) | 🟢 API Deploy Workflow |
+| AvatarUpload Reusable Component | 🟢 Complete (view-only + editable modes, camera overlay, initials fallback, custom sizes, SVG support; integrated into ProfilePage, UserFormDialog, OrganizationsDialog, table columns, user menus) |
+| Sidebar Logo Customization | 🟢 Complete (useAppLogo hook via app_logo_url SystemSetting; Logo component accepts src prop; admin camera overlay upload in sidebar) |
 | Reporting (CSV/Excel/PDF) | 🟢 Complete (backend + frontend, 4 report types) |
 | Real-time Features (WebSocket, live notifications) | 🟢 Complete (Phases 21-22 — WebSocket + live dashboard + presence) |
 | Reusable Form Components | 🟢 Complete (14 components + Zod) |
@@ -2205,6 +2207,9 @@ Future licensing terms may change as the platform evolves.
 - ✅ Real-time features (WebSocket, live notifications)
 - ✅ Testing & Performance optimization with optimistic updates for improved user experience
 - ✅ Large page refactoring (UsersPage 790→149, FileManagerPage 1,231→187, ReportsPage 627→111, OrganizationsPage 420→74, SystemLogsPage 234→56 lines) — all pages <600 lines with extracted hooks + sub-components
+- ✅ Reusable AvatarUpload component (view-only + editable, camera overlay, custom sizes, SVG support) — unified avatar/logo upload across all consumer sites
+- ✅ Sidebar logo customization (useAppLogo hook via app_logo_url SystemSetting; sidebar camera overlay for admin replace)
+- ✅ Optimistic update bug fix (narrowed setQueriesData filter to avoid `old.data.map is not a function` on detail/stats queries)
 
 ---
 
