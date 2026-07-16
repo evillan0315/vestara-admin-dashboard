@@ -13,6 +13,12 @@
  * A Chromium executable is located automatically (system install, Playwright
  * cache, or an explicit VESTARA_SCREENSHOT_CHROME path). No headless browser
  * download is performed unless one cannot be found.
+ *
+ * Options:
+ *   --skip-db   No database step is performed (the tool never manages the DB;
+ *               this flag documents that expectation and is accepted for parity with
+ *               `pnpm dev:local --skip-db`). The dev servers (web + api) must
+ *               already be running and the database seeded.
  */
 
 import { chromium, type Browser, type BrowserContext } from 'playwright';
@@ -128,9 +134,52 @@ async function captureRoute(
   }
 }
 
+/** Parse CLI flags. Currently only `--skip-db` is recognized. */
+function parseArgs(argv: string[]): { skipDb: boolean } {
+  let skipDb = false;
+  for (const arg of argv) {
+    if (arg === '--skip-db' || arg === '--skip-db') {
+      skipDb = true;
+    } else if (arg.startsWith('-')) {
+      console.warn(`  ⚠ Unknown flag ignored: ${arg}`);
+    }
+  }
+  return { skipDb };
+}
+
+/**
+ * Pre-flight check that the dev servers are reachable before launching the
+ * browser. Provides a clear error instead of a confusing Playwright timeout.
+ */
+async function assertServersUp(config: ScreenshotConfig): Promise<void> {
+  const checks: Array<[string, string]> = [
+    ['web', config.baseUrl],
+    ['api', `${config.apiUrl}/health`],
+  ];
+  for (const [label, url] of checks) {
+    try {
+      const res = await fetch(url, { method: 'GET' });
+      if (!res.ok && res.status !== 401) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+    } catch {
+      throw new Error(
+        `The ${label} server is not reachable at ${url}.\n` +
+          '  Start the dev stack first: `pnpm dev` (or `pnpm dev:local`).',
+      );
+    }
+  }
+}
+
 async function main(): Promise<void> {
+  const { skipDb } = parseArgs(process.argv.slice(2));
   const config = loadConfig();
   if (!existsSync(config.outDir)) mkdirSync(config.outDir, { recursive: true });
+
+  if (skipDb) {
+    console.log('🐳 --skip-db: assuming Postgres/Redis are already up.');
+  }
+  await assertServersUp(config);
 
   console.log(`🔐 Logging in as ${config.email}…`);
   const tokens = await login(config);

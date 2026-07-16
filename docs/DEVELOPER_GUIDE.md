@@ -155,7 +155,12 @@ and the database seeded (`pnpm prisma:seed`).
 ```bash
 pnpm screenshot          # dark + light, every route → ./screens
 pnpm screenshot:dev      # dark only (quick preview)
+pnpm screenshot -- --skip-db   # same, explicit "DB already up" flag (parity with dev:local)
 ```
+
+`--skip-db` is accepted for parity with `pnpm dev:local --skip-db`; the
+tool never manages the database, so it simply documents the expectation that
+Postgres/Redis are already running and the dev data is seeded.
 
 Outputs are written to `./screens/` as `<route>-<theme>.png`
 (e.g. `dashboard-dark.png`, `users-light.png`). A Chromium executable is
