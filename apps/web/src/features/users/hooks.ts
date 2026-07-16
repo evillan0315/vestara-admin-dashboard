@@ -1,11 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { usersApi, type UserListParams } from '../../api/users';
+import { usersApi, type UserListParams, type UserStats } from '../../api/users';
 import type { CreateUserRequestDTO, UpdateUserRequestDTO } from '@vestara/types';
 
 export const userKeys = {
   all: ['users'] as const,
   list: (params?: UserListParams) => ['users', 'list', params] as const,
   detail: (id: string) => ['users', id] as const,
+  stats: ['users', 'stats'] as const,
 };
 
 export function useUsers(params?: UserListParams) {
@@ -20,6 +21,14 @@ export function useUser(id: string) {
     queryKey: userKeys.detail(id),
     queryFn: () => usersApi.getById(id),
     enabled: !!id,
+  });
+}
+
+export function useUserStats() {
+  return useQuery({
+    queryKey: userKeys.stats,
+    queryFn: () => usersApi.getStats(),
+    select: (data) => data.data?.stats,
   });
 }
 

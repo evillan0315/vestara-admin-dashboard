@@ -4,7 +4,30 @@ import { BaseRepository } from './base.repository.js';
 
 export class UserRepository extends BaseRepository {
   /**
-   * Find all users with optional filtering and pagination.
+   * Get user statistics for the organization
+   */
+  async getStats(organizationId: string) {
+    const [total, active, inactive, byRole] = await Promise.all([
+      this.prisma.user.count({ where: { organizationId } }),
+      this.prisma.user.count({ where: { organizationId, isActive: true } }),
+      this.prisma.user.count({ where: { organizationId, isActive: false } }),
+      this.prisma.user.groupBy({
+        by: ['role'],
+        where: { organizationId },
+        _count: { role: true },
+      }),
+    ]);
+
+    return {
+      total,
+      active,
+      inactive,
+      byRole: byRole.map((r) => ({ role: r.role, count: r._count.role })),
+    };
+  }
+
+  /**
+   * Find user by email
    */
   async findAll(params?: {
     page?: number;

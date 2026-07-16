@@ -6,6 +6,9 @@ import {
   Activity,
   Settings,
   Monitor,
+  MapPin,
+  Eye,
+  IdCard,
 } from "lucide-react";
 
 /**
@@ -15,10 +18,14 @@ import {
  */
 export type ProfileTabValue =
   | "overview"
+  | "personal"
+  | "address"
+  | "preferences"
+  | "privacy"
+  | "identity"
   | "security"
   | "permissions"
   | "activity"
-  | "preferences"
   | "sessions";
 
 export interface ProfileTabConfig {
@@ -45,6 +52,36 @@ export const profileTabs: ProfileTabConfig[] = [
     icon: <UserIcon size={16} />,
   },
   {
+    value: "personal",
+    label: "Personal Info",
+    path: "/profile/personal",
+    icon: <UserIcon size={16} />,
+  },
+  {
+    value: "address",
+    label: "Address",
+    path: "/profile/address",
+    icon: <MapPin size={16} />,
+  },
+  {
+    value: "preferences",
+    label: "Preferences",
+    path: "/preferences",
+    icon: <Settings size={16} />,
+  },
+  {
+    value: "privacy",
+    label: "Privacy",
+    path: "/profile/privacy",
+    icon: <Eye size={16} />,
+  },
+  {
+    value: "identity",
+    label: "Identity & KYC",
+    path: "/profile/identity",
+    icon: <IdCard size={16} />,
+  },
+  {
     value: "security",
     label: "Security",
     path: "/security",
@@ -61,12 +98,6 @@ export const profileTabs: ProfileTabConfig[] = [
     label: "Activity",
     path: "/activity",
     icon: <Activity size={16} />,
-  },
-  {
-    value: "preferences",
-    label: "Preferences",
-    path: "/preferences",
-    icon: <Settings size={16} />,
   },
   {
     value: "sessions",
@@ -93,3 +124,4 @@ export function getProfileTabFromPath(pathname: string): ProfileTabValue {
   const match = profileTabByPath[pathname];
   return match ? match.value : "overview";
 }
+

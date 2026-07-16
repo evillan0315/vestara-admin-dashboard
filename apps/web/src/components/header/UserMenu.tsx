@@ -17,12 +17,12 @@ import {
   ChevronDown,
   LogOut,
   SlidersHorizontal,
+  User as UserIcon,
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../features/auth/AuthContext";
-import { profileTabs } from "../../features/profile/tabs";
 import UserPreferencesDrawer from "../layout/UserPreferencesDialog";
 
 export interface UserMenuProps {
@@ -67,11 +67,6 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
     setAnchorEl(null);
   };
 
-  const navigateTo = (path: string) => {
-    closeMenu();
-    navigate(path);
-  };
-
   const logout = async () => {
     closeMenu();
     await onLogout?.();
@@ -82,10 +77,10 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
     setPreferencesOpen(true);
   };
 
-  // Profile-related tabs surfaced as shortcuts in the menu.
-  // Excludes "Overview" (already reachable via the header avatar) to keep
-  // the list focused on secondary destinations.
-  const profileShortcuts = profileTabs.filter((tab) => tab.value !== "overview");
+  const navigateToProfile = () => {
+    closeMenu();
+    navigate("/profile");
+  };
 
   return (
     <>
@@ -229,29 +224,22 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
 
         <Divider />
 
-        {/* Profile tab shortcuts — kept in sync with ProfilePage via profileTabs */}
-        {profileShortcuts.map((tab) => (
-          <MenuItem
-            key={tab.value}
-            onClick={() => navigateTo(tab.path)}
-            sx={{
-              "&:hover": {
-                bgcolor: alpha(primary.main, 0.08),
-                "& .MuiListItemIcon-root svg": { color: primary.main },
-              },
-            }}
-          >
-            <ListItemIcon sx={{ minWidth: 36, color: text.secondary }}>
-              {tab.icon}
-            </ListItemIcon>
+        <MenuItem onClick={navigateToProfile} sx={{
+          "&:hover": {
+            bgcolor: alpha(primary.main, 0.08),
+            "& .MuiListItemIcon-root svg": { color: primary.main },
+          },
+        }}>
+          <ListItemIcon sx={{ minWidth: 36, color: text.secondary }}>
+            <UserIcon size={18} />
+          </ListItemIcon>
 
-            <ListItemText
-              primaryTypographyProps={{ fontSize: 13.5, fontWeight: 500 }}
-            >
-              {tab.label}
-            </ListItemText>
-          </MenuItem>
-        ))}
+          <ListItemText
+            primaryTypographyProps={{ fontSize: 13.5, fontWeight: 500 }}
+          >
+            Profile
+          </ListItemText>
+        </MenuItem>
 
         <Divider />
 

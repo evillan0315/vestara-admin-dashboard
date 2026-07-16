@@ -93,6 +93,10 @@ export function AppRoutes() {
             <Route path="/integrations" element={<IntegrationsPage />} />
             <Route path="/integrations/:id" element={<DataExplorerPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile/personal" element={<ProfilePage />} />
+            <Route path="/profile/address" element={<ProfilePage />} />
+            <Route path="/profile/privacy" element={<ProfilePage />} />
+            <Route path="/profile/identity" element={<ProfilePage />} />
             <Route path="/security" element={<ProfilePage />} />
             <Route path="/permissions" element={<ProfilePage />} />
             <Route path="/activity" element={<ProfilePage />} />

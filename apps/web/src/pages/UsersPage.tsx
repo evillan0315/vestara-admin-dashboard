@@ -1,4 +1,4 @@
-import { Box, Typography, Button, Chip, IconButton, styled, Avatar, Tooltip, Paper } from '@mui/material';
+import { Box, Typography, Button, Chip, IconButton, styled, Avatar, Tooltip, Paper, Grid } from '@mui/material';
 import {
   People as PeopleIcon,
   Add as AddIcon,
@@ -8,10 +8,13 @@ import {
   CheckCircle as CheckCircleIcon,
   Download as DownloadIcon,
   Business as BusinessIcon,
+  Person as PersonIcon,
+  TrendingUp as TrendingUpIcon,
+  Security as SecurityIcon,
 } from '@mui/icons-material';
 import { useState, useCallback, type ReactElement } from 'react';
 import { DataTable, type Column, type SortState, type PaginationState } from '../components/data/DataTable';
-import { useUsers,
+import { useUsers, useUserStats,
   useCreateUser,
   useUpdateUser,
   useDeleteUser,
@@ -26,6 +29,8 @@ import { useToast } from '../components/feedback/Toast';
 import { ConfirmDialog } from '../components/ui/Modal';
 import { useAuth } from '../features/auth/AuthContext';
 import type { UserDTO, UserRole } from '@vestara/types';
+import { StatCard } from '../components/data/StatCard';
+import { Loading } from '../components/feedback/Loading';
 
 // ── Styled ──
 
@@ -101,6 +106,8 @@ export function UsersPage(): ReactElement {
     sort: sort.field,
     order: sort.direction,
   });
+
+  const { data: stats, isLoading: statsLoading } = useUserStats();
 
   const { data: organizations = [] } = useOrganizations();
   const { user } = useAuth();
@@ -360,6 +367,41 @@ export function UsersPage(): ReactElement {
     },
   ];
 
+  // KPI Cards
+  const kpiCards = [
+    {
+      title: 'Total Users',
+      value: stats?.total ?? 0,
+      icon: <PeopleIcon fontSize="large" />,
+      iconBg: 'primary.main',
+      trend: stats ? { value: stats.active, label: 'active' } : undefined,
+    },
+    {
+      title: 'Active Users',
+      value: stats?.active ?? 0,
+      icon: <PersonIcon fontSize="large" />,
+      iconBg: 'success.main',
+      trend: stats && stats.total > 0 ? { value: Math.round((stats.active / stats.total) * 100), label: 'active %' } : undefined,
+    },
+    {
+      title: 'Inactive Users',
+      value: stats?.inactive ?? 0,
+      icon: <SecurityIcon fontSize="large" />,
+      iconBg: 'warning.main',
+      trend: stats && stats.total > 0 ? { value: Math.round((stats.inactive / stats.total) * 100), label: 'inactive %' } : undefined,
+    },
+    {
+      title: 'New This Month',
+      value: 0, // Could add a date-filtered count
+      icon: <TrendingUpIcon fontSize="large" />,
+      iconBg: 'info.main',
+    },
+  ];
+
+  if (statsLoading || isLoading) {
+    return <Loading fullScreen />;
+  }
+
   return (
     <PageContainer>
       <Box>
@@ -370,6 +412,22 @@ export function UsersPage(): ReactElement {
           Manage user accounts and permissions.
         </Typography>
       </Box>
+
+      {/* KPI Stats Row */}
+      <Grid container spacing={3} sx={{ mb: 2 }}>
+        {kpiCards.map((kpi, idx) => (
+          <Grid item xs={12} sm={6} md={3} key={idx}>
+            <StatCard
+              title={kpi.title}
+              value={kpi.value}
+              icon={kpi.icon}
+              iconBg={kpi.iconBg}
+              trend={kpi.trend}
+              loading={statsLoading}
+            />
+          </Grid>
+        ))}
+      </Grid>
 
       {selectedIds.length > 0 && (
         <Paper
@@ -488,8 +546,8 @@ export function UsersPage(): ReactElement {
           bulkAction === 'delete'
             ? 'Delete Users'
             : bulkAction === 'activate'
-              ? 'Activate Users'
-              : 'Deactivate Users'
+            ? 'Activate Users'
+            : 'Deactivate Users'
         }
         message={
           bulkAction === 'delete'

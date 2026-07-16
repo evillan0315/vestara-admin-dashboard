@@ -20,6 +20,14 @@ enum UserRole {
   support
 }
 
+// Verification status for KYC documents / account verification.
+enum VerificationStatus {
+  unverified
+  pending
+  verified
+  rejected
+}
+
 model Organization {
   id        String   @id @default(uuid())
   name      String
@@ -37,6 +45,8 @@ model Organization {
   chatConversations   ChatConversation[]
   reports             Report[]
   dataSources         DataSource[]
+  userProfiles        UserProfile[]
+  kycDocuments        KycDocument[]
 
   @@map("organizations")
 }
@@ -66,10 +76,95 @@ model User {
   chatConversations ChatConversation[]
   createdReports    Report[]           @relation("ReportCreatedBy")
   dataSources       DataSource[]       @relation("DataSourceCreatedBy")
+  profile           UserProfile?
+  kycDocuments      KycDocument[]
 
   @@unique([provider, providerId])
   @@index([organizationId])
   @@map("users")
+}
+
+// ── User Profiles ──────────────────────────
+// Extended personalization / identity / KYC data, kept separate from the
+// authentication `User` row. One profile per user (1:1), org-scoped.
+
+model UserProfile {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  organizationId String
+
+  // Personal information
+  phone        String?
+  bio          String?
+  dateOfBirth  DateTime?
+  // Contact details
+  contactEmail  String?
+  // Address management
+  addressLine1  String?
+  addressLine2  String?
+  city          String?
+  state         String?
+  postalCode    String?
+  country       String?
+
+  // Notification preferences
+  emailNotifications Boolean @default(true)
+  pushNotifications  Boolean @default(true)
+  loginAlerts        Boolean @default(true)
+  marketingEmails    Boolean @default(false)
+  // Language & localization preferences
+  language String @default("en")
+  timezone String @default("UTC")
+  dateFormat String @default("mdy")
+  // Theme preference (light | dark | system)
+  themeMode String @default("system")
+  // Privacy settings
+  profileVisibility String @default("organization") // public | organization | private
+  showEmail         Boolean @default(false)
+  showActivity      Boolean @default(true)
+  searchable        Boolean @default(true)
+
+  // KYC preparation / account verification status
+  kycStatus       VerificationStatus @default(unverified)
+  kycSubmittedAt  DateTime?
+  kycReviewedAt   DateTime?
+  kycRejectionReason String?
+
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  documents    KycDocument[] @relation("ProfileKycDocuments")
+
+  @@index([organizationId])
+  @@map("user_profiles")
+}
+
+// KYC / verification document metadata. The binary is stored in the existing
+// `File` model (org-scoped object storage); this row tracks verification state
+// and the document type for KYC preparation.
+
+model KycDocument {
+  id         String   @id @default(uuid())
+  userId     String
+  profileId  String
+  fileId     String   @unique
+  organizationId String
+  // e.g. passport, driver_license, proof_of_address, selfie, other
+  documentType String @default("other")
+  status     VerificationStatus @default(pending)
+  reviewedAt DateTime?
+  rejectionReason String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profile  UserProfile @relation("ProfileKycDocuments", fields: [profileId], references: [id], onDelete: Cascade)
+  file     File        @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([userId])
+  @@index([profileId])
+  @@map("kyc_documents")
 }
 
 model RefreshToken {
@@ -224,6 +319,7 @@ model File {
   uploadedByUser User    @relation("UploadedFiles", fields: [uploadedBy], references: [id], onDelete: Restrict)
   folder       File?     @relation("FileFolder", fields: [folderId], references: [id], onDelete: SetNull)
   children     File[]    @relation("FileFolder")
+  kycDocument  KycDocument?
 
   @@index([organizationId])
   @@index([folderId])

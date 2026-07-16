@@ -43,6 +43,10 @@ export enum AuditAction {
   PASSWORD_CHANGE = 'password_change',
   EMAIL_CHANGE = 'email_change',
   ACCOUNT_DELETION = 'account_deletion',
+  PROFILE_UPDATE = 'profile_update',
+  KYC_SUBMIT = 'kyc_submit',
+  KYC_DOCUMENT_UPLOAD = 'kyc_document_upload',
+  KYC_DOCUMENT_DELETE = 'kyc_document_delete',
   SETTINGS_UPDATE = 'settings_update',
   SETTINGS_DELETE = 'settings_delete',
   SETTINGS_IMPORT = 'settings_import',
@@ -177,6 +181,119 @@ export interface ChangeEmailRequestDTO {
 export interface DeleteAccountRequestDTO {
   currentPassword?: string;
   confirmation: string;
+}
+
+// ── DTOs: User Profiles ─────────────────────
+
+export type ProfileThemeMode = 'light' | 'dark' | 'system';
+export type ProfileVisibility = 'public' | 'organization' | 'private';
+export type VerificationStatus = 'unverified' | 'pending' | 'verified' | 'rejected';
+export type KycDocumentType = 'passport' | 'driver_license' | 'proof_of_address' | 'selfie' | 'other';
+
+/**
+ * Extended personalization / identity / KYC data for a user. Returned
+ * nested inside the `UserDTO.profile` field from GET /profile.
+ */
+export interface UserProfileDTO {
+  id: string;
+  phone?: string;
+  bio?: string;
+  dateOfBirth?: string;
+  contactEmail?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
+  // Notification preferences
+  emailNotifications: boolean;
+  pushNotifications: boolean;
+  loginAlerts: boolean;
+  marketingEmails: boolean;
+  // Localization
+  language: string;
+  timezone: string;
+  dateFormat: string;
+  // Theme
+  themeMode: ProfileThemeMode;
+  // Privacy
+  profileVisibility: ProfileVisibility;
+  showEmail: boolean;
+  showActivity: boolean;
+  searchable: boolean;
+  // KYC / verification
+  kycStatus: VerificationStatus;
+  kycSubmittedAt?: string;
+  kycReviewedAt?: string;
+  kycRejectionReason?: string;
+  documents: KycDocumentDTO[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface KycDocumentDTO {
+  id: string;
+  fileId: string;
+  fileName: string;
+  fileUrl?: string;
+  fileSize?: number;
+  documentType: KycDocumentType;
+  status: VerificationStatus;
+  reviewedAt?: string;
+  rejectionReason?: string;
+  createdAt: string;
+}
+
+/**
+ * Envelope returned by GET /profile — the base user plus the extended profile.
+ */
+export interface ProfileResponseDTO {
+  user: UserDTO;
+  profile: UserProfileDTO;
+}
+
+export interface UpdateProfileRequestDTO {
+  // Personal information
+  firstName?: string;
+  lastName?: string;
+  avatarUrl?: string;
+  phone?: string;
+  bio?: string;
+  dateOfBirth?: string;
+  // Contact details
+  contactEmail?: string;
+  // Address management
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
+  // Notification preferences
+  emailNotifications?: boolean;
+  pushNotifications?: boolean;
+  loginAlerts?: boolean;
+  marketingEmails?: boolean;
+  // Localization
+  language?: string;
+  timezone?: string;
+  dateFormat?: string;
+  // Theme
+  themeMode?: ProfileThemeMode;
+  // Privacy
+  profileVisibility?: ProfileVisibility;
+  showEmail?: boolean;
+  showActivity?: boolean;
+  searchable?: boolean;
+}
+
+export interface SubmitKycRequestDTO {
+  documentType?: KycDocumentType;
+}
+
+export interface AddKycDocumentRequestDTO {
+  documentType?: KycDocumentType;
 }
 
 // ── DTOs: Pagination ─────────────────────────

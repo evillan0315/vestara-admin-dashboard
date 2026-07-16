@@ -23,6 +23,23 @@ const param = (val: string | string[] | undefined): string => String(val ?? '');
 router.use(authenticate);
 
 /**
+ * GET /users/stats — Get user statistics
+ * Access: SUPER_ADMIN, ADMIN
+ */
+router.get(
+  '/stats',
+  requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  async (req, res, next) => {
+    try {
+      const stats = await userRepository.getStats(req.user!.organizationId);
+      sendSuccess(res, { stats });
+    } catch (error) {
+      next(error);
+    }
+  },
+);
+
+/**
  * GET /users — List users (paginated, filterable)
  * Access: SUPER_ADMIN, ADMIN
  */

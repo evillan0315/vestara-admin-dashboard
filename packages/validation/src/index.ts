@@ -72,9 +72,43 @@ export const userIdParamSchema = z.object({
 // ── Profile ───────────────────────────────────
 
 export const updateProfileSchema = z.object({
-  firstName: nameField('First name'),
-  lastName: nameField('Last name'),
+  firstName: nameField('First name').optional(),
+  lastName: nameField('Last name').optional(),
   avatarUrl: z.string().url().optional().or(z.literal('')),
+  phone: z.string().max(30, 'Phone must be at most 30 characters').optional().or(z.literal('')),
+  bio: z.string().max(500, 'Bio must be at most 500 characters').optional().or(z.literal('')),
+  dateOfBirth: z.string().datetime().optional().or(z.literal('')),
+  contactEmail: emailField.optional().or(z.literal('')),
+  addressLine1: z.string().max(200).optional().or(z.literal('')),
+  addressLine2: z.string().max(200).optional().or(z.literal('')),
+  city: z.string().max(100).optional().or(z.literal('')),
+  state: z.string().max(100).optional().or(z.literal('')),
+  postalCode: z.string().max(20).optional().or(z.literal('')),
+  country: z.string().max(100).optional().or(z.literal('')),
+  emailNotifications: z.boolean().optional(),
+  pushNotifications: z.boolean().optional(),
+  loginAlerts: z.boolean().optional(),
+  marketingEmails: z.boolean().optional(),
+  language: z.string().min(2).max(10).optional(),
+  timezone: z.string().max(100).optional(),
+  dateFormat: z.enum(['mdy', 'dmy', 'ymd']).optional(),
+  themeMode: z.enum(['light', 'dark', 'system']).optional(),
+  profileVisibility: z.enum(['public', 'organization', 'private']).optional(),
+  showEmail: z.boolean().optional(),
+  showActivity: z.boolean().optional(),
+  searchable: z.boolean().optional(),
+});
+
+export const submitKycSchema = z.object({
+  documentType: z
+    .enum(['passport', 'driver_license', 'proof_of_address', 'selfie', 'other'])
+    .optional(),
+});
+
+export const addKycDocumentSchema = z.object({
+  documentType: z
+    .enum(['passport', 'driver_license', 'proof_of_address', 'selfie', 'other'])
+    .default('other'),
 });
 
 export const changeEmailSchema = z.object({
@@ -238,6 +272,8 @@ export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 export type PaginationInput = z.infer<typeof paginationSchema>;
 export type AuditLogQueryInput = z.infer<typeof auditLogQuerySchema>;
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+export type SubmitKycInput = z.infer<typeof submitKycSchema>;
+export type AddKycDocumentInput = z.infer<typeof addKycDocumentSchema>;
 export type ChangeEmailInput = z.infer<typeof changeEmailSchema>;
 export type DeleteAccountInput = z.infer<typeof deleteAccountSchema>;
 export type UpdateSettingInput = z.infer<typeof updateSettingSchema>;

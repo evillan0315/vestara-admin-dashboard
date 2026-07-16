@@ -17,6 +17,13 @@ export interface UserListResponse {
   pagination: PaginationMeta;
 }
 
+export interface UserStats {
+  total: number;
+  active: number;
+  inactive: number;
+  byRole: { role: string; count: number }[];
+}
+
 export const usersApi = {
   list(params?: UserListParams) {
     const searchParams = new URLSearchParams();
@@ -29,6 +36,10 @@ export const usersApi = {
     if (params?.role) searchParams.set('role', params.role);
     const qs = searchParams.toString();
     return apiClient.get<UserDTO[]>(`/users${qs ? `?${qs}` : ''}`);
+  },
+
+  getStats() {
+    return apiClient.get<{ stats: UserStats }>('/users/stats');
   },
 
   getById(id: string) {

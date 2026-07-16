@@ -81,6 +81,30 @@ async function main(): Promise<void> {
       },
     });
     createdUsers.push({ id: userRecord.id, email: userRecord.email, organizationId: org.id, role: userRecord.role });
+
+    // Create a demo user profile (1:1) so the profile module has data.
+    await prisma.userProfile.upsert({
+      where: { userId: userRecord.id },
+      update: {},
+      create: {
+        userId: userRecord.id,
+        organizationId: org.id,
+        phone: '+1 (555) 010-1000',
+        bio: `Demo ${user.role} account for the ${org.name} organization.`,
+        contactEmail: user.email,
+        addressLine1: '123 Market Street',
+        city: 'San Francisco',
+        state: 'CA',
+        postalCode: '94103',
+        country: 'United States',
+        language: 'en',
+        timezone: 'America/Los_Angeles',
+        dateFormat: 'mdy',
+        themeMode: 'system',
+        kycStatus: user.role === UserRole.admin ? 'verified' : 'unverified',
+      },
+    });
+
     console.log(`  ✓ User created: ${userRecord.email} (${user.role}) in ${org.name}`);
   }
 
