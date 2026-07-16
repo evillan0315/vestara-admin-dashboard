@@ -72,9 +72,9 @@ function getFormatIcon(format: string) {
 
 function getTypeLabel(type: Report['type']) {
   switch (type) {
-    case 'audit-logs':
+    case 'audit_logs':
       return 'Audit Logs';
-    case 'system-logs':
+    case 'system_logs':
       return 'System Logs';
     case 'users':
       return 'Users';

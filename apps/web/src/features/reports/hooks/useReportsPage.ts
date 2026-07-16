@@ -50,7 +50,7 @@ export function useReportsPage() {
   }, []);
 
   const handleGenerate = useCallback(
-    async (params: ReportParams, type: 'audit-logs' | 'system-logs') => {
+    async (params: ReportParams, type: 'audit_logs' | 'system_logs' | 'users' | 'activity') => {
       try {
         await generateMutation.mutateAsync({ params, type });
         showSuccess('Report generation started');

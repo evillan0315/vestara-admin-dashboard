@@ -12,7 +12,7 @@ export interface ReportParams {
 export interface Report {
   id: string;
   name: string;
-  type: 'audit-logs' | 'system-logs' | 'users' | 'activity';
+  type: 'audit_logs' | 'system_logs' | 'users' | 'activity';
   status: 'pending' | 'generating' | 'completed' | 'failed';
   params: ReportParams;
   createdAt: string;
@@ -24,7 +24,7 @@ export interface Report {
 
 export const reportsApi = {
   // Generate a new report
-  generate(params: ReportParams, type: 'audit-logs' | 'system-logs' = 'audit-logs') {
+  generate(params: ReportParams, type: 'audit_logs' | 'system_logs' | 'users' | 'activity' = 'audit_logs') {
     return apiClient.post<{ report: Report }>('/reports/generate', {
       ...params,
       type,

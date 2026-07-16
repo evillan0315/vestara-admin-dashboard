@@ -12,7 +12,7 @@ export function useGenerateReport() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ params, type }: { params: ReportParams; type?: 'audit-logs' | 'system-logs' }) =>
+    mutationFn: ({ params, type }: { params: ReportParams; type?: 'audit_logs' | 'system_logs' | 'users' | 'activity' }) =>
       reportsApi.generate(params, type),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reports'] });

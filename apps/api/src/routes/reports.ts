@@ -2,26 +2,44 @@
 import express from 'express';
 import { authenticate } from '../middleware/authenticate.js';
 import { validate } from '../middleware/validate.js';
-import { reportService } from '../services/reports.service.js';
+import { reportService, type CreateReportParams } from '../services/reports.service.js';
 import { z } from 'zod';
 
 const router = express.Router();
 
 // Export schemas
 export const generateReportSchema = z.object({
+  name: z.string().optional(),
   startDate: z.string().transform((val) => new Date(val)),
   endDate: z.string().transform((val) => new Date(val)),
   action: z.string().optional(),
   entity: z.string().optional(),
   userId: z.string().optional(),
   format: z.enum(['csv', 'excel', 'pdf']).default('csv'),
-  type: z.enum(['audit-logs', 'system-logs']).default('audit-logs'),
+  type: z.enum(['audit_logs', 'system_logs', 'users', 'activity']).default('audit_logs'),
 });
 
 // Generate report endpoint
 router.post('/generate', authenticate, validate(generateReportSchema), async (req, res, next) => {
   try {
-    const report = await reportService.generate(req.body, req.user!.id);
+    const body = req.body as z.infer<typeof generateReportSchema>;
+    // Generate a human-readable name when not provided
+    const typeLabels: Record<string, string> = {
+      audit_logs: 'Audit Logs',
+      system_logs: 'System Logs',
+      users: 'Users',
+      activity: 'Activity',
+    };
+    const dateStr = new Date(body.startDate).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+    const reportName = body.name || `${typeLabels[body.type] || body.type} Report - ${dateStr}`;
+    const report = await reportService.generate(
+      { ...body, name: reportName } as CreateReportParams,
+      req.user!.id,
+    );
     res.json({ success: true, data: report });
   } catch (err) {
     next(err);

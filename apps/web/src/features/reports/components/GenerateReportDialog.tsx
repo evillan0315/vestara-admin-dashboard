@@ -14,15 +14,15 @@ import type { ReportParams } from '../../../api/reports';
 interface GenerateReportDialogProps {
   open: boolean;
   onClose: () => void;
-  onGenerate: (params: ReportParams, type: 'audit-logs' | 'system-logs') => void;
+  onGenerate: (params: ReportParams, type: 'audit_logs' | 'system_logs' | 'users' | 'activity') => void;
   generating: boolean;
 }
 
 export function GenerateReportDialog({ open, onClose, onGenerate, generating }: GenerateReportDialogProps) {
-  const [formData, setFormData] = useState<ReportParams & { type: 'audit-logs' | 'system-logs'; name: string }>({
+  const [formData, setFormData] = useState<ReportParams & { type: 'audit_logs' | 'system_logs' | 'users' | 'activity'; name: string }>({
     startDate: '',
     endDate: '',
-    type: 'audit-logs',
+    type: 'audit_logs',
     format: 'csv',
     name: '',
   });
@@ -75,7 +75,7 @@ export function GenerateReportDialog({ open, onClose, onGenerate, generating }: 
                 </Typography>
                 <select
                   value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value as 'audit-logs' | 'system-logs' })}
+                   onChange={(e) => setFormData({ ...formData, type: e.target.value as 'audit_logs' | 'system_logs' | 'users' | 'activity' })}
                   style={{
                     width: '100%',
                     marginTop: 4,
@@ -87,8 +87,10 @@ export function GenerateReportDialog({ open, onClose, onGenerate, generating }: 
                     fontSize: '0.875rem',
                   }}
                 >
-                  <option value="audit-logs">Audit Logs</option>
-                  <option value="system-logs">System Logs</option>
+                  <option value="audit_logs">Audit Logs</option>
+                  <option value="system_logs">System Logs</option>
+                  <option value="users">Users</option>
+                  <option value="activity">Activity</option>
                 </select>
               </label>
             </Grid>
