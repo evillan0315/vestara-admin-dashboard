@@ -2155,7 +2155,8 @@ Future licensing terms may change as the platform evolves.
 | File Manager | 🟢 Complete (backend + frontend with upload, folders, preview) and avatar upload integration; refactored into 7 focused files |
 | User Profile (name, avatar, password change) | 🟢 Complete (backend + frontend) with avatar upload integration |
 | Profile Navigation (6 tabs: Overview, Security, Permissions, Activity, Preferences, Sessions) | 🟢 Complete (shared `profileTabs` config; header `UserMenu` shortcuts + dedicated routes; dark-luxury `theme.palette` header chrome) |
-| User Preferences (Modal) | 🟢 Complete (Appearance, Notifications, Localization) |
+| User Preferences (full-page tab) | 🟢 Complete (16 persisted fields — theme mode, font family/size/weight, primary color, density, sidebar variant, border radius, contrast, notifications, language, timezone, date format, privacy) with live ThemeContext preview, debounced sliders, undo/reset/save |
+| UserMenu | 🟢 Complete (`UserMenuTrigger` + `UserMenuDropdown` with grouped sections, sparkle glow avatar, admin shortcuts) |
 | Global Search (Cmd/Ctrl+K) | 🟢 Complete (data-driven, live user search, route-scoped) |
 | Sidebar Navigation (platform-domain categories) | 🟢 Complete (Wallet & Payments, Marketplace, Bookings, Rewards, AI Services, Management, System, Security; roadmap modules marked "Soon") |
 | CI/CD (GitHub Actions) | 🟢 API Deploy Workflow |
@@ -2188,7 +2189,8 @@ Future licensing terms may change as the platform evolves.
 - ✅ Reusable Feedback Components (Toast queue, Loading, EmptyState, useConfirm)
 - ✅ Form Validation (react-hook-form + Zod via useFormWithZod)
 - ✅ File Manager (browser, upload, folders, preview, rename, move, delete) and avatar upload integration
-- ✅ User Preferences Modal (Appearance, Notifications, Localization)
+- ✅ User Preferences (full-page tab with 16 persisted fields, live ThemeContext preview, debounced sliders, undo/reset/save)
+- ✅ UserMenu redesign (UserMenuTrigger + UserMenuDropdown with sparkle glow avatar, grouped sections)
 - ✅ Global Search Dialog (Cmd/Ctrl+K — data-driven, live user search, route-scoped All/This Page toggle)
 - ✅ Notifications (wired to audit-logs API, real-time unread count)
 - ✅ BigInt serialization fix (File Manager 500 error resolved)

@@ -2,6 +2,12 @@ import type {
   UserProfileDTO,
   KycDocumentDTO,
   ProfileThemeMode,
+  ProfileFontFamily,
+  ProfilePrimaryColor,
+  ProfileDensity,
+  ProfileSidebarVariant,
+  ProfileFontWeight,
+  ProfileContrastLevel,
   ProfileVisibility,
   VerificationStatus,
   KycDocumentType,
@@ -43,6 +49,14 @@ type ProfileWithDocuments = {
   timezone: string;
   dateFormat: string;
   themeMode: string;
+  fontFamily: string;
+  fontSizeScale: number;
+  fontWeight: string;
+  primaryColor: string;
+  density: string;
+  sidebarVariant: string;
+  borderRadiusScale: number;
+  contrastLevel: string;
   profileVisibility: string;
   showEmail: boolean;
   showActivity: boolean;
@@ -96,6 +110,14 @@ export function toUserProfileDTO(profile: ProfileWithDocuments): UserProfileDTO 
     timezone: profile.timezone,
     dateFormat: profile.dateFormat,
     themeMode: profile.themeMode as ProfileThemeMode,
+    fontFamily: profile.fontFamily as ProfileFontFamily,
+    fontSizeScale: profile.fontSizeScale,
+    fontWeight: profile.fontWeight as ProfileFontWeight,
+    primaryColor: profile.primaryColor as ProfilePrimaryColor,
+    density: profile.density as ProfileDensity,
+    sidebarVariant: profile.sidebarVariant as ProfileSidebarVariant,
+    borderRadiusScale: profile.borderRadiusScale,
+    contrastLevel: profile.contrastLevel as ProfileContrastLevel,
     profileVisibility: profile.profileVisibility as ProfileVisibility,
     showEmail: profile.showEmail,
     showActivity: profile.showActivity,

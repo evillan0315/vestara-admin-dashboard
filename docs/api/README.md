@@ -432,6 +432,86 @@ Get the currently authenticated user's profile.
 
 ---
 
+### Profile Endpoints
+
+All profile endpoints require `Authorization: Bearer <access_token>`.
+
+#### `GET /profile`
+
+Get the current user's base info and extended profile (preferences, KYC).
+
+**Response `200`**
+
+```json
+{
+  "success": true,
+  "data": {
+    "user": { "id": "uuid", "firstName": "John", "lastName": "Doe", "email": "john@example.com", "role": "admin", "avatarUrl": null },
+    "profile": {
+      "id": "uuid",
+      "themeMode": "dark",
+      "fontFamily": "inter",
+      "fontSizeScale": 1.0,
+      "fontWeight": "normal",
+      "primaryColor": "gold",
+      "density": "comfortable",
+      "sidebarVariant": "default",
+      "borderRadiusScale": 1.0,
+      "contrastLevel": "normal",
+      "language": "en",
+      "timezone": "UTC",
+      "dateFormat": "mdy",
+      "emailNotifications": true,
+      "pushNotifications": true,
+      "loginAlerts": true,
+      "marketingEmails": false,
+      "profileVisibility": "organization",
+      "showEmail": false,
+      "showActivity": true,
+      "searchable": true,
+      "kycStatus": "unverified",
+      "documents": []
+    }
+  }
+}
+```
+
+#### `PUT /profile`
+
+Update the current user's profile fields. Only provided fields are changed.
+
+**Request Body** (all fields optional):
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `firstName` | string | User's first name |
+| `lastName` | string | User's last name |
+| `avatarUrl` | string | Avatar image URL |
+| `themeMode` | enum | `light`, `dark`, or `system` |
+| `fontFamily` | enum | `inter`, `plus-jakarta-sans`, `roboto`, `system` |
+| `fontSizeScale` | number | 0.75 – 1.25 |
+| `fontWeight` | enum | `light`, `normal`, `medium`, `semibold`, `bold` |
+| `primaryColor` | enum | `gold`, `blue`, `purple`, `green`, `red`, `indigo`, `teal` |
+| `density` | enum | `compact`, `comfortable`, `spacious` |
+| `sidebarVariant` | enum | `default`, `compact`, `hidden` |
+| `borderRadiusScale` | number | 0.5 – 2.0 |
+| `contrastLevel` | enum | `normal`, `high` |
+| `language` | string | Locale code (e.g. `en`) |
+| `timezone` | string | IANA timezone (e.g. `UTC`) |
+| `dateFormat` | enum | `mdy`, `dmy`, `ymd` |
+| `emailNotifications` | boolean | Email notification toggle |
+| `pushNotifications` | boolean | Push notification toggle |
+| `loginAlerts` | boolean | Login alert toggle |
+| `marketingEmails` | boolean | Marketing email toggle |
+| `profileVisibility` | enum | `public`, `organization`, `private` |
+| `showEmail` | boolean | Show email on profile |
+| `showActivity` | boolean | Show activity on profile |
+| `searchable` | boolean | Allow profile to be found in search |
+
+**Response `200`**: Returns the updated user and profile.
+
+---
+
 ### Protected Routes
 
 All protected routes require an `Authorization: Bearer <access_token>` header and are only accessible to authenticated users. Some routes also require specific roles (RBAC).

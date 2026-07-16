@@ -187,6 +187,12 @@ export interface DeleteAccountRequestDTO {
 
 export type ProfileThemeMode = 'light' | 'dark' | 'system';
 export type ProfileVisibility = 'public' | 'organization' | 'private';
+export type ProfileFontFamily = 'inter' | 'plus-jakarta-sans' | 'roboto' | 'system';
+export type ProfilePrimaryColor = 'gold' | 'blue' | 'purple' | 'green' | 'red' | 'indigo' | 'teal';
+export type ProfileDensity = 'compact' | 'comfortable' | 'spacious';
+export type ProfileSidebarVariant = 'default' | 'compact' | 'hidden';
+export type ProfileFontWeight = 'light' | 'normal' | 'medium' | 'semibold' | 'bold';
+export type ProfileContrastLevel = 'normal' | 'high';
 export type VerificationStatus = 'unverified' | 'pending' | 'verified' | 'rejected';
 export type KycDocumentType = 'passport' | 'driver_license' | 'proof_of_address' | 'selfie' | 'other';
 
@@ -217,6 +223,15 @@ export interface UserProfileDTO {
   dateFormat: string;
   // Theme
   themeMode: ProfileThemeMode;
+  // Custom theme preferences
+  fontFamily?: ProfileFontFamily;
+  fontSizeScale?: number;
+  fontWeight?: ProfileFontWeight;
+  primaryColor?: ProfilePrimaryColor;
+  density?: ProfileDensity;
+  sidebarVariant?: ProfileSidebarVariant;
+  borderRadiusScale?: number;
+  contrastLevel?: ProfileContrastLevel;
   // Privacy
   profileVisibility: ProfileVisibility;
   showEmail: boolean;
@@ -281,6 +296,15 @@ export interface UpdateProfileRequestDTO {
   dateFormat?: string;
   // Theme
   themeMode?: ProfileThemeMode;
+  // Custom theme preferences
+  fontFamily?: ProfileFontFamily;
+  fontSizeScale?: number;
+  fontWeight?: ProfileFontWeight;
+  primaryColor?: ProfilePrimaryColor;
+  density?: ProfileDensity;
+  sidebarVariant?: ProfileSidebarVariant;
+  borderRadiusScale?: number;
+  contrastLevel?: ProfileContrastLevel;
   // Privacy
   profileVisibility?: ProfileVisibility;
   showEmail?: boolean;

@@ -137,6 +137,10 @@ export function ThemeContextProvider({ children }: ThemeContextProviderProps) {
     setConfig((prev) => ({ ...prev, fontFamily }));
   }, []);
 
+  const setFontWeight = useCallback((fontWeight: 'light' | 'normal' | 'medium' | 'semibold' | 'bold') => {
+    setConfig((prev) => ({ ...prev, fontWeight }));
+  }, []);
+
   const setSidebarCollapsed = useCallback((sidebarCollapsed: boolean) => {
     setConfig((prev) => ({ ...prev, sidebarCollapsed }));
   }, []);
@@ -182,6 +186,7 @@ export function ThemeContextProvider({ children }: ThemeContextProviderProps) {
       setPrimaryColor,
       setDensity,
       setFontFamily,
+      setFontWeight,
       setSidebarCollapsed,
       toggleSidebar,
       setSidebarVariant,
@@ -195,7 +200,7 @@ export function ThemeContextProvider({ children }: ThemeContextProviderProps) {
       toggleSettings,
     }),
     [config, settingsOpen, toggleTheme, setMode, setPrimaryColor, setDensity,
-     setFontFamily, setSidebarCollapsed, toggleSidebar, setSidebarVariant,
+     setFontFamily, setFontWeight, setSidebarCollapsed, toggleSidebar, setSidebarVariant,
      setFontSizeScale, setBorderRadiusScale, setContrastLevel, setMaintenanceMode,
      resetTheme, toggleSettings],
   );

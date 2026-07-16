@@ -66,6 +66,7 @@ export interface ThemeContextValue extends ThemeConfig {
   setPrimaryColor: (color: ThemePrimaryColor) => void;
   setDensity: (density: ThemeDensity) => void;
   setFontFamily: (font: ThemeFontFamily) => void;
+  setFontWeight: (weight: 'light' | 'normal' | 'medium' | 'semibold' | 'bold') => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
   toggleSidebar: () => void;
   setSidebarVariant: (variant: SidebarVariant) => void;

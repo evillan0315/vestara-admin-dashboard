@@ -92,6 +92,7 @@ export function AppRoutes() {
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/integrations" element={<IntegrationsPage />} />
             <Route path="/integrations/:id" element={<DataExplorerPage />} />
+            <Route path="/data-explorer" element={<IntegrationsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile/personal" element={<ProfilePage />} />
             <Route path="/profile/address" element={<ProfilePage />} />

@@ -101,7 +101,7 @@ export const navGroups: NavGroup[] = [
       {
         label: "Data Explorer",
         icon: Database,
-        path: "/integrations",
+        path: "/data-explorer",
         allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR],
       },
     ],

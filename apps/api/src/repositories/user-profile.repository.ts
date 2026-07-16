@@ -48,12 +48,26 @@ export class UserProfileRepository extends BaseRepository {
       'timezone',
       'dateFormat',
       'themeMode',
+      'fontFamily',
+      'fontWeight',
+      'primaryColor',
+      'density',
+      'sidebarVariant',
+      'contrastLevel',
       'profileVisibility',
     ];
 
     for (const field of stringFields) {
       if (data[field] !== undefined) {
         updateData[field] = data[field] === '' ? null : data[field];
+      }
+    }
+
+    const floatFields = ['fontSizeScale', 'borderRadiusScale'];
+
+    for (const field of floatFields) {
+      if (data[field] !== undefined) {
+        updateData[field] = data[field] as number;
       }
     }
 

@@ -32,6 +32,14 @@ export interface UpdateProfileData {
   timezone?: string;
   dateFormat?: string;
   themeMode?: string;
+  fontFamily?: string;
+  fontSizeScale?: number;
+  fontWeight?: string;
+  primaryColor?: string;
+  density?: string;
+  sidebarVariant?: string;
+  borderRadiusScale?: number;
+  contrastLevel?: string;
   profileVisibility?: string;
   showEmail?: boolean;
   showActivity?: boolean;

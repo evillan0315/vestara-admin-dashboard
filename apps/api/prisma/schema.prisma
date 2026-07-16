@@ -117,7 +117,16 @@ model UserProfile {
   timezone String @default("UTC")
   dateFormat String @default("mdy")
   // Theme preference (light | dark | system)
-  themeMode String @default("system")
+  themeMode       String  @default("system")
+  // Theme customization
+  fontFamily      String  @default("inter")    // inter | plus-jakarta-sans | roboto | system
+  fontSizeScale   Float   @default(1.0)        // 0.75 – 1.25
+  fontWeight      String  @default("normal")   // light | normal | medium | semibold | bold
+  primaryColor    String  @default("gold")     // gold | blue | purple | green | red | indigo | teal
+  density         String  @default("comfortable") // compact | comfortable | spacious
+  sidebarVariant  String  @default("default")     // default | compact | hidden
+  borderRadiusScale Float @default(1.0)         // 0.5 – 2.0
+  contrastLevel   String  @default("normal")   // normal | high
   // Privacy settings
   profileVisibility String @default("organization") // public | organization | private
   showEmail         Boolean @default(false)
