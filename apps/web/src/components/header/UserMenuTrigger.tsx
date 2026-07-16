@@ -1,7 +1,6 @@
 import { type JSX, useMemo } from "react";
 
 import {
-  Avatar,
   Box,
   Typography,
   useTheme,
@@ -11,6 +10,7 @@ import {
 import { ChevronDown } from "lucide-react";
 
 import type { UserDTO } from "@vestara/types";
+import AvatarUpload from "../common/AvatarUpload";
 
 export interface UserMenuTriggerProps {
   user: UserDTO | null;
@@ -62,20 +62,12 @@ export default function UserMenuTrigger({
       }}
     >
       <Box sx={{ position: "relative" }}>
-        <Avatar
+        <AvatarUpload
           src={user?.avatarUrl}
-          sx={{
-            width: 42,
-            height: 42,
-            bgcolor: primary.main,
-            color: primary.contrastText,
-            fontWeight: 700,
-            border: `2px solid ${alpha(primary.main, 0.3)}`,
-            transition: "border-color .2s ease",
-          }}
-        >
-          {initials}
-        </Avatar>
+          size={42}
+          initials={initials}
+          border={`2px solid ${alpha(primary.main, 0.3)}`}
+        />
 
         <Box
           sx={{

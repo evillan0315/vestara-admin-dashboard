@@ -1,14 +1,13 @@
 import type { JSX } from 'react';
 import { Box, Typography } from '@mui/material';
 
-/** Logo served from public/ */
-const logo = '/logo.svg';
-
 export interface LogoProps {
   collapsed?: boolean;
   orientation?: 'vertical' | 'horizontal';
   showText?: boolean;
   size?: number;
+  /** Custom logo URL — overrides the default `/logo.svg`. */
+  src?: string | null;
 }
 
 export default function Logo({
@@ -16,9 +15,11 @@ export default function Logo({
   orientation = 'vertical',
   showText,
   size = 72,
+  src,
 }: LogoProps): JSX.Element {
   const displayText = showText ?? !collapsed;
   const vertical = orientation === 'vertical';
+  const logoSrc = src || '/logo.svg';
 
   return (
     <Box
@@ -33,7 +34,7 @@ export default function Logo({
     >
       <Box
         component="img"
-        src={logo}
+        src={logoSrc}
         alt="Vestara"
         sx={{
           width: size,

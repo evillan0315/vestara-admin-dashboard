@@ -1,4 +1,5 @@
-import { Avatar, Box, IconButton, Tooltip, Typography } from '@mui/material';
+import { Box, IconButton, Tooltip, Typography } from '@mui/material';
+import AvatarUpload from '../../../components/common/AvatarUpload';
 import { Edit as EditIcon, People as PeopleIcon } from '@mui/icons-material';
 import type { Column } from '../../../components/data/DataTable';
 import type { OrganizationDTO } from '@vestara/types';
@@ -26,18 +27,11 @@ export function createOrganizationsColumns({
       sortable: true,
       render: (_value, row) => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <Avatar
+          <AvatarUpload
             src={row.logoUrl || undefined}
-            sx={{
-              width: 32,
-              height: 32,
-              fontSize: '0.8125rem',
-              fontWeight: 600,
-              bgcolor: 'primary.main',
-            }}
-          >
-            {row.name.charAt(0).toUpperCase()}
-          </Avatar>
+            size="small"
+            initials={row.name.charAt(0).toUpperCase()}
+          />
           <Box>
             <Typography variant="body2" fontWeight={600}>
               {row.name}

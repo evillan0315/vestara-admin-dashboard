@@ -1,7 +1,6 @@
 import { type JSX, useMemo } from "react";
 
 import {
-  Avatar,
   Box,
   Chip,
   Divider,
@@ -13,6 +12,7 @@ import {
   useTheme,
   alpha,
 } from "@mui/material";
+import AvatarUpload from "../common/AvatarUpload";
 
 import {
   Activity,
@@ -178,18 +178,11 @@ export default function UserMenuDropdown({
             gap: 2,
           }}
         >
-          <Avatar
+          <AvatarUpload
             src={user?.avatarUrl}
-            sx={{
-              width: 50,
-              height: 50,
-              bgcolor: primary.main,
-              color: primary.contrastText,
-              fontWeight: 700,
-            }}
-          >
-            {initials}
-          </Avatar>
+            size={50}
+            initials={initials}
+          />
 
           <Box sx={{ minWidth: 0, flex: 1 }}>
             <Typography

@@ -40,7 +40,7 @@ export function useCreateUser() {
       await queryClient.cancelQueries({ queryKey: userKeys.all });
       const previousUsers = queryClient.getQueriesData({ queryKey: userKeys.all });
       queryClient.setQueriesData(
-        { queryKey: userKeys.all },
+        { queryKey: userKeys.list() },
         (old: { data?: UserDTO[]; meta?: { total: number } } | undefined) => {
           if (!old || !old.data) return old;
           const optimisticUser: UserDTO = {
@@ -87,7 +87,7 @@ export function useUpdateUser() {
       await queryClient.cancelQueries({ queryKey: userKeys.all });
       const previousUsers = queryClient.getQueriesData({ queryKey: userKeys.all });
       queryClient.setQueriesData(
-        { queryKey: userKeys.all },
+        { queryKey: userKeys.list() },
         (old: { data?: UserDTO[] } | undefined) => {
           if (!old || !old.data) return old;
           return {
@@ -119,7 +119,7 @@ export function useDeleteUser() {
       await queryClient.cancelQueries({ queryKey: userKeys.all });
       const previousUsers = queryClient.getQueriesData({ queryKey: userKeys.all });
       queryClient.setQueriesData(
-        { queryKey: userKeys.all },
+        { queryKey: userKeys.list() },
         (old: { data?: UserDTO[]; meta?: { total: number } } | undefined) => {
           if (!old || !old.data) return old;
           return {
@@ -150,7 +150,7 @@ export function useToggleUserStatus() {
       await queryClient.cancelQueries({ queryKey: userKeys.all });
       const previousUsers = queryClient.getQueriesData({ queryKey: userKeys.all });
       queryClient.setQueriesData(
-        { queryKey: userKeys.all },
+        { queryKey: userKeys.list() },
         (old: { data?: UserDTO[] } | undefined) => {
           if (!old || !old.data) return old;
           return {
@@ -182,7 +182,7 @@ export function useBulkDeleteUsers() {
       await queryClient.cancelQueries({ queryKey: userKeys.all });
       const previousUsers = queryClient.getQueriesData({ queryKey: userKeys.all });
       queryClient.setQueriesData(
-        { queryKey: userKeys.all },
+        { queryKey: userKeys.list() },
         (old: { data?: UserDTO[]; meta?: { total: number } } | undefined) => {
           if (!old || !old.data) return old;
           return {
@@ -215,7 +215,7 @@ export function useBulkUpdateUserStatus() {
       const previousUsers = queryClient.getQueriesData({ queryKey: userKeys.all });
       const newIsActive = status === 'active';
       queryClient.setQueriesData(
-        { queryKey: userKeys.all },
+        { queryKey: userKeys.list() },
         (old: { data?: UserDTO[] } | undefined) => {
           if (!old || !old.data) return old;
           return {

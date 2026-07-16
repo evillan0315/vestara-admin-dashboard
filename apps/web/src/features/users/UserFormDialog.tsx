@@ -9,13 +9,13 @@ import {
   Box,
   Typography,
   Chip,
-  Avatar,
 } from '@mui/material';
-import { useState, useEffect, useRef, type ReactElement } from 'react';
-import { User as UserIcon, Shield, Mail, KeyRound, Camera } from 'lucide-react';
+import { useState, useEffect, type ReactElement } from 'react';
+import { User as UserIcon, Shield, Mail, KeyRound } from 'lucide-react';
 import type { UserDTO, UserRole, OrganizationDTO } from '@vestara/types';
 import { colors } from '../../theme/tokens';
 import { uploadImage } from '../../api/upload';
+import AvatarUpload from '../../components/common/AvatarUpload';
 
 export interface UserFormData {
   firstName: string;
@@ -84,7 +84,6 @@ export function UserFormDialog({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
@@ -146,10 +145,7 @@ export function UserFormDialog({
     await onSubmit(data);
   };
 
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const handleAvatarUpload = async (file: File) => {
     setUploadingAvatar(true);
     try {
       const result = await uploadImage(file);
@@ -163,7 +159,6 @@ export function UserFormDialog({
       console.error('Avatar upload error:', err);
     } finally {
       setUploadingAvatar(false);
-      if (e.target) e.target.value = '';
     }
   };
 
@@ -243,51 +238,14 @@ export function UserFormDialog({
           {/* Avatar Preview (Edit mode) */}
           {isEdit && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-              <Box sx={{ position: 'relative' }}>
-                <Avatar
-                  src={user?.avatarUrl || undefined}
-                  sx={{
-                    width: 56,
-                    height: 56,
-                    bgcolor: colors.gold,
-                    color: '#0A0F18',
-                    fontWeight: 700,
-                    fontSize: 20,
-                    border: `2px solid ${colors.gold}`,
-                  }}
-                >
-                  {initials}
-                </Avatar>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                  onChange={handleAvatarUpload}
-                  disabled={uploadingAvatar}
-                />
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={() => {
-                    fileInputRef.current?.click();
-                  }}
-                  disabled={uploadingAvatar}
-                  loading={uploadingAvatar}
-                  sx={{
-                    position: 'absolute',
-                    bottom: -4,
-                    right: -4,
-                    minWidth: 32,
-                    width: 32,
-                    height: 32,
-                    borderRadius: '50%',
-                    p: 0,
-                  }}
-                >
-                  <Camera size={14} />
-                </Button>
-              </Box>
+              <AvatarUpload
+                src={user?.avatarUrl || formData.avatarUrl}
+                size="medium"
+                editable
+                loading={uploadingAvatar}
+                initials={initials}
+                onUpload={handleAvatarUpload}
+              />
               <Box>
                 <Typography sx={{ fontWeight: 600, color: colors.text, fontSize: 14 }}>
                   {formData.firstName} {formData.lastName}

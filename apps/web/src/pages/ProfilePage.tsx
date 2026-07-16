@@ -1,17 +1,15 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, useTheme, alpha } from '@mui/material';
-import { Camera } from 'lucide-react';
 import { useProfile, useUpdateProfile } from '../features/profile/hooks';
 import {
   profileTabs,
   getProfileTabFromPath,
 } from '../features/profile/tabs';
 import { uploadImage } from '../api/upload';
+import AvatarUpload from '../components/common/AvatarUpload';
 import { Card } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
 import { Tabs } from '../components/ui/Tabs';
-import { Avatar } from '../components/ui/Avatar';
 import { Loading } from '../components/feedback/Loading';
 import { useToast } from '../components/feedback/Toast';
 
@@ -34,7 +32,6 @@ export default function ProfilePage() {
   const { showSuccess, showError } = useToast();
   const { data: profileData, isLoading } = useProfile();
   const updateProfile = useUpdateProfile();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const activeTab = getProfileTabFromPath(location.pathname);
 
@@ -50,10 +47,7 @@ export default function ProfilePage() {
     }
   };
 
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const handleAvatarUpload = async (file: File) => {
     try {
       const result = await uploadImage(file);
       if (result.success && result.data?.url) {
@@ -64,8 +58,6 @@ export default function ProfilePage() {
       }
     } catch (err) {
       showError(err instanceof Error ? err.message : 'Failed to upload avatar');
-    } finally {
-      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -116,41 +108,16 @@ export default function ProfilePage() {
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
           {/* Avatar with upload */}
-          <Box sx={{ position: 'relative' }}>
-            <Avatar
-              src={profileUser.avatarUrl}
-              alt={`${profileUser.firstName} ${profileUser.lastName}`}
-              size="large"
-              sx={{ width: 96, height: 96, border: `3px solid ${theme.palette.primary.main}` }}
-            >
-              {profileUser.firstName[0]}{profileUser.lastName[0]}
-            </Avatar>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={handleAvatarUpload}
-            />
-            <Button
-              variant="contained"
-              size="small"
-              onClick={() => fileInputRef.current?.click()}
-              loading={updateProfile.isPending}
-              sx={{
-                position: 'absolute',
-                bottom: -8,
-                right: -8,
-                minWidth: 36,
-                width: 36,
-                height: 36,
-                borderRadius: '50%',
-                p: 0,
-              }}
-            >
-              <Camera size={16} />
-            </Button>
-          </Box>
+          <AvatarUpload
+            src={profileUser.avatarUrl}
+            alt={`${profileUser.firstName} ${profileUser.lastName}`}
+            size="large"
+            editable
+            loading={updateProfile.isPending}
+            initials={`${profileUser.firstName[0]}${profileUser.lastName[0]}`}
+            onUpload={handleAvatarUpload}
+            border={`3px solid ${theme.palette.primary.main}`}
+          />
 
           {/* Profile Info */}
           <Box sx={{ flex: 1, minWidth: 0 }}>

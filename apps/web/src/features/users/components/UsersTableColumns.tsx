@@ -1,4 +1,5 @@
-import { Box, Typography, Chip, IconButton, styled, Avatar, Tooltip } from '@mui/material';
+import { Box, Typography, Chip, IconButton, styled, Tooltip } from '@mui/material';
+import AvatarUpload from '../../../components/common/AvatarUpload';
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
@@ -46,12 +47,11 @@ export function createUsersColumns({
       sortable: true,
       render: (_value, row) => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <Avatar
+          <AvatarUpload
             src={row.avatarUrl}
-            sx={{ width: 32, height: 32, fontSize: '0.8125rem', fontWeight: 600 }}
-          >
-            {`${row.firstName.charAt(0)}${row.lastName.charAt(0)}`}
-          </Avatar>
+            size="small"
+            initials={`${row.firstName.charAt(0)}${row.lastName.charAt(0)}`}
+          />
           <Box>
             <Typography variant="body2" fontWeight={600}>
               {row.firstName} {row.lastName}

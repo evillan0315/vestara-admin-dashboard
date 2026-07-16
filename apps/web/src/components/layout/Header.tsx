@@ -1,4 +1,5 @@
-import { Box, Typography, IconButton, Avatar, Menu, MenuItem, styled, Tooltip, useTheme, Divider } from '@mui/material';
+import { Box, Typography, IconButton, Menu, MenuItem, styled, Tooltip, useTheme, Divider } from '@mui/material';
+import AvatarUpload from '../common/AvatarUpload';
 import { Menu as MenuIcon, DarkMode, LightMode, Person, Settings, Logout, Search, Notifications, Settings as SettingsIcon } from '@mui/icons-material';
 import { useState, type ReactNode, type ReactElement } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -126,11 +127,10 @@ const UserMenuButton = styled(IconButton)(({ theme }) => ({
   },
 }));
 
-const UserAvatar = styled(Avatar)(() => ({
-  width: 36,
-  height: 36,
-  fontSize: '0.875rem',
-  fontWeight: 600,
+const UserAvatarChip = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: theme.spacing(1),
 }));
 
 const UserName = styled(Typography)(() => ({
@@ -281,9 +281,13 @@ export const Header = ({
                 aria-expanded={Boolean(userMenuAnchor)}
                 aria-haspopup="true"
               >
-                <UserAvatar src={user.avatarUrl || undefined}>
-                  {user.firstName?.[0]?.toUpperCase() || 'U'}
-                </UserAvatar>
+                <UserAvatarChip>
+                  <AvatarUpload
+                    src={user.avatarUrl || undefined}
+                    size="small"
+                    initials={user.firstName?.[0]?.toUpperCase() || 'U'}
+                  />
+                </UserAvatarChip>
                 <UserName sx={{ display: { xs: 'none', md: 'block' } }}>
                   {user.firstName} {user.lastName}
                 </UserName>

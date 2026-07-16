@@ -11,17 +11,22 @@
  *  - No hardcoded color tokens — everything via MUI theme.palette
  */
 
-import { type JSX } from 'react';
+import { type JSX, useCallback, useRef } from 'react';
 import {
   Box,
   Typography,
   Tooltip,
   useTheme,
+  CircularProgress,
+  alpha,
 } from '@mui/material';
+import { Camera } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../features/auth/AuthContext';
 import { useSidebarConfig } from '../../features/sidebar/useSidebarConfig';
+import { useAppLogo, useUpdateAppLogo } from '../../features/settings/useAppLogo';
 import { navGroups, type NavItem } from '../../layouts/navConfig';
+import { uploadImage } from '../../api/upload';
 import Logo from '../common/Logo';
 import ApiStatusWidget from './ApiStatusWidget';
 
@@ -37,6 +42,34 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element | null {
   const navigate = useNavigate();
   const { user } = useAuth();
   const cfg = useSidebarConfig();
+
+  const { data: appLogoUrl } = useAppLogo();
+  const updateAppLogo = useUpdateAppLogo();
+  const logoFileInputRef = useRef<HTMLInputElement>(null);
+
+  const isAdmin = user?.role === 'super_admin' || user?.role === 'admin';
+
+  const handleLogoUpload = useCallback(
+    async (file: File) => {
+      try {
+        const result = await uploadImage(file);
+        if (result.success && result.data?.url) {
+          await updateAppLogo.mutateAsync(result.data.url);
+        }
+      } catch {
+        // silently fail — the logo simply won't update
+      }
+    },
+    [updateAppLogo],
+  );
+
+  const handleLogoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleLogoUpload(file);
+    }
+    if (e.target) e.target.value = '';
+  };
 
   // If the variant is 'hidden', render nothing (the outer DashboardLayout
   // also removes the container, this is a safety net).
@@ -123,29 +156,72 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element | null {
     >
       {/* ── Logo ── */}
       <Box
-        component={Link}
-        to="/"
-        onClick={() => onClose?.()}
+        component={isAdmin ? 'div' : Link}
+        to={isAdmin ? undefined : '/'}
+        onClick={() => {
+          if (!isAdmin) onClose?.();
+        }}
         sx={{
           px: cfg.iconOnly ? 1 : 2.5,
           py: cfg.iconOnly ? 1.5 : 2,
           display: 'flex',
           justifyContent: 'center',
+          alignItems: 'center',
           textDecoration: 'none',
           color: 'inherit',
-          cursor: 'pointer',
+          cursor: isAdmin ? 'default' : 'pointer',
           userSelect: 'none',
           borderBottom: `1px solid ${theme.palette.divider}`,
           transition: 'opacity 0.2s ease, transform 0.2s ease',
-          '&:hover': { opacity: 0.92 },
-          '&:active': { transform: 'scale(0.98)' },
+          position: 'relative',
+          ...(isAdmin
+            ? {
+                '&:hover .logo-upload-overlay': { opacity: 1 },
+              }
+            : { '&:hover': { opacity: 0.92 }, '&:active': { transform: 'scale(0.98)' } }),
         }}
       >
         <Logo
+          src={appLogoUrl}
           collapsed={cfg.iconOnly}
           orientation="vertical"
           size={cfg.iconOnly ? 36 : 62}
         />
+
+        {/* Admin-only upload overlay */}
+        {isAdmin && (
+          <>
+            <Box
+              className="logo-upload-overlay"
+              onClick={() => logoFileInputRef.current?.click()}
+              sx={{
+                position: 'absolute',
+                inset: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                bgcolor: alpha(theme.palette.common.black, 0.5),
+                opacity: 0,
+                transition: 'opacity 0.2s',
+                cursor: 'pointer',
+                zIndex: 2,
+              }}
+            >
+              {updateAppLogo.isPending ? (
+                <CircularProgress size={20} sx={{ color: '#fff' }} />
+              ) : (
+                <Camera size={20} color="#fff" />
+              )}
+            </Box>
+            <input
+              ref={logoFileInputRef}
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleLogoFileChange}
+            />
+          </>
+        )}
       </Box>
 
       {/* ── Navigation groups ── */}

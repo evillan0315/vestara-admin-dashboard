@@ -1,9 +1,6 @@
-import { useRef } from 'react';
 import {
-  Avatar,
   Box,
   Button,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -12,9 +9,9 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { Camera as CameraIcon } from '@mui/icons-material';
 import type { OrganizationDTO } from '@vestara/types';
 import type { CreateOrganizationInput } from '@vestara/validation';
+import AvatarUpload from '../../../components/common/AvatarUpload';
 
 interface OrganizationsDialogProps {
   open: boolean;
@@ -39,11 +36,8 @@ export function OrganizationsDialog({
   onLogoUpload,
   onSubmit,
 }: OrganizationsDialogProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) onLogoUpload(file);
+  const handleLogoUpload = (file: File) => {
+    onLogoUpload(file);
   };
 
   return (
@@ -81,47 +75,15 @@ export function OrganizationsDialog({
                 Organization Logo
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
-                <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-                  <Avatar
-                    src={formData.logoUrl || undefined}
-                    alt="Organization logo"
-                    sx={{
-                      width: 96,
-                      height: 96,
-                      bgcolor: 'action.hover',
-                      border: '2px dashed',
-                      borderColor: 'divider',
-                      '& img': { objectFit: 'cover' },
-                    }}
-                  >
-                    {formData.name?.charAt(0)?.toUpperCase() || 'O'}
-                  </Avatar>
-                  <Box
-                    onClick={() => fileInputRef.current?.click()}
-                    sx={{
-                      position: 'absolute',
-                      bottom: 0,
-                      right: 0,
-                      bgcolor: 'primary.main',
-                      borderRadius: '50%',
-                      width: 32,
-                      height: 32,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      transition: 'opacity 0.2s',
-                      '&:hover': { opacity: 0.85 },
-                      boxShadow: 1,
-                    }}
-                  >
-                    {uploadingLogo ? (
-                      <CircularProgress size={18} sx={{ color: '#fff' }} />
-                    ) : (
-                      <CameraIcon fontSize="small" sx={{ color: '#fff' }} />
-                    )}
-                  </Box>
-                </Box>
+                <AvatarUpload
+                  src={formData.logoUrl || undefined}
+                  alt="Organization logo"
+                  size="large"
+                  editable
+                  loading={uploadingLogo}
+                  initials={formData.name?.charAt(0)?.toUpperCase() || 'O'}
+                  onUpload={handleLogoUpload}
+                />
 
                 <TextField
                   label="Logo URL"
@@ -134,13 +96,6 @@ export function OrganizationsDialog({
                   sx={{ flex: '1 1 260px', minWidth: 200 }}
                 />
               </Box>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg,image/png,image/webp,image/svg+xml"
-                onChange={handleFileChange}
-                hidden
-              />
             </Grid>
           </Grid>
         </DialogContent>
