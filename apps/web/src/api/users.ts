@@ -10,6 +10,8 @@ export interface UserListParams {
   order?: 'asc' | 'desc';
   isActive?: boolean;
   role?: string;
+  createdAtStart?: string;
+  createdAtEnd?: string;
 }
 
 export interface UserListResponse {
@@ -34,6 +36,8 @@ export const usersApi = {
     if (params?.order) searchParams.set('order', params.order);
     if (params?.isActive !== undefined) searchParams.set('isActive', String(params.isActive));
     if (params?.role) searchParams.set('role', params.role);
+    if (params?.createdAtStart) searchParams.set('createdAtStart', params.createdAtStart);
+    if (params?.createdAtEnd) searchParams.set('createdAtEnd', params.createdAtEnd);
     const qs = searchParams.toString();
     return apiClient.get<UserDTO[]>(`/users${qs ? `?${qs}` : ''}`);
   },

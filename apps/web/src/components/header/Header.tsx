@@ -1,38 +1,20 @@
-import { type JSX, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  Typography,
-  InputBase,
-  Button,
-  IconButton,
-  useTheme,
-  alpha,
-} from "@mui/material";
-import { Search, Menu, PanelLeftClose, PanelLeft } from "lucide-react";
+/// <reference types="react/jsx-runtime" />
+import { useState } from "react";
+import { Box, Typography, Button, IconButton, useTheme, alpha } from "@mui/material";
+import { Menu, PanelLeftClose, PanelLeft } from "lucide-react";
 import { useAuth } from "../../features/auth/AuthContext";
 import { useLiveNotifications } from "../../features/realtime/LiveNotificationsProvider";
 import { useThemeContext } from "../../providers/ThemeProvider";
+import { useNavigate } from "react-router-dom";
 import HeaderActions from "./HeaderActions";
 import NotificationPopover from "./NotificationPopover";
 import MessagePopover from "./MessagePopover";
-import CalendarPopover from "../../features/calendar/CalendarPopover";
 import type { Message } from "./types";
 
 interface HeaderProps {
   title: string;
   subtitle: string;
   onMenuToggle?: () => void;
-  showSearch?: boolean;
-  showNotifications?: boolean;
-  showThemeToggle?: boolean;
-  showUserMenu?: boolean;
-  showSettings?: boolean;
-  _showSearch?: boolean;
-  _showNotifications?: boolean;
-  _showThemeToggle?: boolean;
-  _showUserMenu?: boolean;
-  _showSettings?: boolean;
   refreshing?: boolean;
   onRefresh?: () => Promise<void> | void;
   onNotificationsClick?: (event: React.MouseEvent<HTMLElement>) => void;
@@ -42,15 +24,10 @@ export default function Header({
   title,
   subtitle,
   onMenuToggle,
-  _showSearch = true,
-  _showNotifications = true,
-  _showThemeToggle = true,
-  _showUserMenu = true,
-  _showSettings = true,
   refreshing = false,
   onRefresh,
   onNotificationsClick,
-}: HeaderProps): JSX.Element {
+}: HeaderProps) {
   const theme = useTheme();
   const { primary, text, divider, background } = theme.palette;
   const { sidebarCollapsed, toggleSidebar } = useThemeContext();
@@ -167,47 +144,9 @@ export default function Header({
         </Box>
       </Box>
 
-      <Box
-        sx={{
-          flex: 1,
-          maxWidth: 480,
-          display: { xs: "none", md: "flex" },
-          alignItems: "center",
-          gap: 1,
-          bgcolor: background.paper,
-          border: `1px solid ${divider}`,
-          borderRadius: "10px",
-          px: 1.75,
-          py: 1,
-        }}
-      >
-        <Search size={16} color={text.secondary} />
-        <InputBase
-          placeholder="Search bookings, clients..."
-          sx={{
-            flex: 1,
-            fontSize: 13,
-            color: text.primary,
-            "& input::placeholder": { color: text.secondary, opacity: 1 },
-          }}
-        />
-        <Box
-          sx={{
-            fontSize: 11,
-            color: text.secondary,
-            border: `1px solid ${divider}`,
-            borderRadius: "6px",
-            px: 0.75,
-            py: 0.1,
-          }}
-        >
-          ⌘ K
-        </Box>
-      </Box>
+      {/* Removed search box and date range picker from here */}
 
       <Box sx={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 1.5 }}>
-        <CalendarPopover />
-
         {isAuthenticated ? (
           <>
             <HeaderActions

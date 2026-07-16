@@ -1,4 +1,4 @@
-import { Box, Typography, Button, Chip, IconButton, styled, Avatar, Tooltip, Paper } from '@mui/material';
+import { Box, Typography, Button, Chip, IconButton, styled, Avatar, Tooltip, TextField, alpha, InputAdornment } from '@mui/material';
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -7,7 +7,9 @@ import {
   CheckCircle as CheckCircleIcon,
   Download as DownloadIcon,
   Business as BusinessIcon,
+  Search as SearchIcon,
 } from '@mui/icons-material';
+import { Calendar as CalendarIcon, ChevronDown as ChevronDownIcon } from 'lucide-react';
 import { useState, useCallback, type ReactElement } from 'react';
 import { DataTable, type Column, type SortState, type PaginationState } from '../components/data/DataTable';
 import {
@@ -27,8 +29,23 @@ import { ConfirmDialog } from '../components/ui/Modal';
 import { useAuth } from '../features/auth/AuthContext';
 import type { UserDTO, UserRole } from '@vestara/types';
 import { UsersFilterChips } from '../features/users/UsersFilterChips';
+import CalendarDatePicker from '../features/calendar/CalendarDatePicker';
+import { Popover } from '@mui/material';
 
-// ── Styled ──
+// Helper to compute default date range (last 14 days)
+function getDefaultDateRange(): { startDate: string; endDate: string } {
+  const end = new Date();
+  end.setHours(23, 59, 59, 999);
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  start.setDate(start.getDate() - 13); // 14 days inclusive
+  return {
+    startDate: start.toISOString(),
+    endDate: end.toISOString(),
+  };
+}
+
+// ── Styled ——
 
 const PageContainer = styled(Box)(() => ({
   display: 'flex',
@@ -53,22 +70,7 @@ const RoleChip = styled(Chip)<{ role: string }>(({ theme, role }) => {
   };
 });
 
-// ── Helpers ──
-
-function formatDate(dateStr?: string): string {
-  if (!dateStr) return '—';
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-}
-
-function getInitials(firstName: string, lastName: string): string {
-  return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
-}
-
-// ── Component ──
+// ── Component ——
 
 export function UsersPage(): ReactElement {
   const { showSuccess, showError } = useToast();
@@ -77,11 +79,17 @@ export function UsersPage(): ReactElement {
   const [sort, setSort] = useState<SortState>({ field: 'createdAt', direction: 'desc' });
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
-  // Removed search state as requested
+  // Search state
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Filter state
   const [roleFilter, setRoleFilter] = useState<UserRole | ''>('');
   const [statusFilter, setStatusFilter] = useState<boolean | ''>('');
+
+  // Date range state (always a valid range, defaults to last 14 days)
+  const [dateRange, setDateRange] = useState<{ startDate: string; endDate: string }>(getDefaultDateRange());
+  const [dateRangeAnchorEl, setDateRangeAnchorEl] = useState<HTMLElement | null>(null);
+  const dateRangeOpen = Boolean(dateRangeAnchorEl);
 
   // Selection
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -102,11 +110,13 @@ export function UsersPage(): ReactElement {
   const { data, isLoading, isError, error, refetch } = useUsers({
     page,
     perPage,
-    // Removed search as requested
+    search: searchTerm || undefined,
     sort: sort.field,
     order: sort.direction,
     role: roleFilter || undefined,
     isActive: statusFilter !== '' ? statusFilter : undefined,
+    createdAtStart: dateRange.startDate,
+    createdAtEnd: dateRange.endDate,
   });
 
   const { data: organizations = [] } = useOrganizations();
@@ -136,7 +146,11 @@ export function UsersPage(): ReactElement {
     setSelectedIds([]);
   }, []);
 
-  // Removed handleSearchChange as requested
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setPage(1);
+    setSelectedIds([]);
+  }, []);
 
   const handleRoleFilterChange = useCallback((role: UserRole | '') => {
     setRoleFilter(role);
@@ -151,9 +165,10 @@ export function UsersPage(): ReactElement {
   }, []);
 
   const handleClearFilters = useCallback(() => {
-    // Removed setSearch('') as requested
+    setSearchTerm('');
     setRoleFilter('');
     setStatusFilter('');
+    setDateRange(getDefaultDateRange()); // Reset to default range
     setPage(1);
     setSelectedIds([]);
   }, []);
@@ -162,6 +177,20 @@ export function UsersPage(): ReactElement {
     setPage(newPage);
     setSelectedIds([]);
   }, []);
+
+  const handleDateRangeOpen = (e: React.MouseEvent<HTMLElement>) => {
+    setDateRangeAnchorEl(e.currentTarget);
+  };
+
+  const handleDateRangeClose = () => {
+    setDateRangeAnchorEl(null);
+  };
+
+  const handleDateRangeChange = (newRange: { startDate: string; endDate: string }) => {
+    setDateRange(newRange);
+    setPage(1);
+    setSelectedIds([]);
+  };
 
   const handleCreate = useCallback(() => {
     setEditUser(null);
@@ -228,11 +257,6 @@ export function UsersPage(): ReactElement {
   );
 
   // Bulk actions
-  const openBulkConfirm = useCallback((action: 'delete' | 'activate' | 'deactivate') => {
-    setBulkAction(action);
-    setBulkConfirmOpen(true);
-  }, []);
-
   const handleBulkConfirm = useCallback(async () => {
     if (!bulkAction || selectedIds.length === 0) return;
     try {
@@ -272,6 +296,67 @@ export function UsersPage(): ReactElement {
     }
   }, [sort, showSuccess, showError]);
 
+  // Date range picker component (inline)
+  const DateRangePicker = () => {
+    const formatDate = (dateString: string) => {
+      const date = new Date(dateString);
+      return `${date.toLocaleDateString('en-US', { month: 'short' })} ${date.getDate()}, ${date.getFullYear()}`;
+    };
+
+    const label = `${formatDate(dateRange.startDate)} – ${formatDate(dateRange.endDate)}`;
+
+    return (
+      <>
+        <Button
+          disableElevation
+          onClick={handleDateRangeOpen}
+          startIcon={<CalendarIcon size={16} />}
+          endIcon={<ChevronDownIcon size={16} />}
+          sx={{
+            height: 40,
+            px: 1.75,
+            borderRadius: '10px',
+            textTransform: 'none',
+            fontSize: 12.5,
+            fontWeight: 600,
+            color: 'text.primary',
+            bgcolor: 'background.paper',
+            border: '1px solid divider',
+            whiteSpace: 'nowrap',
+            transition: 'all .2s ease',
+            '&:hover': {
+              bgcolor: alpha('primary.main', 0.08),
+              borderColor: 'primary.main',
+            },
+            '&:active': {
+              transform: 'scale(.98)',
+            },
+          }}
+          aria-haspopup="dialog"
+          aria-expanded={dateRangeOpen}
+        >
+          {label}
+        </Button>
+
+        <Popover
+          open={dateRangeOpen}
+          anchorEl={dateRangeAnchorEl}
+          onClose={handleDateRangeClose}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+          sx={{ mt: 1 }}
+        >
+          <Box sx={{ p: 0.5, minWidth: 280 }}>
+            <CalendarDatePicker
+              value={dateRange}
+              onChange={handleDateRangeChange}
+            />
+          </Box>
+        </Popover>
+      </>
+    );
+  };
+
   // Columns
   const columns: Column<UserDTO>[] = [
     {
@@ -284,7 +369,7 @@ export function UsersPage(): ReactElement {
             src={row.avatarUrl}
             sx={{ width: 32, height: 32, fontSize: '0.8125rem', fontWeight: 600 }}
           >
-            {getInitials(row.firstName, row.lastName)}
+            {`${row.firstName.charAt(0)}${row.lastName.charAt(0)}`}
           </Avatar>
           <Box>
             <Typography variant="body2" fontWeight={600}>
@@ -344,14 +429,28 @@ export function UsersPage(): ReactElement {
       label: 'Last Login',
       width: 140,
       sortable: true,
-      render: (value) => formatDate(value as string),
+      render: (value) => {
+        const date = new Date(value as string);
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        });
+      },
     },
     {
       id: 'createdAt',
       label: 'Created',
       width: 140,
       sortable: true,
-      render: (value) => formatDate(value as string),
+      render: (value) => {
+        const date = new Date(value as string);
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        });
+      },
     },
     {
       id: 'actions',
@@ -394,46 +493,55 @@ export function UsersPage(): ReactElement {
         </Typography>
       </Box>
 
-{selectedIds.length > 0 && (
-         <Paper
-           variant="outlined"
-           sx={{
-             display: 'flex',
-             alignItems: 'center',
-             justifyContent: 'space-between',
-             gap: 2,
-             p: 1.5,
-             px: 2,
-             flexWrap: 'wrap',
-             borderColor: 'primary.main',
-           }}
-         >
-           <Typography variant="body2" fontWeight={600}>
-             {selectedIds.length} selected
-           </Typography>
-           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-             <Button size="small" startIcon={<CheckCircleIcon />} onClick={() => openBulkConfirm('activate')}>
-               Activate
-             </Button>
-             <Button size="small" startIcon={<BlockIcon />} onClick={() => openBulkConfirm('deactivate')}>
-               Deactivate
-             </Button>
-             <Button
-               size="small"
-               color="error"
-               startIcon={<DeleteIcon />}
-               onClick={() => openBulkConfirm('delete')}
-             >
-               Delete
-             </Button>
-             <Button size="small" onClick={() => setSelectedIds([])}>
-               Clear
-             </Button>
-           </Box>
-         </Paper>
-       )}
+      {/* Toolbar with search, date range, and actions */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2, mb: 2 }}>
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+          <TextField
+            label="Search"
+            placeholder="Search by name, email"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            sx={{ width: 250 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="inherit" sx={{ fontSize: 20 }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <DateRangePicker />
+        </Box>
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+          <Button
+            variant="outlined"
+            startIcon={<DownloadIcon />}
+            onClick={handleExport}
+            disabled={exporting || isLoading}
+          >
+            Export
+          </Button>
+          <Box sx={{ ml: 2 }}>
+            <UsersFilterChips
+              roleFilter={roleFilter}
+              statusFilter={statusFilter}
+              onRoleFilterChange={handleRoleFilterChange}
+              onStatusFilterChange={handleStatusFilterChange}
+              onClearFilters={handleClearFilters}
+              hasActiveFilters={!!roleFilter || statusFilter !== ''}
+            />
+          </Box>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleCreate}
+          >
+            Add User
+          </Button>
+        </Box>
+      </Box>
 
-       <DataTable<UserDTO>
+      <DataTable<UserDTO>
         columns={columns}
         rows={users}
         keyExtractor={(row) => row.id}
@@ -448,35 +556,6 @@ export function UsersPage(): ReactElement {
         pagination={paginationState}
         onPageChange={handlePageChange}
         onPerPageChange={setPerPage}
-        actions={
-          <>
-            <Button
-              variant="outlined"
-              startIcon={<DownloadIcon />}
-              onClick={handleExport}
-              disabled={exporting || isLoading}
-            >
-              Export
-            </Button>
-            <Box sx={{ ml: 2 }}>
-              <UsersFilterChips
-                roleFilter={roleFilter}
-                statusFilter={statusFilter}
-                onRoleFilterChange={handleRoleFilterChange}
-                onStatusFilterChange={handleStatusFilterChange}
-                onClearFilters={handleClearFilters}
-                hasActiveFilters={!!roleFilter || statusFilter !== ''}
-              />
-            </Box>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleCreate}
-            >
-              Add User
-            </Button>
-          </>
-        }
       />
 
       {/* Create / Edit Dialog */}
@@ -518,9 +597,7 @@ export function UsersPage(): ReactElement {
         }
         message={
           bulkAction === 'delete'
-            ? `Are you sure you want to delete ${selectedIds.length} selected user${
-                selectedIds.length === 1 ? '' : 's'
-              }? This action cannot be undone.`
+            ? `Are you sure you want to delete ${selectedIds.length} selected user${selectedIds.length === 1 ? '' : 's'}? This action cannot be undone.`
             : `Are you sure you want to ${
                 bulkAction === 'activate' ? 'activate' : 'deactivate'
               } ${selectedIds.length} selected user${selectedIds.length === 1 ? '' : 's'}?`
@@ -537,5 +614,3 @@ export function UsersPage(): ReactElement {
     </PageContainer>
   );
 }
-
-export default UsersPage;

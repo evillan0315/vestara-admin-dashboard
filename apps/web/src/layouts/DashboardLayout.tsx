@@ -144,11 +144,6 @@ export default function DashboardLayout({
           title={title ?? routeTitle}
           subtitle={subtitle ?? routeSubtitle}
           onMenuToggle={isHidden ? undefined : handleDrawerToggle}
-          showSearch
-          showNotifications
-          showThemeToggle
-          showUserMenu
-          showSettings
           refreshing={notificationsLoading}
           onRefresh={handleRefresh}
         />
