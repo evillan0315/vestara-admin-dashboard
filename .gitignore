@@ -15,6 +15,9 @@ build/
 # Local deployment config (contains server secrets/paths)
 deploy.env
 
+# Local production env vars (contains application secrets)
+.env.deploy
+
 # Google OAuth client secret (never commit)
 client_secret_*.json
 

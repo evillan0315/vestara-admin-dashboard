@@ -16,6 +16,10 @@
 #   ./scripts/deploy.sh --api                 # also pull/build/restart the API
 #   DEPLOY_HOST=example.com ./scripts/deploy.sh
 #
+# When --api is set, the script also copies the local .env.deploy (git-ignored
+# runtime secrets) to <DEPLOY_API_PATH>/.env.deploy and (re)starts the API via
+# infrastructure/pm2/ecosystem.config.cjs, which auto-loads those vars.
+#
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -138,11 +142,24 @@ fi
 # ── 7. Optional API deploy ─────────────────────────────────────────────────
 if [[ "${DEPLOY_API}" == "true" ]]; then
   echo "🛠  Deploying API from ${DEPLOY_API_PATH}..."
+
+  # Ship the git-ignored runtime secrets alongside the code so the API has its
+  # environment on first boot. Refuse to deploy if the local file is missing.
+  if [[ -f "${REPO_ROOT}/.env.deploy" ]]; then
+    echo "🔐 Copying .env.deploy to ${DEPLOY_API_PATH}/.env.deploy"
+    rsync_cmd "${REPO_ROOT}/.env.deploy" "${SSH_TARGET}:${DEPLOY_API_PATH}/.env.deploy"
+    ssh_cmd "sudo chown ${DEPLOY_WEB_ROOT_GROUP}:${DEPLOY_WEB_ROOT_GROUP} ${DEPLOY_API_PATH}/.env.deploy && \
+      chmod 600 ${DEPLOY_API_PATH}/.env.deploy"
+  else
+    echo "⚠️  Local .env.deploy not found — skipping secret copy. The API may fail to start without its environment." >&2
+  fi
+
   ssh_cmd "cd ${DEPLOY_API_PATH} && \
     git pull --ff-only && \
     pnpm install --frozen-lockfile && \
     pnpm exec prisma migrate deploy && \
     pnpm build && \
+    pnpm exec pm2 start infrastructure/pm2/ecosystem.config.cjs --env production --update-env || \
     pnpm exec pm2 restart vestara-api"
 fi
 
