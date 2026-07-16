@@ -1,0 +1,29 @@
+{
+  "name": "@vestara/marketing-video",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Vestara 30s ecosystem overview marketing video — Remotion project (dark luxury + gold branding).",
+  "type": "module",
+  "scripts": {
+    "dev": "remotion studio",
+    "render": "remotion render VestaraEcosystemAd out/vestara-ad.mp4",
+    "render:still": "remotion still VestaraEcosystemAd out/vestara-thumbnail.png --frame=120",
+    "upgrade": "remotion upgrade",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.285",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "remotion": "4.0.285",
+    "@remotion/shapes": "4.0.285"
+  },
+  "devDependencies": {
+    "@types/react": "19.0.0",
+    "@types/react-dom": "19.0.0",
+    "typescript": "5.7.2"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}
