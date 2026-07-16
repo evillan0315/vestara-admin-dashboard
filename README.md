@@ -128,12 +128,16 @@ The admin dashboard is fully data-driven and real-time:
 
 ### Video Assets (`apps/marketing-video`)
 
-A self-contained [Remotion](https://www.remotion.dev/) project renders a **30-second
-ecosystem overview ad** in the product's dark-luxury + metallic-gold style
-(1920×1080, 30fps). It sequences five crossfaded beats — Hook, Module grid,
-AI Assistant spotlight, Admin Analytics spotlight, and CTA — and builds a static
-`build/` bundle for embedding. See `apps/marketing-video/README.md` for the
-scene layout and `pnpm dev` / `pnpm render` commands.
+A self-contained [Remotion](https://www.remotion.dev/) project (`@vestara/marketing-video`)
+renders a **30-second ecosystem overview ad** in the product's dark-luxury +
+metallic-gold style (1920×1080, 30fps, 900 frames). It sequences five crossfaded
+beats — Hook, Module grid, AI Assistant spotlight, Admin Analytics spotlight,
+and CTA — and builds a static `build/` bundle for embedding. The project is a
+standalone workspace app and does not depend on `apps/web` or `apps/api` at build
+time. Run `pnpm --filter=@vestara/marketing-video dev` to preview in Remotion
+Studio or `pnpm --filter=@vestara/marketing-video render` to export
+`out/vestara-ad.mp4` (requires a Chromium binary). See
+`apps/marketing-video/README.md` for the full scene layout and customization guide.
 
 For a fully cinematic "command center" cut, `apps/marketing-video/prompts/vestara-cinematic-t2v.md`
 ships a ready-to-use prompt optimized for the **HappyHorse-1.1-T2V** text-to-video
@@ -921,7 +925,8 @@ vestara/
 │
 ├── apps/
 │   ├── web/              # React 19 Frontend (Vite)
-│   └── api/              # Express 5 Backend
+│   ├── api/              # Express 5 Backend
+│   └── marketing-video/  # Remotion project: 30s ecosystem ad + T2V cinematic prompt
 │
 ├── packages/
 │   ├── types/            # Shared TypeScript types & enums
@@ -1103,6 +1108,7 @@ The repository is organized into reusable workspaces.
 |-----------|---------|
 | apps/web | Admin Dashboard Frontend (React 19) |
 | apps/api | Admin Dashboard Backend (Express 5) |
+| apps/marketing-video | Remotion ad studio — 30s ecosystem overview video |
 | packages/types | Shared TypeScript types, enums, DTOs |
 | packages/constants | Shared global constants |
 | packages/validation | Zod validation schemas |

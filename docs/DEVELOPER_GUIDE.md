@@ -86,17 +86,20 @@ vestara-admin-dashboard/
 │   │   ├── prisma/         # schema.prisma, migrations, seed.ts
 │   │   ├── tests/          # vitest integration tests
 │   │   └── vercel.json
-│   └── web/                # React 19 frontend (@vestara/web)
-│       ├── src/
-│       │   ├── api/        # API client (axios) + typed hooks
-│       │   ├── components/ # Shared UI (layout, common)
-│       │   ├── features/   # Feature modules (auth, users, settings, ...)
-│       │   ├── layouts/    # navConfig, route composition
-│       │   ├── pages/      # Route pages
-│       │   ├── styles/     # MUI theme factory (theme.ts)
-│       │   └── theme/      # Theme types, tokens, density presets
-│       └── vercel.json
+│   ├── web/                # React 19 frontend (@vestara/web)
+│   │   ├── src/
+│   │   │   ├── api/        # API client (axios) + typed hooks
+│   │   │   ├── components/ # Shared UI (layout, common)
+│   │   │   ├── features/   # Feature modules (auth, users, settings, ...)
+│   │   │   ├── layouts/    # navConfig, route composition
+│   │   │   ├── pages/      # Route pages
+│   │   │   ├── styles/     # MUI theme factory (theme.ts)
+│   │   │   └── theme/      # Theme types, tokens, density presets
+│   │   └── vercel.json
 │   └── marketing-video/     # Remotion project: 30s ecosystem ad + T2V cinematic prompt
+│       ├── src/             # Composition, scenes, components, theme
+│       ├── prompts/         # HappyHorse-1.1-T2V cinematic command-center prompt
+│       └── README.md        # dev / render commands
 ├── packages/               # Shared libraries (see below)
 ├── docs/                   # This folder
 ├── turbo.json
@@ -138,6 +141,9 @@ Run from the repository root unless noted. Turbo fans commands out to the worksp
 | `pnpm prisma:seed` | Seed development data |
 | `pnpm screenshot` | Capture dark + light PNGs of every dashboard route (localhost dev) |
 | `pnpm screenshot:dev` | Capture only the dark theme (faster preview) |
+| `pnpm --filter=@vestara/marketing-video dev` | Open the Remotion Studio to preview the 30s ad |
+| `pnpm --filter=@vestara/marketing-video render` | Render the ad to `out/vestara-ad.mp4` |
+| `pnpm --filter=@vestara/marketing-video typecheck` | TypeScript check for the marketing app |
 | `pnpm clean` | Remove build artifacts + `node_modules` |
 
 ### Screenshot Tooling
@@ -186,6 +192,41 @@ Filter to a single workspace when needed:
 pnpm --filter=@vestara/web build
 pnpm --filter=@vestara/api test
 ```
+
+### Marketing Video (`apps/marketing-video`)
+
+`apps/marketing-video/` is a self-contained [Remotion](https://www.remotion.dev/)
+(React/TypeScript) project that renders the **30-second Vestara ecosystem
+overview ad** in the product's dark-luxury + metallic-gold brand style
+(1920×1080, 30fps, 900 frames). It is a workspace member (`@vestara/marketing-video`)
+and does not depend on `apps/web` or `apps/api` at build time.
+
+The ad sequences five crossfaded beats with a persistent brand bar:
+
+1. **Hook** — "One platform. Every transaction."
+2. **Module grid** — Wallet · Marketplace · Rewards · Bookings
+3. **AI Assistant spotlight** — RAG, floating widget, data connector
+4. **Admin Analytics spotlight** — live dashboards, multi-tenant, exports
+5. **CTA** — "Build. Trade. Earn. Grow." + early access
+
+```bash
+cd apps/marketing-video
+pnpm install
+pnpm dev      # Remotion Studio (scrub/preview in browser)
+pnpm render   # → out/vestara-ad.mp4  (requires a Chromium binary)
+pnpm typecheck
+```
+
+> **Rendering needs Chromium.** Remotion downloads a headless shell on first
+> `render`; if you prefer a system browser, pass `--chromium-binary=/path/to/chromium`.
+> The `@types/react` version is pinned via a root `pnpm.overrides` entry
+> (`19.0.10`) because Remotion 4.0.285 is incompatible with `@types/react` 19.2.x.
+
+For a fully cinematic "command center" cut, `apps/marketing-video/prompts/vestara-cinematic-t2v.md`
+ships a ready-to-use prompt optimized for the **HappyHorse-1.1-T2V** text-to-video
+model (visual/camera/animation/lighting specs + negative prompt), mirroring the
+Vestara Elite Companions branding. See `apps/marketing-video/README.md` for the
+full scene layout and customization guide.
 
 ---
 
