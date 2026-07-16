@@ -1449,6 +1449,8 @@ pnpm dev:api
 | pnpm prisma:migrate | Run database migrations |
 | pnpm prisma:studio | Open Prisma Studio |
 | pnpm prisma:seed | Seed development data |
+| pnpm screenshot | Capture dark + light screenshots of every localhost dashboard route |
+| pnpm screenshot:dev | Capture only the dark-theme screenshots (faster preview) |
 | pnpm deploy:api | Deploy API to Vercel (production) |
 | pnpm clean | Clean all build artifacts |
 

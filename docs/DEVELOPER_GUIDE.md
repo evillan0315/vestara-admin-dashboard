@@ -136,7 +136,44 @@ Run from the repository root unless noted. Turbo fans commands out to the worksp
 | `pnpm prisma:migrate` | Create/apply a migration |
 | `pnpm prisma:studio` | Open Prisma Studio |
 | `pnpm prisma:seed` | Seed development data |
+| `pnpm screenshot` | Capture dark + light PNGs of every dashboard route (localhost dev) |
+| `pnpm screenshot:dev` | Capture only the dark theme (faster preview) |
 | `pnpm clean` | Remove build artifacts + `node_modules` |
+
+### Screenshot Tooling
+
+`scripts/screenshot/` captures authenticated screenshots of the running localhost
+dashboard using Playwright (Chromium). It logs in through the real
+`POST /api/v1/auth/login` endpoint, seeds the returned JWT into `localStorage`
+(the same keys the web app reads: `accessToken` / `refreshToken`), and then
+navigates each route with a headless browser. This guarantees captured pages
+reflect authenticated, data-driven UI rather than redirected login screens.
+
+**Prerequisites:** the dev stack must be running (`pnpm dev` or `pnpm dev:local`)
+and the database seeded (`pnpm prisma:seed`).
+
+```bash
+pnpm screenshot          # dark + light, every route → ./screens
+pnpm screenshot:dev      # dark only (quick preview)
+```
+
+Outputs are written to `./screens/` as `<route>-<theme>.png`
+(e.g. `dashboard-dark.png`, `users-light.png`). A Chromium executable is
+located automatically (system install, Playwright cache, or
+`VESTARA_SCREENSHOT_CHROME`); no browser download is forced.
+
+Override any default via environment variables:
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `VESTARA_SCREENSHOT_BASE_URL` | `http://localhost:5173` | Dev server origin |
+| `VESTARA_SCREENSHOT_API_URL` | `http://localhost:5000/api/v1` | API origin |
+| `VESTARA_SCREENSHOT_EMAIL` | `admin@vestara.com` | Login email (matches seed) |
+| `VESTARA_SCREENSHOT_PASSWORD` | `Admin123!` | Login password (matches seed) |
+| `VESTARA_SCREENSHOT_OUT_DIR` | `<repo>/screens` | Output directory |
+| `VESTARA_SCREENSHOT_CHROME` | _auto-detected_ | Explicit Chromium executable path |
+| `VESTARA_SCREENSHOT_THEMES` | `dark,light` | Comma-separated themes |
+| `VESTARA_SCREENSHOT_FULL_PAGE` | `true` | Capture full scrollable page |
 
 Filter to a single workspace when needed:
 
