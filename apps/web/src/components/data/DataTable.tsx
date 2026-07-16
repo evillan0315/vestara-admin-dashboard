@@ -73,6 +73,7 @@ export interface DataTableProps<T> {
   searchValue?: string;
   onSearchChange?: (value: string) => void;
   searchPlaceholder?: string;
+  filters?: ReactNode;
   title?: string;
   actions?: ReactNode;
   emptyTitle?: string;
@@ -194,6 +195,7 @@ export function DataTable<T>({
   searchPlaceholder = 'Search...',
   title,
   actions,
+  filters,
   emptyTitle,
   emptyDescription,
   emptyIcon,
@@ -287,9 +289,9 @@ export function DataTable<T>({
   return (
     <TableWrapper>
       {/* Toolbar */}
-      {(searchable || title || actions) && (
+      {(searchable || title || actions || filters) && (
         <ToolbarContainer>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
             {title && (
               <Typography variant="subtitle1" fontWeight={600}>
                 {title}
@@ -317,8 +319,9 @@ export function DataTable<T>({
                 }}
               />
             )}
+            {filters && <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>{filters}</Box>}
           </Box>
-          {actions && <Box sx={{ display: 'flex', gap: 1 }}>{actions}</Box>}
+          {actions && <Box sx={{ display: 'flex', gap: 1, flexShrink: 0 }}>{actions}</Box>}
         </ToolbarContainer>
       )}
 

@@ -24,7 +24,7 @@ import { useAuth } from '../features/auth/AuthContext';
 import { useLiveDashboard } from '../features/realtime/useLiveDashboard';
 import LiveBadge from '../features/realtime/LiveBadge';
 import { useOrganization } from '../features/organizations/hooks';
-import { useDateRange } from '../features/calendar';
+import { DateRangePicker, useDateRange } from '../features/calendar';
 import {
   toActivityItem,
   useDailySeries,
@@ -96,7 +96,7 @@ function EmptyChart({ height = 280 }: { height?: number }) {
 export function DashboardPage() {
   const theme = useTheme();
   const { user } = useAuth();
-  const { range: dateRange, rangeDays } = useDateRange();
+  const { range: dateRange, rangeDays, setRange } = useDateRange();
 
   // Refresh dashboard data in real time as org-scoped audit events arrive.
   useLiveDashboard();
@@ -154,6 +154,7 @@ export function DashboardPage() {
           {user?.organizationId && (
             <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1.5 }}>
               <LiveBadge />
+              <DateRangePicker dateRange={dateRange} onDateRangeChange={setRange} />
               {organizationName && (
                 <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
                   Organization: {organizationName}

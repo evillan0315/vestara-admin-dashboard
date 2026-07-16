@@ -1,15 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import {
   Box,
   Typography,
   Grid,
   Paper,
   styled,
-  ToggleButton,
-  ToggleButtonGroup,
   Skeleton,
   useTheme,
-  type ToggleButtonGroupProps,
 } from '@mui/material';
 import { LineChart, PieChart, BarChart } from '@mui/x-charts';
 import {
@@ -25,9 +22,8 @@ import { useSettings } from '../features/settings/hooks';
 import { useAuditLogs } from '../features/audit-logs/hooks';
 import { useLiveDashboard } from '../features/realtime/useLiveDashboard';
 import LiveBadge from '../features/realtime/LiveBadge';
+import { DateRangePicker, useDateRange } from '../features/calendar';
 import {
-  RANGE_OPTIONS,
-  type RangeOption,
   toActivityItem,
   useDailySeries,
   useDistribution,
@@ -82,7 +78,7 @@ function EmptyChart({ height = 280 }: { height?: number }) {
 
 export function AnalyticsPage() {
   const theme = useTheme();
-  const [range, setRange] = useState<RangeOption>(30);
+  const { range: dateRange, rangeDays, setRange } = useDateRange();
 
   // Keep analytics live as org-scoped audit events arrive.
   useLiveDashboard();
@@ -92,15 +88,12 @@ export function AnalyticsPage() {
   const settingsQuery = useSettings();
   const auditQuery = useAuditLogs({ perPage: 8, sort: 'createdAt', order: 'desc' });
 
-  const { startDate, endDate } = useMemo(() => {
-    const end = new Date();
-    const start = new Date();
-    start.setDate(start.getDate() - (range - 1));
-    start.setHours(0, 0, 0, 0);
-    return { startDate: start.toISOString(), endDate: end.toISOString() };
-  }, [range]);
+  const { startDate, endDate } = useMemo(
+    () => ({ startDate: dateRange.startDate, endDate: dateRange.endDate }),
+    [dateRange.startDate, dateRange.endDate],
+  );
 
-  const analytics = useAuditActivity(startDate, endDate, range);
+  const analytics = useAuditActivity(startDate, endDate, rangeDays);
   const logs = analytics.logs;
 
   const totalUsers = usersAll.data?.meta?.total ?? 0;
@@ -108,7 +101,7 @@ export function AnalyticsPage() {
   const inactiveUsers = Math.max(0, totalUsers - activeUsers);
   const settingsCount = Object.keys(settingsQuery.data?.data?.settings ?? {}).length;
 
-  const prevRange = useMemo(() => getPreviousRange(range, endDate), [range, endDate]);
+  const prevRange = useMemo(() => getPreviousRange(rangeDays, endDate), [rangeDays, endDate]);
   const prevCountQuery = useAuditCount(prevRange.startDate, prevRange.endDate);
   const currentEvents = analytics.total;
   const prevEvents = prevCountQuery.data ?? 0;
@@ -117,15 +110,11 @@ export function AnalyticsPage() {
 
   const activityItems = (auditQuery.data?.data ?? []).map(toActivityItem);
 
-  const daily = useDailySeries(logs, range, endDate);
+  const daily = useDailySeries(logs, rangeDays, endDate);
   const byAction = useDistribution(logs, (l) => l.action, actionLabelLookup, 6);
   const byEntity = useDistribution(logs, (l) => l.entity, entityLabelLookup);
 
   const chartsLoading = analytics.loading;
-
-  const handleRangeChange: ToggleButtonGroupProps['onChange'] = (_event, newRange) => {
-    if (newRange !== null) setRange(newRange as RangeOption);
-  };
 
   return (
     <PageContainer>
@@ -141,19 +130,7 @@ export function AnalyticsPage() {
             Detailed, live insights for your organization.
           </Typography>
         </Box>
-        <ToggleButtonGroup
-          size="small"
-          value={range}
-          exclusive
-          onChange={handleRangeChange}
-          aria-label="date range"
-        >
-          {RANGE_OPTIONS.map((option) => (
-            <ToggleButton key={option} value={option}>
-              {option}d
-            </ToggleButton>
-          ))}
-        </ToggleButtonGroup>
+        <DateRangePicker dateRange={dateRange} onDateRangeChange={setRange} />
       </Box>
 
       <Grid container spacing={3}>
@@ -180,7 +157,7 @@ export function AnalyticsPage() {
             title="Audit Events"
             value={currentEvents}
             change={eventsChange}
-            changeLabel={`vs. previous ${range}d`}
+            changeLabel={`vs. previous ${rangeDays}d`}
             icon={<AssessmentIcon />}
             iconColor="info"
             loading={chartsLoading}

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Box, Button, Popover, alpha } from '@mui/material';
 import { Calendar as CalendarIcon, ChevronDown as ChevronDownIcon } from 'lucide-react';
-import CalendarDatePicker from '../../calendar/CalendarDatePicker';
-import type { DateRangeValue } from '../../calendar/DateRangeContext';
+import CalendarDatePicker from './CalendarDatePicker';
+import type { DateRangeValue } from './DateRangeContext';
 
 interface DateRangePickerProps {
   dateRange: DateRangeValue;

@@ -1,13 +1,13 @@
-import { Box, Typography, Button, styled } from '@mui/material';
-import { Add as AddIcon, Download as DownloadIcon } from '@mui/icons-material';
+import { Box, Typography, Button, Select, MenuItem, FormControl, TextField, InputAdornment, IconButton, styled, useTheme } from '@mui/material';
+import { Add as AddIcon, Download as DownloadIcon, Search as SearchIcon, Clear as ClearIcon } from '@mui/icons-material';
 import { useMemo, type ReactElement } from 'react';
 import { DataTable } from '../components/data/DataTable';
 import { useUsersPage } from '../features/users/hooks/useUsersPage';
 import { createUsersColumns } from '../features/users/components/UsersTableColumns';
-import { DateRangePicker } from '../features/users/components/DateRangePicker';
-import { UsersFilterBar } from '../features/users/components/UsersFilterBar';
 import { UsersBulkBar } from '../features/users/components/UsersBulkBar';
 import { UsersDialogs } from '../features/users/components/UsersDialogs';
+import type { UserRole } from '@vestara/types';
+import { UserRole as UserRoleEnum } from '@vestara/types';
 
 const PageContainer = styled(Box)(() => ({
   display: 'flex',
@@ -15,7 +15,22 @@ const PageContainer = styled(Box)(() => ({
   gap: 24,
 }));
 
+const ROLE_OPTIONS: { value: UserRole | ''; label: string }[] = [
+  { value: '', label: 'All Roles' },
+  { value: UserRoleEnum.SUPER_ADMIN, label: 'Super Admin' },
+  { value: UserRoleEnum.ADMIN, label: 'Admin' },
+  { value: UserRoleEnum.MODERATOR, label: 'Moderator' },
+  { value: UserRoleEnum.SUPPORT, label: 'Support' },
+];
+
+const STATUS_OPTIONS: { value: string; label: string }[] = [
+  { value: '', label: 'All Statuses' },
+  { value: 'true', label: 'Active' },
+  { value: 'false', label: 'Inactive' },
+];
+
 export function UsersPage(): ReactElement {
+  const theme = useTheme();
   const ctx = useUsersPage();
 
   const columns = useMemo(
@@ -29,22 +44,96 @@ export function UsersPage(): ReactElement {
     [ctx.orgMap, ctx.handleEdit, ctx.handleToggleStatus, ctx.setDeleteTarget],
   );
 
+  const filterControls = (
+    <>
+      <TextField
+        placeholder="Search by name or email"
+        value={ctx.searchTerm}
+        onChange={ctx.handleSearchChange}
+        size="small"
+        sx={{ minWidth: 200 }}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon fontSize="inherit" sx={{ fontSize: 20, color: 'text.secondary' }} />
+            </InputAdornment>
+          ),
+          endAdornment: ctx.searchTerm ? (
+            <InputAdornment position="end">
+              <IconButton size="small" onClick={ctx.handleSearchClear}>
+                <ClearIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            </InputAdornment>
+          ) : null,
+        }}
+      />
+      <FormControl size="small" sx={{ minWidth: 130 }}>
+        <Select
+          value={ctx.roleFilter === '' ? '' : ctx.roleFilter}
+          onChange={(e) => ctx.handleRoleFilterChange(e.target.value)}
+          displayEmpty
+          renderValue={(v) => {
+            const option = ROLE_OPTIONS.find((o) => o.value === v);
+            return option?.label || 'All Roles';
+          }}
+          sx={{ borderRadius: '8px', fontSize: '0.8125rem' }}
+        >
+          {ROLE_OPTIONS.map((option) => (
+            <MenuItem key={String(option.value)} value={option.value} sx={{ fontSize: '0.8125rem' }}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <FormControl size="small" sx={{ minWidth: 130 }}>
+        <Select
+          value={ctx.statusFilter === '' ? '' : String(ctx.statusFilter)}
+          onChange={(e) => ctx.handleStatusFilterChange(e.target.value)}
+          displayEmpty
+          renderValue={(v) => {
+            if (v === 'true') return 'Active';
+            if (v === 'false') return 'Inactive';
+            return 'All Statuses';
+          }}
+          sx={{ borderRadius: '8px', fontSize: '0.8125rem' }}
+        >
+          {STATUS_OPTIONS.map((option) => (
+            <MenuItem key={option.value} value={option.value} sx={{ fontSize: '0.8125rem' }}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      {ctx.hasActiveFilters && (
+        <Button
+          size="small"
+          startIcon={<ClearIcon />}
+          onClick={ctx.handleClearFilters}
+          sx={{
+            color: theme.palette.text.secondary,
+            textTransform: 'none',
+            fontWeight: 600,
+            fontSize: '0.75rem',
+            minWidth: 'auto',
+          }}
+        >
+          Clear
+        </Button>
+      )}
+    </>
+  );
+
   return (
     <PageContainer>
-      {/* Row 1 — Header with title + date range */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <Box>
-          <Typography variant="h4" fontWeight={700}>
-            Users
-          </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>
-            Manage user accounts and permissions.
-          </Typography>
-        </Box>
-        <DateRangePicker dateRange={ctx.dateRange} onDateRangeChange={ctx.handleDateRangeChange} />
+      <Box>
+        <Typography variant="h4" fontWeight={700}>
+          Users
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>
+          Manage user accounts and permissions.
+        </Typography>
       </Box>
 
-      {/* Row 2 — Summary stat line */}
       {ctx.userStats && (
         <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
           <Typography component="span" variant="body2" fontWeight={600} color="text.primary">
@@ -64,20 +153,6 @@ export function UsersPage(): ReactElement {
         </Typography>
       )}
 
-      {/* Row 3 — Filter bar */}
-      <UsersFilterBar
-        searchTerm={ctx.searchTerm}
-        onSearchChange={ctx.handleSearchChange}
-        onSearchClear={ctx.handleSearchClear}
-        roleFilter={ctx.roleFilter}
-        onRoleFilterChange={ctx.handleRoleFilterChange}
-        statusFilter={ctx.statusFilter}
-        onStatusFilterChange={ctx.handleStatusFilterChange}
-        onClearFilters={ctx.handleClearFilters}
-        hasActiveFilters={ctx.hasActiveFilters}
-      />
-
-      {/* Row 4 — Bulk action bar */}
       <UsersBulkBar
         selectedCount={ctx.selectedIds.length}
         onActivate={() => ctx.handleBulkClick('activate')}
@@ -85,7 +160,6 @@ export function UsersPage(): ReactElement {
         onDelete={() => ctx.handleBulkClick('delete')}
       />
 
-      {/* Row 5 — DataTable */}
       <DataTable
         columns={columns}
         rows={ctx.users}
@@ -101,6 +175,7 @@ export function UsersPage(): ReactElement {
         pagination={ctx.paginationState}
         onPageChange={ctx.handlePageChange}
         onPerPageChange={ctx.setPerPage}
+        filters={filterControls}
         actions={
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Button
@@ -124,7 +199,6 @@ export function UsersPage(): ReactElement {
         }
       />
 
-      {/* Dialogs */}
       <UsersDialogs
         dialogOpen={ctx.dialogOpen}
         editUser={ctx.editUser}
@@ -147,3 +221,5 @@ export function UsersPage(): ReactElement {
     </PageContainer>
   );
 }
+
+export default UsersPage;

@@ -7,15 +7,6 @@ import { exportUsersCsv } from '../exportUsers';
 import { useToast } from '../../../components/feedback/Toast';
 import { useAuth } from '../../auth/AuthContext';
 
-function getDefaultDateRange(): { startDate: string; endDate: string } {
-  const end = new Date();
-  end.setHours(23, 59, 59, 999);
-  const start = new Date();
-  start.setHours(0, 0, 0, 0);
-  start.setDate(start.getDate() - 13);
-  return { startDate: start.toISOString(), endDate: end.toISOString() };
-}
-
 export interface UsersPageState {
   sort: SortState;
   page: number;
@@ -23,7 +14,6 @@ export interface UsersPageState {
   searchTerm: string;
   roleFilter: UserRole | '';
   statusFilter: boolean | '';
-  dateRange: { startDate: string; endDate: string };
   selectedIds: string[];
   dialogOpen: boolean;
   editUser: UserDTO | null;
@@ -42,7 +32,6 @@ export function useUsersPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<UserRole | ''>('');
   const [statusFilter, setStatusFilter] = useState<boolean | ''>('');
-  const [dateRange, setDateRange] = useState<{ startDate: string; endDate: string }>(getDefaultDateRange());
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editUser, setEditUser] = useState<UserDTO | null>(null);
@@ -59,8 +48,6 @@ export function useUsersPage() {
     order: sort.direction,
     role: roleFilter || undefined,
     isActive: statusFilter !== '' ? statusFilter : undefined,
-    createdAtStart: dateRange.startDate,
-    createdAtEnd: dateRange.endDate,
   });
 
   const { data: userStats } = useUserStats();
@@ -128,7 +115,6 @@ export function useUsersPage() {
     setSearchTerm('');
     setRoleFilter('');
     setStatusFilter('');
-    setDateRange(getDefaultDateRange());
     setPage(1);
     setSelectedIds([]);
   }, []);
@@ -137,11 +123,6 @@ export function useUsersPage() {
     setPage(newPage);
     setSelectedIds([]);
   }, []);
-
-  const handleDateRangeChange = useCallback((newRange: { startDate: string; endDate: string }) => {
-    setDateRange(newRange);
-    resetPageAndSelection();
-  }, [resetPageAndSelection]);
 
   const handleCreate = useCallback(() => {
     setEditUser(null);
@@ -263,7 +244,6 @@ export function useUsersPage() {
     searchTerm,
     roleFilter,
     statusFilter,
-    dateRange,
     selectedIds,
     dialogOpen,
     editUser,
@@ -294,7 +274,6 @@ export function useUsersPage() {
     handleStatusFilterChange,
     handleClearFilters,
     handlePageChange,
-    handleDateRangeChange,
     handleCreate,
     handleEdit,
     handleDialogClose,
