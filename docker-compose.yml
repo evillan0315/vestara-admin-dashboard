@@ -1,0 +1,54 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Vestara Admin Dashboard — Local Development Infrastructure
+# ─────────────────────────────────────────────────────────────────────────────
+# Spin up the backing services for local development:
+#   - PostgreSQL 17  (required — the API's primary datastore)
+#   - Redis 8       (optional — used by the WebSocket realtime layer; the API
+#                    boots without it and WS features degrade gracefully)
+#
+# Usage:
+#   docker compose up -d            # start Postgres + Redis
+#   docker compose down             # stop (keeps volumes)
+#   docker compose down -v          # stop AND wipe data
+#
+# The API connects via DATABASE_URL / REDIS_URL in the repo-root .env
+# (defaults match the values below). See infrastructure/local/README.md.
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: vestara-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: vestara_user
+      POSTGRES_PASSWORD: vestara_password
+      POSTGRES_DB: vestara_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - vestara_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vestara_user -d vestara_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:8-alpine
+    container_name: vestara-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - vestara_redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  vestara_pgdata:
+  vestara_redisdata:

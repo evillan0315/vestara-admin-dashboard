@@ -114,7 +114,15 @@ export default defineConfig({
     fs: {
       allow: [resolve(__dirname, '../../..')],
     },
-   
+    // Proxy the API (mounted at /api/v1 on the Express server) so the web
+    // client can use its default relative base (`/api/v1`) with no CORS
+    // configuration during local development. The Express API listens on 5000.
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+    },
   },
   build: {
     outDir: 'dist',
