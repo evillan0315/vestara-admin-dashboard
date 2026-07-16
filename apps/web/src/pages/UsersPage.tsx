@@ -32,7 +32,7 @@ import type { UserDTO, UserRole } from '@vestara/types';
 import { StatCard } from '../components/data/StatCard';
 import { Loading } from '../components/feedback/Loading';
 
-// ── Styled ──
+// Styled
 
 const PageContainer = styled(Box)(() => ({
   display: 'flex',
@@ -57,22 +57,7 @@ const RoleChip = styled(Chip)<{ role: string }>(({ theme, role }) => {
   };
 });
 
-// ── Helpers ──
-
-function formatDate(dateStr?: string): string {
-  if (!dateStr) return '—';
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-}
-
-function getInitials(firstName: string, lastName: string): string {
-  return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
-}
-
-// ── Component ──
+// Component
 
 export function UsersPage(): ReactElement {
   const { showSuccess, showError } = useToast();
@@ -211,38 +196,6 @@ export function UsersPage(): ReactElement {
     [toggleStatusMutation, showSuccess, showError],
   );
 
-  // Bulk actions
-  const openBulkConfirm = useCallback((action: 'delete' | 'activate' | 'deactivate') => {
-    setBulkAction(action);
-    setBulkConfirmOpen(true);
-  }, []);
-
-  const handleBulkConfirm = useCallback(async () => {
-    if (!bulkAction || selectedIds.length === 0) return;
-    try {
-      if (bulkAction === 'delete') {
-        await bulkDeleteMutation.mutateAsync(selectedIds);
-        showSuccess(`Deleted ${selectedIds.length} user${selectedIds.length === 1 ? '' : 's'}`);
-      } else {
-        await bulkStatusMutation.mutateAsync({
-          ids: selectedIds,
-          status: bulkAction === 'activate' ? 'active' : 'inactive',
-        });
-        showSuccess(
-          `${bulkAction === 'activate' ? 'Activated' : 'Deactivated'} ${
-            selectedIds.length
-          } user${selectedIds.length === 1 ? '' : 's'}`,
-        );
-      }
-      setSelectedIds([]);
-    } catch (err) {
-      showError(err instanceof Error ? err.message : 'Bulk action failed');
-    } finally {
-      setBulkConfirmOpen(false);
-      setBulkAction(null);
-    }
-  }, [bulkAction, selectedIds, bulkDeleteMutation, bulkStatusMutation, showSuccess, showError]);
-
   // CSV export
   const handleExport = useCallback(async () => {
     try {
@@ -268,7 +221,7 @@ export function UsersPage(): ReactElement {
             src={row.avatarUrl}
             sx={{ width: 32, height: 32, fontSize: '0.8125rem', fontWeight: 600 }}
           >
-            {getInitials(row.firstName, row.lastName)}
+            {row.firstName.charAt(0)}{row.lastName.charAt(0)}
           </Avatar>
           <Box>
             <Typography variant="body2" fontWeight={600}>
@@ -367,37 +320,6 @@ export function UsersPage(): ReactElement {
     },
   ];
 
-  // KPI Cards
-  const kpiCards = [
-    {
-      title: 'Total Users',
-      value: stats?.total ?? 0,
-      icon: <PeopleIcon fontSize="large" />,
-      iconBg: 'primary.main',
-      trend: stats ? { value: stats.active, label: 'active' } : undefined,
-    },
-    {
-      title: 'Active Users',
-      value: stats?.active ?? 0,
-      icon: <PersonIcon fontSize="large" />,
-      iconBg: 'success.main',
-      trend: stats && stats.total > 0 ? { value: Math.round((stats.active / stats.total) * 100), label: 'active %' } : undefined,
-    },
-    {
-      title: 'Inactive Users',
-      value: stats?.inactive ?? 0,
-      icon: <SecurityIcon fontSize="large" />,
-      iconBg: 'warning.main',
-      trend: stats && stats.total > 0 ? { value: Math.round((stats.inactive / stats.total) * 100), label: 'inactive %' } : undefined,
-    },
-    {
-      title: 'New This Month',
-      value: 0, // Could add a date-filtered count
-      icon: <TrendingUpIcon fontSize="large" />,
-      iconBg: 'info.main',
-    },
-  ];
-
   if (statsLoading || isLoading) {
     return <Loading fullScreen />;
   }
@@ -413,21 +335,20 @@ export function UsersPage(): ReactElement {
         </Typography>
       </Box>
 
-      {/* KPI Stats Row */}
-      <Grid container spacing={3} sx={{ mb: 2 }}>
+      <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', mb: 3 }}>
         {kpiCards.map((kpi, idx) => (
-          <Grid item xs={12} sm={6} md={3} key={idx}>
-            <StatCard
-              title={kpi.title}
-              value={kpi.value}
-              icon={kpi.icon}
-              iconBg={kpi.iconBg}
-              trend={kpi.trend}
-              loading={statsLoading}
-            />
-          </Grid>
+          <StatCard
+            key={idx}
+            title={kpi.title}
+            value={kpi.value}
+            icon={kpi.icon}
+            iconColor={kpi.iconColor}
+            trend={kpi.trend}
+            loading={statsLoading}
+            sx={{ minWidth: 200, flex: 1 }}
+          />
         ))}
-      </Grid>
+      </Box>
 
       {selectedIds.length > 0 && (
         <Paper
@@ -512,7 +433,6 @@ export function UsersPage(): ReactElement {
         }
       />
 
-      {/* Create / Edit Dialog */}
       <UserFormDialog
         open={dialogOpen}
         user={editUser}
@@ -523,7 +443,6 @@ export function UsersPage(): ReactElement {
         currentUserRole={user?.role}
       />
 
-      {/* Delete Confirmation */}
       <ConfirmDialog
         open={!!deleteTarget}
         title="Delete User"
@@ -539,7 +458,6 @@ export function UsersPage(): ReactElement {
         loading={deleteMutation.isPending}
       />
 
-      {/* Bulk action confirmation */}
       <ConfirmDialog
         open={bulkConfirmOpen}
         title={
@@ -551,9 +469,7 @@ export function UsersPage(): ReactElement {
         }
         message={
           bulkAction === 'delete'
-            ? `Are you sure you want to delete ${selectedIds.length} selected user${
-                selectedIds.length === 1 ? '' : 's'
-              }? This action cannot be undone.`
+            ? `Are you sure you want to delete ${selectedIds.length} selected user${selectedIds.length === 1 ? '' : 's'}? This action cannot be undone.`
             : `Are you sure you want to ${
                 bulkAction === 'activate' ? 'activate' : 'deactivate'
               } ${selectedIds.length} selected user${selectedIds.length === 1 ? '' : 's'}?`
