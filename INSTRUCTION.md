@@ -100,7 +100,7 @@ For every task:
 | 11 | Authentication Pages | ✅ Complete | 100% |
 | 12 | User CRUD | ✅ Complete | 100% |
 | 13 | Roles & Permissions | ✅ Complete | 100% |
-| 14 | User Profile | ✅ Complete | ~85% |
+| 14 | User Profile | ✅ Complete | 100% |
 | 15 | Reusable Forms | ✅ Complete | 100% |
 | 16 | Data Table | ✅ Complete | 100% |
 | 17 | Feedback Components | ✅ Complete | 100% |

@@ -1291,6 +1291,9 @@ seeded with the Docker service credentials below. To regenerate or customize:
 cp .env.example .env
 ```
 
+The full local runbook (services, env, Prisma, dev servers, teardown) lives at
+[`infrastructure/local/README.md`](./infrastructure/local/README.md).
+
 ---
 
 ## Local Infrastructure (Docker)
@@ -2027,6 +2030,18 @@ Before submitting a Pull Request, ensure that:
 - ESLint reports zero errors.
 - The project builds successfully.
 
+### Repository Access (HTTPS + `gh`)
+
+The remote uses `https://github.com/`. Authenticate pushes/pulls with the GitHub CLI so no token is stored in plaintext:
+
+```bash
+gh auth login        # keyring-backed login (scopes: repo, workflow)
+gh auth setup-git    # wires git's credential helper to `gh auth git-credential`
+```
+
+After this, ordinary `git push`/`git pull` work without prompts. Never commit
+`.env`, `.env.deploy`, or `deploy.env` — they are git-ignored.
+
 ---
 
 ## Development Standards
@@ -2065,6 +2080,7 @@ Project documentation lives in the [`/docs`](./docs) directory:
 - [API Documentation](./docs/api/README.md) — endpoints, auth, error codes, data models, architecture
 - [Deployment Guide](./docs/DEPLOYMENT.md) — Vercel deployment (API + web), environment variables, OAuth, rollback, monitoring
 - [Self-Hosted Deployment Guide](./docs/SELF_HOSTED_DEPLOYMENT.md) — full Ubuntu 24.04 walkthrough (Node + PM2 + Nginx + PostgreSQL + Redis + Let's Encrypt)
+- [Local Development Runbook](./infrastructure/local/README.md) — Docker Compose + one-command `pnpm dev:local` bootstrap for localhost
 - [Architecture Decision Records](./docs/decisions/README.md) — key technology and design decisions (monorepo, React/MUI, Express/Prisma, JWT, Vercel, Zod, OAuth)
 - [Roadmap](./ROADMAP.md) — phased delivery plan and status
 
