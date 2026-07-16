@@ -60,6 +60,27 @@ pnpm prisma:seed               # seed orgs + users + settings + audit logs
 
 ## 4. Run the apps
 
+### One-command (recommended)
+
+`pnpm dev:local` does everything: starts Docker services (waiting for them to
+be healthy), generates the Prisma client, applies migrations, seeds data, then
+launches both dev servers (`pnpm dev`).
+
+```bash
+pnpm install
+pnpm dev:local                # infra + migrate + seed + web(:5173) + api(:5000)
+```
+
+Useful flags:
+
+```bash
+pnpm dev:local --skip-db      # assume Postgres/Redis already running
+pnpm dev:local --no-seed      # migrate only, skip seeding
+pnpm dev:local --no-dev       # set up infra + DB, then exit (no dev servers)
+```
+
+### Manual / step-by-step
+
 ```bash
 pnpm install
 pnpm dev                       # starts web (:5173) + api (:5000) via turbo
