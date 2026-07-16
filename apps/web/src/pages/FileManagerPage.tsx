@@ -2,6 +2,7 @@ import { Box, Typography, Button, Paper, styled } from '@mui/material';
 import { CloudUpload as CloudUploadIcon } from '@mui/icons-material';
 import { useMemo, type ReactElement } from 'react';
 import { DataTable } from '../components/data/DataTable';
+import { GridView } from '../components/data/GridView';
 import { Loading } from '../components/feedback/Loading';
 import { useFileManagerPage } from '../features/files/hooks/useFileManagerPage';
 import { FileManagerBreadcrumbs } from '../features/files/components/FileManagerBreadcrumbs';
@@ -94,22 +95,37 @@ export function FileManagerPage(): ReactElement {
             onDeleteRequest={ctx.setDeleteTarget}
           />
 
-          <DataTable<FileItemDTO>
-            columns={columns}
-            rows={ctx.filteredFiles}
-            keyExtractor={(row) => row.id}
-            loading={false}
-            sortState={ctx.sort}
-            onSortChange={ctx.setSort}
-            selectable
-            selectedIds={ctx.selectedIds}
-            onSelectionChange={ctx.setSelectedIds}
-            searchable={false}
-            title={ctx.filteredFiles.length > 0 ? `Files (${ctx.filteredFiles.length})` : 'Files'}
-            emptyIcon={<CloudUploadIcon sx={{ fontSize: 48 }} />}
-            emptyTitle={ctx.search ? 'No files match your search' : 'No files in this folder'}
-            emptyDescription={ctx.search ? 'Try a different search term.' : 'Upload files or create a folder to get started.'}
-          />
+          {ctx.viewMode === 'grid' ? (
+            <GridView<FileItemDTO>
+              columns={columns}
+              rows={ctx.filteredFiles}
+              keyExtractor={(row) => row.id}
+              selectable
+              selectedIds={ctx.selectedIds}
+              onSelectionChange={ctx.setSelectedIds}
+              onRowClick={(row) => ctx.handlePreview(row)}
+              emptyIcon={<CloudUploadIcon sx={{ fontSize: 48 }} />}
+              emptyTitle={ctx.search ? 'No files match your search' : 'No files in this folder'}
+              emptyDescription={ctx.search ? 'Try a different search term.' : 'Upload files or create a folder to get started.'}
+            />
+          ) : (
+            <DataTable<FileItemDTO>
+              columns={columns}
+              rows={ctx.filteredFiles}
+              keyExtractor={(row) => row.id}
+              loading={false}
+              sortState={ctx.sort}
+              onSortChange={ctx.setSort}
+              selectable
+              selectedIds={ctx.selectedIds}
+              onSelectionChange={ctx.setSelectedIds}
+              searchable={false}
+              title={ctx.filteredFiles.length > 0 ? `Files (${ctx.filteredFiles.length})` : 'Files'}
+              emptyIcon={<CloudUploadIcon sx={{ fontSize: 48 }} />}
+              emptyTitle={ctx.search ? 'No files match your search' : 'No files in this folder'}
+              emptyDescription={ctx.search ? 'Try a different search term.' : 'Upload files or create a folder to get started.'}
+            />
+          )}
         </>
       )}
 

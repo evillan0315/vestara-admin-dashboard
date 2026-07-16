@@ -1,4 +1,4 @@
-import { Box, IconButton, Paper, Tooltip, Typography } from '@mui/material';
+import { Box, IconButton, Paper, Tooltip, Typography, alpha } from '@mui/material';
 import { Folder as FolderIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import type { FolderItemDTO, FileItemDTO } from '../../../api/files';
 
@@ -22,11 +22,11 @@ export function FileManagerFolderGrid({
       <Typography
         variant="subtitle2"
         color="text.secondary"
-        sx={{ mb: 1.5, textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.75rem' }}
+        sx={{ mb: 1, textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.7rem' }}
       >
         Folders ({folders.length})
       </Typography>
-      <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
         {folders.map((folder) => (
           <Paper
             key={folder.id}
@@ -34,43 +34,29 @@ export function FileManagerFolderGrid({
             sx={{
               display: 'flex',
               alignItems: 'center',
-              gap: 12,
-              p: '12px 16px',
-              borderRadius: 12,
+              gap: 0.75,
+              p: '6px 10px',
+              borderRadius: 1.5,
               cursor: 'pointer',
-              transition: 'all 0.2s',
+              transition: 'all 0.15s',
               border: '1px solid',
               borderColor: 'divider',
               '&:hover': {
                 borderColor: 'primary.main',
-                bgcolor: (t) =>
-                  t.palette.mode === 'light'
-                    ? t.palette.primary.light + '10'
-                    : t.palette.primary.dark + '20',
-                transform: 'translateY(-1px)',
-                boxShadow: 2,
+                bgcolor: (t) => alpha(t.palette.primary.main, 0.06),
               },
-              minWidth: 180,
-              flex: '1 1 auto',
-              maxWidth: 280,
+              minWidth: 100,
+              flex: '0 1 auto',
+              maxWidth: 220,
             }}
           >
-            <FolderIcon sx={{ fontSize: 32, color: 'warning.main' }} />
+            <FolderIcon sx={{ fontSize: 18, color: 'warning.main' }} />
             <Box sx={{ minWidth: 0 }}>
-              <Typography variant="body2" fontWeight={600} noWrap sx={{ maxWidth: 160 }}>
+              <Typography variant="caption" fontWeight={600} noWrap sx={{ maxWidth: 120, lineHeight: 1.3 }}>
                 {folder.name}
               </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {folder.createdAt
-                  ? new Date(folder.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                    })
-                  : '—'}
-              </Typography>
             </Box>
-            <Box sx={{ ml: 'auto', display: 'flex', gap: 0.25 }}>
+            <Box sx={{ ml: 'auto', display: 'flex', gap: 0 }}>
               <Tooltip title="Rename">
                 <IconButton
                   size="small"
@@ -78,9 +64,9 @@ export function FileManagerFolderGrid({
                     e.stopPropagation();
                     onRename(folder);
                   }}
-                  sx={{ width: 28, height: 28 }}
+                  sx={{ width: 22, height: 22 }}
                 >
-                  <EditIcon sx={{ fontSize: 16 }} />
+                  <EditIcon sx={{ fontSize: 12 }} />
                 </IconButton>
               </Tooltip>
               <Tooltip title="Delete">
@@ -90,9 +76,9 @@ export function FileManagerFolderGrid({
                     e.stopPropagation();
                     onDeleteRequest(folder);
                   }}
-                  sx={{ width: 28, height: 28 }}
+                  sx={{ width: 22, height: 22 }}
                 >
-                  <DeleteIcon sx={{ fontSize: 16, color: 'error.main' }} />
+                  <DeleteIcon sx={{ fontSize: 12, color: 'error.main' }} />
                 </IconButton>
               </Tooltip>
             </Box>
