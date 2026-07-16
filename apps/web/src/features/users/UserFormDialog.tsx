@@ -7,10 +7,14 @@ import {
   TextField,
   MenuItem,
   Box,
-  styled,
+  Typography,
+  Chip,
+  Avatar,
 } from '@mui/material';
 import { useState, useEffect, type ReactElement } from 'react';
+import { User as UserIcon, Shield, Mail, KeyRound } from 'lucide-react';
 import type { UserDTO, UserRole, OrganizationDTO } from '@vestara/types';
+import { colors } from '../../theme/tokens';
 
 export interface UserFormData {
   firstName: string;
@@ -31,38 +35,31 @@ interface UserFormDialogProps {
   currentUserRole?: UserRole;
 }
 
-const StyledDialog = styled(Dialog)(({ theme: _theme }) => ({
-  '& .MuiDialog-paper': {
-    borderRadius: 12,
-    maxWidth: 480,
-    width: '100%',
-  },
-}));
-
-const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
-  fontWeight: 700,
-  fontSize: '1.125rem',
-  padding: theme.spacing(2.5, 3, 1.5),
-}));
-
-const StyledDialogContent = styled(DialogContent)(({ theme }) => ({
-  padding: theme.spacing(1.5, 3, 2),
-  display: 'flex',
-  flexDirection: 'column',
-  gap: theme.spacing(2),
-}));
-
-const StyledDialogActions = styled(DialogActions)(({ theme }) => ({
-  padding: theme.spacing(1.5, 3, 2.5),
-  gap: theme.spacing(1),
-}));
-
-const roles: { value: UserRole; label: string }[] = [
-  { value: 'super_admin' as UserRole, label: 'Super Admin' },
-  { value: 'admin' as UserRole, label: 'Admin' },
-  { value: 'moderator' as UserRole, label: 'Moderator' },
-  { value: 'support' as UserRole, label: 'Support' },
+const roles: { value: UserRole; label: string; color: string; bgColor: string }[] = [
+  { value: 'super_admin' as UserRole, label: 'Super Admin', color: colors.error, bgColor: colors.errorSoft },
+  { value: 'admin' as UserRole, label: 'Admin', color: colors.gold, bgColor: colors.goldSoft },
+  { value: 'moderator' as UserRole, label: 'Moderator', color: colors.purple, bgColor: colors.purpleSoft },
+  { value: 'support' as UserRole, label: 'Support', color: colors.teal, bgColor: colors.tealSoft },
 ];
+
+const textFieldStyles = {
+  '& .MuiOutlinedInput-root': {
+    borderRadius: '10px',
+    bgcolor: colors.card,
+    color: colors.text,
+    fontSize: 14,
+    '& fieldset': { borderColor: colors.border },
+    '&:hover fieldset': { borderColor: colors.gold },
+    '&.Mui-focused fieldset': { borderColor: colors.gold, borderWidth: 1.5 },
+  },
+  '& .MuiInputLabel-root': { color: colors.secondary, fontSize: 13 },
+  '& .MuiInputLabel-root.Mui-focused': { color: colors.gold },
+  '& .MuiFormHelperText-root': { color: colors.muted, fontSize: 11 },
+  '& .Mui-disabled': {
+    '& .MuiOutlinedInput-notchedOutline': { borderColor: `${colors.border} !important` },
+    '& .MuiOutlinedInput-input': { color: colors.muted },
+  },
+};
 
 export function UserFormDialog({
   open,
@@ -155,109 +152,311 @@ export function UserFormDialog({
     }
   };
 
+  const selectedRole = roles.find((r) => r.value === formData.role);
+  const initials = [formData.firstName, formData.lastName]
+    .filter(Boolean)
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2) || '?';
+
   return (
-    <StyledDialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <StyledDialogTitle>
-        {isEdit ? 'Edit User' : 'Add User'}
-      </StyledDialogTitle>
-
-      <StyledDialogContent>
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <TextField
-            label="First Name"
-            value={formData.firstName}
-            onChange={handleChange('firstName')}
-            error={!!errors.firstName}
-            helperText={errors.firstName}
-            fullWidth
-            size="small"
-            required
-          />
-          <TextField
-            label="Last Name"
-            value={formData.lastName}
-            onChange={handleChange('lastName')}
-            error={!!errors.lastName}
-            helperText={errors.lastName}
-            fullWidth
-            size="small"
-            required
-          />
-        </Box>
-
-        <TextField
-          label="Email"
-          type="email"
-          value={formData.email}
-          onChange={handleChange('email')}
-          error={!!errors.email}
-          helperText={errors.email}
-          fullWidth
-          size="small"
-          required
-          disabled={isEdit}
-        />
-
-        {!isEdit && (
-          <TextField
-            label="Password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange('password')}
-            error={!!errors.password}
-            helperText={errors.password || 'At least 8 characters with uppercase, lowercase, and number'}
-            fullWidth
-            size="small"
-            required
-          />
-        )}
-
-        <TextField
-          label="Role"
-          select
-          value={formData.role}
-          onChange={handleChange('role')}
-          fullWidth
-          size="small"
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{
+        sx: {
+          bgcolor: colors.surface,
+          border: `1px solid ${colors.border}`,
+          borderRadius: 3,
+          maxHeight: '90vh',
+        },
+      }}
+    >
+      {/* Header */}
+      <DialogTitle
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+          pb: 1,
+          borderBottom: `1px solid ${colors.border}`,
+        }}
+      >
+        <Box
+          sx={{
+            width: 44,
+            height: 44,
+            borderRadius: 2,
+            bgcolor: isEdit ? colors.goldSoft : colors.cardAlt,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
         >
-          {roles.map((r) => (
-            <MenuItem key={r.value} value={r.value}>
-              {r.label}
-            </MenuItem>
-          ))}
-        </TextField>
+          {isEdit ? (
+            <UserIcon size={22} color={colors.gold} />
+          ) : (
+            <UserIcon size={22} color={colors.secondary} />
+          )}
+        </Box>
+        <Box>
+          <Typography sx={{ fontWeight: 700, color: colors.text, fontSize: 16 }}>
+            {isEdit ? 'Edit User' : 'Create New User'}
+          </Typography>
+          <Typography sx={{ color: colors.secondary, fontSize: 12 }}>
+            {isEdit ? 'Update user information and role' : 'Fill in the details to add a new user'}
+          </Typography>
+        </Box>
+      </DialogTitle>
 
-        {currentUserRole === 'super_admin' && organizations && organizations.length > 0 && (
+      <DialogContent sx={{ pt: 3 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+          {/* Avatar Preview (Edit mode) */}
+          {isEdit && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+              <Avatar
+                src={user?.avatarUrl || undefined}
+                sx={{
+                  width: 56,
+                  height: 56,
+                  bgcolor: colors.gold,
+                  color: '#0A0F18',
+                  fontWeight: 700,
+                  fontSize: 20,
+                  border: `2px solid ${colors.gold}`,
+                }}
+              >
+                {initials}
+              </Avatar>
+              <Box>
+                <Typography sx={{ fontWeight: 600, color: colors.text, fontSize: 14 }}>
+                  {formData.firstName} {formData.lastName}
+                </Typography>
+                <Typography sx={{ color: colors.secondary, fontSize: 12 }}>
+                  {formData.email}
+                </Typography>
+                {selectedRole && (
+                  <Chip
+                    label={selectedRole.label}
+                    size="small"
+                    sx={{
+                      mt: 0.5,
+                      height: 20,
+                      fontSize: 10,
+                      fontWeight: 600,
+                      bgcolor: selectedRole.bgColor,
+                      color: selectedRole.color,
+                      border: `1px solid ${selectedRole.color}30`,
+                    }}
+                  />
+                )}
+              </Box>
+            </Box>
+          )}
+
+          {/* Name Fields */}
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <TextField
+              label="First Name"
+              value={formData.firstName}
+              onChange={handleChange('firstName')}
+              error={!!errors.firstName}
+              helperText={errors.firstName}
+              fullWidth
+              size="small"
+              required
+              sx={textFieldStyles}
+            />
+            <TextField
+              label="Last Name"
+              value={formData.lastName}
+              onChange={handleChange('lastName')}
+              error={!!errors.lastName}
+              helperText={errors.lastName}
+              fullWidth
+              size="small"
+              required
+              sx={textFieldStyles}
+            />
+          </Box>
+
+          {/* Email */}
           <TextField
-            label="Organization"
-            select
-            value={formData.organizationId}
-            onChange={handleChange('organizationId')}
+            label="Email Address"
+            type="email"
+            value={formData.email}
+            onChange={handleChange('email')}
+            error={!!errors.email}
+            helperText={errors.email}
             fullWidth
             size="small"
-          >
-            {organizations.map((org) => (
-              <MenuItem key={org.id} value={org.id}>
-                {org.name} ({org.slug})
-              </MenuItem>
-            ))}
-          </TextField>
-        )}
-      </StyledDialogContent>
+            required
+            disabled={isEdit}
+            InputProps={{
+              startAdornment: (
+                <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
+                  <Mail size={16} color={colors.muted} />
+                </Box>
+              ),
+            }}
+            sx={textFieldStyles}
+          />
 
-      <StyledDialogActions>
-        <Button onClick={onClose} color="inherit" disabled={loading}>
+          {/* Password (Create mode only) */}
+          {!isEdit && (
+            <TextField
+              label="Password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange('password')}
+              error={!!errors.password}
+              helperText={errors.password || 'At least 8 characters with uppercase, lowercase, and number'}
+              fullWidth
+              size="small"
+              required
+              InputProps={{
+                startAdornment: (
+                  <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
+                    <KeyRound size={16} color={colors.muted} />
+                  </Box>
+                ),
+              }}
+              sx={textFieldStyles}
+            />
+          )}
+
+          {/* Role Selector */}
+          <Box>
+            <Typography sx={{ fontWeight: 500, color: colors.text, fontSize: 13, mb: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Shield size={14} color={colors.gold} />
+              Role
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              {roles.map((role) => {
+                const isSelected = formData.role === role.value;
+                return (
+                  <Box
+                    key={role.value}
+                    onClick={() => {
+                      setFormData((prev) => ({ ...prev, role: role.value }));
+                      if (errors.role) {
+                        setErrors((prev) => {
+                          const next = { ...prev };
+                          delete next.role;
+                          return next;
+                        });
+                      }
+                    }}
+                    sx={{
+                      px: 2,
+                      py: 1,
+                      borderRadius: 2,
+                      bgcolor: isSelected ? role.bgColor : 'transparent',
+                      border: `1.5px solid ${isSelected ? role.color : colors.border}`,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      '&:hover': {
+                        borderColor: role.color,
+                        bgcolor: `${role.color}10`,
+                      },
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                      <Box
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          bgcolor: isSelected ? role.color : colors.muted,
+                        }}
+                      />
+                      <Typography
+                        sx={{
+                          fontSize: 13,
+                          fontWeight: isSelected ? 600 : 400,
+                          color: isSelected ? role.color : colors.text,
+                        }}
+                      >
+                        {role.label}
+                      </Typography>
+                    </Box>
+                  </Box>
+                );
+              })}
+            </Box>
+          </Box>
+
+          {/* Organization (Super Admin only) */}
+          {currentUserRole === 'super_admin' && organizations && organizations.length > 0 && (
+            <TextField
+              label="Organization"
+              select
+              value={formData.organizationId}
+              onChange={handleChange('organizationId')}
+              fullWidth
+              size="small"
+              sx={textFieldStyles}
+            >
+              <MenuItem value="">
+                <Typography sx={{ color: colors.muted, fontSize: 13 }}>Select organization</Typography>
+              </MenuItem>
+              {organizations.map((org) => (
+                <MenuItem key={org.id} value={org.id}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography sx={{ fontSize: 13 }}>{org.name}</Typography>
+                    <Typography sx={{ color: colors.muted, fontSize: 11 }}>({org.slug})</Typography>
+                  </Box>
+                </MenuItem>
+              ))}
+            </TextField>
+          )}
+        </Box>
+      </DialogContent>
+
+      <DialogActions
+        sx={{
+          px: 3,
+          py: 2,
+          borderTop: `1px solid ${colors.border}`,
+          gap: 1.5,
+        }}
+      >
+        <Button
+          onClick={onClose}
+          disabled={loading}
+          sx={{
+            textTransform: 'none',
+            borderRadius: '10px',
+            color: colors.secondary,
+            fontWeight: 500,
+            px: 3,
+            '&:hover': { bgcolor: colors.cardAlt },
+          }}
+        >
           Cancel
         </Button>
         <Button
           variant="contained"
           onClick={handleSubmit}
           disabled={loading}
+          sx={{
+            textTransform: 'none',
+            borderRadius: '10px',
+            bgcolor: colors.gold,
+            color: '#0A0F18',
+            fontWeight: 700,
+            px: 4,
+            '&:hover': { bgcolor: colors.goldHover },
+            '&.Mui-disabled': { bgcolor: colors.gold, opacity: 0.6, color: '#0A0F18' },
+          }}
         >
           {loading ? 'Saving...' : isEdit ? 'Save Changes' : 'Create User'}
         </Button>
-      </StyledDialogActions>
-    </StyledDialog>
+      </DialogActions>
+    </Dialog>
   );
 }
 

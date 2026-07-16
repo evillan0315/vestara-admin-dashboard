@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -15,48 +15,238 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Chip,
+  IconButton,
+  Grid,
+  Switch,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListItemSecondaryAction,
+  MenuItem,
 } from '@mui/material';
 import {
   User as UserIcon,
-  Lock,
+  Shield,
+  ShieldCheck,
+  KeyRound,
+  Bell,
+  Monitor,
+  Smartphone,
+  Clock,
   Camera,
   CheckCircle,
   AlertCircle,
   Mail,
   Trash2,
+  Lock,
+  Fingerprint,
+  MapPin,
+  Building2,
+  FileText,
+  Activity,
+  LogOut,
+  RefreshCw,
+  Download,
+  Upload,
+  Settings,
 } from 'lucide-react';
 import { useAuth } from '../features/auth/AuthContext';
 import {
   useProfile,
   useUpdateProfile,
-  useChangePassword,
   useChangeEmail,
   useDeleteAccount,
 } from '../features/profile/hooks';
 import { uploadImage } from '../api/upload';
 import { colors } from '../theme/tokens';
 
-type TabValue = 'general' | 'security';
+type TabValue = 'overview' | 'security' | 'permissions' | 'activity' | 'preferences' | 'sessions';
+
+// ── Shared TextField Styles ────────────────────
+const textFieldStyles = {
+  '& .MuiOutlinedInput-root': {
+    borderRadius: '10px',
+    bgcolor: colors.card,
+    color: colors.text,
+    '& fieldset': { borderColor: colors.border },
+    '&:hover fieldset': { borderColor: colors.gold },
+    '&.Mui-focused fieldset': { borderColor: colors.gold },
+  },
+  '& .MuiInputLabel-root': { color: colors.secondary },
+  '& .MuiInputLabel-root.Mui-focused': { color: colors.gold },
+  '& .MuiFormHelperText-root': { color: colors.muted },
+  '& .Mui-disabled': {
+    '& .MuiOutlinedInput-notchedOutline': { borderColor: `${colors.border} !important` },
+  },
+};
+
+// ── Role card configuration ────────────────────
+const roleCards = [
+  {
+    role: 'admin',
+    label: 'Admin',
+    description: 'Full system access with user management',
+    color: colors.gold,
+    bgColor: colors.goldSoft,
+    permissions: ['User Management', 'Settings', 'Reports', 'Audit Logs'],
+  },
+  {
+    role: 'moderator',
+    label: 'Moderator',
+    description: 'Content and user moderation capabilities',
+    color: colors.purple,
+    bgColor: colors.purpleSoft,
+    permissions: ['Content Review', 'User Support', 'Basic Reports'],
+  },
+  {
+    role: 'support',
+    label: 'Support',
+    description: 'Customer support and ticket management',
+    color: colors.teal,
+    bgColor: colors.tealSoft,
+    permissions: ['Ticket Management', 'User Lookup', 'Basic Reports'],
+  },
+];
+
+// ── Security items ─────────────────────────────
+const securityItems = [
+  {
+    icon: KeyRound,
+    label: 'Password',
+    description: 'Last changed 30 days ago',
+    status: 'Strong',
+    statusColor: colors.success,
+    action: 'Change',
+  },
+  {
+    icon: Fingerprint,
+    label: 'Two-Factor Authentication',
+    description: 'Add an extra layer of security',
+    status: 'Disabled',
+    statusColor: colors.error,
+    action: 'Enable',
+  },
+  {
+    icon: Bell,
+    label: 'Login Alerts',
+    description: 'Get notified of new sign-ins',
+    status: 'Enabled',
+    statusColor: colors.success,
+    action: 'Manage',
+  },
+  {
+    icon: Monitor,
+    label: 'Active Sessions',
+    description: '2 devices currently signed in',
+    status: '2 Active',
+    statusColor: colors.info,
+    action: 'Manage',
+  },
+  {
+    icon: ShieldCheck,
+    label: 'Trusted Devices',
+    description: 'Devices you\'ve saved for future logins',
+    status: '3 Devices',
+    statusColor: colors.gold,
+    action: 'Manage',
+  },
+];
+
+// ── Permission items ───────────────────────────
+const permissionGroups = [
+  {
+    category: 'User Management',
+    items: [
+      { name: 'Create Users', enabled: true },
+      { name: 'Edit Users', enabled: true },
+      { name: 'Delete Users', enabled: false },
+      { name: 'Manage Roles', enabled: true },
+    ],
+  },
+  {
+    category: 'System Settings',
+    items: [
+      { name: 'View Settings', enabled: true },
+      { name: 'Edit Settings', enabled: false },
+      { name: 'Manage Organizations', enabled: true },
+    ],
+  },
+  {
+    category: 'Reports & Analytics',
+    items: [
+      { name: 'View Reports', enabled: true },
+      { name: 'Export Data', enabled: true },
+      { name: 'Schedule Reports', enabled: false },
+    ],
+  },
+];
+
+// ── Mock activity data ─────────────────────────
+const recentActivity = [
+  { action: 'Updated profile information', time: '2 hours ago', icon: UserIcon, color: colors.gold },
+  { action: 'Changed password', time: '3 days ago', icon: KeyRound, color: colors.info },
+  { action: 'Logged in from new device', time: '5 days ago', icon: Monitor, color: colors.success },
+  { action: 'Exported user report', time: '1 week ago', icon: Download, color: colors.purple },
+  { action: 'Updated organization settings', time: '2 weeks ago', icon: Settings, color: colors.teal },
+];
+
+// ── Mock sessions ──────────────────────────────
+const activeSessions = [
+  {
+    device: 'MacBook Pro — Chrome',
+    ip: '192.168.1.100',
+    location: 'San Francisco, US',
+    lastActive: 'Current session',
+    icon: Monitor,
+    isCurrent: true,
+  },
+  {
+    device: 'iPhone 15 Pro — Safari',
+    ip: '192.168.1.101',
+    location: 'San Francisco, US',
+    lastActive: '2 hours ago',
+    icon: Smartphone,
+    isCurrent: false,
+  },
+  {
+    device: 'Windows Desktop — Firefox',
+    ip: '10.0.0.55',
+    location: 'New York, US',
+    lastActive: '3 days ago',
+    icon: Monitor,
+    isCurrent: false,
+  },
+];
 
 export default function ProfilePage() {
   const { user, updateUser, deleteAccount: clearAuth } = useAuth();
   const { data: profileData, isLoading: profileLoading } = useProfile();
   const updateProfileMutation = useUpdateProfile();
-  const changePasswordMutation = useChangePassword();
   const changeEmailMutation = useChangeEmail();
   const deleteAccountMutation = useDeleteAccount();
   const location = useLocation();
-  const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Derive initial tab from path: /security → security tab
-  const initialTab: TabValue = location.pathname === '/security' ? 'security' : 'general';
-  const [tab, setTab] = useState<TabValue>(initialTab);
+  // Derive initial tab from path
+  const getInitialTab = (): TabValue => {
+    const path = location.pathname;
+    if (path === '/security') return 'security';
+    if (path === '/permissions') return 'permissions';
+    if (path === '/activity') return 'activity';
+    if (path === '/preferences') return 'preferences';
+    if (path === '/sessions') return 'sessions';
+    return 'overview';
+  };
+
+  const [tab, setTab] = useState<TabValue>(getInitialTab());
 
   // ── General form state ─────────────────────
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
+  const [bio, setBio] = useState('Passionate about building great products and leading teams to success.');
 
   // ── Email change dialog state ───────────────
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
@@ -64,13 +254,6 @@ export default function ProfilePage() {
   const [emailPassword, setEmailPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [emailSuccess, setEmailSuccess] = useState('');
-
-  // ── Security form state ─────────────────────
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [passwordSuccess, setPasswordSuccess] = useState('');
 
   // ── Delete account state ────────────────────
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -81,6 +264,12 @@ export default function ProfilePage() {
   // ── Avatar upload state ─────────────────────
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [avatarUploadError, setAvatarUploadError] = useState('');
+
+  // ── Preferences state ──────────────────────
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [pushNotifications, setPushNotifications] = useState(true);
+  const [loginAlerts, setLoginAlerts] = useState(true);
+  const [marketingEmails, setMarketingEmails] = useState(false);
 
   // Load profile data into form
   useEffect(() => {
@@ -110,7 +299,6 @@ export default function ProfilePage() {
         lastName,
         avatarUrl: avatarUrl || '',
       });
-      // Refresh user in auth context
       if (profileData?.data?.user) {
         updateUser({
           ...profileData.data.user,
@@ -135,7 +323,6 @@ export default function ProfilePage() {
       const result = await uploadImage(file);
       if (result.success && result.data?.url) {
         setAvatarUrl(result.data.url);
-        // Auto-save the profile with the new avatar
         await updateProfileMutation.mutateAsync({
           firstName,
           lastName,
@@ -154,7 +341,6 @@ export default function ProfilePage() {
       setAvatarUploadError('Failed to upload image');
     } finally {
       setAvatarUploading(false);
-      // Reset file input so the same file can be re-selected
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -199,42 +385,6 @@ export default function ProfilePage() {
     }
   };
 
-  // ── Password Change ─────────────────────────
-
-  const handleChangePassword = async () => {
-    setPasswordError('');
-    setPasswordSuccess('');
-
-    if (newPassword !== confirmPassword) {
-      setPasswordError('Passwords do not match');
-      return;
-    }
-
-    if (newPassword.length < 8) {
-      setPasswordError('Password must be at least 8 characters');
-      return;
-    }
-
-    if (!isOAuthAccount && !currentPassword) {
-      setPasswordError('Current password is required');
-      return;
-    }
-
-    try {
-      await changePasswordMutation.mutateAsync({
-        currentPassword: currentPassword ?? '',
-        newPassword,
-      });
-      setPasswordSuccess('Password changed successfully');
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-    } catch (err: unknown) {
-      const apiErr = err as { message?: string; code?: string };
-      setPasswordError(apiErr?.message || 'Failed to change password');
-    }
-  };
-
   // ── Account Deletion ────────────────────────
 
   const handleOpenDeleteDialog = () => {
@@ -254,7 +404,7 @@ export default function ProfilePage() {
       });
       setDeleteDialogOpen(false);
       clearAuth();
-      navigate('/login');
+      window.location.href = '/login';
     } catch (err: unknown) {
       const apiErr = err as { message?: string };
       setDeleteError(apiErr?.message || 'Failed to delete account');
@@ -274,18 +424,27 @@ export default function ProfilePage() {
 
   const canChangeEmail = !!(newEmail && newEmail !== user?.email && (!isOAuthAccount ? emailPassword : true));
 
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return 'Never';
+    return new Date(dateStr).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
   // ── Loading ─────────────────────────────────
 
   if (profileLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
-        <CircularProgress />
+        <CircularProgress sx={{ color: colors.gold }} />
       </Box>
     );
   }
 
   return (
-    <Box sx={{ maxWidth: 800, mx: 'auto' }}>
+    <Box sx={{ maxWidth: 1100, mx: 'auto' }}>
       {/* Hidden file input for avatar upload */}
       <input
         ref={fileInputRef}
@@ -295,89 +454,131 @@ export default function ProfilePage() {
         onChange={handleAvatarUpload}
       />
 
-      {/* Page Header */}
-      <Typography variant="h5" sx={{ fontWeight: 700, color: colors.text, mb: 0.5 }}>
-        Profile Settings
-      </Typography>
-      <Typography variant="body2" sx={{ color: colors.secondary, mb: 3 }}>
-        Manage your personal information and security settings
-      </Typography>
-
-      {/* Tabs */}
-      <Tabs
-        value={tab}
-        onChange={(_, v) => setTab(v)}
+      {/* ── Profile Header Card ─────────────────── */}
+      <Paper
         sx={{
+          p: { xs: 3, sm: 4 },
+          bgcolor: colors.surface,
+          border: `1px solid ${colors.border}`,
+          borderRadius: 3,
           mb: 3,
-          borderBottom: `1px solid ${colors.border}`,
-          '& .MuiTab-root': { textTransform: 'none', fontWeight: 600, fontSize: 14 },
-          '& .Mui-selected': { color: `${colors.gold} !important` },
-          '& .MuiTabs-indicator': { backgroundColor: colors.gold },
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 100,
+            background: `linear-gradient(135deg, ${colors.goldSoft} 0%, transparent 60%)`,
+            pointerEvents: 'none',
+          },
         }}
       >
-        <Tab icon={<UserIcon size={18} />} iconPosition="start" label="General" value="general" />
-        <Tab icon={<Lock size={18} />} iconPosition="start" label="Security" value="security" />
-      </Tabs>
-
-      {/* ── General Tab ───────────────────────── */}
-      {tab === 'general' && (
-        <Paper
-          sx={{
-            p: { xs: 2.5, sm: 3.5 },
-            bgcolor: colors.card,
-            border: `1px solid ${colors.border}`,
-            borderRadius: 3,
-          }}
-        >
-          {/* Avatar Section */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mb: 4, pb: 3, borderBottom: `1px solid ${colors.border}` }}>
-            <Box sx={{ position: 'relative' }}>
-              <Avatar
-                src={avatarUrl || undefined}
-                sx={{
-                  width: 80,
-                  height: 80,
-                  bgcolor: colors.gold,
-                  color: '#0A0F18',
-                  fontWeight: 700,
-                  fontSize: 28,
-                  border: `3px solid ${colors.gold}`,
-                }}
-              >
-                {initials}
-              </Avatar>
-              <Box
-                onClick={() => fileInputRef.current?.click()}
-                sx={{
-                  position: 'absolute',
-                  bottom: -2,
-                  right: -2,
-                  width: 28,
-                  height: 28,
-                  borderRadius: '50%',
-                  bgcolor: colors.gold,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  transition: 'opacity 0.2s',
-                  '&:hover': { opacity: 0.8 },
-                }}
-              >
-                {avatarUploading ? (
-                  <CircularProgress size={14} sx={{ color: '#0A0F18' }} />
-                ) : (
-                  <Camera size={14} color="#0A0F18" />
-                )}
-              </Box>
+        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 3, position: 'relative', zIndex: 1 }}>
+          {/* Avatar */}
+          <Box sx={{ position: 'relative' }}>
+            <Avatar
+              src={avatarUrl || undefined}
+              sx={{
+                width: 96,
+                height: 96,
+                bgcolor: colors.gold,
+                color: '#0A0F18',
+                fontWeight: 700,
+                fontSize: 32,
+                border: `3px solid ${colors.gold}`,
+                boxShadow: `0 0 20px ${colors.goldSoft}`,
+              }}
+            >
+              {initials}
+            </Avatar>
+            <Box
+              onClick={() => fileInputRef.current?.click()}
+              sx={{
+                position: 'absolute',
+                bottom: 0,
+                right: 0,
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                bgcolor: colors.card,
+                border: `2px solid ${colors.border}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                '&:hover': { bgcolor: colors.gold, borderColor: colors.gold, '& svg': { color: '#0A0F18' } },
+              }}
+            >
+              {avatarUploading ? (
+                <CircularProgress size={14} sx={{ color: colors.gold }} />
+              ) : (
+                <Camera size={14} color={colors.gold} />
+              )}
             </Box>
-            <Box>
-              <Typography sx={{ fontWeight: 700, color: colors.text, fontSize: 18 }}>
+          </Box>
+
+          {/* User Info */}
+          <Box sx={{ flex: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
+              <Typography sx={{ fontWeight: 700, color: colors.text, fontSize: 22 }}>
                 {firstName} {lastName}
               </Typography>
-              <Typography sx={{ color: colors.secondary, fontSize: 13, textTransform: 'capitalize' }}>
-                {user?.role?.replace('_', ' ')}
+              <Chip
+                label={user?.role?.replace('_', ' ').toUpperCase()}
+                size="small"
+                sx={{
+                  bgcolor: colors.goldSoft,
+                  color: colors.gold,
+                  fontWeight: 600,
+                  fontSize: 11,
+                  height: 24,
+                  border: `1px solid ${colors.goldBorder}`,
+                }}
+              />
+              <Chip
+                label={user?.isActive ? 'Active' : 'Inactive'}
+                size="small"
+                icon={user?.isActive ? <CheckCircle size={12} /> : undefined}
+                sx={{
+                  bgcolor: user?.isActive ? colors.successSoft : colors.errorSoft,
+                  color: user?.isActive ? colors.success : colors.error,
+                  fontWeight: 600,
+                  fontSize: 11,
+                  height: 24,
+                  border: `1px solid ${user?.isActive ? 'rgba(46, 160, 67, 0.25)' : 'rgba(218, 55, 67, 0.25)'}`,
+                  '& .MuiChip-icon': { color: 'inherit' },
+                }}
+              />
+            </Box>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1, flexWrap: 'wrap' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <Mail size={14} color={colors.secondary} />
+                <Typography sx={{ color: colors.secondary, fontSize: 13 }}>{user?.email}</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <Building2 size={14} color={colors.secondary} />
+                <Typography sx={{ color: colors.secondary, fontSize: 13 }}>Engineering</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <MapPin size={14} color={colors.secondary} />
+                <Typography sx={{ color: colors.secondary, fontSize: 13 }}>San Francisco, CA</Typography>
+              </Box>
+            </Box>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1 }}>
+              <Typography sx={{ color: colors.muted, fontSize: 12 }}>
+                Member since {formatDate(user?.createdAt)}
               </Typography>
+              {user?.lastLoginAt && (
+                <Typography sx={{ color: colors.muted, fontSize: 12 }}>
+                  Last login {formatDate(user?.lastLoginAt)}
+                </Typography>
+              )}
             </Box>
           </Box>
 
@@ -386,273 +587,927 @@ export default function ProfilePage() {
             <Alert
               icon={<AlertCircle size={18} />}
               severity="error"
-              sx={{ borderRadius: 2, bgcolor: 'rgba(244,67,54,0.1)', color: colors.error, mb: 2 }}
+              sx={{ position: 'absolute', top: 0, right: 0, borderRadius: 2, bgcolor: 'rgba(244,67,54,0.1)', color: colors.error }}
             >
               {avatarUploadError}
             </Alert>
           )}
+        </Box>
+      </Paper>
 
-          {/* Form Fields */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-            <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
-              <TextField
-                label="First Name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                fullWidth
-                size="small"
-                sx={textFieldStyles}
-              />
-              <TextField
-                label="Last Name"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                fullWidth
-                size="small"
-                sx={textFieldStyles}
-              />
-            </Box>
+      {/* ── Tabs ─────────────────────────────────── */}
+      <Paper
+        sx={{
+          bgcolor: colors.surface,
+          border: `1px solid ${colors.border}`,
+          borderRadius: 3,
+          mb: 3,
+        }}
+      >
+        <Tabs
+          value={tab}
+          onChange={(_, v) => setTab(v)}
+          variant="scrollable"
+          scrollButtons="auto"
+          sx={{
+            borderBottom: `1px solid ${colors.border}`,
+            '& .MuiTab-root': {
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: 13,
+              minHeight: 48,
+              color: colors.secondary,
+              '&.Mui-selected': { color: colors.gold },
+            },
+            '& .MuiTabs-indicator': { backgroundColor: colors.gold, height: 2 },
+          }}
+        >
+          <Tab icon={<UserIcon size={16} />} iconPosition="start" label="Overview" value="overview" />
+          <Tab icon={<Shield size={16} />} iconPosition="start" label="Security" value="security" />
+          <Tab icon={<Lock size={16} />} iconPosition="start" label="Permissions" value="permissions" />
+          <Tab icon={<Activity size={16} />} iconPosition="start" label="Activity" value="activity" />
+          <Tab icon={<Settings size={16} />} iconPosition="start" label="Preferences" value="preferences" />
+          <Tab icon={<Monitor size={16} />} iconPosition="start" label="Sessions" value="sessions" />
+        </Tabs>
 
-            {/* Email field with change button */}
-            <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
-              <TextField
-                label="Email"
-                value={user?.email ?? ''}
-                fullWidth
-                size="small"
-                disabled
-                sx={{ ...textFieldStyles, flex: 1 }}
-              />
-              <Button
-                variant="outlined"
-                onClick={handleOpenEmailDialog}
-                startIcon={<Mail size={16} />}
-                sx={{
-                  mt: 0.5,
-                  minWidth: 120,
-                  height: 40,
-                  textTransform: 'none',
-                  borderRadius: '10px',
-                  borderColor: colors.gold,
-                  color: colors.gold,
-                  '&:hover': {
-                    borderColor: colors.goldHover,
-                    bgcolor: colors.goldSoft,
-                  },
-                }}
-              >
-                Change
-              </Button>
-            </Box>
+        {/* ── Overview Tab ───────────────────────── */}
+        {tab === 'overview' && (
+          <Box sx={{ p: { xs: 2.5, sm: 3.5 } }}>
+            <Grid container spacing={3}>
+              {/* About Card */}
+              <Grid size={{ xs: 12, md: 8 }}>
+                <Paper
+                  sx={{
+                    p: 3,
+                    bgcolor: colors.card,
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: 3,
+                  }}
+                >
+                  <Typography sx={{ fontWeight: 700, color: colors.text, fontSize: 16, mb: 2.5 }}>
+                    About
+                  </Typography>
 
-            <TextField
-              label="Avatar URL"
-              value={avatarUrl}
-              onChange={(e) => setAvatarUrl(e.target.value)}
-              fullWidth
-              size="small"
-              placeholder="https://example.com/avatar.jpg"
-              helperText="Enter a URL for your profile picture, or click the camera icon to upload"
-              sx={textFieldStyles}
-            />
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                    <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
+                      <TextField
+                        label="First Name"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        fullWidth
+                        size="small"
+                        sx={textFieldStyles}
+                      />
+                      <TextField
+                        label="Last Name"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        fullWidth
+                        size="small"
+                        sx={textFieldStyles}
+                      />
+                    </Box>
 
-            {/* Success Message */}
-            {updateProfileMutation.isSuccess && (
-              <Alert
-                icon={<CheckCircle size={18} />}
-                severity="success"
-                sx={{ borderRadius: 2, bgcolor: 'rgba(76, 175, 80, 0.1)', color: '#4caf50' }}
-              >
-                Profile updated successfully
-              </Alert>
-            )}
+                    {/* Email field with change button */}
+                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+                      <TextField
+                        label="Email"
+                        value={user?.email ?? ''}
+                        fullWidth
+                        size="small"
+                        disabled
+                        sx={{ ...textFieldStyles, flex: 1 }}
+                      />
+                      <Button
+                        variant="outlined"
+                        onClick={handleOpenEmailDialog}
+                        startIcon={<Mail size={14} />}
+                        sx={{
+                          mt: 0.5,
+                          minWidth: 100,
+                          height: 40,
+                          textTransform: 'none',
+                          borderRadius: '10px',
+                          borderColor: colors.gold,
+                          color: colors.gold,
+                          fontWeight: 600,
+                          fontSize: 13,
+                          '&:hover': {
+                            borderColor: colors.goldHover,
+                            bgcolor: colors.goldSoft,
+                          },
+                        }}
+                      >
+                        Change
+                      </Button>
+                    </Box>
 
-            {/* Error Message */}
-            {updateProfileMutation.isError && (
-              <Alert
-                icon={<AlertCircle size={18} />}
-                severity="error"
-                sx={{ borderRadius: 2, bgcolor: 'rgba(244,67,54,0.1)', color: colors.error }}
-              >
-                {(updateProfileMutation.error as { message?: string })?.message || 'Failed to update profile'}
-              </Alert>
-            )}
+                    <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
+                      <TextField
+                        label="Department"
+                        value="Engineering"
+                        fullWidth
+                        size="small"
+                        disabled
+                        sx={textFieldStyles}
+                      />
+                      <TextField
+                        label="Position"
+                        value="Administrator"
+                        fullWidth
+                        size="small"
+                        disabled
+                        sx={textFieldStyles}
+                      />
+                    </Box>
 
-            <Button
-              variant="contained"
-              onClick={handleUpdateProfile}
-              disabled={updateProfileMutation.isPending}
-              sx={{
-                alignSelf: 'flex-start',
-                mt: 1,
-                bgcolor: colors.gold,
-                color: '#0A0F18',
-                fontWeight: 700,
-                textTransform: 'none',
-                borderRadius: '10px',
-                px: 4,
-                py: 1,
-                '&:hover': { bgcolor: colors.goldHover },
-                '&.Mui-disabled': { bgcolor: colors.gold, opacity: 0.6, color: '#0A0F18' },
-              }}
-            >
-              {updateProfileMutation.isPending ? 'Saving...' : 'Save Changes'}
-            </Button>
+                    <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
+                      <TextField
+                        label="Location"
+                        value="San Francisco, CA"
+                        fullWidth
+                        size="small"
+                        disabled
+                        sx={textFieldStyles}
+                      />
+                      <TextField
+                        label="Timezone"
+                        value="Pacific Time (UTC-8)"
+                        fullWidth
+                        size="small"
+                        disabled
+                        sx={textFieldStyles}
+                      />
+                    </Box>
+
+                    <TextField
+                      label="Bio"
+                      value={bio}
+                      onChange={(e) => setBio(e.target.value)}
+                      fullWidth
+                      size="small"
+                      multiline
+                      rows={3}
+                      sx={textFieldStyles}
+                    />
+
+                    {/* Success/Error Messages */}
+                    {updateProfileMutation.isSuccess && (
+                      <Alert
+                        icon={<CheckCircle size={18} />}
+                        severity="success"
+                        sx={{ borderRadius: 2, bgcolor: 'rgba(76, 175, 80, 0.1)', color: '#4caf50' }}
+                      >
+                        Profile updated successfully
+                      </Alert>
+                    )}
+
+                    {updateProfileMutation.isError && (
+                      <Alert
+                        icon={<AlertCircle size={18} />}
+                        severity="error"
+                        sx={{ borderRadius: 2, bgcolor: 'rgba(244,67,54,0.1)', color: colors.error }}
+                      >
+                        {(updateProfileMutation.error as { message?: string })?.message || 'Failed to update profile'}
+                      </Alert>
+                    )}
+
+                    <Button
+                      variant="contained"
+                      onClick={handleUpdateProfile}
+                      disabled={updateProfileMutation.isPending}
+                      sx={{
+                        alignSelf: 'flex-start',
+                        mt: 1,
+                        bgcolor: colors.gold,
+                        color: '#0A0F18',
+                        fontWeight: 700,
+                        textTransform: 'none',
+                        borderRadius: '10px',
+                        px: 4,
+                        py: 1,
+                        '&:hover': { bgcolor: colors.goldHover },
+                        '&.Mui-disabled': { bgcolor: colors.gold, opacity: 0.6, color: '#0A0F18' },
+                      }}
+                    >
+                      {updateProfileMutation.isPending ? 'Saving...' : 'Save Changes'}
+                    </Button>
+                  </Box>
+                </Paper>
+              </Grid>
+
+              {/* Role & Permissions Card */}
+              <Grid size={{ xs: 12, md: 4 }}>
+                <Paper
+                  sx={{
+                    p: 3,
+                    bgcolor: colors.card,
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: 3,
+                    mb: 3,
+                  }}
+                >
+                  <Typography sx={{ fontWeight: 700, color: colors.text, fontSize: 16, mb: 2 }}>
+                    Role & Permissions
+                  </Typography>
+
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                    {roleCards.map((rc) => {
+                      const isActive = user?.role === rc.role;
+                      return (
+                        <Box
+                          key={rc.role}
+                          sx={{
+                            p: 1.5,
+                            borderRadius: 2,
+                            bgcolor: isActive ? rc.bgColor : 'transparent',
+                            border: `1px solid ${isActive ? rc.color : colors.border}`,
+                            transition: 'all 0.2s',
+                          }}
+                        >
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                            <Box
+                              sx={{
+                                width: 8,
+                                height: 8,
+                                borderRadius: '50%',
+                                bgcolor: rc.color,
+                              }}
+                            />
+                            <Typography sx={{ fontWeight: 600, color: isActive ? rc.color : colors.text, fontSize: 13 }}>
+                              {rc.label}
+                            </Typography>
+                            {isActive && (
+                              <Chip
+                                label="Current"
+                                size="small"
+                                sx={{
+                                  ml: 'auto',
+                                  height: 20,
+                                  fontSize: 10,
+                                  bgcolor: rc.color,
+                                  color: '#0A0F18',
+                                  fontWeight: 600,
+                                }}
+                              />
+                            )}
+                          </Box>
+                          <Typography sx={{ color: colors.secondary, fontSize: 11, mb: 0.5 }}>
+                            {rc.description}
+                          </Typography>
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
+                            {rc.permissions.map((p) => (
+                              <Typography
+                                key={p}
+                                sx={{
+                                  fontSize: 10,
+                                  color: isActive ? rc.color : colors.muted,
+                                  bgcolor: isActive ? `${rc.color}15` : 'transparent',
+                                  px: 0.75,
+                                  py: 0.25,
+                                  borderRadius: 0.5,
+                                }}
+                              >
+                                {p}
+                              </Typography>
+                            ))}
+                          </Box>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                </Paper>
+
+                {/* Account Summary Card */}
+                <Paper
+                  sx={{
+                    p: 3,
+                    bgcolor: colors.card,
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: 3,
+                  }}
+                >
+                  <Typography sx={{ fontWeight: 700, color: colors.text, fontSize: 16, mb: 2 }}>
+                    Account Summary
+                  </Typography>
+
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                    {[
+                      { label: 'Total Logins', value: '142', icon: LogOut },
+                      { label: 'Files Uploaded', value: '23', icon: Upload },
+                      { label: 'Reports Generated', value: '8', icon: FileText },
+                      { label: 'Active Sessions', value: '2', icon: Monitor },
+                    ].map((item) => (
+                      <Box
+                        key={item.label}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          py: 1,
+                          borderBottom: `1px solid ${colors.border}`,
+                          '&:last-child': { borderBottom: 'none' },
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <item.icon size={14} color={colors.secondary} />
+                          <Typography sx={{ color: colors.secondary, fontSize: 13 }}>
+                            {item.label}
+                          </Typography>
+                        </Box>
+                        <Typography sx={{ fontWeight: 600, color: colors.text, fontSize: 14 }}>
+                          {item.value}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                </Paper>
+              </Grid>
+            </Grid>
           </Box>
-        </Paper>
-      )}
+        )}
 
-      {/* ── Security Tab ──────────────────────── */}
-      {tab === 'security' && (
-        <>
-          {/* Change Password Section */}
-          <Paper
-            sx={{
-              p: { xs: 2.5, sm: 3.5 },
-              bgcolor: colors.card,
-              border: `1px solid ${colors.border}`,
-              borderRadius: 3,
-              mb: 3,
-            }}
-          >
-            <Typography sx={{ fontWeight: 700, color: colors.text, fontSize: 16, mb: 0.5 }}>
-              Change Password
-            </Typography>
-            <Typography sx={{ color: colors.secondary, fontSize: 13, mb: 3 }}>
-              Update your password to keep your account secure
-            </Typography>
-
-            {isOAuthAccount ? (
-              <Alert
-                icon={<AlertCircle size={18} />}
-                severity="info"
-                sx={{ borderRadius: 2, bgcolor: 'rgba(59, 130, 246, 0.1)', color: colors.info, mb: 2 }}
-              >
-                You signed in with {user?.provider}. You can set a password here for email/password login.
-              </Alert>
-            ) : null}
-
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, maxWidth: 440 }}>
-              <TextField
-                label="Current Password"
-                type="password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                fullWidth
-                size="small"
-                required={!isOAuthAccount}
-                helperText={isOAuthAccount ? 'Optional for OAuth accounts setting initial password' : 'Required'}
-                sx={textFieldStyles}
-              />
-
-              <TextField
-                label="New Password"
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                fullWidth
-                size="small"
-                required
-                helperText="Min 8 characters, at least one uppercase, lowercase, and number"
-                sx={textFieldStyles}
-              />
-
-              <TextField
-                label="Confirm New Password"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                fullWidth
-                size="small"
-                required
-                error={!!passwordError && passwordError === 'Passwords do not match'}
-                sx={textFieldStyles}
-              />
-
-              {/* Success */}
-              {passwordSuccess && (
-                <Alert
-                  icon={<CheckCircle size={18} />}
-                  severity="success"
-                  sx={{ borderRadius: 2, bgcolor: 'rgba(76, 175, 80, 0.1)', color: '#4caf50' }}
+        {/* ── Security Tab ──────────────────────── */}
+        {tab === 'security' && (
+          <Box sx={{ p: { xs: 2.5, sm: 3.5 } }}>
+            <Grid container spacing={3}>
+              {/* Security Overview */}
+              <Grid size={{ xs: 12, md: 8 }}>
+                <Paper
+                  sx={{
+                    p: 3,
+                    bgcolor: colors.card,
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: 3,
+                  }}
                 >
-                  {passwordSuccess}
-                </Alert>
-              )}
+                  <Typography sx={{ fontWeight: 700, color: colors.text, fontSize: 16, mb: 0.5 }}>
+                    Security Overview
+                  </Typography>
+                  <Typography sx={{ color: colors.secondary, fontSize: 13, mb: 3 }}>
+                    Manage your account security settings and authentication methods
+                  </Typography>
 
-              {/* Error */}
-              {passwordError && (
-                <Alert
-                  icon={<AlertCircle size={18} />}
-                  severity="error"
-                  sx={{ borderRadius: 2, bgcolor: 'rgba(244,67,54,0.1)', color: colors.error }}
+                  <List disablePadding>
+                    {securityItems.map((item, index) => (
+                      <ListItem
+                        key={item.label}
+                        sx={{
+                          px: 0,
+                          py: 1.5,
+                          borderBottom: index < securityItems.length - 1 ? `1px solid ${colors.border}` : 'none',
+                        }}
+                      >
+                        <ListItemIcon sx={{ minWidth: 40 }}>
+                          <Box
+                            sx={{
+                              width: 36,
+                              height: 36,
+                              borderRadius: 2,
+                              bgcolor: colors.cardAlt,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <item.icon size={18} color={colors.gold} />
+                          </Box>
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            <Typography sx={{ fontWeight: 600, color: colors.text, fontSize: 14 }}>
+                              {item.label}
+                            </Typography>
+                          }
+                          secondary={
+                            <Typography sx={{ color: colors.secondary, fontSize: 12 }}>
+                              {item.description}
+                            </Typography>
+                          }
+                        />
+                        <ListItemSecondaryAction>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                            <Typography sx={{ color: item.statusColor, fontSize: 12, fontWeight: 600 }}>
+                              {item.status}
+                            </Typography>
+                            <Button
+                              variant="outlined"
+                              size="small"
+                              sx={{
+                                textTransform: 'none',
+                                borderRadius: '8px',
+                                borderColor: colors.gold,
+                                color: colors.gold,
+                                fontWeight: 600,
+                                fontSize: 12,
+                                py: 0.5,
+                                px: 1.5,
+                                minWidth: 70,
+                                '&:hover': {
+                                  borderColor: colors.goldHover,
+                                  bgcolor: colors.goldSoft,
+                                },
+                              }}
+                            >
+                              {item.action}
+                            </Button>
+                          </Box>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    ))}
+                  </List>
+                </Paper>
+              </Grid>
+
+              {/* Quick Actions */}
+              <Grid size={{ xs: 12, md: 4 }}>
+                <Paper
+                  sx={{
+                    p: 3,
+                    bgcolor: colors.card,
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: 3,
+                    mb: 3,
+                  }}
                 >
-                  {passwordError}
-                </Alert>
-              )}
+                  <Typography sx={{ fontWeight: 700, color: colors.text, fontSize: 16, mb: 2 }}>
+                    Quick Actions
+                  </Typography>
 
-              <Button
-                variant="contained"
-                onClick={handleChangePassword}
-                disabled={changePasswordMutation.isPending || !newPassword || !confirmPassword || (!isOAuthAccount && !currentPassword)}
-                sx={{
-                  alignSelf: 'flex-start',
-                  mt: 1,
-                  bgcolor: colors.gold,
-                  color: '#0A0F18',
-                  fontWeight: 700,
-                  textTransform: 'none',
-                  borderRadius: '10px',
-                  px: 4,
-                  py: 1,
-                  '&:hover': { bgcolor: colors.goldHover },
-                  '&.Mui-disabled': { bgcolor: colors.gold, opacity: 0.6, color: '#0A0F18' },
-                }}
-              >
-                {changePasswordMutation.isPending ? 'Changing...' : 'Change Password'}
-              </Button>
-            </Box>
-          </Paper>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                    {[
+                      { label: 'Change Password', icon: KeyRound, color: colors.gold },
+                      { label: 'Enable 2FA', icon: Fingerprint, color: colors.purple },
+                      { label: 'Download Data', icon: Download, color: colors.info },
+                      { label: 'View Login History', icon: Clock, color: colors.teal },
+                    ].map((action) => (
+                      <Button
+                        key={action.label}
+                        variant="outlined"
+                        startIcon={<action.icon size={16} />}
+                        fullWidth
+                        sx={{
+                          justifyContent: 'flex-start',
+                          textTransform: 'none',
+                          borderRadius: '10px',
+                          borderColor: colors.border,
+                          color: colors.text,
+                          fontWeight: 500,
+                          fontSize: 13,
+                          py: 1.2,
+                          '&:hover': {
+                            borderColor: action.color,
+                            color: action.color,
+                            bgcolor: `${action.color}10`,
+                          },
+                        }}
+                      >
+                        {action.label}
+                      </Button>
+                    ))}
+                  </Box>
+                </Paper>
 
-          {/* ── Delete Account Danger Zone ────── */}
-          <Paper
-            sx={{
-              p: { xs: 2.5, sm: 3.5 },
-              bgcolor: colors.card,
-              border: `1px solid ${colors.error}40`,
-              borderRadius: 3,
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
-              <Trash2 size={18} color={colors.error} />
-              <Typography sx={{ fontWeight: 700, color: colors.error, fontSize: 16 }}>
-                Delete Account
-              </Typography>
-            </Box>
-            <Typography sx={{ color: colors.secondary, fontSize: 13, mb: 3 }}>
-              Permanently delete your account and all associated data. This action cannot be undone.
-            </Typography>
+                {/* Danger Zone */}
+                <Paper
+                  sx={{
+                    p: 3,
+                    bgcolor: colors.card,
+                    border: `1px solid ${colors.error}40`,
+                    borderRadius: 3,
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                    <AlertCircle size={16} color={colors.error} />
+                    <Typography sx={{ fontWeight: 700, color: colors.error, fontSize: 14 }}>
+                      Danger Zone
+                    </Typography>
+                  </Box>
+                  <Typography sx={{ color: colors.secondary, fontSize: 12, mb: 2 }}>
+                    Permanently delete your account and all associated data. This action cannot be undone.
+                  </Typography>
+                  <Button
+                    variant="outlined"
+                    onClick={handleOpenDeleteDialog}
+                    startIcon={<Trash2 size={14} />}
+                    fullWidth
+                    sx={{
+                      textTransform: 'none',
+                      borderRadius: '10px',
+                      borderColor: colors.error,
+                      color: colors.error,
+                      fontWeight: 600,
+                      fontSize: 13,
+                      '&:hover': {
+                        borderColor: colors.error,
+                        bgcolor: colors.errorSoft,
+                      },
+                    }}
+                  >
+                    Delete Account
+                  </Button>
+                </Paper>
+              </Grid>
+            </Grid>
+          </Box>
+        )}
 
-            <Button
-              variant="outlined"
-              onClick={handleOpenDeleteDialog}
-              startIcon={<Trash2 size={16} />}
+        {/* ── Permissions Tab ───────────────────── */}
+        {tab === 'permissions' && (
+          <Box sx={{ p: { xs: 2.5, sm: 3.5 } }}>
+            <Paper
               sx={{
-                textTransform: 'none',
-                borderRadius: '10px',
-                borderColor: colors.error,
-                color: colors.error,
-                '&:hover': {
-                  borderColor: colors.error,
-                  bgcolor: colors.errorSoft,
-                },
+                p: 3,
+                bgcolor: colors.card,
+                border: `1px solid ${colors.border}`,
+                borderRadius: 3,
               }}
             >
-              Delete My Account
-            </Button>
-          </Paper>
-        </>
-      )}
+              <Typography sx={{ fontWeight: 700, color: colors.text, fontSize: 16, mb: 0.5 }}>
+                Permissions
+              </Typography>
+              <Typography sx={{ color: colors.secondary, fontSize: 13, mb: 3 }}>
+                View your current role permissions. Contact an administrator to request changes.
+              </Typography>
+
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                {permissionGroups.map((group) => (
+                  <Box key={group.category}>
+                    <Typography sx={{ fontWeight: 600, color: colors.gold, fontSize: 14, mb: 1.5 }}>
+                      {group.category}
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      {group.items.map((item) => (
+                        <Box
+                          key={item.name}
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            py: 1,
+                            px: 1.5,
+                            borderRadius: 1.5,
+                            bgcolor: item.enabled ? colors.goldSoft : 'transparent',
+                            border: `1px solid ${item.enabled ? colors.goldBorder : colors.border}`,
+                          }}
+                        >
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            {item.enabled ? (
+                              <CheckCircle size={16} color={colors.gold} />
+                            ) : (
+                              <Lock size={16} color={colors.muted} />
+                            )}
+                            <Typography
+                              sx={{
+                                fontSize: 13,
+                                color: item.enabled ? colors.text : colors.muted,
+                                fontWeight: item.enabled ? 500 : 400,
+                              }}
+                            >
+                              {item.name}
+                            </Typography>
+                          </Box>
+                          <Chip
+                            label={item.enabled ? 'Granted' : 'Denied'}
+                            size="small"
+                            sx={{
+                              height: 22,
+                              fontSize: 11,
+                              fontWeight: 600,
+                              bgcolor: item.enabled ? colors.successSoft : colors.errorSoft,
+                              color: item.enabled ? colors.success : colors.error,
+                              border: `1px solid ${item.enabled ? 'rgba(46, 160, 67, 0.25)' : 'rgba(218, 55, 67, 0.25)'}`,
+                            }}
+                          />
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                ))}
+              </Box>
+            </Paper>
+          </Box>
+        )}
+
+        {/* ── Activity Tab ──────────────────────── */}
+        {tab === 'activity' && (
+          <Box sx={{ p: { xs: 2.5, sm: 3.5 } }}>
+            <Paper
+              sx={{
+                p: 3,
+                bgcolor: colors.card,
+                border: `1px solid ${colors.border}`,
+                borderRadius: 3,
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+                <Box>
+                  <Typography sx={{ fontWeight: 700, color: colors.text, fontSize: 16, mb: 0.5 }}>
+                    Recent Activity
+                  </Typography>
+                  <Typography sx={{ color: colors.secondary, fontSize: 13 }}>
+                    Your recent actions and events
+                  </Typography>
+                </Box>
+                <Button
+                  variant="outlined"
+                  startIcon={<RefreshCw size={14} />}
+                  sx={{
+                    textTransform: 'none',
+                    borderRadius: '10px',
+                    borderColor: colors.border,
+                    color: colors.secondary,
+                    fontWeight: 500,
+                    fontSize: 12,
+                    '&:hover': { borderColor: colors.gold, color: colors.gold },
+                  }}
+                >
+                  Refresh
+                </Button>
+              </Box>
+
+              <List disablePadding>
+                {recentActivity.map((item, index) => (
+                  <ListItem
+                    key={index}
+                    sx={{
+                      px: 0,
+                      py: 1.5,
+                      borderBottom: index < recentActivity.length - 1 ? `1px solid ${colors.border}` : 'none',
+                    }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 40 }}>
+                      <Box
+                        sx={{
+                          width: 36,
+                          height: 36,
+                          borderRadius: 2,
+                          bgcolor: `${item.color}15`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <item.icon size={18} color={item.color} />
+                      </Box>
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <Typography sx={{ fontWeight: 500, color: colors.text, fontSize: 13 }}>
+                          {item.action}
+                        </Typography>
+                      }
+                      secondary={
+                        <Typography sx={{ color: colors.muted, fontSize: 11 }}>
+                          {item.time}
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </Paper>
+          </Box>
+        )}
+
+        {/* ── Preferences Tab ───────────────────── */}
+        {tab === 'preferences' && (
+          <Box sx={{ p: { xs: 2.5, sm: 3.5 } }}>
+            <Grid container spacing={3}>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Paper
+                  sx={{
+                    p: 3,
+                    bgcolor: colors.card,
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: 3,
+                    mb: 3,
+                  }}
+                >
+                  <Typography sx={{ fontWeight: 700, color: colors.text, fontSize: 16, mb: 2.5 }}>
+                    Notifications
+                  </Typography>
+
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                    {[
+                      { label: 'Email Notifications', desc: 'Receive updates via email', checked: emailNotifications, onChange: setEmailNotifications },
+                      { label: 'Push Notifications', desc: 'Receive push notifications in browser', checked: pushNotifications, onChange: setPushNotifications },
+                      { label: 'Login Alerts', desc: 'Get notified of new sign-ins', checked: loginAlerts, onChange: setLoginAlerts },
+                      { label: 'Marketing Emails', desc: 'Receive product updates and offers', checked: marketingEmails, onChange: setMarketingEmails },
+                    ].map((pref) => (
+                      <Box
+                        key={pref.label}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          py: 1.5,
+                          borderBottom: `1px solid ${colors.border}`,
+                          '&:last-child': { borderBottom: 'none' },
+                        }}
+                      >
+                        <Box>
+                          <Typography sx={{ fontWeight: 500, color: colors.text, fontSize: 14 }}>
+                            {pref.label}
+                          </Typography>
+                          <Typography sx={{ color: colors.secondary, fontSize: 12 }}>
+                            {pref.desc}
+                          </Typography>
+                        </Box>
+                        <Switch
+                          checked={pref.checked}
+                          onChange={(e) => pref.onChange(e.target.checked)}
+                          sx={{
+                            '& .MuiSwitch-switchBase.Mui-checked': { color: colors.gold },
+                            '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: colors.gold },
+                          }}
+                        />
+                      </Box>
+                    ))}
+                  </Box>
+                </Paper>
+              </Grid>
+
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Paper
+                  sx={{
+                    p: 3,
+                    bgcolor: colors.card,
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: 3,
+                  }}
+                >
+                  <Typography sx={{ fontWeight: 700, color: colors.text, fontSize: 16, mb: 2.5 }}>
+                    Appearance
+                  </Typography>
+
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                    <Box>
+                      <Typography sx={{ fontWeight: 500, color: colors.text, fontSize: 13, mb: 1 }}>
+                        Language
+                      </Typography>
+                      <TextField
+                        select
+                        value="en"
+                        fullWidth
+                        size="small"
+                        sx={textFieldStyles}
+                      >
+                        <MenuItem value="en">English</MenuItem>
+                        <MenuItem value="es">Spanish</MenuItem>
+                        <MenuItem value="fr">French</MenuItem>
+                        <MenuItem value="de">German</MenuItem>
+                      </TextField>
+                    </Box>
+
+                    <Box>
+                      <Typography sx={{ fontWeight: 500, color: colors.text, fontSize: 13, mb: 1 }}>
+                        Timezone
+                      </Typography>
+                      <TextField
+                        select
+                        value="pst"
+                        fullWidth
+                        size="small"
+                        sx={textFieldStyles}
+                      >
+                        <MenuItem value="pst">Pacific Time (UTC-8)</MenuItem>
+                        <MenuItem value="est">Eastern Time (UTC-5)</MenuItem>
+                        <MenuItem value="utc">UTC</MenuItem>
+                        <MenuItem value="cet">Central European Time (UTC+1)</MenuItem>
+                      </TextField>
+                    </Box>
+
+                    <Box>
+                      <Typography sx={{ fontWeight: 500, color: colors.text, fontSize: 13, mb: 1 }}>
+                        Date Format
+                      </Typography>
+                      <TextField
+                        select
+                        value="mdy"
+                        fullWidth
+                        size="small"
+                        sx={textFieldStyles}
+                      >
+                        <MenuItem value="mdy">MM/DD/YYYY</MenuItem>
+                        <MenuItem value="dmy">DD/MM/YYYY</MenuItem>
+                        <MenuItem value="ymd">YYYY-MM-DD</MenuItem>
+                      </TextField>
+                    </Box>
+                  </Box>
+                </Paper>
+              </Grid>
+            </Grid>
+          </Box>
+        )}
+
+        {/* ── Sessions Tab ──────────────────────── */}
+        {tab === 'sessions' && (
+          <Box sx={{ p: { xs: 2.5, sm: 3.5 } }}>
+            <Paper
+              sx={{
+                p: 3,
+                bgcolor: colors.card,
+                border: `1px solid ${colors.border}`,
+                borderRadius: 3,
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+                <Box>
+                  <Typography sx={{ fontWeight: 700, color: colors.text, fontSize: 16, mb: 0.5 }}>
+                    Active Sessions
+                  </Typography>
+                  <Typography sx={{ color: colors.secondary, fontSize: 13 }}>
+                    Devices currently signed in to your account
+                  </Typography>
+                </Box>
+                <Button
+                  variant="outlined"
+                  startIcon={<LogOut size={14} />}
+                  sx={{
+                    textTransform: 'none',
+                    borderRadius: '10px',
+                    borderColor: colors.error,
+                    color: colors.error,
+                    fontWeight: 600,
+                    fontSize: 12,
+                    '&:hover': { bgcolor: colors.errorSoft },
+                  }}
+                >
+                  Sign Out All
+                </Button>
+              </Box>
+
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                {activeSessions.map((session, index) => (
+                  <Box
+                    key={index}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 2,
+                      p: 2,
+                      borderRadius: 2,
+                      bgcolor: session.isCurrent ? colors.goldSoft : 'transparent',
+                      border: `1px solid ${session.isCurrent ? colors.goldBorder : colors.border}`,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 2,
+                        bgcolor: session.isCurrent ? `${colors.gold}20` : colors.cardAlt,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <session.icon size={20} color={session.isCurrent ? colors.gold : colors.secondary} />
+                    </Box>
+
+                    <Box sx={{ flex: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography sx={{ fontWeight: 600, color: colors.text, fontSize: 13 }}>
+                          {session.device}
+                        </Typography>
+                        {session.isCurrent && (
+                          <Chip
+                            label="Current"
+                            size="small"
+                            sx={{
+                              height: 20,
+                              fontSize: 10,
+                              bgcolor: colors.gold,
+                              color: '#0A0F18',
+                              fontWeight: 600,
+                            }}
+                          />
+                        )}
+                      </Box>
+                      <Typography sx={{ color: colors.secondary, fontSize: 11 }}>
+                        {session.ip} • {session.location} • {session.lastActive}
+                      </Typography>
+                    </Box>
+
+                    {!session.isCurrent && (
+                      <IconButton
+                        size="small"
+                        sx={{
+                          color: colors.error,
+                          '&:hover': { bgcolor: colors.errorSoft },
+                        }}
+                      >
+                        <LogOut size={16} />
+                      </IconButton>
+                    )}
+                  </Box>
+                ))}
+              </Box>
+            </Paper>
+          </Box>
+        )}
+      </Paper>
 
       {/* ── Email Change Dialog ───────────────── */}
       <Dialog
@@ -855,22 +1710,3 @@ export default function ProfilePage() {
     </Box>
   );
 }
-
-// ── Shared TextField Styles ────────────────────
-
-const textFieldStyles = {
-  '& .MuiOutlinedInput-root': {
-    borderRadius: '10px',
-    bgcolor: colors.card,
-    color: colors.text,
-    '& fieldset': { borderColor: colors.border },
-    '&:hover fieldset': { borderColor: colors.gold },
-    '&.Mui-focused fieldset': { borderColor: colors.gold },
-  },
-  '& .MuiInputLabel-root': { color: colors.secondary },
-  '& .MuiInputLabel-root.Mui-focused': { color: colors.gold },
-  '& .MuiFormHelperText-root': { color: colors.muted },
-  '& .Mui-disabled': {
-    '& .MuiOutlinedInput-notchedOutline': { borderColor: `${colors.border} !important` },
-  },
-};
