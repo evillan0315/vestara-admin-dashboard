@@ -126,6 +126,20 @@ The admin dashboard is fully data-driven and real-time:
 |-----------|-------------------|
 | <img src="./assets/vestara-elite-marketing-recruitment.png" width="100%" alt="Marketing Recruitment"> | <img src="./assets/vestara-elite-investor-marketing-ads.png" width="100%" alt="Investor Marketing"> |
 
+### Video Assets (`apps/marketing-video`)
+
+A self-contained [Remotion](https://www.remotion.dev/) project renders a **30-second
+ecosystem overview ad** in the product's dark-luxury + metallic-gold style
+(1920×1080, 30fps). It sequences five crossfaded beats — Hook, Module grid,
+AI Assistant spotlight, Admin Analytics spotlight, and CTA — and builds a static
+`build/` bundle for embedding. See `apps/marketing-video/README.md` for the
+scene layout and `pnpm dev` / `pnpm render` commands.
+
+For a fully cinematic "command center" cut, `apps/marketing-video/prompts/vestara-cinematic-t2v.md`
+ships a ready-to-use prompt optimized for the **HappyHorse-1.1-T2V** text-to-video
+model (visual/camera/animation/lighting specs + negative prompt), mirroring the
+Vestara Elite Companions branding.
+
 ---
 
 ## Elite Companion Profiles
@@ -1029,7 +1043,8 @@ vestara/
 │
 ├── apps/
 │   ├── api/                     # Express Backend
-│   └── web/                     # React Frontend
+│   ├── web/                     # React Frontend
+│   └── marketing-video/         # Remotion project: 30s ecosystem ad + T2V cinematic prompt
 │
 ├── packages/
 │   ├── sdk/                     # Generated API SDK

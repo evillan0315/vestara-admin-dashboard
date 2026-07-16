@@ -96,6 +96,7 @@ vestara-admin-dashboard/
 │       │   ├── styles/     # MUI theme factory (theme.ts)
 │       │   └── theme/      # Theme types, tokens, density presets
 │       └── vercel.json
+│   └── marketing-video/     # Remotion project: 30s ecosystem ad + T2V cinematic prompt
 ├── packages/               # Shared libraries (see below)
 ├── docs/                   # This folder
 ├── turbo.json
