@@ -5,7 +5,6 @@ import {
   DriveFileMove as MoveIcon,
   Image as ImageIcon,
   Delete as DeleteIcon,
-  Folder as FolderIcon,
   InsertDriveFile as FileIcon,
   Cloud as CloudIcon,
 } from '@mui/icons-material';

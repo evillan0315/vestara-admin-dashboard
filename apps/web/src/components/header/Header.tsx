@@ -15,8 +15,6 @@ interface HeaderProps {
   title: string;
   subtitle: string;
   onMenuToggle?: () => void;
-  refreshing?: boolean;
-  onRefresh?: () => Promise<void> | void;
   onNotificationsClick?: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
@@ -24,8 +22,6 @@ export default function Header({
   title,
   subtitle,
   onMenuToggle,
-  refreshing = false,
-  onRefresh,
   onNotificationsClick,
 }: HeaderProps) {
   const theme = useTheme();
@@ -57,10 +53,6 @@ export default function Header({
   };
 
   const handleMsgClose = () => setMsgAnchor(null);
-
-  const handleRefresh = async () => {
-    onRefresh?.();
-  };
 
   const handleMessageClick = (message: Message) => {
     setMessages((prev) =>
@@ -152,9 +144,7 @@ export default function Header({
             <HeaderActions
               notificationCount={unreadCount}
               messageCount={messages.filter((m) => m.unread).length}
-              refreshing={refreshing}
               onLogout={handleLogout}
-              onRefresh={handleRefresh}
               onNotificationsClick={handleNotifClick}
               onMessagesClick={handleMsgClick}
             />

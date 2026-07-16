@@ -34,7 +34,7 @@ const fileIdParamSchema = z.object({
 });
 
 const folderIdParamSchema = z.object({
-  id: z.string().uuid().nullable(),
+  folderId: z.string().uuid(),
 });
 
 const createFolderSchema = z.object({

@@ -5,7 +5,6 @@ import { Box, useTheme } from "@mui/material";
 import { Bell, Mail } from "lucide-react";
 
 import HeaderIconButton from "./HeaderIconButton";
-import RefreshButton from "./RefreshButton";
 import UserMenu from "./UserMenu";
 import ConnectionStatus from "./ConnectionStatus";
 
@@ -13,10 +12,6 @@ export interface HeaderActionsProps {
   notificationCount?: number;
 
   messageCount?: number;
-
-  refreshing?: boolean;
-
-  onRefresh?: () => Promise<void> | void;
 
   onNotificationsClick?: (event: React.MouseEvent<HTMLElement>) => void;
 
@@ -28,8 +23,6 @@ export interface HeaderActionsProps {
 export default function HeaderActions({
   notificationCount = 0,
   messageCount = 0,
-  refreshing = false,
-  onRefresh,
   onNotificationsClick,
   onMessagesClick,
   onLogout,
@@ -46,8 +39,6 @@ export default function HeaderActions({
         flexShrink: 0,
       }}
     >
-      <RefreshButton loading={refreshing} onClick={onRefresh} />
-
       <ConnectionStatus />
 
       <HeaderIconButton

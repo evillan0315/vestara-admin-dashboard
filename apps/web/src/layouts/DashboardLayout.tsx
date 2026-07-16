@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Box, Drawer, useTheme } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import type { ReactNode } from "react";
@@ -35,8 +35,7 @@ export default function DashboardLayout({
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   // Real-time notifications are delivered via the WebSocket connection.
-  const { loading: notificationsLoading, refresh: refreshNotifications } =
-    useLiveNotifications();
+  useLiveNotifications();
 
   const density = densitySpacing[themeCtx.density];
   const sidebarWidth = themeCtx.sidebarCollapsed
@@ -77,10 +76,6 @@ export default function DashboardLayout({
       setTimeout(() => searchInputRef.current?.focus(), 50);
     }
   }, [globalSearchOpen]);
-
-  const handleRefresh = useCallback(async () => {
-    refreshNotifications();
-  }, [refreshNotifications]);
 
   const handleGlobalSearchClose = () => {
     setGlobalSearchOpen(false);
@@ -144,8 +139,6 @@ export default function DashboardLayout({
           title={title ?? routeTitle}
           subtitle={subtitle ?? routeSubtitle}
           onMenuToggle={isHidden ? undefined : handleDrawerToggle}
-          refreshing={notificationsLoading}
-          onRefresh={handleRefresh}
         />
         <Box
           component="main"

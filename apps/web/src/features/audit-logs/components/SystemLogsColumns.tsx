@@ -1,4 +1,4 @@
-import { Box, Chip, Typography, styled } from '@mui/material';
+import { Box, Chip, Typography, styled, Tooltip } from '@mui/material';
 import {
   History as HistoryIcon,
   Login as LoginIcon,
@@ -71,6 +71,58 @@ function formatDate(dateStr: string): string {
   });
 }
 
+function LogTooltipContent({ row }: { row: AuditLogDTO }) {
+  return (
+    <Box sx={{ p: 1.5, maxWidth: 360 }}>
+      <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
+        {row.action.replace(/_/g, ' ').toUpperCase()}
+      </Typography>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+        <Typography variant="caption" color="text.secondary">
+          <strong>Entity:</strong> {row.entity} {row.entityId ? `(${row.entityId})` : ''}
+        </Typography>
+        <Typography variant="caption" color="text.secondary">
+          <strong>User:</strong> {row.userName || 'System'} ({row.userId})
+        </Typography>
+        {row.ipAddress && (
+          <Typography variant="caption" color="text.secondary">
+            <strong>IP:</strong> {row.ipAddress}
+          </Typography>
+        )}
+        {row.userAgent && (
+          <Typography variant="caption" color="text.secondary" sx={{ wordBreak: 'break-word' }}>
+            <strong>User Agent:</strong> {row.userAgent}
+          </Typography>
+        )}
+        <Typography variant="caption" color="text.secondary">
+          <strong>Timestamp:</strong> {new Date(row.createdAt).toLocaleString('en-US', {
+            year: 'numeric', month: 'short', day: 'numeric',
+            hour: '2-digit', minute: '2-digit', second: '2-digit',
+          })}
+        </Typography>
+        {row.metadata && Object.keys(row.metadata).length > 0 && (
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{
+              mt: 0.5,
+              fontFamily: 'monospace',
+              fontSize: '0.65rem',
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+              bgcolor: 'action.hover',
+              p: 0.75,
+              borderRadius: 0.5,
+            }}
+          >
+            {JSON.stringify(row.metadata, null, 2)}
+          </Typography>
+        )}
+      </Box>
+    </Box>
+  );
+}
+
 export function createSystemLogsColumns(): Column<AuditLogDTO>[] {
   return [
     {
@@ -81,14 +133,35 @@ export function createSystemLogsColumns(): Column<AuditLogDTO>[] {
       render: (_value, row) => {
         const Icon = getActionIcon(row.action);
         return (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Icon sx={{ fontSize: 16, color: 'text.secondary' }} />
-            <ActionChip
-              action={row.action}
-              label={row.action.replace(/_/g, ' ')}
-              size="small"
-            />
-          </Box>
+          <Tooltip
+            title={<LogTooltipContent row={row} />}
+            placement="left"
+            slotProps={{
+              popper: {
+                sx: {
+                  '& .MuiTooltip-tooltip': {
+                    bgcolor: 'background.paper',
+                    color: 'text.primary',
+                    boxShadow: 4,
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    borderRadius: 2,
+                    p: 0,
+                    maxWidth: 380,
+                  },
+                },
+              },
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }}>
+              <Icon sx={{ fontSize: 16, color: 'text.secondary' }} />
+              <ActionChip
+                action={row.action}
+                label={row.action.replace(/_/g, ' ')}
+                size="small"
+              />
+            </Box>
+          </Tooltip>
         );
       },
     },
