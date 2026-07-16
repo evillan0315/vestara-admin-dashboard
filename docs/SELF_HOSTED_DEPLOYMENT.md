@@ -257,11 +257,9 @@ JWT_REFRESH_EXPIRES_IN=30d
 # ── File storage (optional; LOCAL is default) ──
 UPLOAD_PATH=./uploads
 CLOUDINARY_CLOUD_NAME=  CLOUDINARY_API_KEY=  CLOUDINARY_API_SECRET=
-# NOTE: two naming variants exist — `config/index.ts` reads S3_ACCESS_KEY /
-# S3_SECRET_KEY, while `services/file.service.ts` reads S3_ACCESS_KEY_ID /
-# S3_SECRET_ACCESS_KEY. Provide both for compatibility.
+# S3-compatible storage uses the AWS-conventional names below.
 S3_ENDPOINT=  S3_BUCKET=  S3_REGION=us-east-1
-S3_ACCESS_KEY=  S3_SECRET_KEY=  S3_ACCESS_KEY_ID=  S3_SECRET_ACCESS_KEY=
+S3_ACCESS_KEY_ID=  S3_SECRET_ACCESS_KEY=
 
 # ── AI / Integrations (optional) ───────────────
 # OPENCODE_API_KEY=
