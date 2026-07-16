@@ -1,9 +1,7 @@
 import type { JSX } from "react";
 
-import { Button } from "@mui/material";
+import { Button, useTheme, alpha } from "@mui/material";
 import { Calendar, ChevronDown } from "lucide-react";
-
-import { colors } from "../../theme/tokens";
 
 export interface DateRangeButtonProps {
   /**
@@ -27,6 +25,9 @@ export default function DateRangeButton({
   onClick,
   disabled = false,
 }: DateRangeButtonProps): JSX.Element {
+  const theme = useTheme();
+  const { primary, text, divider, background } = theme.palette;
+
   return (
     <Button
       disableElevation
@@ -41,14 +42,14 @@ export default function DateRangeButton({
         textTransform: "none",
         fontSize: 12.5,
         fontWeight: 600,
-        color: colors.text,
-        bgcolor: colors.cardAlt,
-        border: `1px solid ${colors.border}`,
+        color: text.primary,
+        bgcolor: background.paper,
+        border: `1px solid ${divider}`,
         whiteSpace: "nowrap",
         transition: "all .2s ease",
         "&:hover": {
-          bgcolor: "rgba(255,255,255,.05)",
-          borderColor: colors.gold,
+          bgcolor: alpha(primary.main, 0.08),
+          borderColor: primary.main,
         },
         "&:active": {
           transform: "scale(.98)",

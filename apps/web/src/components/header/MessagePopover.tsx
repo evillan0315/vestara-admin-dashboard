@@ -1,7 +1,6 @@
 import type { JSX } from "react";
-import { Box, Divider, Popover, Typography } from "@mui/material";
+import { Box, Divider, Popover, Typography, useTheme } from "@mui/material";
 import MessageList from "./MessageList";
-import { colors } from "../../theme/tokens";
 import type { Message } from "./types";
 
 interface MessagePopoverProps {
@@ -19,6 +18,9 @@ export default function MessagePopover({
   onClose,
   onMessageClick,
 }: MessagePopoverProps): JSX.Element {
+  const theme = useTheme();
+  const { text, divider, background } = theme.palette;
+
   return (
     <Popover
       open={open}
@@ -31,8 +33,8 @@ export default function MessagePopover({
           sx: {
             mt: 1,
             width: 380,
-            bgcolor: colors.card,
-            border: `1px solid ${colors.border}`,
+            bgcolor: background.paper,
+            border: `1px solid ${divider}`,
             borderRadius: "14px",
             overflow: "hidden",
           },
@@ -48,7 +50,7 @@ export default function MessagePopover({
           justifyContent: "space-between",
         }}
       >
-        <Typography sx={{ fontWeight: 700, fontSize: 15, color: colors.text }}>
+        <Typography sx={{ fontWeight: 700, fontSize: 15, color: text.primary }}>
           Messages
         </Typography>
       </Box>

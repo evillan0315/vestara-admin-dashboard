@@ -1,6 +1,6 @@
 import { type JSX } from "react";
 
-import { Box } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 
 import { Bell, Mail } from "lucide-react";
 
@@ -10,8 +10,6 @@ import RefreshButton from "./RefreshButton";
 import UserMenu from "./UserMenu";
 import ConnectionStatus from "./ConnectionStatus";
 import PresenceIndicator from "../../features/realtime/PresenceIndicator";
-
-import { colors } from "../../theme/tokens";
 
 export interface HeaderActionsProps {
   dateRange: string;
@@ -44,6 +42,9 @@ export default function HeaderActions({
   onDateRangeClick,
   onLogout,
 }: HeaderActionsProps): JSX.Element {
+  const theme = useTheme();
+  const { primary } = theme.palette;
+
   return (
     <Box
       sx={{
@@ -82,8 +83,8 @@ export default function HeaderActions({
       <HeaderIconButton
         tooltip="Messages"
         badgeContent={messageCount}
-        badgeColor={colors.gold}
-        badgeTextColor="#0A0F18"
+        badgeColor={primary.main}
+        badgeTextColor={primary.contrastText}
         icon={<Mail size={18} />}
         onClick={onMessagesClick}
       />

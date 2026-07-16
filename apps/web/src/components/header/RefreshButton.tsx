@@ -1,10 +1,8 @@
 import type { JSX } from "react";
 
-import { CircularProgress, IconButton, Tooltip } from "@mui/material";
+import { CircularProgress, IconButton, Tooltip, useTheme, alpha } from "@mui/material";
 
 import { RotateCw } from "lucide-react";
-
-import { colors } from "../../theme/tokens";
 
 export interface RefreshButtonProps {
   /**
@@ -34,6 +32,9 @@ export default function RefreshButton({
   disabled = false,
   tooltip = "Refresh dashboard",
 }: RefreshButtonProps): JSX.Element {
+  const theme = useTheme();
+  const { primary, text, divider, background } = theme.palette;
+
   return (
     <Tooltip title={tooltip}>
       <span>
@@ -45,13 +46,13 @@ export default function RefreshButton({
             width: 40,
             height: 40,
             borderRadius: "10px",
-            bgcolor: colors.cardAlt,
-            border: `1px solid ${colors.border}`,
-            color: colors.text,
+            bgcolor: background.paper,
+            border: `1px solid ${divider}`,
+            color: text.primary,
             transition: "all .2s ease",
             "&:hover": {
-              bgcolor: "rgba(255,255,255,.05)",
-              borderColor: colors.gold,
+              bgcolor: alpha(primary.main, 0.08),
+              borderColor: primary.main,
             },
             "&:active": {
               transform: "scale(.96)",
@@ -63,7 +64,7 @@ export default function RefreshButton({
               size={18}
               thickness={5}
               sx={{
-                color: colors.gold,
+                color: primary.main,
               }}
             />
           ) : (

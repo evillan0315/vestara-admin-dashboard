@@ -1,7 +1,6 @@
 import type { JSX } from "react";
-import { Avatar, Box, Divider, Typography } from "@mui/material";
+import { Avatar, Box, Divider, Typography, useTheme, alpha } from "@mui/material";
 import { Mail } from "lucide-react";
-import { colors } from "../../theme/tokens";
 import type { Message } from "./types";
 
 interface MessageListProps {
@@ -13,14 +12,17 @@ export default function MessageList({
   messages,
   onMessageClick,
 }: MessageListProps): JSX.Element {
+  const theme = useTheme();
+  const { primary, text, divider } = theme.palette;
+
   if (messages.length === 0) {
     return (
       <Box sx={{ py: 6, px: 3, textAlign: "center" }}>
-        <Mail size={42} color={colors.muted} />
-        <Typography sx={{ mt: 2, fontWeight: 700, color: colors.text }}>
+        <Mail size={42} color={text.disabled} />
+        <Typography sx={{ mt: 2, fontWeight: 700, color: text.primary }}>
           No messages
         </Typography>
-        <Typography sx={{ mt: 1, color: colors.secondary, fontSize: 13 }}>
+        <Typography sx={{ mt: 1, color: text.secondary, fontSize: 13 }}>
           Your inbox is empty.
         </Typography>
       </Box>
@@ -41,7 +43,7 @@ export default function MessageList({
               gap: 1.5,
               cursor: "pointer",
               transition: "all .18s ease",
-              "&:hover": { bgcolor: "rgba(255,255,255,.03)" },
+              "&:hover": { bgcolor: alpha(text.primary, 0.03) },
             }}
           >
             <Avatar
@@ -50,8 +52,8 @@ export default function MessageList({
                 height: 38,
                 fontSize: 13,
                 fontWeight: 700,
-                bgcolor: message.unread ? colors.gold : colors.muted,
-                color: message.unread ? "#0A0F18" : "#fff",
+                bgcolor: message.unread ? primary.main : text.disabled,
+                color: message.unread ? primary.contrastText : "#fff",
               }}
             >
               {message.sender
@@ -68,13 +70,13 @@ export default function MessageList({
                     flex: 1,
                     fontWeight: message.unread ? 700 : 600,
                     fontSize: 13,
-                    color: colors.text,
+                    color: text.primary,
                   }}
                 >
                   {message.sender}
                 </Typography>
                 <Typography
-                  sx={{ fontSize: 11, color: colors.muted, flexShrink: 0 }}
+                  sx={{ fontSize: 11, color: text.disabled, flexShrink: 0 }}
                 >
                   {message.timestamp}
                 </Typography>
@@ -85,7 +87,7 @@ export default function MessageList({
                   mt: 0.25,
                   fontSize: 12,
                   fontWeight: message.unread ? 600 : 400,
-                  color: colors.text,
+                  color: text.primary,
                 }}
               >
                 {message.subject}
@@ -94,7 +96,7 @@ export default function MessageList({
                 sx={{
                   mt: 0.25,
                   fontSize: 12,
-                  color: colors.secondary,
+                  color: text.secondary,
                   lineHeight: 1.45,
                   display: "-webkit-box",
                   WebkitBoxOrient: "vertical",
@@ -107,7 +109,7 @@ export default function MessageList({
             </Box>
           </Box>
           {index < messages.length - 1 && (
-            <Divider sx={{ borderColor: colors.border }} />
+            <Divider sx={{ borderColor: divider }} />
           )}
         </Box>
       ))}

@@ -2154,6 +2154,7 @@ Future licensing terms may change as the platform evolves.
 | Application Settings | 🟢 Complete (backend + frontend) |
 | File Manager | 🟢 Complete (backend + frontend with upload, folders, preview) |
 | User Profile (name, avatar, password, email change, account deletion) | 🟢 Complete (backend + frontend) |
+| Profile Navigation (6 tabs: Overview, Security, Permissions, Activity, Preferences, Sessions) | 🟢 Complete (shared `profileTabs` config; header `UserMenu` shortcuts + dedicated routes; dark-luxury `theme.palette` header chrome) |
 | User Preferences (Modal) | 🟢 Complete (Appearance, Notifications, Localization) |
 | Global Search (Cmd/Ctrl+K) | 🟢 Complete |
 | Sidebar Navigation (platform-domain categories) | 🟢 Complete (Wallet & Payments, Marketplace, Bookings, Rewards, AI Services, Management, System, Security; roadmap modules marked "Soon") |

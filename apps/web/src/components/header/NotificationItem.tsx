@@ -1,6 +1,6 @@
 import type { JSX } from "react";
 
-import { Avatar, Box, Chip, Typography } from "@mui/material";
+import { Avatar, Box, Chip, Typography, useTheme, alpha } from "@mui/material";
 
 import {
   Activity,
@@ -14,7 +14,6 @@ import {
   UserRound,
 } from "lucide-react";
 
-import { colors } from "../../theme/tokens";
 import type { Notification, NotificationType } from "./types";
 
 export interface NotificationItemProps {
@@ -54,7 +53,7 @@ function getNotificationIcon(type: NotificationType): JSX.Element {
   }
 }
 
-function getAvatarColor(type: NotificationType): string {
+function getAvatarColor(type: NotificationType, gold: string): string {
   switch (type) {
     case "booking":
       return "#3B82F6";
@@ -63,7 +62,7 @@ function getAvatarColor(type: NotificationType): string {
       return "#10B981";
 
     case "membership":
-      return colors.gold;
+      return gold;
 
     case "companion":
     case "user":
@@ -73,7 +72,7 @@ function getAvatarColor(type: NotificationType): string {
       return "#EF4444";
 
     case "setting":
-      return colors.gold;
+      return gold;
 
     case "auth":
       return "#3B82F6";
@@ -90,6 +89,9 @@ export default function NotificationItem({
   notification,
   onClick,
 }: NotificationItemProps): JSX.Element {
+  const theme = useTheme();
+  const { primary, text } = theme.palette;
+
   return (
     <Box
       onClick={() => onClick?.(notification)}
@@ -103,7 +105,7 @@ export default function NotificationItem({
         transition: "all .18s ease",
 
         "&:hover": {
-          bgcolor: "rgba(255,255,255,.03)",
+          bgcolor: alpha(text.primary, 0.03),
         },
       }}
     >
@@ -111,7 +113,7 @@ export default function NotificationItem({
         sx={{
           width: 38,
           height: 38,
-          bgcolor: getAvatarColor(notification.type),
+          bgcolor: getAvatarColor(notification.type, primary.main),
           color: "#fff",
         }}
       >
@@ -137,7 +139,7 @@ export default function NotificationItem({
               flex: 1,
               fontWeight: 700,
               fontSize: 13,
-              color: colors.text,
+              color: text.primary,
             }}
           >
             {notification.title}
@@ -151,8 +153,8 @@ export default function NotificationItem({
                 height: 18,
                 fontSize: 9,
                 fontWeight: 700,
-                bgcolor: colors.gold,
-                color: "#0A0F18",
+                bgcolor: primary.main,
+                color: primary.contrastText,
               }}
             />
           )}
@@ -162,7 +164,7 @@ export default function NotificationItem({
           sx={{
             mt: 0.5,
             fontSize: 12,
-            color: colors.secondary,
+            color: text.secondary,
             lineHeight: 1.45,
             display: "-webkit-box",
             WebkitBoxOrient: "vertical",
@@ -177,7 +179,7 @@ export default function NotificationItem({
           sx={{
             mt: 1,
             fontSize: 11,
-            color: colors.muted,
+            color: text.disabled,
           }}
         >
           {notification.timestamp}

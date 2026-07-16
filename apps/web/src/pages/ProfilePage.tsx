@@ -3,7 +3,6 @@ import { useLocation } from 'react-router-dom';
 import { Box, Chip, IconButton, Grid, List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction, Switch, TextField, useTheme, alpha, type SxProps } from '@mui/material';
 import {
   User as UserIcon,
-  Shield,
   ShieldCheck,
   KeyRound,
   Bell,
@@ -20,7 +19,6 @@ import {
   MapPin,
   Building2,
   FileText,
-  Activity,
   LogOut,
   RefreshCw,
   Download,
@@ -34,6 +32,11 @@ import {
   useChangeEmail,
   useDeleteAccount,
 } from '../features/profile/hooks';
+import {
+  profileTabs,
+  getProfileTabFromPath,
+  type ProfileTabValue,
+} from '../features/profile/tabs';
 import { uploadImage } from '../api/upload';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -44,8 +47,6 @@ import { StatCard } from '../components/data/StatCard';
 import { ActivityFeed, type ActivityItem } from '../components/data/ActivityFeed';
 import { Loading } from '../components/feedback/Loading';
 import { useToast } from '../components/feedback/Toast';
-
-type TabValue = 'overview' | 'security' | 'permissions' | 'activity' | 'preferences' | 'sessions';
 
 // ── Role card configuration ────────────────────
 const roleCards = [
@@ -195,17 +196,9 @@ export default function ProfilePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Derive initial tab from path
-  const getInitialTab = (): TabValue => {
-    const path = location.pathname;
-    if (path === '/security') return 'security';
-    if (path === '/permissions') return 'permissions';
-    if (path === '/activity') return 'activity';
-    if (path === '/preferences') return 'preferences';
-    if (path === '/sessions') return 'sessions';
-    return 'overview';
-  };
+  const getInitialTab = (): ProfileTabValue => getProfileTabFromPath(location.pathname);
 
-  const [tab, setTab] = useState<TabValue>(getInitialTab());
+  const [tab, setTab] = useState<ProfileTabValue>(getInitialTab());
 
   // ── General form state ─────────────────────
   const [firstName, setFirstName] = useState('');
@@ -581,16 +574,13 @@ export default function ProfilePage() {
       <Card sx={{ mb: 3 }}>
         <Tabs
           value={tab}
-          onChange={(v) => setTab(v as TabValue)}
+          onChange={(v) => setTab(v as ProfileTabValue)}
           variant="scrollable"
-          items={[
-            { label: 'Overview', value: 'overview', icon: <UserIcon size={16} /> },
-            { label: 'Security', value: 'security', icon: <Shield size={16} /> },
-            { label: 'Permissions', value: 'permissions', icon: <Lock size={16} /> },
-            { label: 'Activity', value: 'activity', icon: <Activity size={16} /> },
-            { label: 'Preferences', value: 'preferences', icon: <Settings size={16} /> },
-            { label: 'Sessions', value: 'sessions', icon: <Monitor size={16} /> },
-          ]}
+          items={profileTabs.map((t) => ({
+            label: t.label,
+            value: t.value,
+            icon: t.icon,
+          }))}
           sx={{
             px: 2,
             borderBottom: `1px solid ${divider}`,

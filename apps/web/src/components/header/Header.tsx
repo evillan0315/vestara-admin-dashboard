@@ -1,10 +1,17 @@
 import { type JSX, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Typography, InputBase, Button, IconButton } from "@mui/material";
+import {
+  Box,
+  Typography,
+  InputBase,
+  Button,
+  IconButton,
+  useTheme,
+  alpha,
+} from "@mui/material";
 import { Search, Menu } from "lucide-react";
 import { useAuth } from "../../features/auth/AuthContext";
 import { useLiveNotifications } from "../../features/realtime/LiveNotificationsProvider";
-import { colors } from "../../theme/tokens";
 import HeaderActions from "./HeaderActions";
 import NotificationPopover from "./NotificationPopover";
 import MessagePopover from "./MessagePopover";
@@ -42,6 +49,9 @@ export default function Header({
   onRefresh,
   onNotificationsClick,
 }: HeaderProps): JSX.Element {
+  const theme = useTheme();
+  const { primary, text, divider, background } = theme.palette;
+
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const { notifications, unreadCount, markAllRead, markRead } = useLiveNotifications();
@@ -94,9 +104,9 @@ export default function Header({
         position: "sticky",
         top: 0,
         zIndex: 10,
-        bgcolor: "rgba(6, 11, 18, 0.85)",
+        bgcolor: alpha(background.default, 0.85),
         backdropFilter: "blur(10px)",
-        borderBottom: `1px solid ${colors.border}`,
+        borderBottom: `1px solid ${divider}`,
         px: { xs: 2, sm: 3.5 },
         py: 2.25,
         display: "flex",
@@ -113,7 +123,7 @@ export default function Header({
           aria-label="open drawer"
           edge="start"
           onClick={onMenuToggle}
-          sx={{ mr: 0.5, display: { lg: "none" }, color: colors.text }}
+          sx={{ mr: 0.5, display: { lg: "none" }, color: text.primary }}
         >
           <Menu size={22} />
         </IconButton>
@@ -124,7 +134,7 @@ export default function Header({
               fontFamily: "'Plus Jakarta Sans', sans-serif",
               fontWeight: 800,
               fontSize: { xs: 18, sm: 22 },
-              color: colors.text,
+              color: text.primary,
               lineHeight: 1.2,
               whiteSpace: "nowrap",
               overflow: "hidden",
@@ -136,7 +146,7 @@ export default function Header({
           <Typography
             sx={{
               fontSize: 12.5,
-              color: colors.gold,
+              color: primary.main,
               fontWeight: 600,
               whiteSpace: "nowrap",
               overflow: "hidden",
@@ -155,28 +165,28 @@ export default function Header({
           display: { xs: "none", md: "flex" },
           alignItems: "center",
           gap: 1,
-          bgcolor: colors.cardAlt,
-          border: `1px solid ${colors.border}`,
+          bgcolor: background.paper,
+          border: `1px solid ${divider}`,
           borderRadius: "10px",
           px: 1.75,
           py: 1,
         }}
       >
-        <Search size={16} color={colors.muted} />
+        <Search size={16} color={text.secondary} />
         <InputBase
           placeholder="Search bookings, clients..."
           sx={{
             flex: 1,
             fontSize: 13,
-            color: colors.text,
-            "& input::placeholder": { color: colors.muted, opacity: 1 },
+            color: text.primary,
+            "& input::placeholder": { color: text.secondary, opacity: 1 },
           }}
         />
         <Box
           sx={{
             fontSize: 11,
-            color: colors.muted,
-            border: `1px solid ${colors.border}`,
+            color: text.secondary,
+            border: `1px solid ${divider}`,
             borderRadius: "6px",
             px: 0.75,
             py: 0.1,
@@ -224,7 +234,7 @@ export default function Header({
               variant="text"
               onClick={() => navigate("/login")}
               sx={{
-                color: colors.text,
+                color: text.primary,
                 textTransform: "none",
                 fontWeight: 600,
                 fontSize: 13,
@@ -237,14 +247,14 @@ export default function Header({
               variant="contained"
               onClick={() => navigate("/register")}
               sx={{
-                bgcolor: colors.gold,
-                color: "#0A0F18",
+                bgcolor: primary.main,
+                color: primary.contrastText,
                 textTransform: "none",
                 fontWeight: 700,
                 fontSize: 13,
                 borderRadius: "8px",
                 px: { xs: 1.5, sm: 2.5 },
-                "&:hover": { bgcolor: colors.goldHover },
+                "&:hover": { bgcolor: alpha(primary.main, 0.85) },
               }}
             >
               Register

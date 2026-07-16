@@ -1,12 +1,11 @@
 import type { JSX } from "react";
 
-import { Box, Divider, IconButton, Popover, Typography } from "@mui/material";
+import { Box, Divider, IconButton, Popover, Typography, useTheme } from "@mui/material";
 
 import { CheckCheck } from "lucide-react";
 
 import NotificationList from "./NotificationList";
 
-import { colors } from "../../theme/tokens";
 import type { Notification } from "./types";
 
 export interface NotificationPopoverProps {
@@ -37,6 +36,9 @@ export default function NotificationPopover({
   onMarkAllRead,
   onViewAll,
 }: NotificationPopoverProps): JSX.Element {
+  const theme = useTheme();
+  const { text, divider, background } = theme.palette;
+
   return (
     <Popover
       open={open}
@@ -55,8 +57,8 @@ export default function NotificationPopover({
           sx: {
             mt: 1,
             width: 380,
-            bgcolor: colors.card,
-            border: `1px solid ${colors.border}`,
+            bgcolor: background.paper,
+            border: `1px solid ${divider}`,
             borderRadius: "14px",
             overflow: "hidden",
           },
@@ -76,7 +78,7 @@ export default function NotificationPopover({
           sx={{
             fontWeight: 700,
             fontSize: 15,
-            color: colors.text,
+            color: text.primary,
           }}
         >
           Notifications
@@ -86,7 +88,7 @@ export default function NotificationPopover({
           size="small"
           onClick={onMarkAllRead}
           sx={{
-            color: colors.secondary,
+            color: text.secondary,
           }}
         >
           <CheckCheck size={18} />

@@ -9,21 +9,20 @@ import {
   Menu,
   MenuItem,
   Typography,
+  useTheme,
+  alpha,
 } from "@mui/material";
 
 import {
   ChevronDown,
   LogOut,
-  Settings,
-  Shield,
-  User as UserIcon,
   SlidersHorizontal,
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../features/auth/AuthContext";
-import { colors } from "../../theme/tokens";
+import { profileTabs } from "../../features/profile/tabs";
 import UserPreferencesDrawer from "../layout/UserPreferencesDialog";
 
 export interface UserMenuProps {
@@ -31,6 +30,9 @@ export interface UserMenuProps {
 }
 
 export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
+  const theme = useTheme();
+  const { primary, text, divider, error, background } = theme.palette;
+
   const navigate = useNavigate();
 
   const { user } = useAuth();
@@ -80,6 +82,11 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
     setPreferencesOpen(true);
   };
 
+  // Profile-related tabs surfaced as shortcuts in the menu.
+  // Excludes "Overview" (already reachable via the header avatar) to keep
+  // the list focused on secondary destinations.
+  const profileShortcuts = profileTabs.filter((tab) => tab.value !== "overview");
+
   return (
     <>
       <Box
@@ -90,13 +97,13 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
           gap: 1.5,
           pl: 2,
           ml: 1,
-          borderLeft: `1px solid ${colors.border}`,
+          borderLeft: `1px solid ${divider}`,
           cursor: "pointer",
           borderRadius: "10px",
           transition: "all .2s ease",
 
           "&:hover": {
-            bgcolor: "rgba(255,255,255,.03)",
+            bgcolor: alpha(primary.main, 0.08),
           },
         }}
       >
@@ -105,10 +112,11 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
           sx={{
             width: 42,
             height: 42,
-            bgcolor: colors.gold,
-            color: "#0A0F18",
+            bgcolor: primary.main,
+            color: primary.contrastText,
             fontWeight: 700,
-            border: `2px solid rgba(255,255,255,.08)`,
+            border: `2px solid ${alpha(primary.main, 0.3)}`,
+            transition: "border-color .2s ease",
           }}
         >
           {initials}
@@ -126,7 +134,7 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
             sx={{
               fontSize: 14,
               fontWeight: 700,
-              color: colors.text,
+              color: text.primary,
               lineHeight: 1.2,
             }}
           >
@@ -136,7 +144,7 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
           <Typography
             sx={{
               fontSize: 11.5,
-              color: colors.secondary,
+              color: text.secondary,
               textTransform: "capitalize",
             }}
           >
@@ -144,7 +152,7 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
           </Typography>
         </Box>
 
-        <ChevronDown size={16} color={colors.secondary} />
+        <ChevronDown size={16} color={text.secondary} />
       </Box>
 
       <Menu
@@ -165,10 +173,10 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
               width: 270,
               mt: 1,
               overflow: "hidden",
-              bgcolor: colors.card,
-              border: `1px solid ${colors.border}`,
+              bgcolor: background.paper,
+              border: `1px solid ${divider}`,
               borderRadius: "14px",
-              color: colors.text,
+              color: text.primary,
               boxShadow: "0 16px 40px rgba(0,0,0,.45)",
             },
           },
@@ -188,19 +196,21 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
             sx={{
               width: 50,
               height: 50,
-              bgcolor: colors.gold,
-              color: "#0A0F18",
+              bgcolor: primary.main,
+              color: primary.contrastText,
             }}
           >
             {initials}
           </Avatar>
 
-          <Box>
+          <Box sx={{ minWidth: 0 }}>
             <Typography
               sx={{
                 fontWeight: 700,
                 fontSize: 14,
+                color: text.primary,
               }}
+              noWrap
             >
               {user ? `${user.firstName} ${user.lastName}` : ""}
             </Typography>
@@ -208,8 +218,9 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
             <Typography
               sx={{
                 fontSize: 12,
-                color: colors.secondary,
+                color: text.secondary,
               }}
+              noWrap
             >
               {user?.email}
             </Typography>
@@ -218,36 +229,50 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
 
         <Divider />
 
-        <MenuItem onClick={() => navigateTo("/profile")}>
-          <ListItemIcon>
-            <UserIcon size={18} color={colors.secondary} />
+        {/* Profile tab shortcuts — kept in sync with ProfilePage via profileTabs */}
+        {profileShortcuts.map((tab) => (
+          <MenuItem
+            key={tab.value}
+            onClick={() => navigateTo(tab.path)}
+            sx={{
+              "&:hover": {
+                bgcolor: alpha(primary.main, 0.08),
+                "& .MuiListItemIcon-root svg": { color: primary.main },
+              },
+            }}
+          >
+            <ListItemIcon sx={{ minWidth: 36, color: text.secondary }}>
+              {tab.icon}
+            </ListItemIcon>
+
+            <ListItemText
+              primaryTypographyProps={{ fontSize: 13.5, fontWeight: 500 }}
+            >
+              {tab.label}
+            </ListItemText>
+          </MenuItem>
+        ))}
+
+        <Divider />
+
+        <MenuItem
+          onClick={openPreferences}
+          sx={{
+            "&:hover": {
+              bgcolor: alpha(primary.main, 0.08),
+              "& .MuiListItemIcon-root svg": { color: primary.main },
+            },
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 36, color: text.secondary }}>
+            <SlidersHorizontal size={18} />
           </ListItemIcon>
 
-          <ListItemText>Profile</ListItemText>
-        </MenuItem>
-
-        <MenuItem onClick={() => navigateTo("/settings")}>
-          <ListItemIcon>
-            <Settings size={18} color={colors.secondary} />
-          </ListItemIcon>
-
-          <ListItemText>Settings</ListItemText>
-        </MenuItem>
-
-        <MenuItem onClick={() => navigateTo("/security")}>
-          <ListItemIcon>
-            <Shield size={18} color={colors.secondary} />
-          </ListItemIcon>
-
-          <ListItemText>Security</ListItemText>
-        </MenuItem>
-
-        <MenuItem onClick={openPreferences}>
-          <ListItemIcon>
-            <SlidersHorizontal size={18} color={colors.secondary} />
-          </ListItemIcon>
-
-          <ListItemText>Preferences</ListItemText>
+          <ListItemText
+            primaryTypographyProps={{ fontSize: 13.5, fontWeight: 500 }}
+          >
+            Preferences
+          </ListItemText>
         </MenuItem>
 
         <Divider />
@@ -255,14 +280,21 @@ export default function UserMenu({ onLogout }: UserMenuProps): JSX.Element {
         <MenuItem
           onClick={logout}
           sx={{
-            color: colors.error,
+            color: error.main,
+            "&:hover": {
+              bgcolor: alpha(error.main, 0.1),
+            },
           }}
         >
-          <ListItemIcon>
-            <LogOut size={18} color={colors.error} />
+          <ListItemIcon sx={{ minWidth: 36, color: error.main }}>
+            <LogOut size={18} />
           </ListItemIcon>
 
-          <ListItemText>Logout</ListItemText>
+          <ListItemText
+            primaryTypographyProps={{ fontSize: 13.5, fontWeight: 500 }}
+          >
+            Logout
+          </ListItemText>
         </MenuItem>
       </Menu>
 

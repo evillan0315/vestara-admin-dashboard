@@ -1,8 +1,6 @@
 import type { JSX, ReactNode } from "react";
 
-import { Badge, IconButton, Tooltip } from "@mui/material";
-
-import { colors } from "../../theme/tokens";
+import { Badge, IconButton, Tooltip, useTheme, alpha } from "@mui/material";
 
 export interface HeaderIconButtonProps {
   /**
@@ -45,11 +43,18 @@ export default function HeaderIconButton({
   icon,
   tooltip,
   badgeContent,
-  badgeColor = colors.error,
-  badgeTextColor = "#FFFFFF",
+  badgeColor,
+  badgeTextColor,
   onClick,
   disabled = false,
 }: HeaderIconButtonProps): JSX.Element {
+  const theme = useTheme();
+  const { text, divider, error, background } = theme.palette;
+
+  // Default badge color uses the theme error palette unless overridden.
+  const resolvedBadgeColor = badgeColor ?? error.main;
+  const resolvedBadgeText = badgeTextColor ?? "#FFFFFF";
+
   const content =
     badgeContent !== undefined ? (
       <Badge
@@ -57,14 +62,14 @@ export default function HeaderIconButton({
         overlap="circular"
         sx={{
           "& .MuiBadge-badge": {
-            bgcolor: badgeColor,
-            color: badgeTextColor,
+            bgcolor: resolvedBadgeColor,
+            color: resolvedBadgeText,
             fontSize: 9,
             fontWeight: 700,
             minWidth: 18,
             height: 18,
             borderRadius: "999px",
-            border: `2px solid ${colors.sidebar}`,
+            border: `2px solid ${background.paper}`,
           },
         }}
       >
@@ -85,11 +90,13 @@ export default function HeaderIconButton({
             width: 40,
             height: 40,
             borderRadius: "12px",
-            color: colors.secondary,
+            color: text.secondary,
+            border: `1px solid transparent`,
             transition: "all .2s ease",
             "&:hover": {
-              bgcolor: "rgba(255,255,255,.05)",
-              color: colors.text,
+              bgcolor: alpha(text.primary, 0.06),
+              color: text.primary,
+              borderColor: divider,
             },
             "&:active": {
               transform: "scale(.96)",

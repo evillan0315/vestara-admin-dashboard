@@ -1,12 +1,11 @@
 import type { JSX } from "react";
 
-import { Box, Button, Divider, Typography } from "@mui/material";
+import { Box, Button, Divider, Typography, useTheme, alpha } from "@mui/material";
 
 import { Bell } from "lucide-react";
 
 import NotificationItem from "./NotificationItem";
 
-import { colors } from "../../theme/tokens";
 import type { Notification } from "./types";
 
 export interface NotificationListProps {
@@ -25,6 +24,9 @@ export default function NotificationList({
   onNotificationClick,
   onViewAll,
 }: NotificationListProps): JSX.Element {
+  const theme = useTheme();
+  const { primary, text, divider } = theme.palette;
+
   if (loading) {
     return (
       <Box
@@ -36,7 +38,7 @@ export default function NotificationList({
       >
         <Typography
           sx={{
-            color: colors.secondary,
+            color: text.secondary,
             fontSize: 13,
           }}
         >
@@ -55,13 +57,13 @@ export default function NotificationList({
           textAlign: "center",
         }}
       >
-        <Bell size={42} color={colors.muted} />
+        <Bell size={42} color={text.disabled} />
 
         <Typography
           sx={{
             mt: 2,
             fontWeight: 700,
-            color: colors.text,
+            color: text.primary,
           }}
         >
           You're all caught up
@@ -70,7 +72,7 @@ export default function NotificationList({
         <Typography
           sx={{
             mt: 1,
-            color: colors.secondary,
+            color: text.secondary,
             fontSize: 13,
           }}
         >
@@ -98,7 +100,7 @@ export default function NotificationList({
             {index < notifications.length - 1 && (
               <Divider
                 sx={{
-                  borderColor: colors.border,
+                  borderColor: divider,
                 }}
               />
             )}
@@ -118,12 +120,12 @@ export default function NotificationList({
           onClick={onViewAll}
           sx={{
             textTransform: "none",
-            color: colors.gold,
+            color: primary.main,
             fontWeight: 700,
             borderRadius: "10px",
 
             "&:hover": {
-              bgcolor: "rgba(216,164,65,.08)",
+              bgcolor: alpha(primary.main, 0.08),
             },
           }}
         >

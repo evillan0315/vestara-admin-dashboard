@@ -384,7 +384,7 @@ Example: a new resource `reports`.
 - Forms: React Hook Form + Zod (`@hookform/resolvers/zod`).
 - Server state: TanStack Query. UI state: React context (e.g. `AuthContext`).
 - Reuse the shared `DataTable`, `StatCard`, `ConfirmDialog`, `Toast` rather than building one-off components.
-- Theme: extend `apps/web/src/styles/theme.ts` / `apps/web/src/theme/tokens.ts` — do **not** hardcode colors; read from `theme` or `tokens`.
+- Theme: extend `apps/web/src/styles/theme.ts` / `apps/web/src/theme/tokens.ts` — do **not** hardcode colors; read from `theme` or `tokens`. All header chrome (`Header`, `UserMenu`, popovers, status indicators) and the profile page use `theme.palette` (gold = `primary.main`, text = `text.primary/secondary/disabled`, borders = `divider`, surfaces = `background.paper`) for a consistent dark-luxury look. The 6 profile tabs and their routes are defined once in `apps/web/src/features/profile/tabs.tsx` (`profileTabs` + `getProfileTabFromPath`) and shared by `ProfilePage` and the header `UserMenu`.
 - **Forms**: Use the reusable form components from `@/components/ui/forms`:
   - `FormInput`, `FormSelect`, `FormTextarea`, `FormCheckbox`, `FormRadioGroup`, `FormSwitch`
   - `FormField` (Controller wrapper for custom fields)
