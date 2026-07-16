@@ -46,6 +46,8 @@ coverage/
 # Prisma
 apps/api/prisma/migrations/
 generated/
+apps/api/generated
+apps/api/src/generated/
 
 # Docker
 .docker/
