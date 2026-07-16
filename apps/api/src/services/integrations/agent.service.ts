@@ -13,11 +13,9 @@ import { fetchJson } from './http-client.js';
 import { analyzeDataSource, type DataSourceAnalysis } from './analyzer.js';
 import {
   AuditAction,
-  type CreateDataSourceRequestDTO,
   type DataSourceDTO,
   type DataSourceFetchResultDTO,
   type DataSourceAuthType,
-  type UpdateDataSourceRequestDTO,
 } from '@vestara/types';
 import type { CreateDataSourceInput, UpdateDataSourceInput } from '@vestara/validation';
 

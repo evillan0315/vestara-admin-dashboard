@@ -11,10 +11,11 @@ import {
   Chip,
   Avatar,
 } from '@mui/material';
-import { useState, useEffect, type ReactElement } from 'react';
-import { User as UserIcon, Shield, Mail, KeyRound } from 'lucide-react';
+import { useState, useEffect, useRef, type ReactElement } from 'react';
+import { User as UserIcon, Shield, Mail, KeyRound, Camera } from 'lucide-react';
 import type { UserDTO, UserRole, OrganizationDTO } from '@vestara/types';
 import { colors } from '../../theme/tokens';
+import { uploadImage } from '../../api/upload';
 
 export interface UserFormData {
   firstName: string;
@@ -23,6 +24,7 @@ export interface UserFormData {
   password?: string;
   role: UserRole;
   organizationId?: string;
+  avatarUrl?: string;
 }
 
 interface UserFormDialogProps {
@@ -82,6 +84,9 @@ export function UserFormDialog({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -139,6 +144,27 @@ export function UserFormDialog({
       data.password = formData.password;
     }
     await onSubmit(data);
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingAvatar(true);
+    try {
+      const result = await uploadImage(file);
+      const url = result.data?.url;
+      if (result.success && url) {
+        setFormData((prev) => ({ ...prev, avatarUrl: url }));
+      } else {
+        console.error('Avatar upload failed:', result.error);
+      }
+    } catch (err) {
+      console.error('Avatar upload error:', err);
+    } finally {
+      setUploadingAvatar(false);
+      if (e.target) e.target.value = '';
+    }
   };
 
   const handleChange = (field: keyof UserFormData) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -217,20 +243,51 @@ export function UserFormDialog({
           {/* Avatar Preview (Edit mode) */}
           {isEdit && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-              <Avatar
-                src={user?.avatarUrl || undefined}
-                sx={{
-                  width: 56,
-                  height: 56,
-                  bgcolor: colors.gold,
-                  color: '#0A0F18',
-                  fontWeight: 700,
-                  fontSize: 20,
-                  border: `2px solid ${colors.gold}`,
-                }}
-              >
-                {initials}
-              </Avatar>
+              <Box sx={{ position: 'relative' }}>
+                <Avatar
+                  src={user?.avatarUrl || undefined}
+                  sx={{
+                    width: 56,
+                    height: 56,
+                    bgcolor: colors.gold,
+                    color: '#0A0F18',
+                    fontWeight: 700,
+                    fontSize: 20,
+                    border: `2px solid ${colors.gold}`,
+                  }}
+                >
+                  {initials}
+                </Avatar>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={handleAvatarUpload}
+                  disabled={uploadingAvatar}
+                />
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={() => {
+                    fileInputRef.current?.click();
+                  }}
+                  disabled={uploadingAvatar}
+                  loading={uploadingAvatar}
+                  sx={{
+                    position: 'absolute',
+                    bottom: -4,
+                    right: -4,
+                    minWidth: 32,
+                    width: 32,
+                    height: 32,
+                    borderRadius: '50%',
+                    p: 0,
+                  }}
+                >
+                  <Camera size={14} />
+                </Button>
+              </Box>
               <Box>
                 <Typography sx={{ fontWeight: 600, color: colors.text, fontSize: 14 }}>
                   {formData.firstName} {formData.lastName}

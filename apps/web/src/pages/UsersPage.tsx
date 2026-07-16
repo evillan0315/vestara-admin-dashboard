@@ -1,6 +1,5 @@
 import { Box, Typography, Button, Chip, IconButton, styled, Avatar, Tooltip, Paper } from '@mui/material';
 import {
-  People as PeopleIcon,
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
@@ -27,6 +26,7 @@ import { useToast } from '../components/feedback/Toast';
 import { ConfirmDialog } from '../components/ui/Modal';
 import { useAuth } from '../features/auth/AuthContext';
 import type { UserDTO, UserRole } from '@vestara/types';
+import { UsersFilterChips } from '../features/users/UsersFilterChips';
 
 // ── Styled ──
 
@@ -77,7 +77,11 @@ export function UsersPage(): ReactElement {
   const [sort, setSort] = useState<SortState>({ field: 'createdAt', direction: 'desc' });
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
-  const [search, setSearch] = useState('');
+  // Removed search state as requested
+
+  // Filter state
+  const [roleFilter, setRoleFilter] = useState<UserRole | ''>('');
+  const [statusFilter, setStatusFilter] = useState<boolean | ''>('');
 
   // Selection
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -98,9 +102,11 @@ export function UsersPage(): ReactElement {
   const { data, isLoading, isError, error, refetch } = useUsers({
     page,
     perPage,
-    search: search || undefined,
+    // Removed search as requested
     sort: sort.field,
     order: sort.direction,
+    role: roleFilter || undefined,
+    isActive: statusFilter !== '' ? statusFilter : undefined,
   });
 
   const { data: organizations = [] } = useOrganizations();
@@ -130,8 +136,24 @@ export function UsersPage(): ReactElement {
     setSelectedIds([]);
   }, []);
 
-  const handleSearchChange = useCallback((value: string) => {
-    setSearch(value);
+  // Removed handleSearchChange as requested
+
+  const handleRoleFilterChange = useCallback((role: UserRole | '') => {
+    setRoleFilter(role);
+    setPage(1);
+    setSelectedIds([]);
+  }, []);
+
+  const handleStatusFilterChange = useCallback((status: boolean | '') => {
+    setStatusFilter(status);
+    setPage(1);
+    setSelectedIds([]);
+  }, []);
+
+  const handleClearFilters = useCallback(() => {
+    // Removed setSearch('') as requested
+    setRoleFilter('');
+    setStatusFilter('');
     setPage(1);
     setSelectedIds([]);
   }, []);
@@ -241,14 +263,14 @@ export function UsersPage(): ReactElement {
   const handleExport = useCallback(async () => {
     try {
       setExporting(true);
-      await exportUsersCsv({ search: search || undefined, sort: sort.field, order: sort.direction });
+      await exportUsersCsv({ sort: sort.field, order: sort.direction });
       showSuccess('User export downloaded');
     } catch (err) {
       showError(err instanceof Error ? err.message : 'Export failed');
     } finally {
       setExporting(false);
     }
-  }, [search, sort, showSuccess, showError]);
+  }, [sort, showSuccess, showError]);
 
   // Columns
   const columns: Column<UserDTO>[] = [
@@ -372,46 +394,46 @@ export function UsersPage(): ReactElement {
         </Typography>
       </Box>
 
-      {selectedIds.length > 0 && (
-        <Paper
-          variant="outlined"
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 2,
-            p: 1.5,
-            px: 2,
-            flexWrap: 'wrap',
-            borderColor: 'primary.main',
-          }}
-        >
-          <Typography variant="body2" fontWeight={600}>
-            {selectedIds.length} selected
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-            <Button size="small" startIcon={<CheckCircleIcon />} onClick={() => openBulkConfirm('activate')}>
-              Activate
-            </Button>
-            <Button size="small" startIcon={<BlockIcon />} onClick={() => openBulkConfirm('deactivate')}>
-              Deactivate
-            </Button>
-            <Button
-              size="small"
-              color="error"
-              startIcon={<DeleteIcon />}
-              onClick={() => openBulkConfirm('delete')}
-            >
-              Delete
-            </Button>
-            <Button size="small" onClick={() => setSelectedIds([])}>
-              Clear
-            </Button>
-          </Box>
-        </Paper>
-      )}
+{selectedIds.length > 0 && (
+         <Paper
+           variant="outlined"
+           sx={{
+             display: 'flex',
+             alignItems: 'center',
+             justifyContent: 'space-between',
+             gap: 2,
+             p: 1.5,
+             px: 2,
+             flexWrap: 'wrap',
+             borderColor: 'primary.main',
+           }}
+         >
+           <Typography variant="body2" fontWeight={600}>
+             {selectedIds.length} selected
+           </Typography>
+           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+             <Button size="small" startIcon={<CheckCircleIcon />} onClick={() => openBulkConfirm('activate')}>
+               Activate
+             </Button>
+             <Button size="small" startIcon={<BlockIcon />} onClick={() => openBulkConfirm('deactivate')}>
+               Deactivate
+             </Button>
+             <Button
+               size="small"
+               color="error"
+               startIcon={<DeleteIcon />}
+               onClick={() => openBulkConfirm('delete')}
+             >
+               Delete
+             </Button>
+             <Button size="small" onClick={() => setSelectedIds([])}>
+               Clear
+             </Button>
+           </Box>
+         </Paper>
+       )}
 
-      <DataTable<UserDTO>
+       <DataTable<UserDTO>
         columns={columns}
         rows={users}
         keyExtractor={(row) => row.id}
@@ -426,14 +448,6 @@ export function UsersPage(): ReactElement {
         pagination={paginationState}
         onPageChange={handlePageChange}
         onPerPageChange={setPerPage}
-        searchable
-        searchValue={search}
-        onSearchChange={handleSearchChange}
-        searchPlaceholder="Search users by name or email..."
-        title="All Users"
-        emptyIcon={<PeopleIcon sx={{ fontSize: 48 }} />}
-        emptyTitle="No users found"
-        emptyDescription="No users match your search criteria."
         actions={
           <>
             <Button
@@ -444,6 +458,16 @@ export function UsersPage(): ReactElement {
             >
               Export
             </Button>
+            <Box sx={{ ml: 2 }}>
+              <UsersFilterChips
+                roleFilter={roleFilter}
+                statusFilter={statusFilter}
+                onRoleFilterChange={handleRoleFilterChange}
+                onStatusFilterChange={handleStatusFilterChange}
+                onClearFilters={handleClearFilters}
+                hasActiveFilters={!!roleFilter || statusFilter !== ''}
+              />
+            </Box>
             <Button
               variant="contained"
               startIcon={<AddIcon />}

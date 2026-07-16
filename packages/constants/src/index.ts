@@ -189,3 +189,27 @@ export const REGEX = {
   SLUG: /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
   PHONE: /^\+?[\d\s()-]{7,20}$/,
 } as const;
+
+// ── User Constants ─────────────────────────────
+
+export const USER_ROLES = {
+  SUPER_ADMIN: 'super_admin',
+  ADMIN: 'admin',
+  MODERATOR: 'moderator',
+  SUPPORT: 'support',
+} as const;
+
+export const USER_ROLE_OPTIONS = [
+  { value: USER_ROLES.SUPER_ADMIN, label: 'Super Admin' },
+  { value: USER_ROLES.ADMIN, label: 'Admin' },
+  { value: USER_ROLES.MODERATOR, label: 'Moderator' },
+  { value: USER_ROLES.SUPPORT, label: 'Support' },
+] as const;
+
+export const USER_STATUS_OPTIONS = [
+  { value: true, label: 'Active', icon: 'check-circle', color: 'success' },
+  { value: false, label: 'Inactive', icon: 'block', color: 'warning' },
+] as const;
+
+export const USER_DEFAULT_PAGE_SIZE = 20;
+export const USER_MAX_PAGE_SIZE = 100;
