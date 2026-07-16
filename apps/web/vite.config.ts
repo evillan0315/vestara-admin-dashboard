@@ -122,6 +122,16 @@ export default defineConfig({
         target: 'http://localhost:5000',
         changeOrigin: true,
       },
+      // Socket.IO real-time server is attached at `/socket.io` on the same
+      // Express host. Forward it (with WebSocket upgrade) so the dev client's
+      // `window.location.origin` handshake reaches the WS server instead of
+      // 404-ing at the Vite dev server — otherwise LiveBadge flickers to
+      // ERROR/OFFLINE in local development.
+      '/socket.io': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        ws: true,
+      },
     },
   },
   build: {
