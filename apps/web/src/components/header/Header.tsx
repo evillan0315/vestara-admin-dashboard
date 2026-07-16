@@ -9,12 +9,14 @@ import {
   useTheme,
   alpha,
 } from "@mui/material";
-import { Search, Menu } from "lucide-react";
+import { Search, Menu, PanelLeftClose, PanelLeft } from "lucide-react";
 import { useAuth } from "../../features/auth/AuthContext";
 import { useLiveNotifications } from "../../features/realtime/LiveNotificationsProvider";
+import { useThemeContext } from "../../providers/ThemeProvider";
 import HeaderActions from "./HeaderActions";
 import NotificationPopover from "./NotificationPopover";
 import MessagePopover from "./MessagePopover";
+import CalendarPopover from "../../features/calendar/CalendarPopover";
 import type { Message } from "./types";
 
 interface HeaderProps {
@@ -51,6 +53,7 @@ export default function Header({
 }: HeaderProps): JSX.Element {
   const theme = useTheme();
   const { primary, text, divider, background } = theme.palette;
+  const { sidebarCollapsed, toggleSidebar } = useThemeContext();
 
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
@@ -59,7 +62,6 @@ export default function Header({
   const [notifAnchor, setNotifAnchor] = useState<HTMLElement | null>(null);
   const [msgAnchor, setMsgAnchor] = useState<HTMLElement | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [dateRange, setDateRange] = useState("May 18 – Jun 18, 2026");
 
   const handleLogout = async () => {
     await logout();
@@ -81,14 +83,6 @@ export default function Header({
 
   const handleRefresh = async () => {
     onRefresh?.();
-  };
-
-  const handleDateRangeClick = () => {
-    setDateRange((prev) =>
-      prev === "May 18 – Jun 18, 2026"
-        ? "Jun 18 – Jul 18, 2026"
-        : "May 18 – Jun 18, 2026",
-    );
   };
 
   const handleMessageClick = (message: Message) => {
@@ -126,6 +120,21 @@ export default function Header({
           sx={{ mr: 0.5, display: { lg: "none" }, color: text.primary }}
         >
           <Menu size={22} />
+        </IconButton>
+
+        <IconButton
+          color="inherit"
+          aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          onClick={toggleSidebar}
+          sx={{
+            mr: 0.5,
+            display: { xs: "none", lg: "inline-flex" },
+            color: text.primary,
+            transition: "transform .2s ease",
+            "&:hover": { transform: "scale(1.05)" },
+          }}
+        >
+          {sidebarCollapsed ? <PanelLeft size={22} /> : <PanelLeftClose size={22} />}
         </IconButton>
 
         <Box sx={{ minWidth: 0 }}>
@@ -196,11 +205,12 @@ export default function Header({
         </Box>
       </Box>
 
-      <Box sx={{ flexShrink: 0 }}>
+      <Box sx={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 1.5 }}>
+        <CalendarPopover />
+
         {isAuthenticated ? (
           <>
             <HeaderActions
-              dateRange={dateRange}
               notificationCount={unreadCount}
               messageCount={messages.filter((m) => m.unread).length}
               refreshing={refreshing}
@@ -208,7 +218,6 @@ export default function Header({
               onRefresh={handleRefresh}
               onNotificationsClick={handleNotifClick}
               onMessagesClick={handleMsgClick}
-              onDateRangeClick={handleDateRangeClick}
             />
 
             <NotificationPopover

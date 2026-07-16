@@ -1,7 +1,6 @@
 export { default as Header } from "./Header";
 export { default as HeaderActions } from "./HeaderActions";
 export { default as HeaderIconButton } from "./HeaderIconButton";
-export { default as DateRangeButton } from "./DateRangeButton";
 export { default as RefreshButton } from "./RefreshButton";
 export { default as UserMenu } from "./UserMenu";
 export { default as NotificationPopover } from "./NotificationPopover";

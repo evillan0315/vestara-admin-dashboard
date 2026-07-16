@@ -2,8 +2,10 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { Box, Drawer, useTheme } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import type { ReactNode } from "react";
+import { useLocation } from "react-router-dom";
 import Sidebar from "../components/layout/Sidebar";
 import Header from "../components/header/Header";
+import { getRouteTitle } from "./routeTitles";
 import { ThemeSettings } from "../theme/ThemeSettings";
 import { useThemeContext } from "../providers/ThemeProvider";
 import { useLiveNotifications } from "../features/realtime/LiveNotificationsProvider";
@@ -26,6 +28,8 @@ export default function DashboardLayout({
 }: DashboardLayoutProps) {
   const theme = useTheme();
   const themeCtx = useThemeContext();
+  const location = useLocation();
+  const { title: routeTitle, subtitle: routeSubtitle } = getRouteTitle(location.pathname);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [globalSearchOpen, setGlobalSearchOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
@@ -137,8 +141,8 @@ export default function DashboardLayout({
         }}
       >
         <Header
-          title={title}
-          subtitle={subtitle ?? ""}
+          title={title ?? routeTitle}
+          subtitle={subtitle ?? routeSubtitle}
           onMenuToggle={isHidden ? undefined : handleDrawerToggle}
           showSearch
           showNotifications

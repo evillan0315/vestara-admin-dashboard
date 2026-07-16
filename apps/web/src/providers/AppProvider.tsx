@@ -6,6 +6,7 @@ import { AuthProvider } from '../features/auth/AuthContext';
 import { ToastProvider } from '../components/feedback/Toast';
 import { WebSocketProvider } from '../websocket/WebSocketProvider';
 import { LiveNotificationsProvider } from '../features/realtime/LiveNotificationsProvider';
+import { DateRangeProvider } from '../features/calendar';
 
 interface AppProviderProps {
   children: ReactNode;
@@ -17,11 +18,13 @@ export function AppProvider({ children }: AppProviderProps) {
       <QueryProvider>
         <AuthProvider>
           <ThemeProvider>
-            <ToastProvider>
-              <WebSocketProvider>
-                <LiveNotificationsProvider>{children}</LiveNotificationsProvider>
-              </WebSocketProvider>
-            </ToastProvider>
+              <ToastProvider>
+                <WebSocketProvider>
+                  <LiveNotificationsProvider>
+                    <DateRangeProvider>{children}</DateRangeProvider>
+                  </LiveNotificationsProvider>
+                </WebSocketProvider>
+              </ToastProvider>
           </ThemeProvider>
         </AuthProvider>
       </QueryProvider>

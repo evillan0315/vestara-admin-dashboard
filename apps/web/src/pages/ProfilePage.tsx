@@ -195,10 +195,14 @@ export default function ProfilePage() {
   const location = useLocation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Derive initial tab from path
-  const getInitialTab = (): ProfileTabValue => getProfileTabFromPath(location.pathname);
+  // Derive initial tab from path, and keep it in sync when the header
+  // UserMenu navigates between profile sub-routes (e.g. /security, /activity).
+  const initialTab = getProfileTabFromPath(location.pathname);
+  const [tab, setTab] = useState<ProfileTabValue>(initialTab);
 
-  const [tab, setTab] = useState<ProfileTabValue>(getInitialTab());
+  useEffect(() => {
+    setTab(getProfileTabFromPath(location.pathname));
+  }, [location.pathname]);
 
   // ── General form state ─────────────────────
   const [firstName, setFirstName] = useState('');

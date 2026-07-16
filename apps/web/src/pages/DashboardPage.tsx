@@ -1,15 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import {
   Box,
   Typography,
   Grid,
   Paper,
   styled,
-  ToggleButton,
-  ToggleButtonGroup,
   Skeleton,
   useTheme,
-  type ToggleButtonGroupProps,
 } from '@mui/material';
 import { LineChart, PieChart, BarChart } from '@mui/x-charts';
 import {
@@ -27,8 +24,8 @@ import { useAuth } from '../features/auth/AuthContext';
 import { useLiveDashboard } from '../features/realtime/useLiveDashboard';
 import LiveBadge from '../features/realtime/LiveBadge';
 import { useOrganization } from '../features/organizations/hooks';
+import { useDateRange } from '../features/calendar';
 import {
-  RANGE_OPTIONS,
   toActivityItem,
   useDailySeries,
   useDistribution,
@@ -98,8 +95,8 @@ function EmptyChart({ height = 280 }: { height?: number }) {
 
 export function DashboardPage() {
   const theme = useTheme();
-  const [range, setRange] = useState<number>(14);
   const { user } = useAuth();
+  const { range: dateRange, rangeDays } = useDateRange();
 
   // Refresh dashboard data in real time as org-scoped audit events arrive.
   useLiveDashboard();
@@ -113,15 +110,12 @@ export function DashboardPage() {
   const settingsQuery = useSettings();
   const auditQuery = useAuditLogs({ perPage: 6, sort: 'createdAt', order: 'desc' });
 
-  const { startDate, endDate } = useMemo(() => {
-    const end = new Date();
-    const start = new Date();
-    start.setDate(start.getDate() - (range - 1));
-    start.setHours(0, 0, 0, 0);
-    return { startDate: start.toISOString(), endDate: end.toISOString() };
-  }, [range]);
+  const { startDate, endDate } = useMemo(
+    () => ({ startDate: dateRange.startDate, endDate: dateRange.endDate }),
+    [dateRange.startDate, dateRange.endDate],
+  );
 
-  const analytics = useAuditActivity(startDate, endDate, range);
+  const analytics = useAuditActivity(startDate, endDate, rangeDays);
   const logs = analytics.logs;
 
   const totalUsers = usersAll.data?.meta?.total ?? 0;
@@ -130,7 +124,7 @@ export function DashboardPage() {
   const settingsCount = Object.keys(settingsQuery.data?.data?.settings ?? {}).length;
 
   // Trend: current window audit events vs. the previous equal-length window.
-  const prevRange = useMemo(() => getPreviousRange(range, endDate), [range, endDate]);
+  const prevRange = useMemo(() => getPreviousRange(rangeDays, endDate), [rangeDays, endDate]);
   const prevCountQuery = useAuditCount(prevRange.startDate, prevRange.endDate);
   const currentEvents = analytics.total;
   const prevEvents = prevCountQuery.data ?? 0;
@@ -139,15 +133,11 @@ export function DashboardPage() {
 
   const activityItems = (auditQuery.data?.data ?? []).map(toActivityItem);
 
-  const daily = useDailySeries(logs, range, endDate);
+  const daily = useDailySeries(logs, rangeDays, endDate);
   const byAction = useDistribution(logs, (l) => l.action, actionLabelLookup, 6);
   const byEntity = useDistribution(logs, (l) => l.entity, entityLabelLookup);
 
   const chartsLoading = analytics.loading;
-
-  const handleRangeChange: ToggleButtonGroupProps['onChange'] = (_event, newRange) => {
-    if (newRange !== null) setRange(newRange);
-  };
 
   return (
     <DashboardContainer>
@@ -207,7 +197,7 @@ export function DashboardPage() {
             title="Audit Events"
             value={currentEvents}
             change={eventsChange}
-            changeLabel={`vs. previous ${range}d`}
+            changeLabel={`vs. previous ${rangeDays}d`}
             icon={<AssessmentIcon />}
             iconColor="info"
             loading={chartsLoading}
@@ -228,19 +218,16 @@ export function DashboardPage() {
                   Events per day across the selected period
                 </Typography>
               </Box>
-              <ToggleButtonGroup
-                size="small"
-                value={range}
-                exclusive
-                onChange={handleRangeChange}
-                aria-label="date range"
+              <Box
+                sx={{
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  color: 'text.secondary',
+                  px: 1,
+                }}
               >
-                {RANGE_OPTIONS.filter((o) => o <= 30).map((option) => (
-                  <ToggleButton key={option} value={option}>
-                    {option}d
-                  </ToggleButton>
-                ))}
-              </ToggleButtonGroup>
+                Last {rangeDays} {rangeDays === 1 ? 'day' : 'days'}
+              </Box>
             </ChartTitleRow>
             {chartsLoading ? (
               <ChartSkeleton height={300} />

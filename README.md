@@ -2156,7 +2156,7 @@ Future licensing terms may change as the platform evolves.
 | User Profile (name, avatar, password, email change, account deletion) | 🟢 Complete (backend + frontend) |
 | Profile Navigation (6 tabs: Overview, Security, Permissions, Activity, Preferences, Sessions) | 🟢 Complete (shared `profileTabs` config; header `UserMenu` shortcuts + dedicated routes; dark-luxury `theme.palette` header chrome) |
 | User Preferences (Modal) | 🟢 Complete (Appearance, Notifications, Localization) |
-| Global Search (Cmd/Ctrl+K) | 🟢 Complete |
+| Global Search (Cmd/Ctrl+K) | 🟢 Complete (data-driven, live user search, route-scoped) |
 | Sidebar Navigation (platform-domain categories) | 🟢 Complete (Wallet & Payments, Marketplace, Bookings, Rewards, AI Services, Management, System, Security; roadmap modules marked "Soon") |
 | Audit Logs / System Logs | 🟢 API + Frontend Page |
 | CI/CD (GitHub Actions) | 🟢 API Deploy Workflow |
@@ -2188,7 +2188,7 @@ Future licensing terms may change as the platform evolves.
 - ✅ Form Validation (react-hook-form + Zod via useFormWithZod)
 - ✅ File Manager (browser, upload, folders, preview, rename, move, delete)
 - ✅ User Preferences Modal (Appearance, Notifications, Localization)
-- ✅ Global Search Dialog (Cmd/Ctrl+K with keyboard navigation)
+- ✅ Global Search Dialog (Cmd/Ctrl+K — data-driven, live user search, route-scoped All/This Page toggle)
 - ✅ Notifications (wired to audit-logs API, real-time unread count)
 - ✅ BigInt serialization fix (File Manager 500 error resolved)
 - ✅ Auth tests: 11/11 reliable (FK cleanup order, timeout adjusted)
