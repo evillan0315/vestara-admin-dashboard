@@ -2143,23 +2143,24 @@ Future licensing terms may change as the platform evolves.
 | Category | Status |
 |----------|--------|
 | Development | 🚧 Active |
-| Current Phase | Phase 1 – Admin Dashboard MVP (Phases 1–17 coverage) |
+| Current Phase | Phase 1 – Admin Dashboard MVP (Phases 1–22 coverage) |
 | API (Express) | 🟢 Deployed to Vercel |
 | Frontend (React) | 🟢 Deployed to Vercel |
 | OAuth (Google + GitHub) | 🟢 Configured + Working |
-| User Management (CRUD) | 🟢 Complete (backend + frontend) with server-side filtering for role and status |
+| User Management (CRUD) | 🟢 Complete (backend + frontend) with server-side filtering for role and status, page refactored into focused sub-components |
 | Roles & Permissions (RBAC) | 🟢 Implemented (enum-based) |
-| Data Table | 🟢 Reusable, sort/filter/paginate/select with enhanced filtering capabilities |
-| Organizations | 🟢 Complete (list/create/edit + DataTable UI) |
-| Application Settings | 🟢 Complete (backend + frontend) |
-| File Manager | 🟢 Complete (backend + frontend with upload, folders, preview) and avatar upload integration |
+| Data Table | 🟢 Reusable, sort/filter/paginate/select with enhanced filtering capabilities; all consuming pages refactored into <600-line sub-components |
+| Organizations | 🟢 Complete (list/create/edit + DataTable UI), refactored into hook + dialog + columns |
+| Audit Logs / System Logs | 🟢 API + Frontend Page, refactored into hook + columns |
+| File Manager | 🟢 Complete (backend + frontend with upload, folders, preview) and avatar upload integration; refactored into 7 focused files |
 | User Profile (name, avatar, password change) | 🟢 Complete (backend + frontend) with avatar upload integration |
 | Profile Navigation (6 tabs: Overview, Security, Permissions, Activity, Preferences, Sessions) | 🟢 Complete (shared `profileTabs` config; header `UserMenu` shortcuts + dedicated routes; dark-luxury `theme.palette` header chrome) |
 | User Preferences (Modal) | 🟢 Complete (Appearance, Notifications, Localization) |
 | Global Search (Cmd/Ctrl+K) | 🟢 Complete (data-driven, live user search, route-scoped) |
 | Sidebar Navigation (platform-domain categories) | 🟢 Complete (Wallet & Payments, Marketplace, Bookings, Rewards, AI Services, Management, System, Security; roadmap modules marked "Soon") |
-| Audit Logs / System Logs | 🟢 API + Frontend Page |
 | CI/CD (GitHub Actions) | 🟢 API Deploy Workflow |
+| Reporting (CSV/Excel/PDF) | 🟢 Complete (backend + frontend, 4 report types) |
+| Real-time Features (WebSocket, live notifications) | 🟢 Complete (Phases 21-22 — WebSocket + live dashboard + presence) |
 | Reusable Form Components | 🟢 Complete (14 components + Zod) |
 | Feedback Components | 🟢 Complete (Toast queue, Loading, EmptyState, useConfirm) |
 | Mobile | 📋 Planned |
@@ -2198,9 +2199,10 @@ Future licensing terms may change as the platform evolves.
 - ✅ Floating Chat Widget (FAB, keyboard shortcut `Cmd+Shift+K`, page-aware suggestions, minimized bar, full-page nav)
 - ✅ Sidebar Navigation (reorganized into platform-domain categories: Wallet & Payments, Marketplace, Bookings, Rewards, AI Services, Management, System, Security; roadmap modules marked "Soon")
 - 🟡 Security Hardening (rate limiting, CSRF, password policies)
-- 📋 Reporting (CSV/Excel/PDF export)
-- 📋 Real-time features (WebSocket, live notifications)
+- ✅ Reporting (CSV/Excel/PDF export)
+- ✅ Real-time features (WebSocket, live notifications)
 - ✅ Testing & Performance optimization with optimistic updates for improved user experience
+- ✅ Large page refactoring (UsersPage 790→149, FileManagerPage 1,231→187, ReportsPage 627→111, OrganizationsPage 420→74, SystemLogsPage 234→56 lines) — all pages <600 lines with extracted hooks + sub-components
 
 ---
 
