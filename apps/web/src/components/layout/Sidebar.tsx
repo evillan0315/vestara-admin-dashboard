@@ -1,111 +1,62 @@
-import { type JSX, useState, useEffect } from "react";
+/**
+ * Sidebar
+ *
+ * Fully theme-aware sidebar with support for:
+ *  - Dynamic width from density + sidebarCollapsed
+ *  - Icon-only mode when collapsed or variant === 'compact'
+ *  - Tooltip on hover for icon-only items
+ *  - Hidden variant (renders nothing — the outer layout removes the container)
+ *  - Primary color, font family, font scale, borderRadiusScale, contrastLevel
+ *    from ThemeContext
+ *  - No hardcoded color tokens — everything via MUI theme.palette
+ */
+
+import { type JSX } from 'react';
 import {
   Box,
   Typography,
-  Chip,
-  Skeleton,
-} from "@mui/material";
-import { Activity } from "lucide-react";
-import { useLocation, useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../../features/auth/AuthContext";
-import { colors } from "../../theme/tokens";
-import Logo from "../common/Logo";
-import { navGroups, type NavItem } from "../../layouts/navConfig";
+  Tooltip,
+  useTheme,
+} from '@mui/material';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../features/auth/AuthContext';
+import { useSidebarConfig } from '../../features/sidebar/useSidebarConfig';
+import { navGroups, type NavItem } from '../../layouts/navConfig';
+import Logo from '../common/Logo';
+import ApiStatusWidget from './ApiStatusWidget';
 
-// API Status types
-interface ApiStatus {
-  status: 'healthy' | 'error' | 'loading';
-  latency?: number;
-  error?: string;
-  url?: string;
-  version?: string;
-}
-
-// Utility functions for API status
-function isApiLoading(status: ApiStatus): boolean {
-  return status.status === 'loading';
-}
-
-function isApiError(status: ApiStatus): boolean {
-  return status.status === 'error';
-}
-
-function isApiHealthy(status: ApiStatus): boolean {
-  return status.status === 'healthy';
-}
-
-export const SIDEBAR_WIDTH = 264;
+export const SIDEBAR_WIDTH = 264; // kept for external consumers that may reference it
 
 export interface SidebarProps {
   onClose?: () => void;
 }
 
-export default function Sidebar({ onClose }: SidebarProps): JSX.Element {
+export default function Sidebar({ onClose }: SidebarProps): JSX.Element | null {
+  const theme = useTheme();
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const cfg = useSidebarConfig();
 
-  // API Status State
-  const [apiStatus, setApiStatus] = useState<ApiStatus>({
-    status: 'loading',
-    url: 'vestara-admin-api.vercel.app',
-  });
+  // If the variant is 'hidden', render nothing (the outer DashboardLayout
+  // also removes the container, this is a safety net).
+  if (cfg.hidden) return null;
 
-  // Fetch API status
-  useEffect(() => {
-    const fetchApiStatus = async () => {
-      try {
-        const startTime = Date.now();
-        const response = await fetch('https://vestara-admin-api.vercel.app/api/v1/health', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'User-Agent': 'Vestara-Admin-Dashboard/1.0',
-          },
-        });
-        const endTime = Date.now();
-        const latency = endTime - startTime;
+  const isDark = theme.palette.mode === 'dark';
+  const primaryMain = theme.palette.primary.main;
+  const primaryContrast = theme.palette.primary.contrastText;
 
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        setApiStatus({
-          status: 'healthy',
-          latency,
-          url: new URL(response.url).hostname,
-          version: data.version || '1.0.0',
-        });
-      } catch (error) {
-        setApiStatus({
-          status: 'error',
-          error: error instanceof Error ? error.message : 'Connection failed',
-          url: 'vestara-admin-api.vercel.app',
-        });
-      }
-    };
-
-    // Initial fetch
-    fetchApiStatus();
-
-    // Poll every 30 seconds
-    const interval = setInterval(fetchApiStatus, 30000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  /** Filter nav items based on the current user's role */
+  /** Filter nav groups by role. */
   const visibleGroups = navGroups
-    .map((group) => ({
-      ...group,
-      items: group.items.filter((item) => {
+    .map((g) => ({
+      ...g,
+      items: g.items.filter((item) => {
         if (!item.allowedRoles) return true;
         if (!user?.role) return false;
         return item.allowedRoles.includes(user.role);
       }),
     }))
-    .filter((group) => group.items.length > 0);
+    .filter((g) => g.items.length > 0);
 
   const handleNavClick = (item: NavItem) => {
     if (item.soon) return;
@@ -113,329 +64,255 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element {
     onClose?.();
   };
 
+  // Shared style for nav item wrapper
+  const navItemSx = (item: NavItem, active: boolean) => ({
+    display: 'flex',
+    alignItems: 'center',
+    gap: cfg.iconOnly ? 0 : 1.5,
+    px: cfg.iconOnly ? 1.25 : 1.25,
+    py: cfg.iconOnly ? 1 : 1,
+    borderRadius: `${Math.round(10 * cfg.borderRadiusScale)}px`,
+    cursor: item.soon ? 'default' : 'pointer',
+    mb: 0.25,
+    color: item.soon
+      ? theme.palette.text.disabled
+      : active
+        ? primaryContrast
+        : theme.palette.text.secondary,
+    bgcolor: active ? primaryMain : 'transparent',
+    fontWeight: active ? 700 : 500,
+    opacity: item.soon ? 0.6 : 1,
+    transition: 'background-color 0.15s ease, color 0.15s ease',
+    '&:hover': {
+      bgcolor: item.soon
+        ? 'transparent'
+        : active
+          ? primaryMain
+          : isDark
+            ? 'rgba(255,255,255,0.05)'
+            : 'rgba(0,0,0,0.05)',
+      color: item.soon
+        ? theme.palette.text.disabled
+        : active
+          ? primaryContrast
+          : theme.palette.text.primary,
+    },
+  });
+
+  // Font size helper scaled by fontScale
+  const s = (px: number) => `${Math.round(px * cfg.fontScale)}px`;
+
+  // ── Render ──
+
   return (
     <Box
       component="aside"
       sx={{
-        width: "100%",
-        height: "100vh",
-        position: "sticky",
+        width: cfg.width,
+        height: '100vh',
+        position: 'sticky',
         top: 0,
-        bgcolor: colors.sidebar,
-        borderRight: { lg: `1px solid ${colors.border}` },
-        display: "flex",
-        flexDirection: "column",
+        bgcolor: theme.palette.background.paper,
+        borderRight: `1px solid ${theme.palette.divider}`,
+        display: 'flex',
+        flexDirection: 'column',
         zIndex: 20,
+        transition: 'width 0.2s ease',
       }}
     >
-      {/* Branding Logo Section */}
+      {/* ── Logo ── */}
       <Box
         component={Link}
         to="/"
         onClick={() => onClose?.()}
         sx={{
-          px: 2.5,
-          py: 2,
-          display: "flex",
-          justifyContent: "center",
-          textDecoration: "none",
-          color: "inherit",
-          cursor: "pointer",
-          userSelect: "none",
-          borderBottom: `1px solid ${colors.border}`,
-          transition: "opacity .2s ease, transform .2s ease",
-          "&:hover": { opacity: 0.92 },
-          "&:active": { transform: "scale(0.98)" },
+          px: cfg.iconOnly ? 1 : 2.5,
+          py: cfg.iconOnly ? 1.5 : 2,
+          display: 'flex',
+          justifyContent: 'center',
+          textDecoration: 'none',
+          color: 'inherit',
+          cursor: 'pointer',
+          userSelect: 'none',
+          borderBottom: `1px solid ${theme.palette.divider}`,
+          transition: 'opacity 0.2s ease, transform 0.2s ease',
+          '&:hover': { opacity: 0.92 },
+          '&:active': { transform: 'scale(0.98)' },
         }}
       >
-        <Logo orientation="vertical" size={62} />
+        <Logo
+          collapsed={cfg.iconOnly}
+          orientation="vertical"
+          size={cfg.iconOnly ? 36 : 62}
+        />
       </Box>
 
-      {/* Navigation Groups */}
+      {/* ── Navigation groups ── */}
       <Box
         className="scrollbar-none"
-        sx={{ flex: 1, overflowY: "auto", px: 1.75, pb: 2 }}
+        sx={{
+          flex: 1,
+          overflowY: 'auto',
+          px: cfg.iconOnly ? 0.75 : 1.75,
+          pb: 2,
+        }}
       >
         {visibleGroups.map((group) => (
           <Box key={group.title} sx={{ mb: 1.5 }}>
-            <Typography
-              sx={{
-                fontSize: 10.5,
-                fontWeight: 700,
-                letterSpacing: "0.12em",
-                color: colors.muted,
-                px: 1.25,
-                pt: 1.5,
-                pb: 0.75,
-              }}
-            >
-              {group.title}
-            </Typography>
+            {/* Group title — hidden in icon-only mode */}
+            {!cfg.iconOnly && (
+              <Typography
+                sx={{
+                  fontSize: s(10.5),
+                  fontWeight: 700,
+                  letterSpacing: '0.12em',
+                  color: theme.palette.text.disabled,
+                  px: 1.25,
+                  pt: 1.5,
+                  pb: 0.75,
+                }}
+              >
+                {group.title}
+              </Typography>
+            )}
+
             {group.items.map((item) => {
               const active = pathname === item.path;
               const Icon = item.icon;
-              return (
+
+              const content = (
                 <Box
                   key={item.path}
                   onClick={() => handleNavClick(item)}
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1.5,
-                    px: 1.25,
-                    py: 1,
-                    borderRadius: "10px",
-                    cursor: item.soon ? "default" : "pointer",
-                    mb: 0.25,
-                    color: item.soon
-                      ? colors.muted
-                      : active
-                        ? "#0A0F18"
-                        : colors.secondary,
-                    bgcolor: active ? colors.gold : "transparent",
-                    fontWeight: active ? 700 : 500,
-                    opacity: item.soon ? 0.6 : 1,
-                    transition: "background-color .15s ease, color .15s ease",
-                    "&:hover": {
-                      bgcolor: item.soon
-                        ? "transparent"
-                        : active
-                          ? colors.gold
-                          : "rgba(255,255,255,0.05)",
-                      color: item.soon
-                        ? colors.muted
-                        : active
-                          ? "#0A0F18"
-                          : colors.text,
-                    },
-                  }}
+                  sx={navItemSx(item, active)}
                 >
-                  <Icon size={17} strokeWidth={2} />
-                  <Typography
-                    sx={{ fontSize: 13.5, fontWeight: "inherit", flex: 1 }}
-                  >
-                    {item.label}
-                  </Typography>
-                  {item.soon ? (
-                    <Box
+                  <Icon
+                    size={cfg.iconOnly ? 22 : 17}
+                    strokeWidth={active ? 2.5 : 2}
+                  />
+                  {!cfg.iconOnly && (
+                    <Typography
                       sx={{
-                        fontSize: 9.5,
-                        fontWeight: 700,
-                        letterSpacing: "0.04em",
-                        textTransform: "uppercase",
-                        borderRadius: "999px",
-                        px: 0.8,
-                        py: 0.2,
-                        bgcolor: "rgba(255,255,255,0.06)",
-                        color: colors.muted,
-                        border: `1px solid ${colors.border}`,
+                        fontSize: s(13.5),
+                        fontWeight: 'inherit',
+                        flex: 1,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
                       }}
                     >
-                      Soon
-                    </Box>
-                  ) : (
-                    item.badge !== undefined && (
+                      {item.label}
+                    </Typography>
+                  )}
+
+                  {/* "Soon" badge or numeric badge */}
+                  {!cfg.iconOnly && (
+                    item.soon ? (
                       <Box
                         sx={{
-                          fontSize: 11,
+                          fontSize: s(9.5),
+                          fontWeight: 700,
+                          letterSpacing: '0.04em',
+                          textTransform: 'uppercase',
+                          borderRadius: '999px',
+                          px: 0.8,
+                          py: 0.2,
+                          bgcolor: isDark
+                            ? 'rgba(255,255,255,0.06)'
+                            : 'rgba(0,0,0,0.06)',
+                          color: theme.palette.text.disabled,
+                          border: `1px solid ${theme.palette.divider}`,
+                        }}
+                      >
+                        Soon
+                      </Box>
+                    ) : item.badge !== undefined ? (
+                      <Box
+                        sx={{
+                          fontSize: s(11),
                           fontWeight: 700,
                           minWidth: 20,
-                          textAlign: "center",
-                          borderRadius: "999px",
+                          textAlign: 'center',
+                          borderRadius: '999px',
                           px: 0.6,
                           py: 0.1,
                           bgcolor: active
-                            ? "rgba(10,15,24,0.2)"
-                            : "rgba(216,164,65,0.15)",
-                          color: active ? "#0A0F18" : colors.gold,
+                            ? `${primaryContrast}20`
+                            : `${primaryMain}20`,
+                          color: active ? primaryContrast : primaryMain,
                         }}
                       >
                         {item.badge}
                       </Box>
-                    )
+                    ) : null
                   )}
                 </Box>
+              );
+
+              // In icon-only mode, wrap in a Tooltip
+              return cfg.iconOnly ? (
+                <Tooltip
+                  key={item.path}
+                  title={item.label}
+                  placement="right"
+                  arrow
+                >
+                  {content}
+                </Tooltip>
+              ) : (
+                <div key={item.path}>{content}</div>
               );
             })}
           </Box>
         ))}
       </Box>
 
-      {/* Footer - Server API Status & Logout */}
-      <Box sx={{ borderTop: `1px solid ${colors.border}`, px: 2, py: 1.5 }}>
-        {/* Server API Status */}
+      {/* ── Footer: API health widget + info ── */}
+      {!cfg.iconOnly && (
         <Box
           sx={{
-            mb: 2,
-            p: 1.5,
-            borderRadius: "10px",
-            bgcolor: colors.cardAlt,
-            border: `1px solid ${colors.border}`,
+            borderTop: `1px solid ${theme.palette.divider}`,
+            px: 2,
+            py: 1.5,
           }}
         >
-          <Typography
-            sx={{
-              fontSize: 11.5,
-              fontWeight: 700,
-              color: colors.muted,
-              mb: 1,
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-            }}
-          >
-            Server API Status
-          </Typography>
+          <ApiStatusWidget />
+        </Box>
+      )}
 
-          {/* API Status Indicator */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-            {isApiLoading(apiStatus) ? (
-              <>
-                <Activity size={16} color={colors.info} className="animate-pulse" />
-                <Typography sx={{ fontSize: 12, color: colors.info, fontWeight: 600 }}>
-                  Checking...
-                </Typography>
-              </>
-            ) : isApiError(apiStatus) ? (
-              <>
-                <Box
-                  sx={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: "50%",
-                    bgcolor: colors.error,
-                    boxShadow: `0 0 6px ${colors.error}80`,
-                  }}
-                />
-                <Typography sx={{ fontSize: 12, color: colors.error, fontWeight: 600 }}>
-                  Disconnected
-                </Typography>
-              </>
-            ) : isApiHealthy(apiStatus) ? (
-              <>
-                <Box
-                  sx={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: "50%",
-                    bgcolor: colors.success,
-                    boxShadow: `0 0 8px ${colors.success}80`,
-                  }}
-                />
-                <Typography sx={{ fontSize: 12, color: colors.success, fontWeight: 600 }}>
-                  Connected
-                </Typography>
-              </>
-            ) : (
-              <>
-                <Box
-                  sx={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: "50%",
-                    bgcolor: colors.warning,
-                    boxShadow: `0 0 6px ${colors.warning}80`,
-                  }}
-                />
-                <Typography sx={{ fontSize: 12, color: colors.warning, fontWeight: 600 }}>
-                  Unknown
-                </Typography>
-              </>
-            )}
-          </Box>
-
-          {/* API Response Details */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-            {isApiLoading(apiStatus) ? (
-              <Skeleton variant="text" width={120} height={16} />
-            ) : isApiError(apiStatus) ? (
-              <Typography sx={{ fontSize: 11, color: colors.error }}>
-                {apiStatus.error}
-              </Typography>
-            ) : isApiHealthy(apiStatus) ? (
-              <>
-                <Chip
-                  label={`v${apiStatus.version || '1.0.0'}`}
-                  size="small"
-                  sx={{
-                    height: 20,
-                    fontSize: '0.65rem',
-                    backgroundColor: colors.success + '20',
-                    color: colors.success,
-                    border: `1px solid ${colors.success}40`,
-                  }}
-                />
-                {apiStatus.latency && (
-                  <Typography sx={{ fontSize: '0.65rem', color: colors.muted }}>
-                    • {apiStatus.latency}ms
-                  </Typography>
-                )}
-              </>
-            ) : (
-              <Typography sx={{ fontSize: 11, color: colors.muted }}>
-                Not initialized
-              </Typography>
-            )}
-          </Box>
-
-          {/* API URL */}
-          <Box
-            sx={{
-              mt: 1,
-              p: 1,
-              borderRadius: "6px",
-              bgcolor: colors.background,
-              border: `1px solid ${colors.border}`,
-            }}
-          >
-            <Typography
-              sx={{
-                fontSize: '0.625rem',
-                color: colors.muted,
-                fontFamily: "'SF Mono', 'Monaco', monospace",
-                textAlign: "center",
-              }}
-            >
-              {apiStatus.url || "vestara-admin-api.vercel.app"}
-            </Typography>
-          </Box>
-
-          {/* Maintenance Mode Status */}
-          {apiStatus.status === 'healthy' && apiStatus.url && (
+      {/* Compact footer – just a thin divider */}
+      {cfg.iconOnly && (
+        <Box
+          sx={{
+            borderTop: `1px solid ${theme.palette.divider}`,
+            px: 1,
+            py: 1,
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
+          <Tooltip title={`${user?.firstName ?? 'User'} ${user?.lastName ?? ''}`} placement="right" arrow>
             <Box
               sx={{
-                mt: 1,
-                p: 1,
-                borderRadius: "6px",
-                bgcolor: colors.background,
-                border: `1px solid ${apiStatus.error ? colors.errorSoft : colors.successSoft}`,
+                width: 28,
+                height: 28,
+                borderRadius: '50%',
+                bgcolor: primaryMain,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: s(11),
+                fontWeight: 700,
+                color: primaryContrast,
+                cursor: 'pointer',
               }}
+              onClick={() => navigate('/profile')}
             >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                <Box
-                  sx={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: "50%",
-                    bgcolor: apiStatus.error ? colors.error : colors.success,
-                    boxShadow: apiStatus.error
-                      ? `0 0 4px ${colors.error}80`
-                      : `0 0 4px ${colors.success}80`,
-                  }}
-                />
-                <Typography
-                  sx={{
-                    fontSize: '0.625rem',
-                    color: apiStatus.error ? colors.error : colors.success,
-                    fontWeight: 600,
-                  }}
-                >
-                  {apiStatus.error ? 'Maintenance Mode Active' : 'Operational'}
-                </Typography>
-              </Box>
+              {(user?.firstName?.[0] ?? 'U').toUpperCase()}
             </Box>
-          )}
+          </Tooltip>
         </Box>
-      </Box>
+      )}
     </Box>
   );
 }

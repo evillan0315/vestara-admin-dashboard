@@ -124,6 +124,15 @@ export const primaryColors: PrimaryColorMap = {
 
 // ── Density spacing multipliers ──
 
+export interface DensitySpacing {
+  sidebarWidth: number;
+  sidebarCollapsedWidth: number;
+  headerHeight: number;
+  padding: number;
+  gap: number;
+  borderRadius: number;
+}
+
 export const densitySpacing = {
   compact: {
     sidebarWidth: 220,
