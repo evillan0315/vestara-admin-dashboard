@@ -220,9 +220,13 @@ Every response includes:
 
 | Header | Value |
 |--------|-------|
+| `Content-Security-Policy` | `script-src 'self'`, `style-src 'self' 'unsafe-inline'`, `img-src 'self' data: blob:` (prod) / `https:` (dev), `connect-src 'self' https: wss:`, `frame-ancestors 'none'` |
 | `X-Content-Type-Options` | `nosniff` |
-| `X-Frame-Options` | `DENY` |
 | `X-XSS-Protection` | `1; mode=block` |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` |
+| `Permissions-Policy` | `camera=(), microphone=(), geolocation=(), payment=()` |
+| `Strict-Transport-Security` | `max-age=31536000; includeSubDomains; preload` (production) |
+| `X-Request-Id` | UUID (generated per request or echoed from client) |
 
 ---
 
@@ -1681,6 +1685,7 @@ Get chat statistics for the current organization.
 | `TOKEN_INVALID` | Access token is malformed or invalid |
 | `REFRESH_TOKEN_INVALID` | Refresh token is invalid or revoked |
 | `ACCOUNT_DISABLED` | User account has been deactivated |
+| `ACCOUNT_LOCKED` | Account temporarily locked due to too many failed login attempts (30 min) |
 | `EMAIL_NOT_VERIFIED` | Email has not been verified |
 
 ### Authorization
@@ -1750,16 +1755,31 @@ apps/api/
 Client Request
     │
     ▼
-Security Headers Middleware
+Security Headers Middleware (Helmet: CSP, HSTS, Referrer-Policy)
+    │
+    ▼
+Permissions Policy Middleware
+    │
+    ▼
+Request ID Middleware (X-Request-Id)
     │
     ▼
 CORS Middleware
     │
     ▼
-Body Parser (JSON + URL-encoded)
+Body Parser (JSON 1 MB + URL-encoded)
     │
     ▼
 Request Logger Middleware
+    │
+    ▼
+CSRF / Origin Verification
+    │
+    ▼
+API Rate Limiter (100 req/min)
+    │
+    ▼
+Input Sanitization (XSS / injection guard)
     │
     ▼
 Route Handler
@@ -1771,7 +1791,7 @@ Route Handler
     │   ├── Validation Middleware (Zod)
     │   │       │
     │   │       ▼
-    │   │   Service Layer (business logic)
+    │   │   Service Layer (business logic + account lockout)
     │   │       │
     │   │       ▼
     │   │   Repository Layer (Prisma queries)
@@ -1783,10 +1803,10 @@ Route Handler
 404 Handler (if no route matched)
     │
     ▼
-Error Handler (catches all thrown errors)
+Error Handler (catches all thrown errors, persists to audit log)
     │
     ▼
-JSON Response
+JSON Response (with X-Request-Id header)
 ```
 
 ### Singleton Pattern

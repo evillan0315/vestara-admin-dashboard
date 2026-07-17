@@ -1562,13 +1562,15 @@ Security is a foundational principle throughout Vestara.
 
 ## API Security
 
-- Request Validation
-- Rate Limiting
-- Input Sanitization
-- CORS Protection
-- CSRF Protection (where applicable)
-- Secure Headers
-- OpenAPI Validation
+- Request Validation (Zod)
+- Rate Limiting (auth: 5/15m, API: 100/min, health: permissive)
+- Account Lockout (5 failed logins → 30 min lock)
+- Input Sanitization (XSS / injection guard)
+- CORS Protection (origin allow-list + Vercel wildcard)
+- CSRF Protection (Origin header verification on state-changing requests)
+- Secure Headers (CSP, HSTS, Referrer-Policy, Permissions-Policy)
+- Request Tracing (X-Request-Id on every request)
+- WebSocket Rate Limiting (10 connections per IP per minute)
 
 ---
 
