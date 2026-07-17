@@ -27,8 +27,7 @@ const pageMeta: Record<string, { title: string; subtitle: string }> = {
   },
   '/reset-password': {
     title: 'Set a New Password',
-    subtitle:
-      'Choose a strong, unique password to keep your Vestara admin account secure.',
+    subtitle: 'Choose a strong, unique password to keep your Vestara admin account secure.',
   },
 };
 
@@ -93,8 +92,7 @@ export function AuthLayout({ children }: AuthLayoutProps): JSX.Element {
             borderRadius: '50%',
             top: '8%',
             left: '-18%',
-            background:
-              'radial-gradient(circle, rgba(216,164,65,0.12) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(216,164,65,0.12) 0%, transparent 70%)',
             animation: 'floatA 8s ease-in-out infinite',
             '@keyframes floatA': {
               '0%, 100%': { transform: 'translateY(0px)' },
@@ -112,8 +110,7 @@ export function AuthLayout({ children }: AuthLayoutProps): JSX.Element {
             borderRadius: '50%',
             bottom: '12%',
             right: '-8%',
-            background:
-              'radial-gradient(circle, rgba(139,92,246,0.10) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(139,92,246,0.10) 0%, transparent 70%)',
             animation: 'floatB 10s ease-in-out infinite',
             '@keyframes floatB': {
               '0%, 100%': { transform: 'translateY(0px)' },
@@ -222,9 +219,8 @@ export function AuthLayout({ children }: AuthLayoutProps): JSX.Element {
               mb: 1.5,
             }}
           >
-            &ldquo;Vestara has transformed how we manage our command center. The
-            platform&apos;s precision and reliability are unmatched in the
-            industry.&rdquo;
+            &ldquo;Vestara has transformed how we manage our command center. The platform&apos;s
+            precision and reliability are unmatched in the industry.&rdquo;
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Box
@@ -244,9 +240,7 @@ export function AuthLayout({ children }: AuthLayoutProps): JSX.Element {
               RC
             </Box>
             <Box>
-              <Typography
-                sx={{ fontSize: 12.5, fontWeight: 700, color: colors.text }}
-              >
+              <Typography sx={{ fontSize: 12.5, fontWeight: 700, color: colors.text }}>
                 Rafael Cruz
               </Typography>
               <Typography sx={{ fontSize: 11, color: colors.muted }}>
@@ -254,15 +248,9 @@ export function AuthLayout({ children }: AuthLayoutProps): JSX.Element {
               </Typography>
             </Box>
             {/* Stars */}
-            <Box
-              sx={{ display: 'flex', alignItems: 'center', gap: 0.5, ml: 'auto' }}
-            >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, ml: 'auto' }}>
               {[...Array(5)].map((_, i) => (
-                <Box
-                  key={i}
-                  component="span"
-                  sx={{ color: colors.gold, fontSize: 13 }}
-                >
+                <Box key={i} component="span" sx={{ color: colors.gold, fontSize: 13 }}>
                   ★
                 </Box>
               ))}

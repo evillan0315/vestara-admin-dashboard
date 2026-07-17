@@ -37,7 +37,13 @@ export function OrganizationsPage(): ReactElement {
         rows={ctx.displayedOrgs}
         keyExtractor={(row) => row.id}
         loading={ctx.isLoading}
-        error={ctx.isError ? (ctx.error instanceof Error ? ctx.error.message : 'Failed to load organizations') : null}
+        error={
+          ctx.isError
+            ? ctx.error instanceof Error
+              ? ctx.error.message
+              : 'Failed to load organizations'
+            : null
+        }
         onRetry={() => ctx.refetch()}
         sortState={ctx.sort}
         onSortChange={ctx.handleSortChange}

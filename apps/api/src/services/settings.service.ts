@@ -71,7 +71,12 @@ export class SettingsService {
       }
 
       const existing = await settingsRepository.findByKey(key, organizationId);
-      await settingsRepository.upsert(key, value as Record<string, unknown>, updatedBy, organizationId);
+      await settingsRepository.upsert(
+        key,
+        value as Record<string, unknown>,
+        updatedBy,
+        organizationId,
+      );
 
       await this.logAudit(AuditAction.SETTINGS_UPDATE, 'setting', key, organizationId, {
         value,

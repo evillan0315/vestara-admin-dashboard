@@ -74,13 +74,20 @@ export function SettingFormDialog({
         {isEdit ? `Edit Setting: ${editKey}` : 'Add Setting'}
       </DialogTitle>
 
-      <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: '16px !important' }}>
+      <DialogContent
+        sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: '16px !important' }}
+      >
         <TextField
           label="Key"
           value={key}
           onChange={(e) => {
             setKey(e.target.value);
-            if (errors.key) setErrors((prev) => { const n = { ...prev }; delete n.key; return n; });
+            if (errors.key)
+              setErrors((prev) => {
+                const n = { ...prev };
+                delete n.key;
+                return n;
+              });
           }}
           error={!!errors.key}
           helperText={errors.key}
@@ -96,10 +103,17 @@ export function SettingFormDialog({
           value={value}
           onChange={(e) => {
             setValue(e.target.value);
-            if (errors.value) setErrors((prev) => { const n = { ...prev }; delete n.value; return n; });
+            if (errors.value)
+              setErrors((prev) => {
+                const n = { ...prev };
+                delete n.value;
+                return n;
+              });
           }}
           error={!!errors.value}
-          helperText={errors.value || 'Enter a valid JSON value (e.g. {"key": "value"} or "string")'}
+          helperText={
+            errors.value || 'Enter a valid JSON value (e.g. {"key": "value"} or "string")'
+          }
           fullWidth
           size="small"
           required
@@ -114,11 +128,7 @@ export function SettingFormDialog({
         <Button onClick={onClose} color="inherit" disabled={loading}>
           Cancel
         </Button>
-        <Button
-          variant="contained"
-          onClick={handleSubmit}
-          disabled={loading}
-        >
+        <Button variant="contained" onClick={handleSubmit} disabled={loading}>
           {loading ? 'Saving...' : isEdit ? 'Save Changes' : 'Add Setting'}
         </Button>
       </DialogActions>

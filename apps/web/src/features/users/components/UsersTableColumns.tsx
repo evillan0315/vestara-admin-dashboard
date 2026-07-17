@@ -69,11 +69,7 @@ export function createUsersColumns({
       width: 140,
       sortable: true,
       render: (_value, row) => (
-        <RoleChip
-          role={row.role}
-          label={row.role.replace('_', ' ')}
-          size="small"
-        />
+        <RoleChip role={row.role} label={row.role.replace('_', ' ')} size="small" />
       ),
     },
     {

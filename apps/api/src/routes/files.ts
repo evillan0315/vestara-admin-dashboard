@@ -87,7 +87,8 @@ router.get('/stats', async (req, res, next) => {
  */
 router.get('/', validate(listFilesQuerySchema, 'query'), async (req, res, next) => {
   try {
-    const { folderId, mimeType, search, page, perPage, sort, order } = req.query as unknown as z.infer<typeof listFilesQuerySchema>;
+    const { folderId, mimeType, search, page, perPage, sort, order } =
+      req.query as unknown as z.infer<typeof listFilesQuerySchema>;
     const result = await fileService.listFiles(req.user!.organizationId, {
       folderId: folderId || null,
       mimeType,
@@ -107,87 +108,72 @@ router.get('/', validate(listFilesQuerySchema, 'query'), async (req, res, next) 
  * GET /files/folder - Get root folder contents (files + subfolders)
  * GET /files/folder/:folderId - Get folder contents (files + subfolders)
  */
-router.get(
-  '/folder',
-  async (req, res, next) => {
-    try {
-      const contents = await fileService.getFolderContents(req.user!.organizationId, null);
-      sendSuccess(res, { contents });
-    } catch (error) {
-      next(error);
-    }
+router.get('/folder', async (req, res, next) => {
+  try {
+    const contents = await fileService.getFolderContents(req.user!.organizationId, null);
+    sendSuccess(res, { contents });
+  } catch (error) {
+    next(error);
   }
-);
+});
 
-router.get(
-  '/folder/:folderId',
-  validate(folderIdParamSchema, 'params'),
-  async (req, res, next) => {
-    try {
-      const folderId = param(req.params.folderId);
-      const contents = await fileService.getFolderContents(req.user!.organizationId, folderId);
-      sendSuccess(res, { contents });
-    } catch (error) {
-      next(error);
-    }
+router.get('/folder/:folderId', validate(folderIdParamSchema, 'params'), async (req, res, next) => {
+  try {
+    const folderId = param(req.params.folderId);
+    const contents = await fileService.getFolderContents(req.user!.organizationId, folderId);
+    sendSuccess(res, { contents });
+  } catch (error) {
+    next(error);
   }
-);
+});
 
 /**
  * GET /files/:id - Get file by ID
  */
-router.get(
-  '/:id',
-  validate(fileIdParamSchema, 'params'),
-  async (req, res, next) => {
-    try {
-      const id = param(req.params.id);
-      const file = await fileService.getFile(req.user!.organizationId, id);
-      sendSuccess(res, { file });
-    } catch (error) {
-      next(error);
-    }
+router.get('/:id', validate(fileIdParamSchema, 'params'), async (req, res, next) => {
+  try {
+    const id = param(req.params.id);
+    const file = await fileService.getFile(req.user!.organizationId, id);
+    sendSuccess(res, { file });
+  } catch (error) {
+    next(error);
   }
-);
+});
 
 /**
  * POST /files/upload - Upload file(s)
  */
-router.post(
-  '/upload',
-  upload.array('files', 20),
-  async (req, res, next) => {
-    try {
-      const files = req.files as Express.Multer.File[];
+router.post('/upload', upload.array('files', 20), async (req, res, next) => {
+  try {
+    const files = req.files as Express.Multer.File[];
 
-      if (!files || files.length === 0) {
-        return res.status(400).json({
-          success: false,
-          error: { code: 'NO_FILES', message: 'No files uploaded' },
-        });
-      }
-
-      const folderId = req.body.folderId || null;
-
-      const results = await Promise.all(
-        files.map((file) =>
-          fileService.uploadFile(
-            req.user!.organizationId,
-            req.user!.id,
-            file.buffer,
-            file.originalname,
-            file.mimetype,
-            folderId
-          )
-        )
-      );
-
-      sendCreated(res, { files: results });
-    } catch (error) {
-      next(error);
+    if (!files || files.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'NO_FILES', message: 'No files uploaded' },
+      });
     }
+
+    const folderId = req.body.folderId || null;
+
+    const results = await Promise.all(
+      files.map((file) =>
+        fileService.uploadFile(
+          req.user!.organizationId,
+          req.user!.id,
+          file.buffer,
+          file.originalname,
+          file.mimetype,
+          folderId,
+        ),
+      ),
+    );
+
+    sendCreated(res, { files: results });
+  } catch (error) {
+    next(error);
   }
-);
+});
 
 /**
  * POST /files/folder - Create folder
@@ -199,7 +185,12 @@ router.post(
   async (req, res, next) => {
     try {
       const { name, parentFolderId } = req.body;
-      const folder = await fileService.createFolder(req.user!.organizationId, req.user!.id, name, parentFolderId);
+      const folder = await fileService.createFolder(
+        req.user!.organizationId,
+        req.user!.id,
+        name,
+        parentFolderId,
+      );
       sendCreated(res, { folder });
     } catch (error) {
       if (error instanceof Error && error.message === 'FOLDER_EXISTS') {
@@ -216,7 +207,7 @@ router.post(
       }
       next(error);
     }
-  }
+  },
 );
 
 /**
@@ -230,7 +221,10 @@ router.put(
     try {
       const id = param(req.params.id);
       const { name, folderId } = req.body;
-      const file = await fileService.updateFile(req.user!.organizationId, id, req.user!.id, { name, folderId });
+      const file = await fileService.updateFile(req.user!.organizationId, id, req.user!.id, {
+        name,
+        folderId,
+      });
       sendSuccess(res, { file });
     } catch (error) {
       if (error instanceof Error && error.message === 'TARGET_FOLDER_NOT_FOUND') {
@@ -241,66 +235,59 @@ router.put(
       }
       next(error);
     }
-  }
+  },
 );
 
 /**
  * GET /files/:id/download - Get file download URL
  */
-router.get(
-  '/:id/download',
-  validate(fileIdParamSchema, 'params'),
-  async (req, res, next) => {
-    try {
-      const id = param(req.params.id);
-      const file = await fileService.getFile(req.user!.organizationId, id);
-      // Return the file URL - in production this would be a signed URL
-      sendSuccess(res, { url: file.url || `/api/files/${file.path}` });
-    } catch (error) {
-      next(error);
-    }
+router.get('/:id/download', validate(fileIdParamSchema, 'params'), async (req, res, next) => {
+  try {
+    const id = param(req.params.id);
+    const file = await fileService.getFile(req.user!.organizationId, id);
+    // Return the file URL - in production this would be a signed URL
+    sendSuccess(res, { url: file.url || `/api/files/${file.path}` });
+  } catch (error) {
+    next(error);
   }
-);
+});
 
 /**
  * POST /files/move - Move files to folder
  */
-router.post(
-  '/move',
-  validate(moveFilesSchema),
-  async (req, res, next) => {
-    try {
-      const { fileIds, folderId } = req.body;
-      const result = await fileService.moveFiles(req.user!.organizationId, fileIds, folderId, req.user!.id);
-      sendSuccess(res, { moved: result.count });
-    } catch (error) {
-      if (error instanceof Error && error.message === 'TARGET_FOLDER_NOT_FOUND') {
-        return res.status(404).json({
-          success: false,
-          error: { code: 'TARGET_FOLDER_NOT_FOUND', message: 'Target folder not found' },
-        });
-      }
-      next(error);
+router.post('/move', validate(moveFilesSchema), async (req, res, next) => {
+  try {
+    const { fileIds, folderId } = req.body;
+    const result = await fileService.moveFiles(
+      req.user!.organizationId,
+      fileIds,
+      folderId,
+      req.user!.id,
+    );
+    sendSuccess(res, { moved: result.count });
+  } catch (error) {
+    if (error instanceof Error && error.message === 'TARGET_FOLDER_NOT_FOUND') {
+      return res.status(404).json({
+        success: false,
+        error: { code: 'TARGET_FOLDER_NOT_FOUND', message: 'Target folder not found' },
+      });
     }
+    next(error);
   }
-);
+});
 
 /**
  * DELETE /files/:id - Delete file
  */
-router.delete(
-  '/:id',
-  validate(fileIdParamSchema, 'params'),
-  async (req, res, next) => {
-    try {
-      const id = param(req.params.id);
-      await fileService.deleteFile(req.user!.organizationId, id, req.user!.id);
-      sendNoContent(res);
-    } catch (error) {
-      next(error);
-    }
+router.delete('/:id', validate(fileIdParamSchema, 'params'), async (req, res, next) => {
+  try {
+    const id = param(req.params.id);
+    await fileService.deleteFile(req.user!.organizationId, id, req.user!.id);
+    sendNoContent(res);
+  } catch (error) {
+    next(error);
   }
-);
+});
 
 /**
  * POST /files/bulk-delete - Bulk delete files
@@ -311,12 +298,16 @@ router.post(
   async (req, res, next) => {
     try {
       const { fileIds } = req.body;
-      const result = await fileService.bulkDeleteFiles(req.user!.organizationId, fileIds, req.user!.id);
+      const result = await fileService.bulkDeleteFiles(
+        req.user!.organizationId,
+        fileIds,
+        req.user!.id,
+      );
       sendSuccess(res, { deleted: result.count });
     } catch (error) {
       next(error);
     }
-  }
+  },
 );
 
 // Storage Settings Routes (Admin only)
@@ -334,7 +325,7 @@ router.get(
     } catch (error) {
       next(error);
     }
-  }
+  },
 );
 
 /**
@@ -347,12 +338,16 @@ router.put(
   async (req, res, next) => {
     try {
       const settings = req.body;
-      const updated = await fileService.updateStorageSettings(req.user!.organizationId, settings, req.user!.id);
+      const updated = await fileService.updateStorageSettings(
+        req.user!.organizationId,
+        settings,
+        req.user!.id,
+      );
       sendSuccess(res, { settings: updated });
     } catch (error) {
       next(error);
     }
-  }
+  },
 );
 
 export default router;

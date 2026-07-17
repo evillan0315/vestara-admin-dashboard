@@ -22,7 +22,11 @@ export function useOrganizationsPage() {
   const [search, setSearch] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingOrg, setEditingOrg] = useState<OrganizationDTO | null>(null);
-  const [formData, setFormData] = useState<CreateOrganizationInput>({ name: '', slug: '', logoUrl: '' });
+  const [formData, setFormData] = useState<CreateOrganizationInput>({
+    name: '',
+    slug: '',
+    logoUrl: '',
+  });
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -88,50 +92,65 @@ export function useOrganizationsPage() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   }, []);
 
-  const handleLogoUpload = useCallback(async (file: File) => {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
-    if (!allowedTypes.includes(file.type)) {
-      showError('Only JPEG, PNG, WebP, and SVG images are allowed');
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      showError('File size must be less than 5MB');
-      return;
-    }
-    setUploadingLogo(true);
-    try {
-      const result = await uploadImage(file);
-      if (result.success && result.data) {
-        setFormData((prev) => ({ ...prev, logoUrl: result.data!.url }));
-      } else {
-        showError(result.error || 'Failed to upload logo');
+  const handleLogoUpload = useCallback(
+    async (file: File) => {
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
+      if (!allowedTypes.includes(file.type)) {
+        showError('Only JPEG, PNG, WebP, and SVG images are allowed');
+        return;
       }
-    } catch {
-      showError('Failed to upload logo');
-    } finally {
-      setUploadingLogo(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+      if (file.size > 5 * 1024 * 1024) {
+        showError('File size must be less than 5MB');
+        return;
       }
-    }
-  }, [showError]);
+      setUploadingLogo(true);
+      try {
+        const result = await uploadImage(file);
+        if (result.success && result.data) {
+          setFormData((prev) => ({ ...prev, logoUrl: result.data!.url }));
+        } else {
+          showError(result.error || 'Failed to upload logo');
+        }
+      } catch {
+        showError('Failed to upload logo');
+      } finally {
+        setUploadingLogo(false);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      }
+    },
+    [showError],
+  );
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      if (editingOrg) {
-        await updateMutation.mutateAsync({ id: editingOrg.id, ...formData });
-        showSuccess('Organization updated successfully');
-      } else {
-        await createMutation.mutateAsync(formData);
-        showSuccess('Organization created successfully');
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      try {
+        if (editingOrg) {
+          await updateMutation.mutateAsync({ id: editingOrg.id, ...formData });
+          showSuccess('Organization updated successfully');
+        } else {
+          await createMutation.mutateAsync(formData);
+          showSuccess('Organization created successfully');
+        }
+        handleDialogClose();
+        refetch();
+      } catch (err) {
+        showError(err instanceof Error ? err.message : 'Failed to save organization');
       }
-      handleDialogClose();
-      refetch();
-    } catch (err) {
-      showError(err instanceof Error ? err.message : 'Failed to save organization');
-    }
-  }, [editingOrg, formData, updateMutation, createMutation, showSuccess, showError, handleDialogClose, refetch]);
+    },
+    [
+      editingOrg,
+      formData,
+      updateMutation,
+      createMutation,
+      showSuccess,
+      showError,
+      handleDialogClose,
+      refetch,
+    ],
+  );
 
   return {
     sort,

@@ -38,7 +38,13 @@ export function FileManagerPage(): ReactElement {
         onPreview: ctx.handlePreview,
         onDeleteRequest: (file) => ctx.setDeleteTarget(file),
       }),
-    [ctx.handleDownload, ctx.handleRenameOpen, ctx.handleMoveSingle, ctx.handlePreview, ctx.setDeleteTarget],
+    [
+      ctx.handleDownload,
+      ctx.handleRenameOpen,
+      ctx.handleMoveSingle,
+      ctx.handlePreview,
+      ctx.setDeleteTarget,
+    ],
   );
 
   return (
@@ -82,7 +88,9 @@ export function FileManagerPage(): ReactElement {
           <Typography color="error" gutterBottom>
             {ctx.error instanceof Error ? ctx.error.message : 'Failed to load files'}
           </Typography>
-          <Button variant="outlined" onClick={() => ctx.refetch()}>Retry</Button>
+          <Button variant="outlined" onClick={() => ctx.refetch()}>
+            Retry
+          </Button>
         </Paper>
       )}
 
@@ -106,7 +114,11 @@ export function FileManagerPage(): ReactElement {
               onRowClick={(row) => ctx.handlePreview(row)}
               emptyIcon={<CloudUploadIcon sx={{ fontSize: 48 }} />}
               emptyTitle={ctx.search ? 'No files match your search' : 'No files in this folder'}
-              emptyDescription={ctx.search ? 'Try a different search term.' : 'Upload files or create a folder to get started.'}
+              emptyDescription={
+                ctx.search
+                  ? 'Try a different search term.'
+                  : 'Upload files or create a folder to get started.'
+              }
             />
           ) : (
             <DataTable<FileItemDTO>
@@ -123,7 +135,11 @@ export function FileManagerPage(): ReactElement {
               title={ctx.filteredFiles.length > 0 ? `Files (${ctx.filteredFiles.length})` : 'Files'}
               emptyIcon={<CloudUploadIcon sx={{ fontSize: 48 }} />}
               emptyTitle={ctx.search ? 'No files match your search' : 'No files in this folder'}
-              emptyDescription={ctx.search ? 'Try a different search term.' : 'Upload files or create a folder to get started.'}
+              emptyDescription={
+                ctx.search
+                  ? 'Try a different search term.'
+                  : 'Upload files or create a folder to get started.'
+              }
             />
           )}
         </>
@@ -177,7 +193,10 @@ export function FileManagerPage(): ReactElement {
       <DeleteConfirmDialog
         open={!!ctx.deleteTarget}
         itemName={ctx.deleteTarget?.name ?? ''}
-        isFolder={'mimeType' in (ctx.deleteTarget ?? {}) && (ctx.deleteTarget as FileItemDTO).mimeType === 'folder'}
+        isFolder={
+          'mimeType' in (ctx.deleteTarget ?? {}) &&
+          (ctx.deleteTarget as FileItemDTO).mimeType === 'folder'
+        }
         loading={ctx.deleteFileMutation.isPending}
         onConfirm={ctx.handleDelete}
         onClose={() => ctx.setDeleteTarget(null)}

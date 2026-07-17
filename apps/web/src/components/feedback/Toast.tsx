@@ -78,52 +78,55 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     setToasts([]);
   }, []);
 
-  const showToast = useCallback((options: ToastOptions) => {
-    const id = options.id || generateId();
-    const newToast: ToastState = {
-      open: true,
-      message: options.message,
-      severity: options.severity || 'info',
-      duration: options.duration || 5000,
-      id,
-    };
+  const showToast = useCallback(
+    (options: ToastOptions) => {
+      const id = options.id || generateId();
+      const newToast: ToastState = {
+        open: true,
+        message: options.message,
+        severity: options.severity || 'info',
+        duration: options.duration || 5000,
+        id,
+      };
 
-    setToasts((prev) => [...prev, newToast]);
+      setToasts((prev) => [...prev, newToast]);
 
-    // Auto-hide after duration
-    if (newToast.duration && newToast.duration > 0) {
-      setTimeout(() => {
-        hideToast(id);
-      }, newToast.duration);
-    }
-  }, [hideToast]);
+      // Auto-hide after duration
+      if (newToast.duration && newToast.duration > 0) {
+        setTimeout(() => {
+          hideToast(id);
+        }, newToast.duration);
+      }
+    },
+    [hideToast],
+  );
 
   const showSuccess = useCallback(
     (message: string, options?: Partial<ToastOptions>) => {
       showToast({ message, severity: 'success', ...options });
     },
-    [showToast]
+    [showToast],
   );
 
   const showError = useCallback(
     (message: string, options?: Partial<ToastOptions>) => {
       showToast({ message, severity: 'error', duration: 7000, ...options });
     },
-    [showToast]
+    [showToast],
   );
 
   const showWarning = useCallback(
     (message: string, options?: Partial<ToastOptions>) => {
       showToast({ message, severity: 'warning', ...options });
     },
-    [showToast]
+    [showToast],
   );
 
   const showInfo = useCallback(
     (message: string, options?: Partial<ToastOptions>) => {
       showToast({ message, severity: 'info', ...options });
     },
-    [showToast]
+    [showToast],
   );
 
   const contextValue = useMemo<ToastContextValue>(
@@ -137,7 +140,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       hideAllToasts,
       toasts,
     }),
-    [showToast, showSuccess, showError, showWarning, showInfo, hideToast, hideAllToasts, toasts]
+    [showToast, showSuccess, showError, showWarning, showInfo, hideToast, hideAllToasts, toasts],
   );
 
   return (

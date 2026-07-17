@@ -23,15 +23,18 @@ interface InnerProps {
 function ThemedApp({ children }: InnerProps) {
   const config = useThemeContext();
 
-  const theme = useMemo(() => createAppTheme(config), [
-    config.resolvedMode,
-    config.primaryColor,
-    config.density,
-    config.fontFamily,
-    config.fontSizeScale,
-    config.borderRadiusScale,
-    config.contrastLevel,
-  ]);
+  const theme = useMemo(
+    () => createAppTheme(config),
+    [
+      config.resolvedMode,
+      config.primaryColor,
+      config.density,
+      config.fontFamily,
+      config.fontSizeScale,
+      config.borderRadiusScale,
+      config.contrastLevel,
+    ],
+  );
 
   return (
     <MuiThemeProvider theme={theme}>

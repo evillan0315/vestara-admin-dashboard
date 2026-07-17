@@ -188,7 +188,7 @@ INSTRUCTIONS:
 - Reference specific numbers, names, and timestamps when relevant
 - If data is not available in the context, say so clearly
 - Never fabricate or guess numbers`;
-    
+
     // Generate AI completion
     const completion = await aiService.complete({
       messages: aiMessages,
@@ -274,11 +274,7 @@ INSTRUCTIONS:
   /**
    * Archive/unarchive a conversation.
    */
-  async toggleArchive(
-    conversationId: string,
-    userId: string,
-    organizationId: string,
-  ) {
+  async toggleArchive(conversationId: string, userId: string, organizationId: string) {
     const conversation = await chatRepository.findConversationById(conversationId, organizationId);
     if (!conversation) {
       throw new NotFoundError('Conversation not found');
@@ -297,11 +293,7 @@ INSTRUCTIONS:
   /**
    * Delete a conversation.
    */
-  async deleteConversation(
-    conversationId: string,
-    userId: string,
-    organizationId: string,
-  ) {
+  async deleteConversation(conversationId: string, userId: string, organizationId: string) {
     const conversation = await chatRepository.findConversationById(conversationId, organizationId);
     if (!conversation) {
       throw new NotFoundError('Conversation not found');

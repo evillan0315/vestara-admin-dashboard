@@ -9,7 +9,13 @@ export const reportKeys = {
   templates: () => ['reports', 'templates'] as const,
 };
 
-export function useReports(params?: { page?: number; perPage?: number; search?: string; sortField?: string; sortDirection?: string }) {
+export function useReports(params?: {
+  page?: number;
+  perPage?: number;
+  search?: string;
+  sortField?: string;
+  sortDirection?: string;
+}) {
   return useQuery({
     queryKey: reportKeys.list(params),
     queryFn: () => reportsApi.list(params),
@@ -93,8 +99,13 @@ export function useCreateTemplate() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { name: string; description?: string; type: Report['type']; format: Report['format']; config?: Record<string, unknown> }) =>
-      reportsApi.createTemplate(data),
+    mutationFn: (data: {
+      name: string;
+      description?: string;
+      type: Report['type'];
+      format: Report['format'];
+      config?: Record<string, unknown>;
+    }) => reportsApi.createTemplate(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reportKeys.templates() });
     },
@@ -105,8 +116,19 @@ export function useUpdateTemplate() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<{ name: string; description: string; type: Report['type']; format: Report['format']; config: Record<string, unknown> }> }) =>
-      reportsApi.updateTemplate(id, data),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: Partial<{
+        name: string;
+        description: string;
+        type: Report['type'];
+        format: Report['format'];
+        config: Record<string, unknown>;
+      }>;
+    }) => reportsApi.updateTemplate(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reportKeys.templates() });
     },

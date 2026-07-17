@@ -1,15 +1,15 @@
-import React from "react";
-import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
-import { BRAND, FONT_FAMILY } from "../theme";
-import { Background } from "../components/Background";
-import { GoldText } from "../components/Glass";
-import { ModuleBadge } from "../components/Logo";
+import React from 'react';
+import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
+import { BRAND, FONT_FAMILY } from '../theme';
+import { Background } from '../components/Background';
+import { GoldText } from '../components/Glass';
+import { ModuleBadge } from '../components/Logo';
 
 const MODULES = [
-  { glyph: "💳", color: BRAND.wallet, label: "Digital Wallet" },
-  { glyph: "🛍️", color: BRAND.marketplace, label: "Marketplace" },
-  { glyph: "🎁", color: BRAND.rewards, label: "Rewards" },
-  { glyph: "✈️", color: BRAND.bookings, label: "Bookings" },
+  { glyph: '💳', color: BRAND.wallet, label: 'Digital Wallet' },
+  { glyph: '🛍️', color: BRAND.marketplace, label: 'Marketplace' },
+  { glyph: '🎁', color: BRAND.rewards, label: 'Rewards' },
+  { glyph: '✈️', color: BRAND.bookings, label: 'Bookings' },
 ];
 
 /**
@@ -23,17 +23,22 @@ export const SceneModules: React.FC = () => {
   const titleIn = spring({ frame: frame - 96, fps, config: { damping: 170 } });
 
   return (
-    <AbsoluteFill style={{ justifyContent: "center", alignItems: "center" }}>
+    <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>
       <Background />
       <div
         style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
           gap: 48,
         }}
       >
-        <div style={{ opacity: titleIn, transform: `translateY(${interpolate(titleIn, [0, 1], [18, 0])}px)` }}>
+        <div
+          style={{
+            opacity: titleIn,
+            transform: `translateY(${interpolate(titleIn, [0, 1], [18, 0])}px)`,
+          }}
+        >
           <GoldText fontSize={52} weight={700}>
             The Financial Super Platform
           </GoldText>
@@ -41,7 +46,7 @@ export const SceneModules: React.FC = () => {
 
         <div
           style={{
-            display: "flex",
+            display: 'flex',
             gap: 32,
             paddingLeft: 24,
             paddingRight: 24,
@@ -65,8 +70,8 @@ export const SceneModules: React.FC = () => {
             fontSize: 18,
             letterSpacing: 0.5,
             opacity: interpolate(frame, [180, 220], [0, 1], {
-              extrapolateLeft: "clamp",
-              extrapolateRight: "clamp",
+              extrapolateLeft: 'clamp',
+              extrapolateRight: 'clamp',
             }),
           }}
         >

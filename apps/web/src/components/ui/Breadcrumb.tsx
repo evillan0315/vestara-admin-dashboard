@@ -67,11 +67,7 @@ export const Breadcrumb: FC<BreadcrumbProps> = ({
             {item.label}
           </Link>
         ) : (
-          <Typography
-            key={item.label}
-            color="text.secondary"
-            sx={{ fontSize: '0.875rem' }}
-          >
+          <Typography key={item.label} color="text.secondary" sx={{ fontSize: '0.875rem' }}>
             {item.label}
           </Typography>
         );

@@ -102,27 +102,62 @@ export function AdminPage() {
                 </Box>
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 6, sm: 3 }}>
-                    <Box sx={{ textAlign: 'center', p: 1.5, bgcolor: alpha(theme.palette.primary.main, 0.04), borderRadius: 2 }}>
-                      <Typography variant="caption" color="text.secondary">Uptime</Typography>
+                    <Box
+                      sx={{
+                        textAlign: 'center',
+                        p: 1.5,
+                        bgcolor: alpha(theme.palette.primary.main, 0.04),
+                        borderRadius: 2,
+                      }}
+                    >
+                      <Typography variant="caption" color="text.secondary">
+                        Uptime
+                      </Typography>
                       <Typography variant="h6" fontWeight={700}>
                         {Math.floor(health.uptime / 86400)}d
                       </Typography>
                     </Box>
                   </Grid>
                   <Grid size={{ xs: 6, sm: 3 }}>
-                    <Box sx={{ textAlign: 'center', p: 1.5, bgcolor: alpha(theme.palette.info.main, 0.04), borderRadius: 2 }}>
-                      <Typography variant="caption" color="text.secondary">Environment</Typography>
-                      <Typography variant="h6" fontWeight={700} sx={{ textTransform: 'capitalize' }}>
+                    <Box
+                      sx={{
+                        textAlign: 'center',
+                        p: 1.5,
+                        bgcolor: alpha(theme.palette.info.main, 0.04),
+                        borderRadius: 2,
+                      }}
+                    >
+                      <Typography variant="caption" color="text.secondary">
+                        Environment
+                      </Typography>
+                      <Typography
+                        variant="h6"
+                        fontWeight={700}
+                        sx={{ textTransform: 'capitalize' }}
+                      >
                         {health.environment}
                       </Typography>
                     </Box>
                   </Grid>
                   <Grid size={{ xs: 6, sm: 3 }}>
-                    <Box sx={{ textAlign: 'center', p: 1.5, bgcolor: alpha(theme.palette.success.main, 0.04), borderRadius: 2 }}>
-                      <Typography variant="caption" color="text.secondary">WebSocket</Typography>
+                    <Box
+                      sx={{
+                        textAlign: 'center',
+                        p: 1.5,
+                        bgcolor: alpha(theme.palette.success.main, 0.04),
+                        borderRadius: 2,
+                      }}
+                    >
+                      <Typography variant="caption" color="text.secondary">
+                        WebSocket
+                      </Typography>
                       <Chip
                         size="small"
-                        label={wsStatus?.connectionCount !== undefined ? `${wsStatus.connectionCount} connected` : 'N/A'}
+                        label={
+                          wsStatus?.connectionCount !== undefined
+                            ? `${wsStatus.connectionCount} connected`
+                            : 'N/A'
+                        }
                         color={wsStatus?.connectionCount ? 'success' : 'default'}
                         variant="outlined"
                         sx={{ mt: 0.5 }}
@@ -130,8 +165,17 @@ export function AdminPage() {
                     </Box>
                   </Grid>
                   <Grid size={{ xs: 6, sm: 3 }}>
-                    <Box sx={{ textAlign: 'center', p: 1.5, bgcolor: alpha(theme.palette.warning.main, 0.04), borderRadius: 2 }}>
-                      <Typography variant="caption" color="text.secondary">Message Throughput</Typography>
+                    <Box
+                      sx={{
+                        textAlign: 'center',
+                        p: 1.5,
+                        bgcolor: alpha(theme.palette.warning.main, 0.04),
+                        borderRadius: 2,
+                      }}
+                    >
+                      <Typography variant="caption" color="text.secondary">
+                        Message Throughput
+                      </Typography>
                       <Typography variant="h6" fontWeight={700}>
                         {wsStatus?.messageThroughput ?? 0}/s
                       </Typography>
@@ -140,7 +184,14 @@ export function AdminPage() {
                 </Grid>
               </Box>
             ) : (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: theme.palette.error.main }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  color: theme.palette.error.main,
+                }}
+              >
                 <ErrorOutline />
                 <Typography>Unable to reach API</Typography>
               </Box>
@@ -154,23 +205,33 @@ export function AdminPage() {
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
               <QuickActionBox onClick={() => navigate('/settings')}>
                 <Settings fontSize="small" color="action" />
-                <Typography variant="body2" fontWeight={500}>System Settings</Typography>
+                <Typography variant="body2" fontWeight={500}>
+                  System Settings
+                </Typography>
               </QuickActionBox>
               <QuickActionBox onClick={() => navigate('/users')}>
                 <People fontSize="small" color="action" />
-                <Typography variant="body2" fontWeight={500}>User Management</Typography>
+                <Typography variant="body2" fontWeight={500}>
+                  User Management
+                </Typography>
               </QuickActionBox>
               <QuickActionBox onClick={() => navigate('/organizations')}>
                 <Business fontSize="small" color="action" />
-                <Typography variant="body2" fontWeight={500}>Organizations</Typography>
+                <Typography variant="body2" fontWeight={500}>
+                  Organizations
+                </Typography>
               </QuickActionBox>
               <QuickActionBox onClick={() => navigate('/system-logs')}>
                 <Security fontSize="small" color="action" />
-                <Typography variant="body2" fontWeight={500}>Audit Logs</Typography>
+                <Typography variant="body2" fontWeight={500}>
+                  Audit Logs
+                </Typography>
               </QuickActionBox>
               <QuickActionBox onClick={() => navigate('/files')}>
                 <FolderOpen fontSize="small" color="action" />
-                <Typography variant="body2" fontWeight={500}>File Manager</Typography>
+                <Typography variant="body2" fontWeight={500}>
+                  File Manager
+                </Typography>
               </QuickActionBox>
             </Box>
           </Card>
@@ -187,8 +248,12 @@ export function AdminPage() {
                   <StatBox onClick={() => navigate('/organizations')}>
                     <Business sx={{ fontSize: 32, color: theme.palette.primary.main }} />
                     <Box>
-                      <Typography variant="h5" fontWeight={700}>{organizations}</Typography>
-                      <Typography variant="caption" color="text.secondary">Organizations</Typography>
+                      <Typography variant="h5" fontWeight={700}>
+                        {organizations}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Organizations
+                      </Typography>
                     </Box>
                   </StatBox>
                 </Grid>
@@ -196,8 +261,12 @@ export function AdminPage() {
                   <StatBox onClick={() => navigate('/users')}>
                     <People sx={{ fontSize: 32, color: theme.palette.info.main }} />
                     <Box>
-                      <Typography variant="h5" fontWeight={700}>{users}</Typography>
-                      <Typography variant="caption" color="text.secondary">Users</Typography>
+                      <Typography variant="h5" fontWeight={700}>
+                        {users}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Users
+                      </Typography>
                     </Box>
                   </StatBox>
                 </Grid>
@@ -205,8 +274,12 @@ export function AdminPage() {
                   <StatBox onClick={() => navigate('/settings')}>
                     <Storage sx={{ fontSize: 32, color: theme.palette.warning.main }} />
                     <Box>
-                      <Typography variant="h5" fontWeight={700}>{files}</Typography>
-                      <Typography variant="caption" color="text.secondary">Files</Typography>
+                      <Typography variant="h5" fontWeight={700}>
+                        {files}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Files
+                      </Typography>
                     </Box>
                   </StatBox>
                 </Grid>
@@ -214,8 +287,12 @@ export function AdminPage() {
                   <StatBox onClick={() => navigate('/system-logs')}>
                     <BarChart sx={{ fontSize: 32, color: theme.palette.success.main }} />
                     <Box>
-                      <Typography variant="h5" fontWeight={700}>{wsStatus?.connectionCount ?? 0}</Typography>
-                      <Typography variant="caption" color="text.secondary">WS Connections</Typography>
+                      <Typography variant="h5" fontWeight={700}>
+                        {wsStatus?.connectionCount ?? 0}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        WS Connections
+                      </Typography>
                     </Box>
                   </StatBox>
                 </Grid>

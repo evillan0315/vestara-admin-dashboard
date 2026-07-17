@@ -33,7 +33,12 @@ interface ReportsStatsCardsProps {
   failed: number;
 }
 
-export function ReportsStatsCards({ total, completed, inProgress, failed }: ReportsStatsCardsProps) {
+export function ReportsStatsCards({
+  total,
+  completed,
+  inProgress,
+  failed,
+}: ReportsStatsCardsProps) {
   return (
     <Grid container spacing={3}>
       <Grid size={{ xs: 12, sm: 6, lg: 3 }}>

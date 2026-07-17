@@ -12,7 +12,9 @@ import { PageLoading } from '../components/feedback/Loading';
  */
 const lazyPage = (loader: () => Promise<Record<string, unknown>>, name: string) =>
   lazy(() =>
-    loader().then((mod) => ({ default: (mod[name] as React.ComponentType) ?? (mod.default as React.ComponentType) })),
+    loader().then((mod) => ({
+      default: (mod[name] as React.ComponentType) ?? (mod.default as React.ComponentType),
+    })),
   );
 
 const DashboardPage = lazyPage(() => import('../pages/DashboardPage'), 'DashboardPage');
@@ -31,7 +33,10 @@ const ProfilePage = lazyPage(() => import('../pages/ProfilePage'), 'ProfilePage'
 const AdminPage = lazyPage(() => import('../pages/AdminPage'), 'AdminPage');
 const LoginPage = lazyPage(() => import('../pages/LoginPage'), 'LoginPage');
 const RegisterPage = lazyPage(() => import('../pages/RegisterPage'), 'RegisterPage');
-const ForgotPasswordPage = lazyPage(() => import('../pages/ForgotPasswordPage'), 'ForgotPasswordPage');
+const ForgotPasswordPage = lazyPage(
+  () => import('../pages/ForgotPasswordPage'),
+  'ForgotPasswordPage',
+);
 const ResetPasswordPage = lazyPage(() => import('../pages/ResetPasswordPage'), 'ResetPasswordPage');
 const OAuthCallbackPage = lazyPage(() => import('../pages/OAuthCallbackPage'), 'OAuthCallbackPage');
 

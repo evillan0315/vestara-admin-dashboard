@@ -99,7 +99,9 @@ function ConversationSidebar({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [selectedConversation, setSelectedConversation] = useState<ChatConversationDTO | null>(null);
+  const [selectedConversation, setSelectedConversation] = useState<ChatConversationDTO | null>(
+    null,
+  );
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [renameValue, setRenameValue] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -108,7 +110,10 @@ function ConversationSidebar({
   const deleteMutation = useDeleteConversation();
   const archiveMutation = useToggleArchive();
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, conversation: ChatConversationDTO) => {
+  const handleMenuOpen = (
+    event: React.MouseEvent<HTMLElement>,
+    conversation: ChatConversationDTO,
+  ) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
     setSelectedConversation(conversation);
@@ -239,7 +244,9 @@ function ConversationSidebar({
           ))
         ) : conversations.length === 0 ? (
           <Box sx={{ p: { xs: 3, sm: 4 }, textAlign: 'center' }}>
-            <ChatIcon sx={{ fontSize: { xs: 36, sm: 48 }, color: theme.palette.text.disabled, mb: 1 }} />
+            <ChatIcon
+              sx={{ fontSize: { xs: 36, sm: 48 }, color: theme.palette.text.disabled, mb: 1 }}
+            />
             <Typography variant="body2" color="text.secondary">
               No conversations yet
             </Typography>
@@ -305,23 +312,36 @@ function ConversationSidebar({
       {/* Context Menu */}
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         <MenuItem onClick={handleRename}>
-          <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
           Rename
         </MenuItem>
         <MenuItem onClick={handleArchive}>
           <ListItemIcon>
-            {selectedConversation?.isArchived ? <UnarchiveIcon fontSize="small" /> : <ArchiveIcon fontSize="small" />}
+            {selectedConversation?.isArchived ? (
+              <UnarchiveIcon fontSize="small" />
+            ) : (
+              <ArchiveIcon fontSize="small" />
+            )}
           </ListItemIcon>
           {selectedConversation?.isArchived ? 'Unarchive' : 'Archive'}
         </MenuItem>
         <MenuItem onClick={handleDelete} sx={{ color: theme.palette.error.main }}>
-          <ListItemIcon><DeleteIcon fontSize="small" sx={{ color: 'inherit' }} /></ListItemIcon>
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" sx={{ color: 'inherit' }} />
+          </ListItemIcon>
           Delete
         </MenuItem>
       </Menu>
 
       {/* Rename Dialog */}
-      <Dialog open={renameDialogOpen} onClose={() => setRenameDialogOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog
+        open={renameDialogOpen}
+        onClose={() => setRenameDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>Rename Conversation</DialogTitle>
         <DialogContent>
           <TextField
@@ -347,7 +367,8 @@ function ConversationSidebar({
         <DialogTitle>Delete Conversation</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete &quot;{selectedConversation?.title}&quot;? This action cannot be undone.
+            Are you sure you want to delete &quot;{selectedConversation?.title}&quot;? This action
+            cannot be undone.
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -420,15 +441,19 @@ function MessageBubbleComponent({ message, isLatest }: MessageBubbleProps) {
         {isUser ? <PersonIcon fontSize="small" /> : <BotIcon fontSize="small" />}
       </Avatar>
 
-      <Box sx={{ maxWidth: { xs: '92%', sm: '80%', md: '75%' }, minWidth: { xs: 40, sm: 60 }, width: '100%' }}>
+      <Box
+        sx={{
+          maxWidth: { xs: '92%', sm: '80%', md: '75%' },
+          minWidth: { xs: 40, sm: 60 },
+          width: '100%',
+        }}
+      >
         <Paper
           elevation={0}
           sx={{
             p: { xs: 1, sm: 1.5 },
             borderRadius: 2,
-            bgcolor: isUser
-              ? theme.palette.primary.main
-              : alpha(theme.palette.grey[500], 0.06),
+            bgcolor: isUser ? theme.palette.primary.main : alpha(theme.palette.grey[500], 0.06),
             color: isUser ? theme.palette.primary.contrastText : theme.palette.text.primary,
             border: isUser ? 'none' : `1px solid ${theme.palette.divider}`,
             position: 'relative',
@@ -437,7 +462,14 @@ function MessageBubbleComponent({ message, isLatest }: MessageBubbleProps) {
           }}
         >
           {isUser ? (
-            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: { xs: '0.8125rem', sm: '0.875rem' } }}>
+            <Typography
+              variant="body2"
+              sx={{
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+                fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+              }}
+            >
               {message.content}
             </Typography>
           ) : (
@@ -554,9 +586,7 @@ function MessageBubbleComponent({ message, isLatest }: MessageBubbleProps) {
                 },
               }}
             >
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {message.content}
-              </ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
             </Box>
           )}
         </Paper>
@@ -570,8 +600,15 @@ function MessageBubbleComponent({ message, isLatest }: MessageBubbleProps) {
             justifyContent: isUser ? 'flex-end' : 'flex-start',
           }}
         >
-          <Typography variant="caption" color="text.disabled" sx={{ fontSize: { xs: '0.65rem', sm: '0.7rem' } }}>
-            {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          <Typography
+            variant="caption"
+            color="text.disabled"
+            sx={{ fontSize: { xs: '0.65rem', sm: '0.7rem' } }}
+          >
+            {new Date(message.createdAt).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
           </Typography>
           {!isUser && isLatest && (
             <IconButton size="small" onClick={handleCopy} sx={{ ml: 0.5 }}>
@@ -595,7 +632,14 @@ function TypingIndicator() {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
-    <Box sx={{ display: 'flex', gap: { xs: 0.75, sm: 1.5 }, alignItems: 'flex-start', mb: { xs: 1, sm: 2 } }}>
+    <Box
+      sx={{
+        display: 'flex',
+        gap: { xs: 0.75, sm: 1.5 },
+        alignItems: 'flex-start',
+        mb: { xs: 1, sm: 2 },
+      }}
+    >
       <Avatar
         sx={{
           width: isMobile ? 28 : 32,
@@ -661,26 +705,42 @@ function EmptyState({ onSuggestionClick }: { onSuggestionClick: (text: string) =
       <Typography variant={isMobile ? 'h6' : 'h5'} fontWeight={700}>
         Vestara AI Assistant
       </Typography>
-      <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ maxWidth: { xs: 280, sm: 400 }, fontSize: { xs: '0.8125rem', sm: '0.875rem' } }}>
-        Powered by OpenCode AI. Ask questions about the dashboard,
-        get help with user management, or explore system settings.
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        textAlign="center"
+        sx={{ maxWidth: { xs: 280, sm: 400 }, fontSize: { xs: '0.8125rem', sm: '0.875rem' } }}
+      >
+        Powered by OpenCode AI. Ask questions about the dashboard, get help with user management, or
+        explore system settings.
       </Typography>
-      <Box sx={{ display: 'flex', gap: { xs: 0.5, sm: 1 }, mt: 1.5, flexWrap: 'wrap', justifyContent: 'center', px: { xs: 1, sm: 0 } }}>
-        {['How do I manage users?', 'Explain the dashboard', 'Security best practices'].map((suggestion) => (
-          <Chip
-            key={suggestion}
-            label={suggestion}
-            variant="outlined"
-            size="small"
-            onClick={() => onSuggestionClick(suggestion)}
-            sx={{
-              cursor: 'pointer',
-              '&:hover': {
-                bgcolor: alpha(theme.palette.primary.main, 0.08),
-              },
-            }}
-          />
-        ))}
+      <Box
+        sx={{
+          display: 'flex',
+          gap: { xs: 0.5, sm: 1 },
+          mt: 1.5,
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          px: { xs: 1, sm: 0 },
+        }}
+      >
+        {['How do I manage users?', 'Explain the dashboard', 'Security best practices'].map(
+          (suggestion) => (
+            <Chip
+              key={suggestion}
+              label={suggestion}
+              variant="outlined"
+              size="small"
+              onClick={() => onSuggestionClick(suggestion)}
+              sx={{
+                cursor: 'pointer',
+                '&:hover': {
+                  bgcolor: alpha(theme.palette.primary.main, 0.08),
+                },
+              }}
+            />
+          ),
+        )}
       </Box>
     </Box>
   );
@@ -701,9 +761,12 @@ export function ChatPage() {
   const { data: conversationsData, isLoading: conversationsLoading } = useConversations();
   const conversations = conversationsData?.conversations ?? [];
   const { data: conversationData } = useConversation(activeConversationId ?? '');
-  const { data: messagesData, isLoading: messagesLoading } = useChatMessages(activeConversationId ?? '', {
-    perPage: 100,
-  });
+  const { data: messagesData, isLoading: messagesLoading } = useChatMessages(
+    activeConversationId ?? '',
+    {
+      perPage: 100,
+    },
+  );
   const messages = messagesData?.messages ?? [];
 
   // Mutations
@@ -809,7 +872,9 @@ export function ChatPage() {
         >
           {activeConversationId ? (
             <>
-              <SparkleIcon sx={{ color: theme.palette.primary.main, fontSize: { xs: 20, sm: 24 } }} />
+              <SparkleIcon
+                sx={{ color: theme.palette.primary.main, fontSize: { xs: 20, sm: 24 } }}
+              />
               <Typography
                 variant="subtitle1"
                 fontWeight={600}
@@ -828,7 +893,9 @@ export function ChatPage() {
             </>
           ) : (
             <>
-              <SparkleIcon sx={{ color: theme.palette.primary.main, fontSize: { xs: 20, sm: 24 } }} />
+              <SparkleIcon
+                sx={{ color: theme.palette.primary.main, fontSize: { xs: 20, sm: 24 } }}
+              />
               <Typography
                 variant="subtitle1"
                 fontWeight={600}
@@ -869,31 +936,39 @@ export function ChatPage() {
               flexDirection: 'column',
             }}
           >
-            {messagesLoading ? (
-              Array.from({ length: 4 }).map((_, i) => (
-                <Box key={i} sx={{ display: 'flex', gap: { xs: 0.75, sm: 1.5 }, mb: { xs: 1, sm: 2 } }}>
-                  <Skeleton variant="circular" width={isMobile ? 28 : 32} height={isMobile ? 28 : 32} />
-                  <Skeleton variant="rounded" width={`${50 + i * 5}%`} height={isMobile ? 32 : 40} sx={{ borderRadius: 2 }} />
-                </Box>
-              ))
-            ) : (
-              messages.map((message, index) => (
-                <MessageBubbleComponent
-                  key={message.id}
-                  message={message}
-                  isLatest={index === messages.length - 1}
-                />
-              ))
-            )}
+            {messagesLoading
+              ? Array.from({ length: 4 }).map((_, i) => (
+                  <Box
+                    key={i}
+                    sx={{ display: 'flex', gap: { xs: 0.75, sm: 1.5 }, mb: { xs: 1, sm: 2 } }}
+                  >
+                    <Skeleton
+                      variant="circular"
+                      width={isMobile ? 28 : 32}
+                      height={isMobile ? 28 : 32}
+                    />
+                    <Skeleton
+                      variant="rounded"
+                      width={`${50 + i * 5}%`}
+                      height={isMobile ? 32 : 40}
+                      sx={{ borderRadius: 2 }}
+                    />
+                  </Box>
+                ))
+              : messages.map((message, index) => (
+                  <MessageBubbleComponent
+                    key={message.id}
+                    message={message}
+                    isLatest={index === messages.length - 1}
+                  />
+                ))}
             {isSending && <TypingIndicator />}
             <div ref={messagesEndRef} />
           </Box>
         )}
 
         {/* Empty State — only when no conversation is active */}
-        {!activeConversationId && (
-          <EmptyState onSuggestionClick={handleSuggestionClick} />
-        )}
+        {!activeConversationId && <EmptyState onSuggestionClick={handleSuggestionClick} />}
 
         {/* Input Area — always visible */}
         <Box
@@ -909,7 +984,11 @@ export function ChatPage() {
             fullWidth
             multiline
             maxRows={isMobile ? 3 : 4}
-            placeholder={isMobile ? 'Type a message...' : 'Type your message... (Enter to send, Shift+Enter for new line)'}
+            placeholder={
+              isMobile
+                ? 'Type a message...'
+                : 'Type your message... (Enter to send, Shift+Enter for new line)'
+            }
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -939,9 +1018,7 @@ export function ChatPage() {
                           ? theme.palette.primary.contrastText
                           : theme.palette.action.disabled,
                         '&:hover': {
-                          bgcolor: inputValue.trim()
-                            ? theme.palette.primary.dark
-                            : undefined,
+                          bgcolor: inputValue.trim() ? theme.palette.primary.dark : undefined,
                         },
                       }}
                     >

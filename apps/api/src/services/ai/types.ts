@@ -113,7 +113,7 @@ export const AI_MODELS = [
 /**
  * Get available models based on configured API keys.
  */
-export function getAvailableModels(): typeof AI_MODELS[number][] {
+export function getAvailableModels(): (typeof AI_MODELS)[number][] {
   const hasOpenCode = !!process.env.OPENCODE_API_KEY;
   const hasOpenAI = !!process.env.OPENAI_API_KEY;
   const hasAnthropic = !!process.env.ANTHROPIC_API_KEY;

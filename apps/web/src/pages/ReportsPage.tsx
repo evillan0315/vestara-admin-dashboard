@@ -1,15 +1,5 @@
 import { useState, useMemo, useEffect, useCallback, type ReactElement } from 'react';
-import {
-  Box,
-  Typography,
-  Button,
-  Menu,
-  MenuItem,
-  Tabs,
-  Tab,
-  styled,
-  alpha,
-} from '@mui/material';
+import { Box, Typography, Button, Menu, MenuItem, Tabs, Tab, styled, alpha } from '@mui/material';
 import {
   Add as AddIcon,
   Download as DownloadIcon,
@@ -42,7 +32,10 @@ export function ReportsPage(): ReactElement {
   const [tab, setTab] = useState(0);
   const [compareOpen, setCompareOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const selectedReports = useMemo(() => ctx.reports.filter((r) => selectedIds.includes(r.id)), [ctx.reports, selectedIds]);
+  const selectedReports = useMemo(
+    () => ctx.reports.filter((r) => selectedIds.includes(r.id)),
+    [ctx.reports, selectedIds],
+  );
 
   // Live WebSocket updates for report status
   const handleReportStatus = useCallback(
@@ -60,7 +53,9 @@ export function ReportsPage(): ReactElement {
     [ctx.handleMenuOpen],
   );
 
-  const hasPendingReports = ctx.reports.some((r) => r.status === 'pending' || r.status === 'generating');
+  const hasPendingReports = ctx.reports.some(
+    (r) => r.status === 'pending' || r.status === 'generating',
+  );
   useEffect(() => {
     if (hasPendingReports) {
       const interval = setInterval(() => ctx.refetch(), 3000);
@@ -110,7 +105,13 @@ export function ReportsPage(): ReactElement {
             rows={ctx.reports}
             keyExtractor={(row) => row.id}
             loading={ctx.isLoading}
-            error={ctx.isError ? (ctx.error instanceof Error ? ctx.error.message : 'Failed to load reports') : null}
+            error={
+              ctx.isError
+                ? ctx.error instanceof Error
+                  ? ctx.error.message
+                  : 'Failed to load reports'
+                : null
+            }
             onRetry={() => ctx.refetch()}
             sortState={ctx.sort}
             onSortChange={ctx.handleSortChange}
@@ -145,13 +146,21 @@ export function ReportsPage(): ReactElement {
                     variant="outlined"
                     color="error"
                     startIcon={<DeleteIcon />}
-                    onClick={() => ctx.handleBulkDelete(selectedIds.map((id) => ctx.reports.find((r) => r.id === id)!))}
+                    onClick={() =>
+                      ctx.handleBulkDelete(
+                        selectedIds.map((id) => ctx.reports.find((r) => r.id === id)!),
+                      )
+                    }
                     sx={{ textTransform: 'none' }}
                   >
                     Delete ({selectedIds.length})
                   </Button>
                 )}
-                <Button variant="contained" startIcon={<AddIcon />} onClick={() => ctx.setGenerateDialogOpen(true)}>
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={() => ctx.setGenerateDialogOpen(true)}
+                >
                   Generate Report
                 </Button>
               </Box>
@@ -177,7 +186,10 @@ export function ReportsPage(): ReactElement {
       />
 
       <Menu anchorEl={ctx.anchorEl} open={Boolean(ctx.anchorEl)} onClose={ctx.handleMenuClose}>
-        <MenuItem onClick={ctx.handleDownloadClick} disabled={!ctx.menuReport || ctx.menuReport.status !== 'completed'}>
+        <MenuItem
+          onClick={ctx.handleDownloadClick}
+          disabled={!ctx.menuReport || ctx.menuReport.status !== 'completed'}
+        >
           <DownloadIcon fontSize="small" sx={{ mr: 1 }} />
           Download
         </MenuItem>
@@ -190,7 +202,11 @@ export function ReportsPage(): ReactElement {
       <ConfirmDialog
         open={!!ctx.deleteTarget}
         title="Delete Report"
-        message={ctx.deleteTarget ? `Are you sure you want to delete "${ctx.deleteTarget.name || 'this report'}"? This action cannot be undone.` : ''}
+        message={
+          ctx.deleteTarget
+            ? `Are you sure you want to delete "${ctx.deleteTarget.name || 'this report'}"? This action cannot be undone.`
+            : ''
+        }
         confirmText="Delete"
         variant="danger"
         onConfirm={ctx.handleDelete}

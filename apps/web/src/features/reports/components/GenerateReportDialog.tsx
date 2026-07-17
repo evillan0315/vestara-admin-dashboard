@@ -14,10 +14,7 @@ import {
   IconButton,
   CircularProgress,
 } from '@mui/material';
-import {
-  Assessment as AssessmentIcon,
-  Close as CloseIcon,
-} from '@mui/icons-material';
+import { Assessment as AssessmentIcon, Close as CloseIcon } from '@mui/icons-material';
 import { useAvailableColumns } from '../hooks';
 import type { Report, ReportParams } from '../../../api/reports';
 
@@ -53,7 +50,12 @@ function formatDate(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
 
-export function GenerateReportDialog({ open, onClose, onGenerate, generating }: GenerateReportDialogProps) {
+export function GenerateReportDialog({
+  open,
+  onClose,
+  onGenerate,
+  generating,
+}: GenerateReportDialogProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [type, setType] = useState<Report['type']>('audit_logs');
@@ -68,7 +70,8 @@ export function GenerateReportDialog({ open, onClose, onGenerate, generating }: 
 
   const { data: columnsData } = useAvailableColumns(type);
   type ColumnDef = { id: string; label: string };
-  const availableColumns: ColumnDef[] = (columnsData as { data?: ColumnDef[] } | undefined)?.data ?? [];
+  const availableColumns: ColumnDef[] =
+    (columnsData as { data?: ColumnDef[] } | undefined)?.data ?? [];
 
   // Initialize columns on type change
   useEffect(() => {
@@ -111,7 +114,8 @@ export function GenerateReportDialog({ open, onClose, onGenerate, generating }: 
         description: description || undefined,
         ...range,
         format,
-        selectedColumns: selectedColumns.length < availableColumns.length ? selectedColumns : undefined,
+        selectedColumns:
+          selectedColumns.length < availableColumns.length ? selectedColumns : undefined,
         schedule: schedule || undefined,
         emailTo: emailTo || undefined,
       },
@@ -119,7 +123,8 @@ export function GenerateReportDialog({ open, onClose, onGenerate, generating }: 
     );
   };
 
-  const canSubmit = generating || (!showCustom && true) || (showCustom && !!customStart && !!customEnd);
+  const canSubmit =
+    generating || (!showCustom && true) || (showCustom && !!customStart && !!customEnd);
 
   return (
     <Dialog open={open} onClose={generating ? undefined : onClose} maxWidth="md" fullWidth>
@@ -242,11 +247,22 @@ export function GenerateReportDialog({ open, onClose, onGenerate, generating }: 
 
             {/* Column Selection */}
             <Grid size={12}>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  mb: 0.5,
+                }}
+              >
                 <Typography variant="body2" fontWeight={600}>
                   Columns ({selectedColumns.length}/{availableColumns.length})
                 </Typography>
-                <Button size="small" onClick={selectAllColumns} sx={{ textTransform: 'none', fontSize: 12 }}>
+                <Button
+                  size="small"
+                  onClick={selectAllColumns}
+                  sx={{ textTransform: 'none', fontSize: 12 }}
+                >
                   Select All
                 </Button>
               </Box>
@@ -301,7 +317,12 @@ export function GenerateReportDialog({ open, onClose, onGenerate, generating }: 
           <Button onClick={onClose} disabled={generating}>
             Cancel
           </Button>
-          <Button type="submit" variant="contained" startIcon={generating ? <CircularProgress size={16} /> : <AssessmentIcon />} disabled={!canSubmit}>
+          <Button
+            type="submit"
+            variant="contained"
+            startIcon={generating ? <CircularProgress size={16} /> : <AssessmentIcon />}
+            disabled={!canSubmit}
+          >
             {generating ? 'Generating...' : 'Generate Report'}
           </Button>
         </DialogActions>

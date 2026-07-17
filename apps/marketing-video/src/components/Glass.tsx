@@ -1,6 +1,6 @@
-import React from "react";
-import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
-import { BRAND, FONT_FAMILY } from "../theme";
+import React from 'react';
+import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
+import { BRAND, FONT_FAMILY } from '../theme';
 
 interface GoldTextProps {
   children: React.ReactNode;
@@ -30,11 +30,11 @@ export const GoldText: React.FC<GoldTextProps> = ({
         lineHeight: 1.05,
         letterSpacing: -0.5,
         backgroundImage: gradient,
-        WebkitBackgroundClip: "text",
-        backgroundClip: "text",
-        color: "transparent",
-        WebkitTextFillColor: "transparent",
-        display: "inline-block",
+        WebkitBackgroundClip: 'text',
+        backgroundClip: 'text',
+        color: 'transparent',
+        WebkitTextFillColor: 'transparent',
+        display: 'inline-block',
         ...style,
       }}
     >
@@ -59,17 +59,16 @@ export const GlassCard: React.FC<{
   return (
     <div
       style={{
-        position: "relative",
+        position: 'relative',
         borderRadius: 20,
         padding: 28,
         opacity,
         transform: `scale(${interpolate(enter, [0, 1], [0.92, 1])})`,
         background:
-          "linear-gradient(160deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%)",
-        backdropFilter: "blur(12px)",
+          'linear-gradient(160deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%)',
+        backdropFilter: 'blur(12px)',
         border: `1px solid rgba(212,175,55,0.28)`,
-        boxShadow:
-          "0 20px 60px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08)",
+        boxShadow: '0 20px 60px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08)',
         ...style,
       }}
     >
@@ -91,9 +90,9 @@ export const GoldDivider: React.FC<{ delay?: number; width?: number }> = ({
   return (
     <AbsoluteFill
       style={{
-        justifyContent: "flex-start",
-        alignItems: "flex-start",
-        pointerEvents: "none",
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start',
+        pointerEvents: 'none',
       }}
     >
       <div

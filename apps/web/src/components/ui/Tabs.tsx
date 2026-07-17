@@ -49,7 +49,7 @@ export const Tabs: FC<TabsProps> = ({
   sx,
 }) => {
   const [internalValue, setInternalValue] = useState<string | number>(
-    defaultValue ?? items[0]?.value ?? 0
+    defaultValue ?? items[0]?.value ?? 0,
   );
 
   const currentValue = controlledValue ?? internalValue;
@@ -92,12 +92,7 @@ export interface TabPanelProps {
   sx?: SxProps<Theme>;
 }
 
-export const TabPanel: FC<TabPanelProps> = ({
-  value,
-  currentValue,
-  children,
-  sx,
-}) => {
+export const TabPanel: FC<TabPanelProps> = ({ value, currentValue, children, sx }) => {
   if (value !== currentValue) return null;
 
   return (

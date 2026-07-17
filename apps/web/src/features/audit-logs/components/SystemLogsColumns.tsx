@@ -95,9 +95,14 @@ function LogTooltipContent({ row }: { row: AuditLogDTO }) {
           </Typography>
         )}
         <Typography variant="caption" color="text.secondary">
-          <strong>Timestamp:</strong> {new Date(row.createdAt).toLocaleString('en-US', {
-            year: 'numeric', month: 'short', day: 'numeric',
-            hour: '2-digit', minute: '2-digit', second: '2-digit',
+          <strong>Timestamp:</strong>{' '}
+          {new Date(row.createdAt).toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
           })}
         </Typography>
         {row.metadata && Object.keys(row.metadata).length > 0 && (
@@ -155,11 +160,7 @@ export function createSystemLogsColumns(): Column<AuditLogDTO>[] {
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }}>
               <Icon sx={{ fontSize: 16, color: 'text.secondary' }} />
-              <ActionChip
-                action={row.action}
-                label={row.action.replace(/_/g, ' ')}
-                size="small"
-              />
+              <ActionChip action={row.action} label={row.action.replace(/_/g, ' ')} size="small" />
             </Box>
           </Tooltip>
         );
@@ -204,8 +205,12 @@ export function createSystemLogsColumns(): Column<AuditLogDTO>[] {
       label: 'IP Address',
       width: 130,
       render: (value) => (
-        <Typography variant="body2" color="text.secondary" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
-          {value as string || '—'}
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}
+        >
+          {(value as string) || '—'}
         </Typography>
       ),
     },

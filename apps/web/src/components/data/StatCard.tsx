@@ -1,4 +1,12 @@
-import { Box, Typography, Card, CardContent, styled, type SxProps, type Theme } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  styled,
+  type SxProps,
+  type Theme,
+} from '@mui/material';
 import { TrendingUp, TrendingDown, TrendingFlat } from '@mui/icons-material';
 import { memo, type ReactElement, type ReactNode } from 'react';
 
@@ -37,27 +45,27 @@ const IconContainer = styled(Box, {
     iconColor === 'primary'
       ? `${theme.palette.primary.main}15`
       : iconColor === 'secondary'
-      ? `${theme.palette.secondary.main}15`
-      : iconColor === 'success'
-      ? `${theme.palette.success.main}15`
-      : iconColor === 'error'
-      ? `${theme.palette.error.main}15`
-      : iconColor === 'warning'
-      ? `${theme.palette.warning.main}15`
-      : `${theme.palette.info.main}15`,
+        ? `${theme.palette.secondary.main}15`
+        : iconColor === 'success'
+          ? `${theme.palette.success.main}15`
+          : iconColor === 'error'
+            ? `${theme.palette.error.main}15`
+            : iconColor === 'warning'
+              ? `${theme.palette.warning.main}15`
+              : `${theme.palette.info.main}15`,
   '& svg': {
     color:
       iconColor === 'primary'
         ? theme.palette.primary.main
         : iconColor === 'secondary'
-        ? theme.palette.secondary.main
-        : iconColor === 'success'
-        ? theme.palette.success.main
-        : iconColor === 'error'
-        ? theme.palette.error.main
-        : iconColor === 'warning'
-        ? theme.palette.warning.main
-        : theme.palette.info.main,
+          ? theme.palette.secondary.main
+          : iconColor === 'success'
+            ? theme.palette.success.main
+            : iconColor === 'error'
+              ? theme.palette.error.main
+              : iconColor === 'warning'
+                ? theme.palette.warning.main
+                : theme.palette.info.main,
   },
 }));
 
@@ -73,16 +81,16 @@ const ChangeContainer = styled(Box, {
     positive === true
       ? `${theme.palette.success.main}15`
       : positive === false
-      ? `${theme.palette.error.main}15`
-      : `${theme.palette.grey[500]}15`,
+        ? `${theme.palette.error.main}15`
+        : `${theme.palette.grey[500]}15`,
   '& svg': {
     fontSize: 14,
     color:
       positive === true
         ? theme.palette.success.main
         : positive === false
-        ? theme.palette.error.main
-        : theme.palette.grey[500],
+          ? theme.palette.error.main
+          : theme.palette.grey[500],
   },
 }));
 
@@ -95,8 +103,8 @@ const ChangeText = styled(Typography, {
     positive === true
       ? theme.palette.success.main
       : positive === false
-      ? theme.palette.error.main
-      : theme.palette.grey[500],
+        ? theme.palette.error.main
+        : theme.palette.grey[500],
 }));
 
 export const StatCard = memo(
@@ -110,45 +118,48 @@ export const StatCard = memo(
     sx,
     loading = false,
   }: StatCardProps): ReactElement => {
-  const isPositive = change !== undefined ? change > 0 : null;
+    const isPositive = change !== undefined ? change > 0 : null;
 
-  return (
-    <StyledCard sx={sx}>
-      <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="body2" color="text.secondary" gutterBottom>
-              {title}
-            </Typography>
-            <Typography variant="h4" fontWeight={700}>
-              {loading ? '—' : value}
-            </Typography>
-          </Box>
-          {icon && (
-            <IconContainer iconColor={iconColor}>
-              {icon}
-            </IconContainer>
-          )}
-        </Box>
-        {change !== undefined && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
-            <ChangeContainer positive={isPositive}>
-              {isPositive === true ? <TrendingUp /> : isPositive === false ? <TrendingDown /> : <TrendingFlat />}
-              <ChangeText positive={isPositive}>
-                {isPositive ? '+' : ''}{change}%
-              </ChangeText>
-            </ChangeContainer>
-            {changeLabel && (
-              <Typography variant="caption" color="text.secondary">
-                {changeLabel}
+    return (
+      <StyledCard sx={sx}>
+        <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                {title}
               </Typography>
-            )}
+              <Typography variant="h4" fontWeight={700}>
+                {loading ? '—' : value}
+              </Typography>
+            </Box>
+            {icon && <IconContainer iconColor={iconColor}>{icon}</IconContainer>}
           </Box>
-        )}
-      </CardContent>
-    </StyledCard>
-  );
-},
+          {change !== undefined && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
+              <ChangeContainer positive={isPositive}>
+                {isPositive === true ? (
+                  <TrendingUp />
+                ) : isPositive === false ? (
+                  <TrendingDown />
+                ) : (
+                  <TrendingFlat />
+                )}
+                <ChangeText positive={isPositive}>
+                  {isPositive ? '+' : ''}
+                  {change}%
+                </ChangeText>
+              </ChangeContainer>
+              {changeLabel && (
+                <Typography variant="caption" color="text.secondary">
+                  {changeLabel}
+                </Typography>
+              )}
+            </Box>
+          )}
+        </CardContent>
+      </StyledCard>
+    );
+  },
 );
 
 export default StatCard;

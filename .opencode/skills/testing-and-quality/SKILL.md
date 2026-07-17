@@ -119,10 +119,7 @@ describe('POST /resource', () => {
     const input = { name: 'test' };
 
     // Act
-    const response = await request(app)
-      .post('/api/v1/resource')
-      .send(input)
-      .expect(201);
+    const response = await request(app).post('/api/v1/resource').send(input).expect(201);
 
     // Assert
     expect(response.body.success).toBe(true);
@@ -137,13 +134,13 @@ describe('POST /resource', () => {
 
 ### What to test
 
-| Layer | Focus |
-|-------|-------|
-| **API routes** | HTTP status codes, response shape, success/error payloads, auth guards, input validation |
-| **Services** | Business logic in isolation, edge cases, error conditions |
-| **Validation schemas** | Zod schemas — valid input passes, invalid input fails with correct error codes |
-| **Middleware** | Auth guards, role checks, request enrichment |
-| **Repository layer** | Database queries, filtering, pagination |
+| Layer                  | Focus                                                                                    |
+| ---------------------- | ---------------------------------------------------------------------------------------- |
+| **API routes**         | HTTP status codes, response shape, success/error payloads, auth guards, input validation |
+| **Services**           | Business logic in isolation, edge cases, error conditions                                |
+| **Validation schemas** | Zod schemas — valid input passes, invalid input fails with correct error codes           |
+| **Middleware**         | Auth guards, role checks, request enrichment                                             |
+| **Repository layer**   | Database queries, filtering, pagination                                                  |
 
 ### Response format
 
@@ -174,13 +171,13 @@ Every pull request must pass:
 
 ### ESLint rules (non-negotiable)
 
-| Rule | Enforcement |
-|------|------------|
-| `@typescript-eslint/no-unused-vars` | `error` — prefix unused params with `_` |
-| `@typescript-eslint/no-explicit-any` | `warn` — avoid `any`; prefer `unknown` |
-| `no-console` | `warn` — only `console.warn` / `console.error` allowed |
-| `prefer-const` | `error` |
-| `no-var` | `error` |
+| Rule                                 | Enforcement                                            |
+| ------------------------------------ | ------------------------------------------------------ |
+| `@typescript-eslint/no-unused-vars`  | `error` — prefix unused params with `_`                |
+| `@typescript-eslint/no-explicit-any` | `warn` — avoid `any`; prefer `unknown`                 |
+| `no-console`                         | `warn` — only `console.warn` / `console.error` allowed |
+| `prefer-const`                       | `error`                                                |
+| `no-var`                             | `error`                                                |
 
 ### TypeScript strictness
 

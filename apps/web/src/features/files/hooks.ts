@@ -80,7 +80,9 @@ export function useUploadFiles() {
       return res.data?.files || [];
     },
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: fileKeys.folderContents(variables.folderId ?? null) });
+      queryClient.invalidateQueries({
+        queryKey: fileKeys.folderContents(variables.folderId ?? null),
+      });
       queryClient.invalidateQueries({ queryKey: fileKeys.stats() });
     },
   });
@@ -125,7 +127,9 @@ export function useUpdateFile() {
     },
     onSuccess: (_data, variables) => {
       // Invalidate both source and destination folders
-      queryClient.invalidateQueries({ queryKey: fileKeys.folderContents(variables.currentFolderId ?? null) });
+      queryClient.invalidateQueries({
+        queryKey: fileKeys.folderContents(variables.currentFolderId ?? null),
+      });
       if (variables.data.folderId !== undefined) {
         queryClient.invalidateQueries({
           queryKey: fileKeys.folderContents(variables.data.folderId),
@@ -180,12 +184,7 @@ export function useDeleteFile() {
 export function useBulkDeleteFiles() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({
-      fileIds,
-    }: {
-      fileIds: string[];
-      currentFolderId?: string | null;
-    }) => {
+    mutationFn: async ({ fileIds }: { fileIds: string[]; currentFolderId?: string | null }) => {
       const res = await filesApi.bulkDelete(fileIds);
       return res.data?.deleted;
     },

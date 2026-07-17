@@ -26,18 +26,14 @@ router.use(authenticate);
  * GET /users/stats — Get user statistics
  * Access: SUPER_ADMIN, ADMIN
  */
-router.get(
-  '/stats',
-  requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN),
-  async (req, res, next) => {
-    try {
-      const stats = await userRepository.getStats(req.user!.organizationId);
-      sendSuccess(res, { stats });
-    } catch (error) {
-      next(error);
-    }
-  },
-);
+router.get('/stats', requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN), async (req, res, next) => {
+  try {
+    const stats = await userRepository.getStats(req.user!.organizationId);
+    sendSuccess(res, { stats });
+  } catch (error) {
+    next(error);
+  }
+});
 
 /**
  * GET /users — List users (paginated, filterable)
@@ -68,7 +64,8 @@ router.get(
         role: role as UserRole | undefined,
         isActive: isActive === undefined ? undefined : isActive === 'true',
         // SUPER_ADMIN sees all users across all organizations; others scoped to their org
-        organizationId: req.user!.role === UserRole.SUPER_ADMIN ? undefined : req.user!.organizationId,
+        organizationId:
+          req.user!.role === UserRole.SUPER_ADMIN ? undefined : req.user!.organizationId,
       });
 
       sendPaginated(res, result.users, {
@@ -227,31 +224,27 @@ router.put(
  * DELETE /users/:id — Delete a user (super_admin only)
  * Access: SUPER_ADMIN
  */
-router.delete(
-  '/:id',
-  requireRole(UserRole.SUPER_ADMIN),
-  async (req, res, next) => {
-    try {
-      const id = param(req.params.id);
+router.delete('/:id', requireRole(UserRole.SUPER_ADMIN), async (req, res, next) => {
+  try {
+    const id = param(req.params.id);
 
-      if (id === req.user!.id) {
-        return res.status(400).json({
-          success: false,
-          error: {
-            code: 'CANNOT_DELETE_SELF',
-            message: 'You cannot delete your own account',
-          },
-        });
-      }
-
-      await userRepository.findByIdOrThrow(id);
-      await userRepository.delete(id);
-      sendNoContent(res);
-    } catch (error) {
-      next(error);
+    if (id === req.user!.id) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'CANNOT_DELETE_SELF',
+          message: 'You cannot delete your own account',
+        },
+      });
     }
-  },
-);
+
+    await userRepository.findByIdOrThrow(id);
+    await userRepository.delete(id);
+    sendNoContent(res);
+  } catch (error) {
+    next(error);
+  }
+});
 
 /**
  * PATCH /users/:id/status — Toggle user active status

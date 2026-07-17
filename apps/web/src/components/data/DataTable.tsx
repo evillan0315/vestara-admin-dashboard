@@ -91,9 +91,8 @@ const TableHeaderCell = styled(TableCell)(({ theme }) => ({
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
   color: theme.palette.text.secondary,
-  backgroundColor: theme.palette.mode === 'light'
-    ? theme.palette.grey[50]
-    : theme.palette.background.default,
+  backgroundColor:
+    theme.palette.mode === 'light' ? theme.palette.grey[50] : theme.palette.background.default,
   borderBottom: `2px solid ${theme.palette.divider}`,
   whiteSpace: 'nowrap',
   padding: theme.spacing(1.5, 2),
@@ -126,11 +125,15 @@ const ToolbarContainer = styled(Box)(({ theme }) => ({
 }));
 
 const SearchField = styled(TextField)(({ theme }) => ({
-  minWidth: 280,
-  maxWidth: 400,
+  minWidth: { xs: '100%', sm: 280 },
+  maxWidth: { xs: '100%', sm: 400 },
+  [theme.breakpoints.down('sm')]: {
+    width: '100%',
+  },
   '& .MuiOutlinedInput-root': {
     borderRadius: 8,
-    backgroundColor: theme.palette.mode === 'light' ? theme.palette.background.paper : theme.palette.grey[900],
+    backgroundColor:
+      theme.palette.mode === 'light' ? theme.palette.background.paper : theme.palette.grey[900],
   },
   '& .MuiOutlinedInput-input': {
     padding: theme.spacing(1, 1.5),
@@ -165,9 +168,12 @@ const TableWrapper = styled(TableContainer)(({ theme }) => ({
   borderRadius: 12,
   border: `1px solid ${theme.palette.divider}`,
   overflow: 'hidden',
+  overflowX: 'auto',
+  WebkitOverflowScrolling: 'touch',
   '& .MuiTable-root': {
     borderCollapse: 'separate',
     borderSpacing: 0,
+    minWidth: 650,
   },
 }));
 
@@ -319,14 +325,16 @@ export function DataTable<T>({
                 }}
               />
             )}
-            {filters && <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>{filters}</Box>}
+            {filters && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>{filters}</Box>
+            )}
           </Box>
           {actions && <Box sx={{ display: 'flex', gap: 1, flexShrink: 0 }}>{actions}</Box>}
         </ToolbarContainer>
       )}
 
       {/* Table */}
-      <Table sx={{ minWidth: 650 }}>
+      <Table sx={{ minWidth: { xs: 650, md: 650 } }}>
         <TableHead>
           <TableRow>
             {selectable && (
@@ -340,11 +348,7 @@ export function DataTable<T>({
               </TableHeaderCell>
             )}
             {columns.map((col) => (
-              <TableHeaderCell
-                key={col.id}
-                sx={{ width: col.width }}
-                align={col.align}
-              >
+              <TableHeaderCell key={col.id} sx={{ width: col.width }} align={col.align}>
                 {sortable && col.sortable !== false && onSortChange ? (
                   <TableSortLabel
                     active={sortState?.field === col.id}
@@ -392,12 +396,7 @@ export function DataTable<T>({
               const rowId = keyExtractor(row);
               const isSelected = selectedIds.includes(rowId);
               return (
-                <TableRowStyled
-                  key={rowId}
-                  hover
-                  selected={isSelected}
-                  clickable={false}
-                >
+                <TableRowStyled key={rowId} hover selected={isSelected} clickable={false}>
                   {selectable && (
                     <BodyCell sx={{ width: 48, px: 2 }}>
                       <Checkbox
@@ -410,7 +409,10 @@ export function DataTable<T>({
                   {columns.map((col) => {
                     let value: ReactNode;
                     if (col.render) {
-                      value = col.render(col.accessor ? col.accessor(row) : (row as Record<string, unknown>)[col.id], row);
+                      value = col.render(
+                        col.accessor ? col.accessor(row) : (row as Record<string, unknown>)[col.id],
+                        row,
+                      );
                     } else if (col.accessor) {
                       value = col.accessor(row);
                     } else {
@@ -483,7 +485,12 @@ export function DataTable<T>({
 
             {getPageNumbers().map((p, i) =>
               p === -1 ? (
-                <Typography key={`ellipsis-${i}`} variant="body2" color="text.disabled" sx={{ px: 0.5 }}>
+                <Typography
+                  key={`ellipsis-${i}`}
+                  variant="body2"
+                  color="text.disabled"
+                  sx={{ px: 0.5 }}
+                >
                   ...
                 </Typography>
               ) : (

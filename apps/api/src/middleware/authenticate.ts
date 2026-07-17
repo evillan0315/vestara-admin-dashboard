@@ -69,11 +69,7 @@ export function requireRole(...roles: UserRole[]) {
     }
 
     if (!roles.includes(req.user.role)) {
-      next(
-        new ForbiddenError(
-          `Requires one of: ${roles.join(', ')}`,
-        ),
-      );
+      next(new ForbiddenError(`Requires one of: ${roles.join(', ')}`));
       return;
     }
 

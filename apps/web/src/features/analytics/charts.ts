@@ -62,7 +62,11 @@ export function buildDistribution<T extends string>(
   return limit ? entries.slice(0, limit) : entries;
 }
 
-export function useDailySeries(logs: AuditLogDTO[], rangeDays: number, endDate: string): DailySeries {
+export function useDailySeries(
+  logs: AuditLogDTO[],
+  rangeDays: number,
+  endDate: string,
+): DailySeries {
   return useMemo(() => buildDailySeries(logs, rangeDays, endDate), [logs, rangeDays, endDate]);
 }
 
@@ -75,8 +79,6 @@ export function useDistribution(
   return useMemo(() => buildDistribution(logs, pick, label, limit), [logs, pick, label, limit]);
 }
 
-export const actionLabelLookup = (key: string): string =>
-  ACTION_LABELS[key as AuditAction] ?? key;
+export const actionLabelLookup = (key: string): string => ACTION_LABELS[key as AuditAction] ?? key;
 
-export const entityLabelLookup = (key: string): string =>
-  ENTITY_LABELS[key as EntityType] ?? key;
+export const entityLabelLookup = (key: string): string => ENTITY_LABELS[key as EntityType] ?? key;

@@ -24,7 +24,12 @@ interface AIHttpResponse {
  */
 export class OpenCodeProvider implements AIProvider {
   readonly name = 'opencode';
-  readonly models = ['mimo-v2.5-free', 'deepseek-v4-flash-free', 'nemotron-3-ultra-free', 'north-mini-code-free'];
+  readonly models = [
+    'mimo-v2.5-free',
+    'deepseek-v4-flash-free',
+    'nemotron-3-ultra-free',
+    'north-mini-code-free',
+  ];
 
   private readonly apiKey: string;
   private readonly baseUrl: string;
@@ -40,7 +45,9 @@ export class OpenCodeProvider implements AIProvider {
 
   async complete(request: AICompletionRequest): Promise<AICompletionResponse> {
     if (!this.isAvailable()) {
-      throw new Error('OpenCode API key not configured. Set OPENCODE_API_KEY environment variable.');
+      throw new Error(
+        'OpenCode API key not configured. Set OPENCODE_API_KEY environment variable.',
+      );
     }
 
     const messages: Array<{ role: string; content: string }> = [];
@@ -100,11 +107,11 @@ export class OpenCodeProvider implements AIProvider {
     // Different models use different field names: reasoning, reasoning_content, reasoning_details.
     const msg = choice.message;
     const content =
-      msg.content
-      ?? msg.reasoning
-      ?? msg.reasoning_content
-      ?? msg.reasoning_details?.[0]?.text
-      ?? '';
+      msg.content ??
+      msg.reasoning ??
+      msg.reasoning_content ??
+      msg.reasoning_details?.[0]?.text ??
+      '';
 
     return {
       content,

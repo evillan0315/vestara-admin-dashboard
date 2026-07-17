@@ -4,12 +4,7 @@ export class RefreshTokenRepository extends BaseRepository {
   /**
    * Create a new refresh token.
    */
-  async create(data: {
-    token: string;
-    userId: string;
-    organizationId: string;
-    expiresAt: Date;
-  }) {
+  async create(data: { token: string; userId: string; organizationId: string; expiresAt: Date }) {
     return this.prisma.refreshToken.create({ data });
   }
 

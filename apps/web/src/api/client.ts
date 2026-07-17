@@ -73,8 +73,7 @@ class ApiClient {
     attemptedRefresh = false,
   ): Promise<ApiResponse<T> | Blob> {
     const url = `${this.baseUrl}${endpoint}`;
-    const hadAuth =
-      !!localStorage.getItem('accessToken') || !!localStorage.getItem('refreshToken');
+    const hadAuth = !!localStorage.getItem('accessToken') || !!localStorage.getItem('refreshToken');
 
     const attempt = (): Promise<Response> =>
       fetch(url, { ...options, headers: buildHeaders(options) });

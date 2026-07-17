@@ -1,8 +1,8 @@
-import { type JSX, useState } from "react";
+import { type JSX, useState } from 'react';
 
-import { useAuth } from "../../features/auth/AuthContext";
-import UserMenuTrigger from "./UserMenuTrigger";
-import UserMenuDropdown from "./UserMenuDropdown";
+import { useAuth } from '../../features/auth/AuthContext';
+import UserMenuTrigger from './UserMenuTrigger';
+import UserMenuDropdown from './UserMenuDropdown';
 
 export interface UserMenuProps {
   onLogout?: () => Promise<void> | void;

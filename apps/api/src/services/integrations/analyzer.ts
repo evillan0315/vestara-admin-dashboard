@@ -41,7 +41,9 @@ function findArrayOfObjects(node: unknown, depth = 0): Record_[] | null {
  */
 export function normalizeToRecords(payload: unknown): Record_[] {
   if (Array.isArray(payload)) {
-    const objs = payload.filter((x) => x && typeof x === 'object' && !Array.isArray(x)) as Record_[];
+    const objs = payload.filter(
+      (x) => x && typeof x === 'object' && !Array.isArray(x),
+    ) as Record_[];
     if (objs.length) return objs;
   }
   if (payload && typeof payload === 'object') {
@@ -54,7 +56,9 @@ function inferFieldType(value: unknown): FieldMetaDTO['type'] {
   if (typeof value === 'number') return 'number';
   if (typeof value === 'boolean') return 'boolean';
   if (typeof value === 'string') {
-    if (/^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2})?(\.\d+)?(Z|[+-]\d{2}:?\d{2})?)?$/i.test(value)) {
+    if (
+      /^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2})?(\.\d+)?(Z|[+-]\d{2}:?\d{2})?)?$/i.test(value)
+    ) {
       const parsed = Date.parse(value);
       if (!Number.isNaN(parsed)) return 'date';
     }
@@ -96,15 +100,26 @@ function distinctCount(records: Record_[], field: string): number {
 /**
  * Deterministic, always-available visualization spec derived from field types.
  */
-export function buildHeuristicSpec(records: Record_[], fields: FieldMetaDTO[]): VisualizationSpecDTO {
+export function buildHeuristicSpec(
+  records: Record_[],
+  fields: FieldMetaDTO[],
+): VisualizationSpecDTO {
   const numeric = fields.filter((f) => f.type === 'number');
   const dates = fields.filter((f) => f.type === 'date');
   const categorical = fields.filter((f) => f.type === 'string' || f.type === 'boolean');
 
   const kpis: KpiSpecDTO[] = [{ title: 'Total Records', aggregation: 'count' }];
   if (numeric.length) {
-    kpis.push({ title: `Avg ${titleCase(numeric[0].name)}`, aggregation: 'avg', field: numeric[0].name });
-    kpis.push({ title: `Sum ${titleCase(numeric[0].name)}`, aggregation: 'sum', field: numeric[0].name });
+    kpis.push({
+      title: `Avg ${titleCase(numeric[0].name)}`,
+      aggregation: 'avg',
+      field: numeric[0].name,
+    });
+    kpis.push({
+      title: `Sum ${titleCase(numeric[0].name)}`,
+      aggregation: 'sum',
+      field: numeric[0].name,
+    });
   }
 
   const charts: ChartSpecDTO[] = [];
@@ -112,7 +127,11 @@ export function buildHeuristicSpec(records: Record_[], fields: FieldMetaDTO[]): 
   for (const f of categorical.slice(0, 2)) {
     const d = distinctCount(records, f.name);
     if (d > 1 && d <= 12) {
-      charts.push({ type: 'pie', title: `Distribution by ${titleCase(f.name)}`, groupByField: f.name });
+      charts.push({
+        type: 'pie',
+        title: `Distribution by ${titleCase(f.name)}`,
+        groupByField: f.name,
+      });
     }
   }
 
@@ -121,7 +140,12 @@ export function buildHeuristicSpec(records: Record_[], fields: FieldMetaDTO[]): 
     return d > 1 && d <= 30;
   });
   if (topCat) {
-    charts.push({ type: 'bar', title: `Count by ${titleCase(topCat.name)}`, groupByField: topCat.name, limit: 10 });
+    charts.push({
+      type: 'bar',
+      title: `Count by ${titleCase(topCat.name)}`,
+      groupByField: topCat.name,
+      limit: 10,
+    });
   }
 
   if (dates.length && records.length > 1) {

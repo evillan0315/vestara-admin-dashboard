@@ -1,7 +1,16 @@
 import { useState, useCallback, useMemo } from 'react';
 import type { UserDTO, UserRole } from '@vestara/types';
 import type { SortState, PaginationState } from '../../../components/data/DataTable';
-import { useUsers, useCreateUser, useUpdateUser, useDeleteUser, useToggleUserStatus, useBulkDeleteUsers, useBulkUpdateUserStatus, useUserStats } from '../hooks';
+import {
+  useUsers,
+  useCreateUser,
+  useUpdateUser,
+  useDeleteUser,
+  useToggleUserStatus,
+  useBulkDeleteUsers,
+  useBulkUpdateUserStatus,
+  useUserStats,
+} from '../hooks';
 import { useOrganizations } from '../../organizations/hooks';
 import { exportUsersCsv } from '../exportUsers';
 import { useToast } from '../../../components/feedback/Toast';
@@ -84,32 +93,44 @@ export function useUsersPage() {
     setSelectedIds([]);
   }, []);
 
-  const handleSortChange = useCallback((newSort: SortState) => {
-    setSort(newSort);
-    resetPageAndSelection();
-  }, [resetPageAndSelection]);
+  const handleSortChange = useCallback(
+    (newSort: SortState) => {
+      setSort(newSort);
+      resetPageAndSelection();
+    },
+    [resetPageAndSelection],
+  );
 
-  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-    resetPageAndSelection();
-  }, [resetPageAndSelection]);
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchTerm(e.target.value);
+      resetPageAndSelection();
+    },
+    [resetPageAndSelection],
+  );
 
   const handleSearchClear = useCallback(() => {
     setSearchTerm('');
     resetPageAndSelection();
   }, [resetPageAndSelection]);
 
-  const handleRoleFilterChange = useCallback((role: string) => {
-    setRoleFilter(role as UserRole | '');
-    resetPageAndSelection();
-  }, [resetPageAndSelection]);
+  const handleRoleFilterChange = useCallback(
+    (role: string) => {
+      setRoleFilter(role as UserRole | '');
+      resetPageAndSelection();
+    },
+    [resetPageAndSelection],
+  );
 
-  const handleStatusFilterChange = useCallback((status: string) => {
-    if (status === 'true') setStatusFilter(true);
-    else if (status === 'false') setStatusFilter(false);
-    else setStatusFilter('');
-    resetPageAndSelection();
-  }, [resetPageAndSelection]);
+  const handleStatusFilterChange = useCallback(
+    (status: string) => {
+      if (status === 'true') setStatusFilter(true);
+      else if (status === 'false') setStatusFilter(false);
+      else setStatusFilter('');
+      resetPageAndSelection();
+    },
+    [resetPageAndSelection],
+  );
 
   const handleClearFilters = useCallback(() => {
     setSearchTerm('');
@@ -140,7 +161,14 @@ export function useUsersPage() {
   }, []);
 
   const handleDialogSubmit = useCallback(
-    async (formData: { firstName: string; lastName: string; email: string; password?: string; role: UserRole; organizationId?: string }) => {
+    async (formData: {
+      firstName: string;
+      lastName: string;
+      email: string;
+      password?: string;
+      role: UserRole;
+      organizationId?: string;
+    }) => {
       try {
         if (editUser) {
           await updateMutation.mutateAsync({
@@ -154,7 +182,9 @@ export function useUsersPage() {
           });
           showSuccess('User updated successfully');
         } else {
-          await createMutation.mutateAsync(formData as Parameters<typeof createMutation.mutateAsync>[0]);
+          await createMutation.mutateAsync(
+            formData as Parameters<typeof createMutation.mutateAsync>[0],
+          );
           showSuccess('User created successfully');
         }
         handleDialogClose();

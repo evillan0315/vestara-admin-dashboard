@@ -1,5 +1,20 @@
-import { Radio as MuiRadio, RadioGroup, FormControlLabel, FormControl, FormLabel, FormHelperText, styled, type SxProps, type Theme } from '@mui/material';
-import { Controller, type ControllerProps, type FieldPath, type FieldValues } from 'react-hook-form';
+import {
+  Radio as MuiRadio,
+  RadioGroup,
+  FormControlLabel,
+  FormControl,
+  FormLabel,
+  FormHelperText,
+  styled,
+  type SxProps,
+  type Theme,
+} from '@mui/material';
+import {
+  Controller,
+  type ControllerProps,
+  type FieldPath,
+  type FieldValues,
+} from 'react-hook-form';
 import type { ReactNode } from 'react';
 
 export interface RadioOption {
@@ -8,7 +23,10 @@ export interface RadioOption {
   disabled?: boolean;
 }
 
-export interface FormRadioGroupProps<T extends FieldValues> extends Omit<ControllerProps<T>, 'render' | 'control' | 'name'> {
+export interface FormRadioGroupProps<T extends FieldValues> extends Omit<
+  ControllerProps<T>,
+  'render' | 'control' | 'name'
+> {
   name: FieldPath<T>;
   label?: ReactNode;
   options: RadioOption[];
@@ -61,7 +79,11 @@ export function FormRadioGroup<T extends FieldValues>({
         return (
           <FormControl component="fieldset" sx={sx}>
             {label && (
-              <FormLabel component="legend" required={required} sx={{ mb: 1, fontSize: '0.875rem', fontWeight: 500 }}>
+              <FormLabel
+                component="legend"
+                required={required}
+                sx={{ mb: 1, fontSize: '0.875rem', fontWeight: 500 }}
+              >
                 {label}
               </FormLabel>
             )}

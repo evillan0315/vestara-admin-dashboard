@@ -54,4 +54,3 @@ export function useAuditLog(id: string) {
     enabled: !!id,
   });
 }
-

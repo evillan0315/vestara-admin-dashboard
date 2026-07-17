@@ -63,11 +63,7 @@ export default function AuthField({
           },
         }}
       >
-        {icon && (
-          <Box sx={{ color: colors.muted, display: 'flex', flexShrink: 0 }}>
-            {icon}
-          </Box>
-        )}
+        {icon && <Box sx={{ color: colors.muted, display: 'flex', flexShrink: 0 }}>{icon}</Box>}
         <InputBase
           type={inputType}
           value={value}
@@ -97,9 +93,7 @@ export default function AuthField({
       </Box>
 
       {error && (
-        <Typography
-          sx={{ fontSize: 12, color: colors.error, mt: 0.5, ml: 0.5 }}
-        >
+        <Typography sx={{ fontSize: 12, color: colors.error, mt: 0.5, ml: 0.5 }}>
           {error}
         </Typography>
       )}

@@ -9,12 +9,20 @@ import {
   type SxProps,
   type Theme,
 } from '@mui/material';
-import { Controller, type ControllerProps, type FieldPath, type FieldValues } from 'react-hook-form';
+import {
+  Controller,
+  type ControllerProps,
+  type FieldPath,
+  type FieldValues,
+} from 'react-hook-form';
 import type { ReactNode } from 'react';
 
 import type { RadioOption } from './FormRadioGroup';
 
-export interface FormRadioProps<T extends FieldValues> extends Omit<ControllerProps<T>, 'render' | 'control' | 'name'> {
+export interface FormRadioProps<T extends FieldValues> extends Omit<
+  ControllerProps<T>,
+  'render' | 'control' | 'name'
+> {
   name: FieldPath<T>;
   label?: ReactNode;
   options: RadioOption[];
@@ -70,7 +78,9 @@ export function FormRadio<T extends FieldValues>({
             {label && (
               <FormLabel component="legend" sx={{ mb: 1, fontSize: '0.875rem', fontWeight: 500 }}>
                 {label}
-                {required && <span style={{ color: 'var(--mui-palette-error-main)', marginLeft: 4 }}>*</span>}
+                {required && (
+                  <span style={{ color: 'var(--mui-palette-error-main)', marginLeft: 4 }}>*</span>
+                )}
               </FormLabel>
             )}
             <FormGroup row={direction === 'row'}>

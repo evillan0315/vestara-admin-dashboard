@@ -1,4 +1,13 @@
-import { Card as MuiCard, CardHeader, CardContent, CardActions, CardMedia, styled, type SxProps, type Theme } from '@mui/material';
+import {
+  Card as MuiCard,
+  CardHeader,
+  CardContent,
+  CardActions,
+  CardMedia,
+  styled,
+  type SxProps,
+  type Theme,
+} from '@mui/material';
 import { type ReactNode, forwardRef, type HTMLAttributes } from 'react';
 
 export interface CardComponentProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
@@ -25,9 +34,15 @@ export interface CardComponentProps extends Omit<HTMLAttributes<HTMLDivElement>,
 
 const StyledCard = styled(MuiCard, {
   shouldForwardProp: (prop) => prop !== 'cardVariant' && prop !== 'hoverable' && prop !== 'padding',
-})<{ cardVariant?: 'elevated' | 'outlined' | 'filled'; hoverable?: boolean; padding?: 'none' | 'normal' | 'comfortable' }>`
+})<{
+  cardVariant?: 'elevated' | 'outlined' | 'filled';
+  hoverable?: boolean;
+  padding?: 'none' | 'normal' | 'comfortable';
+}>`
   border-radius: 12px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   overflow: hidden;
 
   ${({ cardVariant = 'elevated', theme }) => {
@@ -89,7 +104,7 @@ export const Card = forwardRef<HTMLDivElement, CardComponentProps>(
       actionPosition = 'end',
       ...props
     },
-    ref
+    ref,
   ) => {
     return (
       <StyledCard
@@ -100,11 +115,7 @@ export const Card = forwardRef<HTMLDivElement, CardComponentProps>(
         {...props}
       >
         {media && media.position !== 'bottom' && (
-          <CardMedia
-            image={media.image}
-            title={media.title}
-            sx={{ height: 200 }}
-          />
+          <CardMedia image={media.image} title={media.title} sx={{ height: 200 }} />
         )}
 
         {header && (
@@ -119,21 +130,20 @@ export const Card = forwardRef<HTMLDivElement, CardComponentProps>(
         <StyledCardContent cardPadding={padding}>{children}</StyledCardContent>
 
         {actions && (
-          <CardActions disableSpacing sx={{ justifyContent: actionPosition === 'start' ? 'flex-start' : 'flex-end' }}>
+          <CardActions
+            disableSpacing
+            sx={{ justifyContent: actionPosition === 'start' ? 'flex-start' : 'flex-end' }}
+          >
             {actions}
           </CardActions>
         )}
 
         {media && media.position === 'bottom' && (
-          <CardMedia
-            image={media.image}
-            title={media.title}
-            sx={{ height: 200 }}
-          />
+          <CardMedia image={media.image} title={media.title} sx={{ height: 200 }} />
         )}
       </StyledCard>
     );
-  }
+  },
 );
 
 Card.displayName = 'Card';

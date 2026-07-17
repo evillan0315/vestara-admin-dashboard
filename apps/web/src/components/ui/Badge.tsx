@@ -1,8 +1,4 @@
-import {
-  Badge as MuiBadge,
-  styled,
-  type BadgeProps as MuiBadgeProps,
-} from '@mui/material';
+import { Badge as MuiBadge, styled, type BadgeProps as MuiBadgeProps } from '@mui/material';
 import { type FC, type ReactNode } from 'react';
 
 export interface BadgeProps extends MuiBadgeProps {

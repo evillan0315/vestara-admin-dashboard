@@ -12,14 +12,7 @@
  */
 
 import { type JSX, useCallback, useRef } from 'react';
-import {
-  Box,
-  Typography,
-  Tooltip,
-  useTheme,
-  CircularProgress,
-  alpha,
-} from '@mui/material';
+import { Box, Typography, Tooltip, useTheme, CircularProgress, alpha } from '@mui/material';
 import { Camera } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../features/auth/AuthContext';
@@ -263,10 +256,7 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element | null {
                   onClick={() => handleNavClick(item)}
                   sx={navItemSx(item, active)}
                 >
-                  <Icon
-                    size={cfg.iconOnly ? 22 : 17}
-                    strokeWidth={active ? 2.5 : 2}
-                  />
+                  <Icon size={cfg.iconOnly ? 22 : 17} strokeWidth={active ? 2.5 : 2} />
                   {!cfg.iconOnly && (
                     <Typography
                       sx={{
@@ -283,8 +273,8 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element | null {
                   )}
 
                   {/* "Soon" badge or numeric badge */}
-                  {!cfg.iconOnly && (
-                    item.soon ? (
+                  {!cfg.iconOnly &&
+                    (item.soon ? (
                       <Box
                         sx={{
                           fontSize: s(9.5),
@@ -294,9 +284,7 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element | null {
                           borderRadius: '999px',
                           px: 0.8,
                           py: 0.2,
-                          bgcolor: isDark
-                            ? 'rgba(255,255,255,0.06)'
-                            : 'rgba(0,0,0,0.06)',
+                          bgcolor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
                           color: theme.palette.text.disabled,
                           border: `1px solid ${theme.palette.divider}`,
                         }}
@@ -313,27 +301,19 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element | null {
                           borderRadius: '999px',
                           px: 0.6,
                           py: 0.1,
-                          bgcolor: active
-                            ? `${primaryContrast}20`
-                            : `${primaryMain}20`,
+                          bgcolor: active ? `${primaryContrast}20` : `${primaryMain}20`,
                           color: active ? primaryContrast : primaryMain,
                         }}
                       >
                         {item.badge}
                       </Box>
-                    ) : null
-                  )}
+                    ) : null)}
                 </Box>
               );
 
               // In icon-only mode, wrap in a Tooltip
               return cfg.iconOnly ? (
-                <Tooltip
-                  key={item.path}
-                  title={item.label}
-                  placement="right"
-                  arrow
-                >
+                <Tooltip key={item.path} title={item.label} placement="right" arrow>
                   {content}
                 </Tooltip>
               ) : (
@@ -368,7 +348,11 @@ export default function Sidebar({ onClose }: SidebarProps): JSX.Element | null {
             justifyContent: 'center',
           }}
         >
-          <Tooltip title={`${user?.firstName ?? 'User'} ${user?.lastName ?? ''}`} placement="right" arrow>
+          <Tooltip
+            title={`${user?.firstName ?? 'User'} ${user?.lastName ?? ''}`}
+            placement="right"
+            arrow
+          >
             <Box
               sx={{
                 width: 28,

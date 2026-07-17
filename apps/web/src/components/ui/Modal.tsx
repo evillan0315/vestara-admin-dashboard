@@ -11,16 +11,13 @@ import {
   type DialogProps,
   type BackdropProps,
 } from '@mui/material';
-import {
-  Close,
-  CheckCircle,
-  Error,
-  Warning,
-  Info,
-} from '@mui/icons-material';
+import { Close, CheckCircle, Error, Warning, Info } from '@mui/icons-material';
 import { type ReactNode, forwardRef, type ElementType } from 'react';
 
-export interface ModalProps extends Omit<DialogProps, 'open' | 'onClose' | 'children' | 'BackdropComponent' | 'fullScreen'> {
+export interface ModalProps extends Omit<
+  DialogProps,
+  'open' | 'onClose' | 'children' | 'BackdropComponent' | 'fullScreen'
+> {
   /** Whether the modal is open */
   open: boolean;
   /** Callback when modal is closed */
@@ -72,7 +69,9 @@ export interface ModalProps extends Omit<DialogProps, 'open' | 'onClose' | 'chil
 const StyledDialog = styled(Dialog)`
   & .MuiDialog-paper {
     border-radius: 16px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 8px 16px -8px rgba(0, 0, 0, 0.15);
+    box-shadow:
+      0 25px 50px -12px rgba(0, 0, 0, 0.25),
+      0 8px 16px -8px rgba(0, 0, 0, 0.15);
     max-height: 90vh;
     outline: none;
   }
@@ -176,12 +175,13 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
       sx,
       ...props
     },
-    ref
+    ref,
   ) => {
     // Handle responsive fullscreen
-    const isFullScreen = typeof fullScreen === 'string' 
-      ? false // Will be handled by useMediaQuery in parent if needed
-      : fullScreen || size === 'full';
+    const isFullScreen =
+      typeof fullScreen === 'string'
+        ? false // Will be handled by useMediaQuery in parent if needed
+        : fullScreen || size === 'full';
 
     const handleClose = (event: React.SyntheticEvent, reason: string) => {
       if (disableBackdropClick && reason === 'backdropClick') {
@@ -234,28 +234,34 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
             }}
           >
             <Box sx={{ flex: 1, minWidth: 0 }}>
-              {header || (title && <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>{title}</Typography>)}
+              {header ||
+                (title && (
+                  <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+                    {title}
+                  </Typography>
+                ))}
             </Box>
             {showCloseButton && (
-              <CloseButton
-                onClick={onClose}
-                aria-label={closeButtonAriaLabel}
-                size="small"
-              >
+              <CloseButton onClick={onClose} aria-label={closeButtonAriaLabel} size="small">
                 <Close fontSize="medium" />
               </CloseButton>
             )}
           </DialogTitle>
         )}
-        <DialogContent dividers={!!(title || header)} sx={{ overflow: scrollable ? 'auto' : 'visible' }}>
-          {typeof children === 'string' ? <DialogContentText>{children}</DialogContentText> : children}
+        <DialogContent
+          dividers={!!(title || header)}
+          sx={{ overflow: scrollable ? 'auto' : 'visible' }}
+        >
+          {typeof children === 'string' ? (
+            <DialogContentText>{children}</DialogContentText>
+          ) : (
+            children
+          )}
         </DialogContent>
-        {actions && (
-          <DialogActions>{actions}</DialogActions>
-        )}
+        {actions && <DialogActions>{actions}</DialogActions>}
       </StyledDialog>
     );
-  }
+  },
 );
 
 Modal.displayName = 'Modal';
@@ -366,19 +372,13 @@ export const AlertDialog = ({
       showCloseButton
     >
       <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-        <Box sx={{ flexShrink: 0, marginTop: 0.5 }}>
-          {icon || defaultIcons[severity]}
-        </Box>
+        <Box sx={{ flexShrink: 0, marginTop: 0.5 }}>{icon || defaultIcons[severity]}</Box>
         <Typography variant="body1" color="text.secondary" paragraph>
           {message}
         </Typography>
       </Box>
       <DialogActions>
-        <Button
-          onClick={onClose}
-          variant="contained"
-          color={severityColors[severity]}
-        >
+        <Button onClick={onClose} variant="contained" color={severityColors[severity]}>
           {confirmText}
         </Button>
       </DialogActions>

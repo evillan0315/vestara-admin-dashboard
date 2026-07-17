@@ -1,5 +1,22 @@
-import { Box, Typography, Button, Select, MenuItem, FormControl, TextField, InputAdornment, IconButton, styled, useTheme } from '@mui/material';
-import { Add as AddIcon, Download as DownloadIcon, Search as SearchIcon, Clear as ClearIcon } from '@mui/icons-material';
+import {
+  Box,
+  Typography,
+  Button,
+  Select,
+  MenuItem,
+  FormControl,
+  TextField,
+  InputAdornment,
+  IconButton,
+  styled,
+  useTheme,
+} from '@mui/material';
+import {
+  Add as AddIcon,
+  Download as DownloadIcon,
+  Search as SearchIcon,
+  Clear as ClearIcon,
+} from '@mui/icons-material';
 import { useMemo, type ReactElement } from 'react';
 import { DataTable } from '../components/data/DataTable';
 import { useUsersPage } from '../features/users/hooks/useUsersPage';
@@ -79,7 +96,11 @@ export function UsersPage(): ReactElement {
           sx={{ borderRadius: '8px', fontSize: '0.8125rem' }}
         >
           {ROLE_OPTIONS.map((option) => (
-            <MenuItem key={String(option.value)} value={option.value} sx={{ fontSize: '0.8125rem' }}>
+            <MenuItem
+              key={String(option.value)}
+              value={option.value}
+              sx={{ fontSize: '0.8125rem' }}
+            >
               {option.label}
             </MenuItem>
           ))}
@@ -135,17 +156,25 @@ export function UsersPage(): ReactElement {
       </Box>
 
       {ctx.userStats && (
-        <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}
+        >
           <Typography component="span" variant="body2" fontWeight={600} color="text.primary">
             {ctx.userStats.total}
           </Typography>
           total
-          <Typography component="span" sx={{ mx: 0.75, color: 'text.disabled' }}>·</Typography>
+          <Typography component="span" sx={{ mx: 0.75, color: 'text.disabled' }}>
+            ·
+          </Typography>
           <Typography component="span" variant="body2" fontWeight={600} color="success.main">
             {ctx.userStats.active}
           </Typography>
           active
-          <Typography component="span" sx={{ mx: 0.75, color: 'text.disabled' }}>·</Typography>
+          <Typography component="span" sx={{ mx: 0.75, color: 'text.disabled' }}>
+            ·
+          </Typography>
           <Typography component="span" variant="body2" fontWeight={600} color="text.secondary">
             {ctx.userStats.inactive}
           </Typography>
@@ -165,7 +194,13 @@ export function UsersPage(): ReactElement {
         rows={ctx.users}
         keyExtractor={(row) => row.id}
         loading={ctx.isLoading}
-        error={ctx.isError ? (ctx.error instanceof Error ? ctx.error.message : 'Failed to load users') : null}
+        error={
+          ctx.isError
+            ? ctx.error instanceof Error
+              ? ctx.error.message
+              : 'Failed to load users'
+            : null
+        }
         onRetry={() => ctx.refetch()}
         sortState={ctx.sort}
         onSortChange={ctx.handleSortChange}

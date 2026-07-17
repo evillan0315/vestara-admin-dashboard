@@ -1,5 +1,9 @@
 import { Box, Button, Typography, Paper, styled, alpha } from '@mui/material';
-import { CheckCircle as CheckCircleIcon, Block as BlockIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import {
+  CheckCircle as CheckCircleIcon,
+  Block as BlockIcon,
+  Delete as DeleteIcon,
+} from '@mui/icons-material';
 
 const BulkBar = styled(Paper)(({ theme }) => ({
   display: 'flex',
@@ -20,7 +24,12 @@ interface UsersBulkBarProps {
   onDelete: () => void;
 }
 
-export function UsersBulkBar({ selectedCount, onActivate, onDeactivate, onDelete }: UsersBulkBarProps) {
+export function UsersBulkBar({
+  selectedCount,
+  onActivate,
+  onDeactivate,
+  onDelete,
+}: UsersBulkBarProps) {
   if (selectedCount === 0) return null;
 
   return (

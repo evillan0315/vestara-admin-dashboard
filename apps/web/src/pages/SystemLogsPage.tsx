@@ -33,7 +33,13 @@ export function SystemLogsPage(): ReactElement {
         rows={ctx.logs}
         keyExtractor={(row) => row.id}
         loading={ctx.isLoading}
-        error={ctx.isError ? (ctx.error instanceof Error ? ctx.error.message : 'Failed to load audit logs') : null}
+        error={
+          ctx.isError
+            ? ctx.error instanceof Error
+              ? ctx.error.message
+              : 'Failed to load audit logs'
+            : null
+        }
         onRetry={() => ctx.refetch()}
         sortState={ctx.sort}
         onSortChange={ctx.handleSortChange}

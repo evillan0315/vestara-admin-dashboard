@@ -27,12 +27,12 @@ const JAVASCRIPT_URI = /javascript\s*:/gi;
  * Returns the input unchanged if it is not a string.
  */
 export function sanitizeText(value: unknown): string {
-  if (typeof value !== "string") return value as string;
+  if (typeof value !== 'string') return value as string;
   return value
-    .replace(CONTROL_CHARS, "")
-    .replace(SCRIPT_TAG, "")
-    .replace(EVENT_HANDLER_ATTR, "")
-    .replace(JAVASCRIPT_URI, "");
+    .replace(CONTROL_CHARS, '')
+    .replace(SCRIPT_TAG, '')
+    .replace(EVENT_HANDLER_ATTR, '')
+    .replace(JAVASCRIPT_URI, '');
 }
 
 /**
@@ -48,11 +48,11 @@ export function sanitizeObject<T>(input: T): T {
     return input.map((item) => sanitizeObject(item)) as unknown as T;
   }
 
-  if (typeof input === "string") {
+  if (typeof input === 'string') {
     return sanitizeText(input) as unknown as T;
   }
 
-  if (typeof input === "object") {
+  if (typeof input === 'object') {
     const result: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(input as Record<string, unknown>)) {
       result[key] = sanitizeObject(value);
@@ -71,15 +71,15 @@ export function sanitizeObject<T>(input: T): T {
  */
 export function isSafeQueryValue(value: unknown): boolean {
   if (value === null || value === undefined) return true;
-  if (typeof value === "string") return !value.startsWith("$");
+  if (typeof value === 'string') return !value.startsWith('$');
   if (Array.isArray(value)) return value.every(isSafeQueryValue);
 
-  if (typeof value === "object") {
+  if (typeof value === 'object') {
     for (const key of Object.keys(value as Record<string, unknown>)) {
-      if (key === "__proto__" || key === "constructor" || key === "prototype") {
+      if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
         return false;
       }
-      if (key.startsWith("$")) return false;
+      if (key.startsWith('$')) return false;
       if (!isSafeQueryValue((value as Record<string, unknown>)[key])) return false;
     }
   }

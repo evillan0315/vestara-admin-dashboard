@@ -52,7 +52,12 @@ export function FileManagerFolderGrid({
           >
             <FolderIcon sx={{ fontSize: 18, color: 'warning.main' }} />
             <Box sx={{ minWidth: 0 }}>
-              <Typography variant="caption" fontWeight={600} noWrap sx={{ maxWidth: 120, lineHeight: 1.3 }}>
+              <Typography
+                variant="caption"
+                fontWeight={600}
+                noWrap
+                sx={{ maxWidth: 120, lineHeight: 1.3 }}
+              >
                 {folder.name}
               </Typography>
             </Box>

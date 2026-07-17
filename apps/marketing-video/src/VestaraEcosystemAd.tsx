@@ -1,16 +1,10 @@
-import React from "react";
-import {
-  AbsoluteFill,
-  interpolate,
-  Sequence,
-  useCurrentFrame,
-  useVideoConfig,
-} from "remotion";
-import { BRAND, FONT_FAMILY } from "./theme";
-import { SceneHook } from "./scenes/SceneHook";
-import { SceneModules } from "./scenes/SceneModules";
-import { FeatureSpotlight } from "./scenes/FeatureSpotlight";
-import { SceneCTA } from "./scenes/SceneCTA";
+import React from 'react';
+import { AbsoluteFill, interpolate, Sequence, useCurrentFrame, useVideoConfig } from 'remotion';
+import { BRAND, FONT_FAMILY } from './theme';
+import { SceneHook } from './scenes/SceneHook';
+import { SceneModules } from './scenes/SceneModules';
+import { FeatureSpotlight } from './scenes/FeatureSpotlight';
+import { SceneCTA } from './scenes/SceneCTA';
 
 // Scene timing (30fps, 900 frames = 30s)
 const HOOK = 0; // 0–90
@@ -30,14 +24,14 @@ const BrandBar: React.FC = () => {
     frame,
     [HOOK + 30, HOOK + 42, durationInFrames - 40, durationInFrames - 24],
     [0, 1, 1, 0],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
   );
   return (
     <AbsoluteFill
       style={{
-        justifyContent: "flex-end",
-        alignItems: "flex-start",
-        pointerEvents: "none",
+        justifyContent: 'flex-end',
+        alignItems: 'flex-start',
+        pointerEvents: 'none',
       }}
     >
       <div
@@ -45,8 +39,8 @@ const BrandBar: React.FC = () => {
           marginLeft: 40,
           marginBottom: 36,
           opacity,
-          display: "flex",
-          alignItems: "center",
+          display: 'flex',
+          alignItems: 'center',
           gap: 10,
         }}
       >
@@ -55,7 +49,7 @@ const BrandBar: React.FC = () => {
             width: 12,
             height: 12,
             background: `linear-gradient(135deg, ${BRAND.goldBright}, ${BRAND.goldDeep})`,
-            clipPath: "polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)",
+            clipPath: 'polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)',
             boxShadow: `0 0 10px rgba(212,175,55,0.6)`,
           }}
         />
@@ -81,12 +75,10 @@ const Crossfade: React.FC<{ frameStart: number; children: React.ReactNode }> = (
   children,
 }) => {
   const frame = useCurrentFrame();
-  const opacity = interpolate(
-    frame,
-    [frameStart - FADE, frameStart + FADE],
-    [0, 1],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
-  );
+  const opacity = interpolate(frame, [frameStart - FADE, frameStart + FADE], [0, 1], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
+  });
   return <AbsoluteFill style={{ opacity }}>{children}</AbsoluteFill>;
 };
 
@@ -115,18 +107,15 @@ export const VestaraEcosystemAd: React.FC = () => {
             eyebrow="AI Assistant"
             title="Answers about your org"
             bullets={[
-              "Data-aware RAG across users & activity",
-              "Floating assistant on every screen",
-              "Connect any REST API, auto-visualize",
+              'Data-aware RAG across users & activity',
+              'Floating assistant on every screen',
+              'Connect any REST API, auto-visualize',
             ]}
           />
         </Crossfade>
       </Sequence>
 
-      <Sequence
-        from={ANALYTICS - FADE}
-        durationInFrames={TRANSITION - ANALYTICS + FADE * 2}
-      >
+      <Sequence from={ANALYTICS - FADE} durationInFrames={TRANSITION - ANALYTICS + FADE * 2}>
         <Crossfade frameStart={ANALYTICS}>
           <FeatureSpotlight
             startFrame={ANALYTICS}
@@ -135,18 +124,15 @@ export const VestaraEcosystemAd: React.FC = () => {
             eyebrow="Admin Analytics"
             title="Real-time clarity"
             bullets={[
-              "Live KPI & audit dashboards",
-              "Multi-tenant by organization",
-              "CSV · Excel · PDF reporting",
+              'Live KPI & audit dashboards',
+              'Multi-tenant by organization',
+              'CSV · Excel · PDF reporting',
             ]}
           />
         </Crossfade>
       </Sequence>
 
-      <Sequence
-        from={TRANSITION - FADE}
-        durationInFrames={CTA - TRANSITION + FADE * 2}
-      >
+      <Sequence from={TRANSITION - FADE} durationInFrames={CTA - TRANSITION + FADE * 2}>
         <Crossfade frameStart={TRANSITION}>
           <SceneModules />
         </Crossfade>

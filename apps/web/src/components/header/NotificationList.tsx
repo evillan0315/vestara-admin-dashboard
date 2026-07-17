@@ -1,12 +1,12 @@
-import type { JSX } from "react";
+import type { JSX } from 'react';
 
-import { Box, Button, Divider, Typography, useTheme, alpha } from "@mui/material";
+import { Box, Button, Divider, Typography, useTheme, alpha } from '@mui/material';
 
-import { Bell } from "lucide-react";
+import { Bell } from 'lucide-react';
 
-import NotificationItem from "./NotificationItem";
+import NotificationItem from './NotificationItem';
 
-import type { Notification } from "./types";
+import type { Notification } from './types';
 
 export interface NotificationListProps {
   notifications: Notification[];
@@ -33,7 +33,7 @@ export default function NotificationList({
         sx={{
           px: 3,
           py: 6,
-          textAlign: "center",
+          textAlign: 'center',
         }}
       >
         <Typography
@@ -54,7 +54,7 @@ export default function NotificationList({
         sx={{
           py: 6,
           px: 3,
-          textAlign: "center",
+          textAlign: 'center',
         }}
       >
         <Bell size={42} color={text.disabled} />
@@ -87,15 +87,12 @@ export default function NotificationList({
       <Box
         sx={{
           maxHeight: 420,
-          overflowY: "auto",
+          overflowY: 'auto',
         }}
       >
         {notifications.map((notification, index) => (
           <Box key={notification.id}>
-            <NotificationItem
-              notification={notification}
-              onClick={onNotificationClick}
-            />
+            <NotificationItem notification={notification} onClick={onNotificationClick} />
 
             {index < notifications.length - 1 && (
               <Divider
@@ -119,12 +116,12 @@ export default function NotificationList({
           fullWidth
           onClick={onViewAll}
           sx={{
-            textTransform: "none",
+            textTransform: 'none',
             color: primary.main,
             fontWeight: 700,
-            borderRadius: "10px",
+            borderRadius: '10px',
 
-            "&:hover": {
+            '&:hover': {
               bgcolor: alpha(primary.main, 0.08),
             },
           }}

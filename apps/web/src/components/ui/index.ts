@@ -27,11 +27,28 @@ export type { CardComponentProps } from './Card';
 export { Modal, ConfirmDialog, default as ModalComponent } from './Modal';
 export type { ModalProps, ConfirmDialogProps } from './Modal';
 
-export { SimpleDialog, ConfirmDialog as DialogConfirmDialog, AlertDialog, default as Dialog } from './Dialog';
-export type { DialogProps, ConfirmDialogProps as DialogConfirmDialogProps, AlertDialogProps } from './Dialog';
+export {
+  SimpleDialog,
+  ConfirmDialog as DialogConfirmDialog,
+  AlertDialog,
+  default as Dialog,
+} from './Dialog';
+export type {
+  DialogProps,
+  ConfirmDialogProps as DialogConfirmDialogProps,
+  AlertDialogProps,
+} from './Dialog';
 
 export { Drawer, Sidebar, default as DrawerComponent } from './Drawer';
-export type { DrawerProps, BaseDrawerProps, TemporaryDrawerProps, PersistentDrawerProps, PermanentDrawerProps, DrawerVariant, DrawerAnchor } from './Drawer';
+export type {
+  DrawerProps,
+  BaseDrawerProps,
+  TemporaryDrawerProps,
+  PersistentDrawerProps,
+  PermanentDrawerProps,
+  DrawerVariant,
+  DrawerAnchor,
+} from './Drawer';
 
 // ── Data Display ──────────────────────────────────────
 export { Badge, default as BadgeComponent } from './Badge';
@@ -55,7 +72,15 @@ export { Breadcrumb, default as BreadcrumbComponent } from './Breadcrumb';
 export type { BreadcrumbProps, BreadcrumbItem } from './Breadcrumb';
 
 // ── Typography ────────────────────────────────────────
-export { Typography, Heading, Subheading, Paragraph, Caption, Label, default as TypographyComponent } from './Typography';
+export {
+  Typography,
+  Heading,
+  Subheading,
+  Paragraph,
+  Caption,
+  Label,
+  default as TypographyComponent,
+} from './Typography';
 export type { TypographyProps } from './Typography';
 
 // ── Forms ──────────────────────────────────────────────

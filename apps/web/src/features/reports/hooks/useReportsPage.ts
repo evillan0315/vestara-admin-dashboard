@@ -1,6 +1,12 @@
 import { useState, useCallback, useMemo } from 'react';
 import type { SortState, PaginationState } from '../../../components/data/DataTable';
-import { useReports, useGenerateReport, useDownloadReport, useDeleteReport, useReportStats } from '../hooks';
+import {
+  useReports,
+  useGenerateReport,
+  useDownloadReport,
+  useDeleteReport,
+  useReportStats,
+} from '../hooks';
 import type { Report, ReportParams } from '../../../api/reports';
 import { useToast } from '../../../components/feedback/Toast';
 import { useConfirm } from '../../../hooks/useConfirm';
@@ -31,9 +37,14 @@ export function useReportsPage() {
   const downloadMutation = useDownloadReport();
   const deleteMutation = useDeleteReport();
 
-  type ApiData<T> = { success: boolean; data?: T; meta?: { page: number; perPage: number; total: number } };
+  type ApiData<T> = {
+    success: boolean;
+    data?: T;
+    meta?: { page: number; perPage: number; total: number };
+  };
   const response = query.data as ApiData<Report[]> | undefined;
-  const statsResponse = statsQuery.data as ApiData<{ total: number; completed: number; generating: number; failed: number }> | undefined;
+  const statsResponse = statsQuery.data as
+    ApiData<{ total: number; completed: number; generating: number; failed: number }> | undefined;
 
   const { isLoading, isError, error } = query;
   const refetch = query.refetch;
@@ -41,12 +52,15 @@ export function useReportsPage() {
   const reports: Report[] = response?.data ?? [];
   const paginationMeta = response?.meta;
 
-  const stats = useMemo(() => ({
-    total: statsResponse?.data?.total ?? paginationMeta?.total ?? 0,
-    completed: statsResponse?.data?.completed ?? 0,
-    inProgress: statsResponse?.data?.generating ?? 0,
-    failed: statsResponse?.data?.failed ?? 0,
-  }), [statsResponse, paginationMeta]);
+  const stats = useMemo(
+    () => ({
+      total: statsResponse?.data?.total ?? paginationMeta?.total ?? 0,
+      completed: statsResponse?.data?.completed ?? 0,
+      inProgress: statsResponse?.data?.generating ?? 0,
+      failed: statsResponse?.data?.failed ?? 0,
+    }),
+    [statsResponse, paginationMeta],
+  );
 
   const paginationState: PaginationState | undefined = paginationMeta
     ? { page: paginationMeta.page, perPage: paginationMeta.perPage, total: paginationMeta.total }

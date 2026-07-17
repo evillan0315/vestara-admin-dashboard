@@ -121,9 +121,7 @@ export function GridView<T>({
             onChange={handleSelectAll}
           />
           <Typography variant="caption" color="text.secondary">
-            {selectedIds.length > 0
-              ? `${selectedIds.length} selected`
-              : 'Select all'}
+            {selectedIds.length > 0 ? `${selectedIds.length} selected` : 'Select all'}
           </Typography>
         </Box>
       )}
@@ -182,12 +180,8 @@ export function GridView<T>({
                 )}
                 {cardAvatar?.(row)}
                 <Box sx={{ flex: 1, minWidth: 0 }}>
-                  {cardTitle ? (
-                    <Box sx={{ mb: 0.25 }}>{cardTitle(row)}</Box>
-                  ) : null}
-                  {cardSubtitle ? (
-                    <Box sx={{ mb: 1 }}>{cardSubtitle(row)}</Box>
-                  ) : null}
+                  {cardTitle ? <Box sx={{ mb: 0.25 }}>{cardTitle(row)}</Box> : null}
+                  {cardSubtitle ? <Box sx={{ mb: 1 }}>{cardSubtitle(row)}</Box> : null}
                 </Box>
                 {cardActions ? (
                   <Box sx={{ ml: 'auto', display: 'flex', gap: 0.5, flexShrink: 0 }}>
@@ -206,14 +200,22 @@ export function GridView<T>({
               >
                 {columns
                   .filter((col) => {
-                    const val = col.accessor ? col.accessor(row) : (row as Record<string, unknown>)[col.id];
+                    const val = col.accessor
+                      ? col.accessor(row)
+                      : (row as Record<string, unknown>)[col.id];
                     return val != null && val !== '' && col.id !== 'actions';
                   })
                   .map((col) => {
-                    const value = col.accessor ? col.accessor(row) : (row as Record<string, unknown>)[col.id];
+                    const value = col.accessor
+                      ? col.accessor(row)
+                      : (row as Record<string, unknown>)[col.id];
                     return (
                       <Box key={col.id} sx={{ minWidth: 0 }}>
-                        <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.6rem', lineHeight: 1 }}>
+                        <Typography
+                          variant="caption"
+                          color="text.disabled"
+                          sx={{ fontSize: '0.6rem', lineHeight: 1 }}
+                        >
                           {col.label}
                         </Typography>
                         <Box sx={{ fontSize: '0.75rem', lineHeight: 1.4, mt: 0.25 }}>

@@ -1,12 +1,12 @@
-import { type JSX } from "react";
+import { type JSX } from 'react';
 
-import { Box, useTheme } from "@mui/material";
+import { Box, useTheme } from '@mui/material';
 
-import { Bell, Mail } from "lucide-react";
+import { Bell, Mail } from 'lucide-react';
 
-import HeaderIconButton from "./HeaderIconButton";
-import UserMenu from "./UserMenu";
-import ConnectionStatus from "./ConnectionStatus";
+import HeaderIconButton from './HeaderIconButton';
+import UserMenu from './UserMenu';
+import ConnectionStatus from './ConnectionStatus';
 
 export interface HeaderActionsProps {
   notificationCount?: number;
@@ -33,8 +33,8 @@ export default function HeaderActions({
   return (
     <Box
       sx={{
-        display: "flex",
-        alignItems: "center",
+        display: 'flex',
+        alignItems: 'center',
         gap: 1.5,
         flexShrink: 0,
       }}

@@ -117,10 +117,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }): ReactN
     [],
   );
 
-  const value = useMemo<WebSocketContextValue>(
-    () => ({ status, ...actions }),
-    [status, actions],
-  );
+  const value = useMemo<WebSocketContextValue>(() => ({ status, ...actions }), [status, actions]);
 
   return <WebSocketContext.Provider value={value}>{children}</WebSocketContext.Provider>;
 }

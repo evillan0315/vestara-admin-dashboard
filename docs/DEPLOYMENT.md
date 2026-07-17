@@ -27,10 +27,10 @@ This guide covers the currently used setup: both apps are deployed to **Vercel**
 
 ## Overview
 
-| App | Package | Build command | Output | URL |
-|-----|---------|---------------|--------|-----|
+| App | Package        | Build command                            | Output                               | URL                                    |
+| --- | -------------- | ---------------------------------------- | ------------------------------------ | -------------------------------------- |
 | API | `@vestara/api` | `pnpm turbo build --filter=@vestara/api` | Serverless function (`api/index.ts`) | `https://vestara-admin-api.vercel.app` |
-| Web | `@vestara/web` | `pnpm turbo build --filter=@vestara/web` | Static `dist` | `https://vestara-admin-web.vercel.app` |
+| Web | `@vestara/web` | `pnpm turbo build --filter=@vestara/web` | Static `dist`                        | `https://vestara-admin-web.vercel.app` |
 
 The API is served as a Vercel serverless function with a rewrite that mounts all routes under `/api/v1`:
 
@@ -57,32 +57,32 @@ Configure these in **each Vercel project's Environment Variables** settings (Pro
 
 ### API project
 
-| Variable | Example | Notes |
-|----------|---------|-------|
-| `NODE_ENV` | `production` | |
-| `DATABASE_URL` | `postgres://…@db.prisma.io:5432/postgres?sslmode=require` | From Prisma Postgres |
-| `JWT_SECRET` | `openssl rand -hex 64` | Strong random value |
-| `JWT_REFRESH_SECRET` | `openssl rand -hex 64` | Different from `JWT_SECRET` |
-| `JWT_EXPIRES_IN` | `15m` | |
-| `JWT_REFRESH_EXPIRES_IN` | `30d` | |
-| `API_URL` | `https://vestara-admin-api.vercel.app` | Public base URL; used for OAuth callback URLs |
-| `CLIENT_URL` / `CORS_ORIGIN` | `https://vestara-admin-web.vercel.app` | Allowed browser origin |
-| `GOOGLE_CLIENT_ID` | — | Optional (see [OAuth](#oauth-configuration)) |
-| `GOOGLE_CLIENT_SECRET` | — | Optional |
-| `GOOGLE_CALLBACK_URL` | `https://vestara-admin-api.vercel.app/api/v1/auth/oauth/google/callback` | Optional if `API_URL` set |
-| `GITHUB_CLIENT_ID` | — | Optional |
-| `GITHUB_CLIENT_SECRET` | — | Optional |
-| `GITHUB_CALLBACK_URL` | `https://vestara-admin-api.vercel.app/api/v1/auth/oauth/github/callback` | Optional if `API_URL` set |
-| `REDIS_URL`, `SMTP_*`, `S3_*` | — | Optional (cache/email/storage) |
+| Variable                      | Example                                                                  | Notes                                         |
+| ----------------------------- | ------------------------------------------------------------------------ | --------------------------------------------- |
+| `NODE_ENV`                    | `production`                                                             |                                               |
+| `DATABASE_URL`                | `postgres://…@db.prisma.io:5432/postgres?sslmode=require`                | From Prisma Postgres                          |
+| `JWT_SECRET`                  | `openssl rand -hex 64`                                                   | Strong random value                           |
+| `JWT_REFRESH_SECRET`          | `openssl rand -hex 64`                                                   | Different from `JWT_SECRET`                   |
+| `JWT_EXPIRES_IN`              | `15m`                                                                    |                                               |
+| `JWT_REFRESH_EXPIRES_IN`      | `30d`                                                                    |                                               |
+| `API_URL`                     | `https://vestara-admin-api.vercel.app`                                   | Public base URL; used for OAuth callback URLs |
+| `CLIENT_URL` / `CORS_ORIGIN`  | `https://vestara-admin-web.vercel.app`                                   | Allowed browser origin                        |
+| `GOOGLE_CLIENT_ID`            | —                                                                        | Optional (see [OAuth](#oauth-configuration))  |
+| `GOOGLE_CLIENT_SECRET`        | —                                                                        | Optional                                      |
+| `GOOGLE_CALLBACK_URL`         | `https://vestara-admin-api.vercel.app/api/v1/auth/oauth/google/callback` | Optional if `API_URL` set                     |
+| `GITHUB_CLIENT_ID`            | —                                                                        | Optional                                      |
+| `GITHUB_CLIENT_SECRET`        | —                                                                        | Optional                                      |
+| `GITHUB_CALLBACK_URL`         | `https://vestara-admin-api.vercel.app/api/v1/auth/oauth/github/callback` | Optional if `API_URL` set                     |
+| `REDIS_URL`, `SMTP_*`, `S3_*` | —                                                                        | Optional (cache/email/storage)                |
 
 > Turbo's `build` task whitelists these variables (see `turbo.json` `env` list); if you add a new env var used at build time, add it there too.
 
 ### Web project
 
-| Variable | Example | Notes |
-|----------|---------|-------|
-| `VITE_API_URL` | `https://vestara-admin-api.vercel.app` | Browser-called API base. Falls back to `/api/v1` (dev proxy). |
-| `VITE_APP_NAME` | `Vestara Admin` | Display name |
+| Variable        | Example                                | Notes                                                         |
+| --------------- | -------------------------------------- | ------------------------------------------------------------- |
+| `VITE_API_URL`  | `https://vestara-admin-api.vercel.app` | Browser-called API base. Falls back to `/api/v1` (dev proxy). |
+| `VITE_APP_NAME` | `Vestara Admin`                        | Display name                                                  |
 
 > Only `VITE_*` variables are exposed to the browser. They are inlined at build time, so **changing them requires a redeploy**.
 
@@ -191,11 +191,11 @@ pnpm build
 
 ## Common Deployment Issues
 
-| Symptom | Cause / Fix |
-|---------|-------------|
-| API 500 on first request | `DATABASE_URL` missing/stale or Prisma Client not generated. Verify env var and that `prisma generate` ran in build. |
-| CORS error in browser | `CLIENT_URL`/`CORS_ORIGIN` (API) or `VITE_API_URL` (web) point at the wrong origin. Update and redeploy both. |
-| 404 on `/api/v1/...` | The API serverless rewrite `/api/(.*) → /api/index` must be present in `apps/api/vercel.json`; confirm the file deployed. |
-| OAuth redirect mismatch | Callback URL in provider settings must exactly equal `API_URL + /api/v1/auth/oauth/{google,github}/callback`. |
-| Web calls wrong API after domain change | `VITE_*` vars are baked at build time — change them and **redeploy** the web project. |
-| Web build fails with `TS2304`/`TS1117` in `theme.ts` | Theme factory expects a single `components` block and a `scaleFontSize` helper; see `apps/web/src/styles/theme.ts`. |
+| Symptom                                              | Cause / Fix                                                                                                               |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| API 500 on first request                             | `DATABASE_URL` missing/stale or Prisma Client not generated. Verify env var and that `prisma generate` ran in build.      |
+| CORS error in browser                                | `CLIENT_URL`/`CORS_ORIGIN` (API) or `VITE_API_URL` (web) point at the wrong origin. Update and redeploy both.             |
+| 404 on `/api/v1/...`                                 | The API serverless rewrite `/api/(.*) → /api/index` must be present in `apps/api/vercel.json`; confirm the file deployed. |
+| OAuth redirect mismatch                              | Callback URL in provider settings must exactly equal `API_URL + /api/v1/auth/oauth/{google,github}/callback`.             |
+| Web calls wrong API after domain change              | `VITE_*` vars are baked at build time — change them and **redeploy** the web project.                                     |
+| Web build fails with `TS2304`/`TS1117` in `theme.ts` | Theme factory expects a single `components` block and a `scaleFontSize` helper; see `apps/web/src/styles/theme.ts`.       |

@@ -77,16 +77,18 @@ export const Button = ({
     >
       {loading ? (
         <>
-          <span style={{
-            display: 'inline-block',
-            width: '16px',
-            height: '16px',
-            border: '2px solid currentColor',
-            borderRadius: '50%',
-            borderTopColor: 'transparent',
-            animation: 'spin 0.6s linear infinite',
-            marginRight: '8px',
-          }} />
+          <span
+            style={{
+              display: 'inline-block',
+              width: '16px',
+              height: '16px',
+              border: '2px solid currentColor',
+              borderRadius: '50%',
+              borderTopColor: 'transparent',
+              animation: 'spin 0.6s linear infinite',
+              marginRight: '8px',
+            }}
+          />
           Loading...
         </>
       ) : (

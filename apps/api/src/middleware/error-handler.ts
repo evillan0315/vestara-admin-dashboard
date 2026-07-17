@@ -84,8 +84,7 @@ export async function errorHandler(
     info = {
       statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
       code: ERROR_CODES.INTERNAL_ERROR,
-      message:
-        process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message,
+      message: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message,
       details: process.env.NODE_ENV === 'development' ? { stack: err.stack } : undefined,
     };
     logger.error({ err }, 'Unhandled error');

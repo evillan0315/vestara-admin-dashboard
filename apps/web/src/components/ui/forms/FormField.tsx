@@ -1,8 +1,24 @@
-import { Controller, type ControllerProps, type FieldPath, type FieldValues, type ControllerRenderProps } from 'react-hook-form';
-import { FormControl, FormLabel, FormHelperText, styled, type SxProps, type Theme } from '@mui/material';
+import {
+  Controller,
+  type ControllerProps,
+  type FieldPath,
+  type FieldValues,
+  type ControllerRenderProps,
+} from 'react-hook-form';
+import {
+  FormControl,
+  FormLabel,
+  FormHelperText,
+  styled,
+  type SxProps,
+  type Theme,
+} from '@mui/material';
 import type { ReactNode } from 'react';
 
-export interface FormFieldProps<T extends FieldValues> extends Omit<ControllerProps<T>, 'render' | 'control' | 'name'> {
+export interface FormFieldProps<T extends FieldValues> extends Omit<
+  ControllerProps<T>,
+  'render' | 'control' | 'name'
+> {
   name: FieldPath<T>;
   label?: string;
   error?: boolean;
@@ -54,10 +70,7 @@ export function FormField<T extends FieldValues>({
       rules={rules}
       defaultValue={defaultValue}
       render={({ field, fieldState }) => (
-        <StyledFormControl
-          error={error || !!fieldState.error}
-          sx={sx}
-        >
+        <StyledFormControl error={error || !!fieldState.error} sx={sx}>
           {label && (
             <FormLabel
               component="legend"

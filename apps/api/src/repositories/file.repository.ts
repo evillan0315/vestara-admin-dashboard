@@ -131,7 +131,11 @@ export class FileRepository extends BaseRepository {
     };
   }
 
-  async update(id: string, organizationId: string, data: { name?: string; folderId?: string | null }) {
+  async update(
+    id: string,
+    organizationId: string,
+    data: { name?: string; folderId?: string | null },
+  ) {
     return this.model.update({
       where: { id },
       data,

@@ -15,7 +15,10 @@ export function parsePaginationParams(query: Record<string, unknown>): ParsedPag
   const page = Math.max(1, parseInt(String(query.page ?? '1'), 10) || 1);
   const perPage = Math.min(
     MAX_PAGE_SIZE,
-    Math.max(1, parseInt(String(query.perPage ?? String(DEFAULT_PAGE_SIZE)), 10) || DEFAULT_PAGE_SIZE),
+    Math.max(
+      1,
+      parseInt(String(query.perPage ?? String(DEFAULT_PAGE_SIZE)), 10) || DEFAULT_PAGE_SIZE,
+    ),
   );
   const sort = typeof query.sort === 'string' ? query.sort : undefined;
   const order = query.order === 'asc' || query.order === 'desc' ? query.order : 'asc';
@@ -26,11 +29,7 @@ export function parsePaginationParams(query: Record<string, unknown>): ParsedPag
 /**
  * Build pagination metadata.
  */
-export function buildPaginationMeta(
-  page: number,
-  perPage: number,
-  total: number,
-): PaginationMeta {
+export function buildPaginationMeta(page: number, perPage: number, total: number): PaginationMeta {
   return {
     page,
     perPage,
@@ -42,7 +41,10 @@ export function buildPaginationMeta(
 /**
  * Build Prisma skip/take for paginated queries.
  */
-export function buildPrismaPagination(page: number, perPage: number): { skip: number; take: number } {
+export function buildPrismaPagination(
+  page: number,
+  perPage: number,
+): { skip: number; take: number } {
   return {
     skip: (page - 1) * perPage,
     take: perPage,

@@ -1,8 +1,18 @@
-import { useForm, UseFormProps, UseFormReturn, FieldValues, Path, DefaultValues } from 'react-hook-form';
+import {
+  useForm,
+  UseFormProps,
+  UseFormReturn,
+  FieldValues,
+  Path,
+  DefaultValues,
+} from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ZodSchema } from 'zod';
 
-export interface UseFormWithZodOptions<T extends FieldValues> extends Omit<UseFormProps<T>, 'resolver' | 'defaultValues'> {
+export interface UseFormWithZodOptions<T extends FieldValues> extends Omit<
+  UseFormProps<T>,
+  'resolver' | 'defaultValues'
+> {
   schema: ZodSchema<T>;
   defaultValues?: DefaultValues<T>;
 }
@@ -14,7 +24,7 @@ export interface UseFormWithZodReturn<T extends FieldValues> extends UseFormRetu
 }
 
 export function useFormWithZod<T extends FieldValues>(
-  options: UseFormWithZodOptions<T>
+  options: UseFormWithZodOptions<T>,
 ): UseFormWithZodReturn<T> {
   const { schema, defaultValues, ...rest } = options;
 

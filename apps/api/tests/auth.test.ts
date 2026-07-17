@@ -105,9 +105,7 @@ describe('Authentication API', () => {
         role: UserRole.ADMIN,
       };
 
-      const response = await request(server)
-        .post('/api/v1/auth/register')
-        .send(userData);
+      const response = await request(server).post('/api/v1/auth/register').send(userData);
       user = response.body.data.user;
     });
 
@@ -179,9 +177,7 @@ describe('Authentication API', () => {
         role: UserRole.ADMIN,
       };
 
-      const response = await request(server)
-        .post('/api/v1/auth/register')
-        .send(userData);
+      const response = await request(server).post('/api/v1/auth/register').send(userData);
       user = response.body.data.user;
       refreshToken = response.body.data.tokens.refreshToken;
     });
@@ -229,9 +225,7 @@ describe('Authentication API', () => {
         role: UserRole.ADMIN,
       };
 
-      const response = await request(server)
-        .post('/api/v1/auth/register')
-        .send(userData);
+      const response = await request(server).post('/api/v1/auth/register').send(userData);
       user = response.body.data.user;
       refreshToken = response.body.data.tokens.refreshToken;
     });
@@ -269,9 +263,7 @@ describe('Authentication API', () => {
         role: UserRole.ADMIN,
       };
 
-      const response = await request(server)
-        .post('/api/v1/auth/register')
-        .send(userData);
+      const response = await request(server).post('/api/v1/auth/register').send(userData);
       user = response.body.data.user;
       accessToken = response.body.data.tokens.accessToken;
     });

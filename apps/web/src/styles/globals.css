@@ -4,31 +4,31 @@
 
 :root {
   /* Backgrounds */
-  --vestara-bg-primary: #0D0F12;
+  --vestara-bg-primary: #0d0f12;
   --vestara-bg-secondary: #111419;
   --vestara-bg-tertiary: #151923;
-  --vestara-bg-card: #1A1F2B;
+  --vestara-bg-card: #1a1f2b;
 
   /* Gold accent */
-  --vestara-gold: #D4A843;
-  --vestara-gold-hover: #DFBA5A;
-  --vestara-gold-muted: #B8933A;
-  --vestara-gold-soft: rgba(212, 168, 67, 0.10);
+  --vestara-gold: #d4a843;
+  --vestara-gold-hover: #dfba5a;
+  --vestara-gold-muted: #b8933a;
+  --vestara-gold-soft: rgba(212, 168, 67, 0.1);
 
   /* Text */
-  --vestara-text-primary: #E8E8ED;
-  --vestara-text-secondary: #7A7F8E;
-  --vestara-text-muted: #4A5060;
+  --vestara-text-primary: #e8e8ed;
+  --vestara-text-secondary: #7a7f8e;
+  --vestara-text-muted: #4a5060;
 
   /* Borders */
-  --vestara-border: #1E2533;
-  --vestara-border-light: #252D3A;
+  --vestara-border: #1e2533;
+  --vestara-border-light: #252d3a;
 
   /* Status */
-  --vestara-success: #2EA043;
-  --vestara-error: #DA3743;
-  --vestara-warning: #D4A843;
-  --vestara-info: #4A90D9;
+  --vestara-success: #2ea043;
+  --vestara-error: #da3743;
+  --vestara-warning: #d4a843;
+  --vestara-info: #4a90d9;
 
   /* Spacing */
   --vestara-sidebar-width: 264px;
@@ -88,18 +88,18 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2A3040;
+  background: #2a3040;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3A4050;
+  background: #3a4050;
 }
 
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #2A3040 var(--vestara-bg-primary);
+  scrollbar-color: #2a3040 var(--vestara-bg-primary);
 }
 
 /* Hide scrollbar for elements with .scrollbar-none */
@@ -115,12 +115,12 @@ body {
 
 ::selection {
   background-color: rgba(212, 168, 67, 0.3);
-  color: #E8E8ED;
+  color: #e8e8ed;
 }
 
 ::-moz-selection {
   background-color: rgba(212, 168, 67, 0.3);
-  color: #E8E8ED;
+  color: #e8e8ed;
 }
 
 /* ── Focus visible ── */
@@ -148,8 +148,12 @@ svg {
 /* ── Animation utilities ── */
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeInUp {
@@ -197,28 +201,51 @@ svg {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 @keyframes glow {
-  0%, 100% { box-shadow: 0 0 8px rgba(212, 168, 67, 0.3); }
-  50% { box-shadow: 0 0 16px rgba(212, 168, 67, 0.5); }
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(212, 168, 67, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(212, 168, 67, 0.5);
+  }
 }
 
 @keyframes bounce-subtle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
 }
 
 /* ── Animation utility classes ── */
@@ -289,7 +316,7 @@ svg {
 /* ── Gold gradient text ── */
 
 .gold-text {
-  background: linear-gradient(135deg, #D4A843 0%, #DFBA5A 50%, #D4A843 100%);
+  background: linear-gradient(135deg, #d4a843 0%, #dfba5a 50%, #d4a843 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -298,7 +325,10 @@ svg {
 /* ── Card hover effect ── */
 
 .card-hover {
-  transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+  transition:
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    transform 200ms ease;
 }
 
 .card-hover:hover {

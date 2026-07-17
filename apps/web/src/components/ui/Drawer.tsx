@@ -1,10 +1,4 @@
-import {
-  Drawer as MuiDrawer,
-  Box,
-  IconButton,
-  Typography,
-  styled,
-} from '@mui/material';
+import { Drawer as MuiDrawer, Box, IconButton, Typography, styled } from '@mui/material';
 import { Close, ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { forwardRef, type ReactNode } from 'react';
 
@@ -66,10 +60,7 @@ export interface PermanentDrawerProps extends BaseDrawerProps {
   variant: 'permanent';
 }
 
-export type DrawerProps =
-  | TemporaryDrawerProps
-  | PersistentDrawerProps
-  | PermanentDrawerProps;
+export type DrawerProps = TemporaryDrawerProps | PersistentDrawerProps | PermanentDrawerProps;
 
 const StyledDrawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) =>
@@ -154,7 +145,14 @@ type BaseDrawerComponentProps = {
   elevation?: number;
 };
 
-const ResponsiveDrawer = forwardRef<HTMLDivElement, BaseDrawerComponentProps & { variant?: DrawerVariant; modal?: boolean; onToggle?: (open: boolean) => void }>(
+const ResponsiveDrawer = forwardRef<
+  HTMLDivElement,
+  BaseDrawerComponentProps & {
+    variant?: DrawerVariant;
+    modal?: boolean;
+    onToggle?: (open: boolean) => void;
+  }
+>(
   (
     {
       open,
@@ -179,7 +177,7 @@ const ResponsiveDrawer = forwardRef<HTMLDivElement, BaseDrawerComponentProps & {
       onToggle,
       ...props
     },
-    ref
+    ref,
   ) => {
     const handleClose = () => {
       onClose();
@@ -248,7 +246,11 @@ const ResponsiveDrawer = forwardRef<HTMLDivElement, BaseDrawerComponentProps & {
                     size="small"
                     sx={{ color: 'text.secondary', p: 0.5 }}
                   >
-                    {anchor === 'right' ? <ChevronRight fontSize="medium" /> : <ChevronLeft fontSize="medium" />}
+                    {anchor === 'right' ? (
+                      <ChevronRight fontSize="medium" />
+                    ) : (
+                      <ChevronLeft fontSize="medium" />
+                    )}
                   </IconButton>
                 )}
               </DrawerHeader>
@@ -270,7 +272,7 @@ const ResponsiveDrawer = forwardRef<HTMLDivElement, BaseDrawerComponentProps & {
         )}
       </StyledDrawer>
     );
-  }
+  },
 );
 
 ResponsiveDrawer.displayName = 'ResponsiveDrawer';
@@ -314,7 +316,7 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(
       footer,
       ...props
     },
-    ref
+    ref,
   ) => {
     const handleClose = () => {
       onClose();
@@ -375,12 +377,10 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(
           </DrawerHeader>
         )}
         <DrawerContent>{children}</DrawerContent>
-        {footer && (
-          <DrawerFooter>{footer}</DrawerFooter>
-        )}
+        {footer && <DrawerFooter>{footer}</DrawerFooter>}
       </StyledDrawer>
     );
-  }
+  },
 );
 
 Sidebar.displayName = 'Sidebar';
@@ -422,7 +422,7 @@ export const SlideOver = forwardRef<HTMLDivElement, SlideOverProps>(
       showDragHandle = false,
       ...props
     },
-    ref
+    ref,
   ) => {
     const handleBackdropClick = (event: React.MouseEvent) => {
       if (hideOnBackdropClick && event.target === event.currentTarget) {
@@ -507,12 +507,10 @@ export const SlideOver = forwardRef<HTMLDivElement, SlideOverProps>(
           )}
         </DrawerHeader>
         <DrawerContent>{children}</DrawerContent>
-        {actions && (
-          <DrawerFooter>{actions}</DrawerFooter>
-        )}
+        {actions && <DrawerFooter>{actions}</DrawerFooter>}
       </StyledDrawer>
     );
-  }
+  },
 );
 
 SlideOver.displayName = 'SlideOver';

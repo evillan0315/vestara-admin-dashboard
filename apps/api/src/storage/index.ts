@@ -3,4 +3,14 @@
 // ──────────────────────────────────────────────
 
 export { storageProviderFactory } from './factory.js';
-export type { StorageProvider, StorageProviderConfig, StorageProviderType, UploadOptions, UploadResult, FileMetadata, ListOptions, ListResult, DeleteOptions } from './types.js';
+export type {
+  StorageProvider,
+  StorageProviderConfig,
+  StorageProviderType,
+  UploadOptions,
+  UploadResult,
+  FileMetadata,
+  ListOptions,
+  ListResult,
+  DeleteOptions,
+} from './types.js';

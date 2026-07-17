@@ -48,8 +48,7 @@ export function LoginPage() {
       await login(data.email, data.password);
       navigate(from, { replace: true });
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Login failed. Please try again.';
+      const message = err instanceof Error ? err.message : 'Login failed. Please try again.';
       setError(message);
     } finally {
       setIsSubmitting(false);
@@ -117,9 +116,7 @@ export function LoginPage() {
 
       <Box sx={{ my: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
         <Box sx={{ flex: 1, height: 1, bgcolor: colors.border }} />
-        <Typography sx={{ fontSize: 12, color: colors.muted }}>
-          or sign in with email
-        </Typography>
+        <Typography sx={{ fontSize: 12, color: colors.muted }}>or sign in with email</Typography>
         <Box sx={{ flex: 1, height: 1, bgcolor: colors.border }} />
       </Box>
 
@@ -171,9 +168,7 @@ export function LoginPage() {
               />
             }
             label={
-              <Typography sx={{ fontSize: 13, color: colors.secondary }}>
-                Remember me
-              </Typography>
+              <Typography sx={{ fontSize: 13, color: colors.secondary }}>Remember me</Typography>
             }
           />
           <Typography
@@ -235,19 +230,11 @@ export function LoginPage() {
         }}
       >
         By signing in, you agree to Vestara&apos;s{' '}
-        <Box
-          component="a"
-          href="#"
-          sx={{ color: colors.secondary, textDecoration: 'none' }}
-        >
+        <Box component="a" href="#" sx={{ color: colors.secondary, textDecoration: 'none' }}>
           Terms of Service
         </Box>{' '}
         and{' '}
-        <Box
-          component="a"
-          href="#"
-          sx={{ color: colors.secondary, textDecoration: 'none' }}
-        >
+        <Box component="a" href="#" sx={{ color: colors.secondary, textDecoration: 'none' }}>
           Privacy Policy
         </Box>
         .

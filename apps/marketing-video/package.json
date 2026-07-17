@@ -12,11 +12,28 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@remotion/animation-utils": "4.0.285",
+    "@remotion/captions": "4.0.285",
     "@remotion/cli": "4.0.285",
+    "@remotion/fonts": "4.0.285",
+    "@remotion/gif": "4.0.285",
+    "@remotion/google-fonts": "4.0.285",
+    "@remotion/install-whisper-cpp": "4.0.285",
+    "@remotion/lottie": "4.0.285",
+    "@remotion/mcp": "4.0.285",
+    "@remotion/media-parser": "4.0.285",
+    "@remotion/motion-blur": "4.0.285",
+    "@remotion/paths": "4.0.285",
+    "@remotion/player": "4.0.285",
+    "@remotion/preload": "4.0.285",
+    "@remotion/renderer": "4.0.285",
+    "@remotion/shapes": "4.0.285",
+    "@remotion/tailwind-v4": "4.0.285",
+    "@remotion/three": "4.0.285",
+    "@remotion/transitions": "4.0.285",
     "react": "19.0.0",
     "react-dom": "19.0.0",
-    "remotion": "4.0.285",
-    "@remotion/shapes": "4.0.285"
+    "remotion": "4.0.285"
   },
   "devDependencies": {
     "@types/react": "19.0.10",

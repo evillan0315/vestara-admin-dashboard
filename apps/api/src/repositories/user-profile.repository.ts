@@ -28,10 +28,7 @@ export class UserProfileRepository extends BaseRepository {
   /**
    * Update a profile by userId. Only the provided fields are changed.
    */
-  async updateByUserId(
-    userId: string,
-    data: Record<string, unknown>,
-  ) {
+  async updateByUserId(userId: string, data: Record<string, unknown>) {
     const updateData: Record<string, unknown> = {};
 
     const stringFields = [

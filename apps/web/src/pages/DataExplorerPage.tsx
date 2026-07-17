@@ -19,7 +19,12 @@ import { ArrowBack, Refresh, Insights } from '@mui/icons-material';
 import { LineChart, BarChart, PieChart } from '@mui/x-charts';
 import StatCard from '../components/data/StatCard';
 import { useFetchDataSource } from '../features/integrations/hooks';
-import type { ChartSpecDTO, DataSourceFetchResultDTO, FieldMetaDTO, KpiSpecDTO } from '@vestara/types';
+import type {
+  ChartSpecDTO,
+  DataSourceFetchResultDTO,
+  FieldMetaDTO,
+  KpiSpecDTO,
+} from '@vestara/types';
 
 const ChartCard = styled(Paper)(({ theme }) => ({
   borderRadius: 12,
@@ -45,7 +50,11 @@ function countByField(records: Record_[], field: string, limit?: number): [strin
   return entries;
 }
 
-function aggregateByDate(records: Record_[], xField: string, yField?: string): { labels: string[]; values: number[] } {
+function aggregateByDate(
+  records: Record_[],
+  xField: string,
+  yField?: string,
+): { labels: string[]; values: number[] } {
   const map = new Map<string, number[]>();
   for (const r of records) {
     const raw = r[xField];
@@ -74,7 +83,11 @@ function aggregateByDate(records: Record_[], xField: string, yField?: string): {
   return { labels, values };
 }
 
-function computeKpi(spec: KpiSpecDTO, records: Record_[], recordCount: number): { title: string; value: string } {
+function computeKpi(
+  spec: KpiSpecDTO,
+  records: Record_[],
+  recordCount: number,
+): { title: string; value: string } {
   if (spec.aggregation === 'count') {
     return { title: spec.title, value: recordCount.toLocaleString() };
   }
@@ -92,7 +105,20 @@ function computeKpi(spec: KpiSpecDTO, records: Record_[], recordCount: number): 
   return { title: spec.title, value: rounded.toLocaleString() };
 }
 
-const PIE_COLORS = ['#c9a227', '#7b1fa2', '#2e7d32', '#1976d2', '#ed6c02', '#9c27b0', '#00796b', '#c2185b', '#455a64', '#827717', '#00695c', '#5e35b1'];
+const PIE_COLORS = [
+  '#c9a227',
+  '#7b1fa2',
+  '#2e7d32',
+  '#1976d2',
+  '#ed6c02',
+  '#9c27b0',
+  '#00796b',
+  '#c2185b',
+  '#455a64',
+  '#827717',
+  '#00695c',
+  '#5e35b1',
+];
 
 export default function DataExplorerPage() {
   const { id = '' } = useParams();
@@ -132,7 +158,12 @@ export default function DataExplorerPage() {
               cornerRadius: 4,
             },
           ]}
-          slotProps={{ legend: { direction: 'horizontal', position: { vertical: 'bottom', horizontal: 'center' } } }}
+          slotProps={{
+            legend: {
+              direction: 'horizontal',
+              position: { vertical: 'bottom', horizontal: 'center' },
+            },
+          }}
         />
       );
     }
@@ -202,14 +233,20 @@ export default function DataExplorerPage() {
             Live visualization of the connected REST API response.
           </Typography>
         </Box>
-        <Button startIcon={<Refresh />} variant="contained" onClick={() => fetchMut.mutate(id)} disabled={fetchMut.isPending}>
+        <Button
+          startIcon={<Refresh />}
+          variant="contained"
+          onClick={() => fetchMut.mutate(id)}
+          disabled={fetchMut.isPending}
+        >
           {fetchMut.isPending ? 'Fetching…' : 'Refresh'}
         </Button>
       </Box>
 
       {fetchMut.isError && (
         <Alert severity="error" sx={{ mb: 2 }}>
-          Failed to fetch the external API. Verify the URL, authentication, and that it returns JSON.
+          Failed to fetch the external API. Verify the URL, authentication, and that it returns
+          JSON.
         </Alert>
       )}
 
@@ -247,7 +284,9 @@ export default function DataExplorerPage() {
             {data.vizSpec.charts.length === 0 && (
               <Grid size={{ xs: 12 }}>
                 <ChartCard>
-                  <Typography color="text.secondary">No charts could be generated for this response.</Typography>
+                  <Typography color="text.secondary">
+                    No charts could be generated for this response.
+                  </Typography>
                 </ChartCard>
               </Grid>
             )}

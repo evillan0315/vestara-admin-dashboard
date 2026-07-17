@@ -28,9 +28,7 @@ function escapeCsv(value: unknown): string {
 const MAX_PAGES = 50;
 const PAGE_SIZE = 100;
 
-async function fetchAllUsers(
-  params: Omit<UserListParams, 'page' | 'perPage'>,
-): Promise<UserDTO[]> {
+async function fetchAllUsers(params: Omit<UserListParams, 'page' | 'perPage'>): Promise<UserDTO[]> {
   const all: UserDTO[] = [];
   for (let page = 1; page <= MAX_PAGES; page += 1) {
     const res = await usersApi.list({ ...params, page, perPage: PAGE_SIZE });
@@ -53,9 +51,7 @@ export async function exportUsersCsv(
   const users = await fetchAllUsers(params);
 
   const header = CSV_COLUMNS.map((col) => escapeCsv(col.header)).join(',');
-  const rows = users.map((user) =>
-    CSV_COLUMNS.map((col) => escapeCsv(col.value(user))).join(','),
-  );
+  const rows = users.map((user) => CSV_COLUMNS.map((col) => escapeCsv(col.value(user))).join(','));
   const csv = [header, ...rows].join('\n');
 
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });

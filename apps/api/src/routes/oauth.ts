@@ -227,7 +227,8 @@ router.get('/oauth/github/callback', async (req, res, next) => {
     }>;
 
     // Find the primary verified email
-    const primaryEmail = emails.find((e) => e.primary && e.verified) || emails.find((e) => e.verified);
+    const primaryEmail =
+      emails.find((e) => e.primary && e.verified) || emails.find((e) => e.verified);
     if (!primaryEmail) {
       return res.redirect(frontendErrorUrl('No verified email found on GitHub account'));
     }

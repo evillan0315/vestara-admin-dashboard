@@ -53,6 +53,7 @@ export function useFetchDataSource() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => agentApi.fetch(id).then((r) => r.data!),
-    onSuccess: (data) => qc.invalidateQueries({ queryKey: integrationsKeys.result(data.dataSourceId) }),
+    onSuccess: (data) =>
+      qc.invalidateQueries({ queryKey: integrationsKeys.result(data.dataSourceId) }),
   });
 }

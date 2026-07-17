@@ -1,4 +1,4 @@
-import type { JSX } from "react";
+import type { JSX } from 'react';
 import {
   User as UserIcon,
   Shield,
@@ -9,7 +9,7 @@ import {
   MapPin,
   Eye,
   IdCard,
-} from "lucide-react";
+} from 'lucide-react';
 
 /**
  * Value identifying a single profile tab.
@@ -17,16 +17,16 @@ import {
  * profile page stay in sync.
  */
 export type ProfileTabValue =
-  | "overview"
-  | "personal"
-  | "address"
-  | "preferences"
-  | "privacy"
-  | "identity"
-  | "security"
-  | "permissions"
-  | "activity"
-  | "sessions";
+  | 'overview'
+  | 'personal'
+  | 'address'
+  | 'preferences'
+  | 'privacy'
+  | 'identity'
+  | 'security'
+  | 'permissions'
+  | 'activity'
+  | 'sessions';
 
 export interface ProfileTabConfig {
   /** Stable identifier used for tab state. */
@@ -46,63 +46,63 @@ export interface ProfileTabConfig {
  */
 export const profileTabs: ProfileTabConfig[] = [
   {
-    value: "overview",
-    label: "Overview",
-    path: "/profile",
+    value: 'overview',
+    label: 'Overview',
+    path: '/profile',
     icon: <UserIcon size={16} />,
   },
   {
-    value: "personal",
-    label: "Personal Info",
-    path: "/profile/personal",
+    value: 'personal',
+    label: 'Personal Info',
+    path: '/profile/personal',
     icon: <UserIcon size={16} />,
   },
   {
-    value: "address",
-    label: "Address",
-    path: "/profile/address",
+    value: 'address',
+    label: 'Address',
+    path: '/profile/address',
     icon: <MapPin size={16} />,
   },
   {
-    value: "preferences",
-    label: "Preferences",
-    path: "/preferences",
+    value: 'preferences',
+    label: 'Preferences',
+    path: '/preferences',
     icon: <Settings size={16} />,
   },
   {
-    value: "privacy",
-    label: "Privacy",
-    path: "/profile/privacy",
+    value: 'privacy',
+    label: 'Privacy',
+    path: '/profile/privacy',
     icon: <Eye size={16} />,
   },
   {
-    value: "identity",
-    label: "Identity & KYC",
-    path: "/profile/identity",
+    value: 'identity',
+    label: 'Identity & KYC',
+    path: '/profile/identity',
     icon: <IdCard size={16} />,
   },
   {
-    value: "security",
-    label: "Security",
-    path: "/security",
+    value: 'security',
+    label: 'Security',
+    path: '/security',
     icon: <Shield size={16} />,
   },
   {
-    value: "permissions",
-    label: "Permissions",
-    path: "/permissions",
+    value: 'permissions',
+    label: 'Permissions',
+    path: '/permissions',
     icon: <Lock size={16} />,
   },
   {
-    value: "activity",
-    label: "Activity",
-    path: "/activity",
+    value: 'activity',
+    label: 'Activity',
+    path: '/activity',
     icon: <Activity size={16} />,
   },
   {
-    value: "sessions",
-    label: "Sessions",
-    path: "/sessions",
+    value: 'sessions',
+    label: 'Sessions',
+    path: '/sessions',
     icon: <Monitor size={16} />,
   },
 ];
@@ -122,6 +122,5 @@ const profileTabByPath: Record<string, ProfileTabConfig> = profileTabs.reduce(
  */
 export function getProfileTabFromPath(pathname: string): ProfileTabValue {
   const match = profileTabByPath[pathname];
-  return match ? match.value : "overview";
+  return match ? match.value : 'overview';
 }
-

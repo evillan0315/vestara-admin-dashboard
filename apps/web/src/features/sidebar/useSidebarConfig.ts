@@ -56,15 +56,15 @@ export function useSidebarConfig(): SidebarConfig {
   const width = sidebarCollapsed ? spacing.sidebarCollapsedWidth : spacing.sidebarWidth;
 
   // Boost text opacity in high-contrast mode
-  const textPrimary = contrastLevel === 'high'
-    ? theme.palette.text.primary
-    : isDark
-      ? 'rgba(232,232,237,0.87)'
-      : 'rgba(30,30,35,0.87)';
+  const textPrimary =
+    contrastLevel === 'high'
+      ? theme.palette.text.primary
+      : isDark
+        ? 'rgba(232,232,237,0.87)'
+        : 'rgba(30,30,35,0.87)';
 
-  const textMuted = contrastLevel === 'high'
-    ? theme.palette.text.secondary
-    : theme.palette.text.disabled;
+  const textMuted =
+    contrastLevel === 'high' ? theme.palette.text.secondary : theme.palette.text.disabled;
 
   return {
     width,
@@ -77,9 +77,7 @@ export function useSidebarConfig(): SidebarConfig {
     textMuted,
     divider: theme.palette.divider,
     sidebarBg: theme.palette.background.paper,
-    cardBg: isDark
-      ? 'rgba(255,255,255,0.04)'
-      : 'rgba(0,0,0,0.03)',
+    cardBg: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
     isDark,
   };
 }

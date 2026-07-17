@@ -16,13 +16,7 @@
  */
 
 import { type JSX, useRef, useMemo } from 'react';
-import {
-  Avatar,
-  Box,
-  CircularProgress,
-  useTheme,
-  alpha,
-} from '@mui/material';
+import { Avatar, Box, CircularProgress, useTheme, alpha } from '@mui/material';
 import { Camera } from 'lucide-react';
 
 export type AvatarSize = 'small' | 'medium' | 'large';
@@ -94,7 +88,11 @@ export default function AvatarUpload({
     if (e.target) e.target.value = '';
   };
 
-  const avatarBorder = border ?? (editable ? `2px dashed ${alpha(theme.palette.primary.main, 0.4)}` : `2px solid ${alpha(theme.palette.primary.main, 0.25)}`);
+  const avatarBorder =
+    border ??
+    (editable
+      ? `2px dashed ${alpha(theme.palette.primary.main, 0.4)}`
+      : `2px solid ${alpha(theme.palette.primary.main, 0.25)}`);
 
   const mergedSx: SxProps = useMemo(
     () => ({
@@ -127,12 +125,7 @@ export default function AvatarUpload({
           : {}),
       }}
     >
-      <Avatar
-        src={src ?? undefined}
-        alt={alt}
-        onClick={handleClick}
-        sx={mergedSx}
-      >
+      <Avatar src={src ?? undefined} alt={alt} onClick={handleClick} sx={mergedSx}>
         {initials || '?'}
       </Avatar>
 

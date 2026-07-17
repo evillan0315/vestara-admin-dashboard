@@ -46,7 +46,10 @@ const templateUpdateSchema = z.object({
 });
 
 const compareSchema = z.object({
-  reportIds: z.array(z.string()).min(2, 'At least 2 reports needed for comparison').max(5, 'Max 5 reports'),
+  reportIds: z
+    .array(z.string())
+    .min(2, 'At least 2 reports needed for comparison')
+    .max(5, 'Max 5 reports'),
 });
 
 // ── Helper ──────────────────────────────────────────────────────────────────
@@ -86,7 +89,14 @@ router.get('/', authenticate, async (req, res, next) => {
     );
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
-    const reports = await reportService.list(user.organizationId, page, perPage, search, sortField, sortDirection);
+    const reports = await reportService.list(
+      user.organizationId,
+      page,
+      perPage,
+      search,
+      sortField,
+      sortDirection,
+    );
     const total = await reportService.count(user.organizationId, search);
 
     res.json({
@@ -157,7 +167,9 @@ router.post('/generate', authenticate, validate(generateReportSchema), async (re
 // Get report status
 router.get('/:reportId/status', authenticate, async (req, res, next) => {
   try {
-    const reportId = Array.isArray(req.params.reportId) ? req.params.reportId[0] : req.params.reportId;
+    const reportId = Array.isArray(req.params.reportId)
+      ? req.params.reportId[0]
+      : req.params.reportId;
     const report = await reportService.getStatus(reportId, req.user!.id);
     res.json({ success: true, data: report });
   } catch (err) {
@@ -168,7 +180,9 @@ router.get('/:reportId/status', authenticate, async (req, res, next) => {
 // Download report
 router.get('/:reportId/download', authenticate, async (req, res, next) => {
   try {
-    const reportId = Array.isArray(req.params.reportId) ? req.params.reportId[0] : req.params.reportId;
+    const reportId = Array.isArray(req.params.reportId)
+      ? req.params.reportId[0]
+      : req.params.reportId;
     const report = await reportService.getStatus(reportId, req.user!.id);
 
     if (!report.fileUrl) {
@@ -179,7 +193,8 @@ router.get('/:reportId/download', authenticate, async (req, res, next) => {
     if (downloadUrl.startsWith('data:')) {
       // For base64 data URLs, decode and send as binary
       const [header, base64] = downloadUrl.split(',');
-      const mime = header?.replace('data:', '').replace(';base64', '') || 'application/octet-stream';
+      const mime =
+        header?.replace('data:', '').replace(';base64', '') || 'application/octet-stream';
       const ext = report.format === 'csv' ? 'csv' : report.format === 'excel' ? 'xlsx' : 'pdf';
       const buffer = Buffer.from(base64, 'base64');
       res.setHeader('Content-Type', mime);
@@ -196,7 +211,9 @@ router.get('/:reportId/download', authenticate, async (req, res, next) => {
 // Delete report
 router.delete('/:reportId', authenticate, async (req, res, next) => {
   try {
-    const reportId = Array.isArray(req.params.reportId) ? req.params.reportId[0] : req.params.reportId;
+    const reportId = Array.isArray(req.params.reportId)
+      ? req.params.reportId[0]
+      : req.params.reportId;
     await reportService.delete(reportId, req.user!.id);
     res.json({ success: true, message: 'Report deleted successfully' });
   } catch (err) {
@@ -225,62 +242,83 @@ router.get('/templates', authenticate, async (req, res, next) => {
 });
 
 // Create template
-router.post('/templates', authenticate, requireRole(UserRole.ADMIN, UserRole.SUPER_ADMIN), validate(templateSchema), async (req, res, next) => {
-  try {
-    const body = req.body as z.infer<typeof templateSchema>;
-    const user = await import('../utils/prisma.js').then((m) =>
-      m.prisma.user.findUnique({
-        where: { id: req.user!.id },
-        select: { organizationId: true },
-      }),
-    );
-    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+router.post(
+  '/templates',
+  authenticate,
+  requireRole(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  validate(templateSchema),
+  async (req, res, next) => {
+    try {
+      const body = req.body as z.infer<typeof templateSchema>;
+      const user = await import('../utils/prisma.js').then((m) =>
+        m.prisma.user.findUnique({
+          where: { id: req.user!.id },
+          select: { organizationId: true },
+        }),
+      );
+      if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
-    const template = await reportService.createTemplate(body, user.organizationId, req.user!.id);
-    res.json({ success: true, data: template });
-  } catch (err) {
-    next(err);
-  }
-});
+      const template = await reportService.createTemplate(body, user.organizationId, req.user!.id);
+      res.json({ success: true, data: template });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
 // Update template
-router.put('/templates/:templateId', authenticate, requireRole(UserRole.ADMIN, UserRole.SUPER_ADMIN), validate(templateUpdateSchema), async (req, res, next) => {
-  try {
-    const templateId = Array.isArray(req.params.templateId) ? req.params.templateId[0] : req.params.templateId;
-    const body = req.body as z.infer<typeof templateUpdateSchema>;
-    const user = await import('../utils/prisma.js').then((m) =>
-      m.prisma.user.findUnique({
-        where: { id: req.user!.id },
-        select: { organizationId: true },
-      }),
-    );
-    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+router.put(
+  '/templates/:templateId',
+  authenticate,
+  requireRole(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  validate(templateUpdateSchema),
+  async (req, res, next) => {
+    try {
+      const templateId = Array.isArray(req.params.templateId)
+        ? req.params.templateId[0]
+        : req.params.templateId;
+      const body = req.body as z.infer<typeof templateUpdateSchema>;
+      const user = await import('../utils/prisma.js').then((m) =>
+        m.prisma.user.findUnique({
+          where: { id: req.user!.id },
+          select: { organizationId: true },
+        }),
+      );
+      if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
-    const template = await reportService.updateTemplate(templateId, user.organizationId, body);
-    res.json({ success: true, data: template });
-  } catch (err) {
-    next(err);
-  }
-});
+      const template = await reportService.updateTemplate(templateId, user.organizationId, body);
+      res.json({ success: true, data: template });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
 // Delete template
-router.delete('/templates/:templateId', authenticate, requireRole(UserRole.ADMIN, UserRole.SUPER_ADMIN), async (req, res, next) => {
-  try {
-    const templateId = Array.isArray(req.params.templateId) ? req.params.templateId[0] : req.params.templateId;
-    const user = await import('../utils/prisma.js').then((m) =>
-      m.prisma.user.findUnique({
-        where: { id: req.user!.id },
-        select: { organizationId: true },
-      }),
-    );
-    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+router.delete(
+  '/templates/:templateId',
+  authenticate,
+  requireRole(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  async (req, res, next) => {
+    try {
+      const templateId = Array.isArray(req.params.templateId)
+        ? req.params.templateId[0]
+        : req.params.templateId;
+      const user = await import('../utils/prisma.js').then((m) =>
+        m.prisma.user.findUnique({
+          where: { id: req.user!.id },
+          select: { organizationId: true },
+        }),
+      );
+      if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
-    await reportService.deleteTemplate(templateId, user.organizationId);
-    res.json({ success: true, message: 'Template deleted successfully' });
-  } catch (err) {
-    next(err);
-  }
-});
+      await reportService.deleteTemplate(templateId, user.organizationId);
+      res.json({ success: true, message: 'Template deleted successfully' });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
 // ── Report Comparison ────────────────────────────────────────────────────────
 

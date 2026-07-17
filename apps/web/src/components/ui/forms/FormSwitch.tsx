@@ -1,5 +1,20 @@
-import { Switch as MuiSwitch, FormControlLabel, FormControl, FormLabel, FormHelperText, styled, type SxProps, type Theme } from '@mui/material';
-import { Controller, type ControllerProps, type FieldPath, type FieldValues, type PathValue } from 'react-hook-form';
+import {
+  Switch as MuiSwitch,
+  FormControlLabel,
+  FormControl,
+  FormLabel,
+  FormHelperText,
+  styled,
+  type SxProps,
+  type Theme,
+} from '@mui/material';
+import {
+  Controller,
+  type ControllerProps,
+  type FieldPath,
+  type FieldValues,
+  type PathValue,
+} from 'react-hook-form';
 import type { ReactNode } from 'react';
 
 export interface FormSwitchProps<T extends FieldValues> {
@@ -61,7 +76,11 @@ export function FormSwitch<T extends FieldValues>({
         return (
           <FormControl component="fieldset" sx={sx}>
             {label && (
-              <FormLabel component="legend" required={required} sx={{ mb: 1, fontSize: '0.875rem', fontWeight: 500 }}>
+              <FormLabel
+                component="legend"
+                required={required}
+                sx={{ mb: 1, fontSize: '0.875rem', fontWeight: 500 }}
+              >
                 {label}
               </FormLabel>
             )}

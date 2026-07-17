@@ -1,6 +1,6 @@
-import type { JSX } from "react";
+import type { JSX } from 'react';
 
-import { Avatar, Box, Chip, Typography, useTheme, alpha } from "@mui/material";
+import { Avatar, Box, Chip, Typography, useTheme, alpha } from '@mui/material';
 
 import {
   Activity,
@@ -12,9 +12,9 @@ import {
   Settings,
   ShieldCheck,
   UserRound,
-} from "lucide-react";
+} from 'lucide-react';
 
-import type { Notification, NotificationType } from "./types";
+import type { Notification, NotificationType } from './types';
 
 export interface NotificationItemProps {
   notification: Notification;
@@ -23,29 +23,29 @@ export interface NotificationItemProps {
 
 function getNotificationIcon(type: NotificationType): JSX.Element {
   switch (type) {
-    case "booking":
+    case 'booking':
       return <Calendar size={18} />;
 
-    case "payment":
+    case 'payment':
       return <CreditCard size={18} />;
 
-    case "membership":
+    case 'membership':
       return <CheckCircle2 size={18} />;
 
-    case "companion":
-    case "user":
+    case 'companion':
+    case 'user':
       return <UserRound size={18} />;
 
-    case "security":
+    case 'security':
       return <ShieldCheck size={18} />;
 
-    case "setting":
+    case 'setting':
       return <Settings size={18} />;
 
-    case "auth":
+    case 'auth':
       return <LogIn size={18} />;
 
-    case "activity":
+    case 'activity':
       return <Activity size={18} />;
 
     default:
@@ -55,33 +55,33 @@ function getNotificationIcon(type: NotificationType): JSX.Element {
 
 function getAvatarColor(type: NotificationType, gold: string): string {
   switch (type) {
-    case "booking":
-      return "#3B82F6";
+    case 'booking':
+      return '#3B82F6';
 
-    case "payment":
-      return "#10B981";
+    case 'payment':
+      return '#10B981';
 
-    case "membership":
+    case 'membership':
       return gold;
 
-    case "companion":
-    case "user":
-      return "#8B5CF6";
+    case 'companion':
+    case 'user':
+      return '#8B5CF6';
 
-    case "security":
-      return "#EF4444";
+    case 'security':
+      return '#EF4444';
 
-    case "setting":
+    case 'setting':
       return gold;
 
-    case "auth":
-      return "#3B82F6";
+    case 'auth':
+      return '#3B82F6';
 
-    case "activity":
-      return "#64748B";
+    case 'activity':
+      return '#64748B';
 
     default:
-      return "#64748B";
+      return '#64748B';
   }
 }
 
@@ -98,13 +98,13 @@ export default function NotificationItem({
       sx={{
         px: 2,
         py: 1.5,
-        display: "flex",
-        alignItems: "flex-start",
+        display: 'flex',
+        alignItems: 'flex-start',
         gap: 1.5,
-        cursor: "pointer",
-        transition: "all .18s ease",
+        cursor: 'pointer',
+        transition: 'all .18s ease',
 
-        "&:hover": {
+        '&:hover': {
           bgcolor: alpha(text.primary, 0.03),
         },
       }}
@@ -114,7 +114,7 @@ export default function NotificationItem({
           width: 38,
           height: 38,
           bgcolor: getAvatarColor(notification.type, primary.main),
-          color: "#fff",
+          color: '#fff',
         }}
       >
         {getNotificationIcon(notification.type)}
@@ -128,8 +128,8 @@ export default function NotificationItem({
       >
         <Box
           sx={{
-            display: "flex",
-            alignItems: "center",
+            display: 'flex',
+            alignItems: 'center',
             gap: 1,
           }}
         >
@@ -166,10 +166,10 @@ export default function NotificationItem({
             fontSize: 12,
             color: text.secondary,
             lineHeight: 1.45,
-            display: "-webkit-box",
-            WebkitBoxOrient: "vertical",
+            display: '-webkit-box',
+            WebkitBoxOrient: 'vertical',
             WebkitLineClamp: 2,
-            overflow: "hidden",
+            overflow: 'hidden',
           }}
         >
           {notification.description}

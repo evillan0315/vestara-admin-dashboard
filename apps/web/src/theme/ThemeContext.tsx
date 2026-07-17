@@ -137,9 +137,12 @@ export function ThemeContextProvider({ children }: ThemeContextProviderProps) {
     setConfig((prev) => ({ ...prev, fontFamily }));
   }, []);
 
-  const setFontWeight = useCallback((fontWeight: 'light' | 'normal' | 'medium' | 'semibold' | 'bold') => {
-    setConfig((prev) => ({ ...prev, fontWeight }));
-  }, []);
+  const setFontWeight = useCallback(
+    (fontWeight: 'light' | 'normal' | 'medium' | 'semibold' | 'bold') => {
+      setConfig((prev) => ({ ...prev, fontWeight }));
+    },
+    [],
+  );
 
   const setSidebarCollapsed = useCallback((sidebarCollapsed: boolean) => {
     setConfig((prev) => ({ ...prev, sidebarCollapsed }));
@@ -199,17 +202,28 @@ export function ThemeContextProvider({ children }: ThemeContextProviderProps) {
       setSettingsOpen,
       toggleSettings,
     }),
-    [config, settingsOpen, toggleTheme, setMode, setPrimaryColor, setDensity,
-     setFontFamily, setFontWeight, setSidebarCollapsed, toggleSidebar, setSidebarVariant,
-     setFontSizeScale, setBorderRadiusScale, setContrastLevel, setMaintenanceMode,
-     resetTheme, toggleSettings],
+    [
+      config,
+      settingsOpen,
+      toggleTheme,
+      setMode,
+      setPrimaryColor,
+      setDensity,
+      setFontFamily,
+      setFontWeight,
+      setSidebarCollapsed,
+      toggleSidebar,
+      setSidebarVariant,
+      setFontSizeScale,
+      setBorderRadiusScale,
+      setContrastLevel,
+      setMaintenanceMode,
+      resetTheme,
+      toggleSettings,
+    ],
   );
 
-  return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
 // ── Hook ──

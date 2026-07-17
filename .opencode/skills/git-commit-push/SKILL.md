@@ -43,18 +43,20 @@ git add path/to/dir/
 **Format:** `<type>: <description>`
 
 **Types:**
-| Type | Use For |
-|------|---------|
-| `feat` | New features |
-| `fix` | Bug fixes |
+
+| Type       | Use For                                    |
+| ---------- | ------------------------------------------ |
+| `feat`     | New features                               |
+| `fix`      | Bug fixes                                  |
 | `refactor` | Code restructuring without behavior change |
-| `chore` | Maintenance, deps, config, tooling |
-| `docs` | Documentation only |
-| `ci` | CI/CD pipeline changes |
-| `test` | Test additions/changes |
-| `perf` | Performance improvements |
+| `chore`    | Maintenance, deps, config, tooling         |
+| `docs`     | Documentation only                         |
+| `ci`       | CI/CD pipeline changes                     |
+| `test`     | Test additions/changes                     |
+| `perf`     | Performance improvements                   |
 
 **Examples:**
+
 ```bash
 git commit -m "feat: add user authentication API endpoints"
 git commit -m "fix: resolve token refresh race condition"
@@ -64,6 +66,7 @@ git commit -m "docs: add API documentation for auth routes"
 ```
 
 **Rules:**
+
 - Use imperative mood ("add" not "added")
 - Keep first line under 72 chars
 - Add body for context if needed (blank line after subject)
@@ -95,16 +98,17 @@ gh pr list
 
 ## Branch Strategy
 
-| Branch | Purpose |
-|--------|---------|
-| `main` | Production-ready, protected |
-| `develop` | Integration branch for next release |
-| `feature/*` | Feature branches (from develop) |
-| `fix/*` | Bug fix branches (from develop) |
-| `release/*` | Release preparation |
-| `hotfix/*` | Emergency fixes (from main) |
+| Branch      | Purpose                             |
+| ----------- | ----------------------------------- |
+| `main`      | Production-ready, protected         |
+| `develop`   | Integration branch for next release |
+| `feature/*` | Feature branches (from develop)     |
+| `fix/*`     | Bug fix branches (from develop)     |
+| `release/*` | Release preparation                 |
+| `hotfix/*`  | Emergency fixes (from main)         |
 
 **Naming convention:**
+
 ```bash
 feature/auth-login-page
 fix/token-refresh-bug
@@ -159,6 +163,7 @@ pnpm test
 ```
 
 **Shortcuts per package:**
+
 ```bash
 pnpm lint --filter=@vestara/api
 pnpm typecheck --filter=@vestara/web
@@ -169,18 +174,19 @@ pnpm test --filter=@vestara/types
 
 ## Common Issues & Fixes
 
-| Issue | Fix |
-|-------|-----|
-| `git push` rejected (non-fast-forward) | `git pull --rebase origin <branch>` then push |
-| Forgot to add file to last commit | `git add <file> && git commit --amend --no-edit` |
-| Wrong commit message | `git commit --amend` (before push) |
-| Need to split commits | `git rebase -i HEAD~n` |
+| Issue                                  | Fix                                              |
+| -------------------------------------- | ------------------------------------------------ |
+| `git push` rejected (non-fast-forward) | `git pull --rebase origin <branch>` then push    |
+| Forgot to add file to last commit      | `git add <file> && git commit --amend --no-edit` |
+| Wrong commit message                   | `git commit --amend` (before push)               |
+| Need to split commits                  | `git rebase -i HEAD~n`                           |
 
 ---
 
 ## GitHub CLI Setup
 
 Ensure `gh` is authenticated:
+
 ```bash
 gh auth status
 gh auth login  # if not authenticated

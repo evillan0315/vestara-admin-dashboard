@@ -1,4 +1,4 @@
-import { type JSX, useMemo } from "react";
+import { type JSX, useMemo } from 'react';
 
 import {
   Box,
@@ -11,23 +11,15 @@ import {
   Typography,
   useTheme,
   alpha,
-} from "@mui/material";
-import AvatarUpload from "../common/AvatarUpload";
+} from '@mui/material';
+import AvatarUpload from '../common/AvatarUpload';
 
-import {
-  Activity,
-  Lock,
-  LogOut,
-  Monitor,
-  Settings,
-  Shield,
-  User as UserIcon,
-} from "lucide-react";
+import { Activity, Lock, LogOut, Monitor, Settings, Shield, User as UserIcon } from 'lucide-react';
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
-import { UserRole, type UserDTO } from "@vestara/types";
-import { useOrganization } from "../../features/organizations/hooks";
+import { UserRole, type UserDTO } from '@vestara/types';
+import { useOrganization } from '../../features/organizations/hooks';
 
 interface UserMenuDropdownProps {
   user: UserDTO | null;
@@ -38,25 +30,25 @@ interface UserMenuDropdownProps {
 }
 
 const roleColors: Record<UserRole, string> = {
-  [UserRole.SUPER_ADMIN]: "#D4A843",
-  [UserRole.ADMIN]: "#4A90D9",
-  [UserRole.MODERATOR]: "#8B5CF6",
-  [UserRole.SUPPORT]: "#2EA043",
+  [UserRole.SUPER_ADMIN]: '#D4A843',
+  [UserRole.ADMIN]: '#4A90D9',
+  [UserRole.MODERATOR]: '#8B5CF6',
+  [UserRole.SUPPORT]: '#2EA043',
 };
 
 function getRoleChipColor(role: UserRole): string {
-  return roleColors[role] ?? "#7A7F8E";
+  return roleColors[role] ?? '#7A7F8E';
 }
 
 function timeAgo(dateStr: string | undefined): string {
   if (!dateStr) {
-    return "N/A";
+    return 'N/A';
   }
   const now = Date.now();
   const then = new Date(dateStr).getTime();
   const diffMs = now - then;
   if (diffMs < 0) {
-    return "just now";
+    return 'just now';
   }
   const seconds = Math.floor(diffMs / 1000);
   if (seconds < 60) {
@@ -84,15 +76,15 @@ interface QuickLink {
 }
 
 const quickLinks: QuickLink[] = [
-  { label: "My Profile", icon: <UserIcon size={18} />, path: "/profile" },
-  { label: "Security", icon: <Shield size={18} />, path: "/security" },
-  { label: "Activity", icon: <Activity size={18} />, path: "/activity" },
+  { label: 'My Profile', icon: <UserIcon size={18} />, path: '/profile' },
+  { label: 'Security', icon: <Shield size={18} />, path: '/security' },
+  { label: 'Activity', icon: <Activity size={18} />, path: '/activity' },
 ];
 
 const settingsLinks: QuickLink[] = [
-  { label: "Preferences", icon: <Settings size={18} />, path: "/preferences" },
-  { label: "Sessions", icon: <Monitor size={18} />, path: "/sessions" },
-  { label: "Permissions", icon: <Lock size={18} />, path: "/permissions" },
+  { label: 'Preferences', icon: <Settings size={18} />, path: '/preferences' },
+  { label: 'Sessions', icon: <Monitor size={18} />, path: '/sessions' },
+  { label: 'Permissions', icon: <Lock size={18} />, path: '/permissions' },
 ];
 
 export default function UserMenuDropdown({
@@ -107,21 +99,19 @@ export default function UserMenuDropdown({
 
   const navigate = useNavigate();
 
-  const organizationQuery = useOrganization(user?.organizationId ?? "");
+  const organizationQuery = useOrganization(user?.organizationId ?? '');
 
   const initials = useMemo(() => {
-    const name = user
-      ? `${user.firstName} ${user.lastName}`.trim()
-      : "";
+    const name = user ? `${user.firstName} ${user.lastName}`.trim() : '';
 
     if (!name) {
-      return "U";
+      return 'U';
     }
 
     return name
-      .split(" ")
+      .split(' ')
       .map((part: string) => part[0])
-      .join("")
+      .join('')
       .slice(0, 2)
       .toUpperCase();
   }, [user]);
@@ -137,7 +127,7 @@ export default function UserMenuDropdown({
   };
 
   const role = user?.role;
-  const roleColor = role ? getRoleChipColor(role) : "#7A7F8E";
+  const roleColor = role ? getRoleChipColor(role) : '#7A7F8E';
 
   return (
     <>
@@ -146,12 +136,12 @@ export default function UserMenuDropdown({
         open={open}
         onClose={onClose}
         transformOrigin={{
-          horizontal: "right",
-          vertical: "top",
+          horizontal: 'right',
+          vertical: 'top',
         }}
         anchorOrigin={{
-          horizontal: "right",
-          vertical: "bottom",
+          horizontal: 'right',
+          vertical: 'bottom',
         }}
         slotProps={{
           paper: {
@@ -159,12 +149,12 @@ export default function UserMenuDropdown({
               width: 320,
               maxHeight: 560,
               mt: 1,
-              overflow: "hidden",
+              overflow: 'hidden',
               bgcolor: background.paper,
               border: `1px solid ${divider}`,
-              borderRadius: "14px",
+              borderRadius: '14px',
               color: text.primary,
-              boxShadow: "0 16px 40px rgba(0,0,0,.45)",
+              boxShadow: '0 16px 40px rgba(0,0,0,.45)',
             },
           },
         }}
@@ -173,16 +163,12 @@ export default function UserMenuDropdown({
           sx={{
             px: 2.5,
             py: 2.5,
-            display: "flex",
-            alignItems: "center",
+            display: 'flex',
+            alignItems: 'center',
             gap: 2,
           }}
         >
-          <AvatarUpload
-            src={user?.avatarUrl}
-            size={50}
-            initials={initials}
-          />
+          <AvatarUpload src={user?.avatarUrl} size={50} initials={initials} />
 
           <Box sx={{ minWidth: 0, flex: 1 }}>
             <Typography
@@ -193,7 +179,7 @@ export default function UserMenuDropdown({
               }}
               noWrap
             >
-              {user ? `${user.firstName} ${user.lastName}` : ""}
+              {user ? `${user.firstName} ${user.lastName}` : ''}
             </Typography>
 
             <Typography
@@ -206,22 +192,22 @@ export default function UserMenuDropdown({
               {user?.email}
             </Typography>
 
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.5 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
               {role && (
                 <Chip
-                  label={role.replace("_", " ")}
+                  label={role.replace('_', ' ')}
                   size="small"
                   sx={{
                     height: 20,
                     fontSize: 10.5,
                     fontWeight: 700,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.04em",
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
                     bgcolor: alpha(roleColor, 0.15),
                     color: roleColor,
                     border: `1px solid ${alpha(roleColor, 0.3)}`,
-                    borderRadius: "4px",
-                    "& .MuiChip-label": { px: 0.75 },
+                    borderRadius: '4px',
+                    '& .MuiChip-label': { px: 0.75 },
                   }}
                 />
               )}
@@ -234,8 +220,8 @@ export default function UserMenuDropdown({
             sx={{
               px: 2.5,
               pb: 1.5,
-              display: "flex",
-              alignItems: "center",
+              display: 'flex',
+              alignItems: 'center',
               gap: 1,
             }}
           >
@@ -271,8 +257,8 @@ export default function UserMenuDropdown({
             fontSize: 10.5,
             fontWeight: 700,
             color: text.secondary,
-            textTransform: "uppercase",
-            letterSpacing: "0.06em",
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
           }}
         >
           Quick Access
@@ -284,19 +270,15 @@ export default function UserMenuDropdown({
             onClick={() => navigateTo(link.path)}
             sx={{
               mx: 1,
-              borderRadius: "8px",
-              "&:hover": {
+              borderRadius: '8px',
+              '&:hover': {
                 bgcolor: alpha(primary.main, 0.08),
-                "& .MuiListItemIcon-root svg": { color: primary.main },
+                '& .MuiListItemIcon-root svg': { color: primary.main },
               },
             }}
           >
-            <ListItemIcon sx={{ minWidth: 36, color: text.secondary }}>
-              {link.icon}
-            </ListItemIcon>
-            <ListItemText
-              primaryTypographyProps={{ fontSize: 13.5, fontWeight: 500 }}
-            >
+            <ListItemIcon sx={{ minWidth: 36, color: text.secondary }}>{link.icon}</ListItemIcon>
+            <ListItemText primaryTypographyProps={{ fontSize: 13.5, fontWeight: 500 }}>
               {link.label}
             </ListItemText>
           </MenuItem>
@@ -312,8 +294,8 @@ export default function UserMenuDropdown({
             fontSize: 10.5,
             fontWeight: 700,
             color: text.secondary,
-            textTransform: "uppercase",
-            letterSpacing: "0.06em",
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
           }}
         >
           Settings
@@ -325,19 +307,15 @@ export default function UserMenuDropdown({
             onClick={() => navigateTo(link.path)}
             sx={{
               mx: 1,
-              borderRadius: "8px",
-              "&:hover": {
+              borderRadius: '8px',
+              '&:hover': {
                 bgcolor: alpha(primary.main, 0.08),
-                "& .MuiListItemIcon-root svg": { color: primary.main },
+                '& .MuiListItemIcon-root svg': { color: primary.main },
               },
             }}
           >
-            <ListItemIcon sx={{ minWidth: 36, color: text.secondary }}>
-              {link.icon}
-            </ListItemIcon>
-            <ListItemText
-              primaryTypographyProps={{ fontSize: 13.5, fontWeight: 500 }}
-            >
+            <ListItemIcon sx={{ minWidth: 36, color: text.secondary }}>{link.icon}</ListItemIcon>
+            <ListItemText primaryTypographyProps={{ fontSize: 13.5, fontWeight: 500 }}>
               {link.label}
             </ListItemText>
           </MenuItem>
@@ -349,18 +327,18 @@ export default function UserMenuDropdown({
           sx={{
             px: 2.5,
             py: 1.5,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Box
               sx={{
                 width: 8,
                 height: 8,
-                borderRadius: "50%",
-                bgcolor: user?.isActive ? "#2EA043" : "#4A5060",
+                borderRadius: '50%',
+                bgcolor: user?.isActive ? '#2EA043' : '#4A5060',
               }}
             />
             <Typography
@@ -370,7 +348,7 @@ export default function UserMenuDropdown({
                 fontWeight: 500,
               }}
             >
-              {user?.isActive ? "Active" : "Inactive"}
+              {user?.isActive ? 'Active' : 'Inactive'}
             </Typography>
           </Box>
 
@@ -392,8 +370,8 @@ export default function UserMenuDropdown({
             color: error.main,
             mx: 1,
             my: 0.5,
-            borderRadius: "8px",
-            "&:hover": {
+            borderRadius: '8px',
+            '&:hover': {
               bgcolor: alpha(error.main, 0.1),
             },
           }}
@@ -402,9 +380,7 @@ export default function UserMenuDropdown({
             <LogOut size={18} />
           </ListItemIcon>
 
-          <ListItemText
-            primaryTypographyProps={{ fontSize: 13.5, fontWeight: 500 }}
-          >
+          <ListItemText primaryTypographyProps={{ fontSize: 13.5, fontWeight: 500 }}>
             Sign Out
           </ListItemText>
         </MenuItem>

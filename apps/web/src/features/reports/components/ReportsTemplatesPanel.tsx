@@ -23,7 +23,12 @@ import {
   Delete as DeleteIcon,
   AutoAwesome as TemplateIcon,
 } from '@mui/icons-material';
-import { useReportTemplates, useCreateTemplate, useUpdateTemplate, useDeleteTemplate } from '../hooks';
+import {
+  useReportTemplates,
+  useCreateTemplate,
+  useUpdateTemplate,
+  useDeleteTemplate,
+} from '../hooks';
 import { useToast } from '../../../components/feedback/Toast';
 import { useConfirm } from '../../../hooks/useConfirm';
 import type { ReportTemplate } from '../../../api/reports';
@@ -58,7 +63,8 @@ export function ReportsTemplatesPanel() {
   const updateMutation = useUpdateTemplate();
   const deleteMutation = useDeleteTemplate();
 
-  const templates: ReportTemplate[] = (templatesData as { data?: ReportTemplate[] } | undefined)?.data ?? [];
+  const templates: ReportTemplate[] =
+    (templatesData as { data?: ReportTemplate[] } | undefined)?.data ?? [];
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<ReportTemplate | null>(null);
@@ -169,15 +175,31 @@ export function ReportsTemplatesPanel() {
                     </Typography>
                   )}
                   <Box sx={{ display: 'flex', gap: 1 }}>
-                    <Chip label={REPORT_TYPES.find((t) => t.value === template.type)?.label ?? template.type} size="small" variant="outlined" />
-                    <Chip label={template.format.toUpperCase()} size="small" color="primary" variant="outlined" />
+                    <Chip
+                      label={
+                        REPORT_TYPES.find((t) => t.value === template.type)?.label ?? template.type
+                      }
+                      size="small"
+                      variant="outlined"
+                    />
+                    <Chip
+                      label={template.format.toUpperCase()}
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                    />
                   </Box>
                 </CardContent>
                 <CardActions sx={{ justifyContent: 'flex-end', gap: 0 }}>
                   <IconButton size="small" onClick={() => openEdit(template)} title="Edit">
                     <EditIcon fontSize="small" />
                   </IconButton>
-                  <IconButton size="small" onClick={() => handleDelete(template)} title="Delete" color="error">
+                  <IconButton
+                    size="small"
+                    onClick={() => handleDelete(template)}
+                    title="Delete"
+                    color="error"
+                  >
                     <DeleteIcon fontSize="small" />
                   </IconButton>
                 </CardActions>
@@ -226,7 +248,9 @@ export function ReportsTemplatesPanel() {
             select
             label="Format"
             value={form.format}
-            onChange={(e) => setForm({ ...form, format: e.target.value as ReportTemplate['format'] })}
+            onChange={(e) =>
+              setForm({ ...form, format: e.target.value as ReportTemplate['format'] })
+            }
             fullWidth
             size="small"
           >

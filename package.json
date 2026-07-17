@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Vestara Admin Dashboard — Enterprise administration platform for the Vestara ecosystem",
   "scripts": {
-    "dev": "NODE_ENV=development turbo dev",
+    "dev": "NODE_ENV=development turbo dev --filter=@vestara/web && turbo dev --filter=@vestara/api",
     "dev:web": "NODE_ENV=development turbo dev --filter=@vestara/web",
     "dev:api": "NODE_ENV=development turbo dev --filter=@vestara/api",
     "dev:local": "bash scripts/dev-local.sh",

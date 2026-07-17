@@ -34,59 +34,51 @@ router.get('/', async (_req, res, next) => {
 /**
  * GET /organizations/:id — Get a single organization by ID.
  */
-router.get(
-  '/:id',
-  validate(organizationIdParamSchema, 'params'),
-  async (req, res, next) => {
-    try {
-      const id = param(req.params.id);
-      const organization = await organizationRepository.findById(id);
-      if (!organization) {
-        return res.status(404).json({
-          success: false,
-          error: { code: 'NOT_FOUND', message: 'Organization not found' },
-        });
-      }
-      sendSuccess(res, { organization });
-    } catch (error) {
-      next(error);
+router.get('/:id', validate(organizationIdParamSchema, 'params'), async (req, res, next) => {
+  try {
+    const id = param(req.params.id);
+    const organization = await organizationRepository.findById(id);
+    if (!organization) {
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Organization not found' },
+      });
     }
-  },
-);
+    sendSuccess(res, { organization });
+  } catch (error) {
+    next(error);
+  }
+});
 
 /**
  * POST /organizations — Create a new organization.
  */
-router.post(
-  '/',
-  validate(createOrganizationSchema),
-  async (req, res, next) => {
-    try {
-      const { name, slug, logoUrl } = req.body;
+router.post('/', validate(createOrganizationSchema), async (req, res, next) => {
+  try {
+    const { name, slug, logoUrl } = req.body;
 
-      const existing = await organizationRepository.findBySlug(slug);
-      if (existing) {
-        return res.status(409).json({
-          success: false,
-          error: {
-            code: 'ORGANIZATION_SLUG_EXISTS',
-            message: 'An organization with this slug already exists',
-          },
-        });
-      }
-
-      const organization = await organizationRepository.create({
-        name,
-        slug,
-        ...(logoUrl ? { logoUrl } : {}),
+    const existing = await organizationRepository.findBySlug(slug);
+    if (existing) {
+      return res.status(409).json({
+        success: false,
+        error: {
+          code: 'ORGANIZATION_SLUG_EXISTS',
+          message: 'An organization with this slug already exists',
+        },
       });
-
-      sendCreated(res, { organization });
-    } catch (error) {
-      next(error);
     }
-  },
-);
+
+    const organization = await organizationRepository.create({
+      name,
+      slug,
+      ...(logoUrl ? { logoUrl } : {}),
+    });
+
+    sendCreated(res, { organization });
+  } catch (error) {
+    next(error);
+  }
+});
 
 /**
  * PUT /organizations/:id — Update an organization's name or logo.

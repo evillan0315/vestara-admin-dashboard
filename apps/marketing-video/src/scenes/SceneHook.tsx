@@ -1,9 +1,9 @@
-import React from "react";
-import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
-import { BRAND, FONT_FAMILY } from "../theme";
-import { Background } from "../components/Background";
-import { GoldText, GoldDivider } from "../components/Glass";
-import { VestaraLogo } from "../components/Logo";
+import React from 'react';
+import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
+import { BRAND, FONT_FAMILY } from '../theme';
+import { Background } from '../components/Background';
+import { GoldText, GoldDivider } from '../components/Glass';
+import { VestaraLogo } from '../components/Logo';
 
 /**
  * Scene 1 — Hook (frames 0–90, ~3s)
@@ -18,17 +18,17 @@ export const SceneHook: React.FC = () => {
   const subIn = spring({ frame: frame - 40, fps, config: { damping: 170 } });
 
   const pulse = interpolate(frame, [0, 90], [1, 1.04], {
-    extrapolateRight: "clamp",
+    extrapolateRight: 'clamp',
   });
 
   return (
-    <AbsoluteFill style={{ justifyContent: "center", alignItems: "center" }}>
+    <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>
       <Background />
       <div
         style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
           gap: 26,
           transform: `scale(${pulse})`,
         }}
@@ -37,7 +37,12 @@ export const SceneHook: React.FC = () => {
           <VestaraLogo size={1.1} showTagline />
         </div>
 
-        <div style={{ opacity: lineIn, transform: `translateY(${interpolate(lineIn, [0, 1], [20, 0])}px)` }}>
+        <div
+          style={{
+            opacity: lineIn,
+            transform: `translateY(${interpolate(lineIn, [0, 1], [20, 0])}px)`,
+          }}
+        >
           <GoldText fontSize={72} weight={800}>
             One platform.
           </GoldText>

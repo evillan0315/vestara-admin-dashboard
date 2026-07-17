@@ -1,12 +1,5 @@
 import type { ReactNode } from 'react';
-import {
-  Box,
-  Typography,
-  Paper,
-  styled,
-  Skeleton,
-  type PaperProps,
-} from '@mui/material';
+import { Box, Typography, Paper, styled, Skeleton, type PaperProps } from '@mui/material';
 
 // ── Styled Wrapper ─────────────────────────────────
 

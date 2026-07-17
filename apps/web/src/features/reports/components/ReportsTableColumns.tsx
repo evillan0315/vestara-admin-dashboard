@@ -98,7 +98,17 @@ export function createReportsColumns({ onMenuOpen }: CreateReportsColumnsParams)
       width: 200,
       render: (_value, row) => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: 1, backgroundColor: 'action.hover' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 36,
+              height: 36,
+              borderRadius: 1,
+              backgroundColor: 'action.hover',
+            }}
+          >
             {getFormatIcon(row.format)}
           </Box>
           <Box>
@@ -143,14 +153,22 @@ export function createReportsColumns({ onMenuOpen }: CreateReportsColumnsParams)
       label: 'Size',
       width: 100,
       align: 'right' as const,
-      render: (value) => <Typography variant="body2" color="text.secondary">{formatFileSize(value as number)}</Typography>,
+      render: (value) => (
+        <Typography variant="body2" color="text.secondary">
+          {formatFileSize(value as number)}
+        </Typography>
+      ),
     },
     {
       id: 'createdAt',
       label: 'Created',
       width: 160,
       sortable: true,
-      render: (value) => <Typography variant="body2" color="text.secondary">{formatDate(value as string)}</Typography>,
+      render: (value) => (
+        <Typography variant="body2" color="text.secondary">
+          {formatDate(value as string)}
+        </Typography>
+      ),
     },
     {
       id: 'actions',

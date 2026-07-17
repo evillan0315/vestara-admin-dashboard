@@ -14,7 +14,13 @@ interface ProfileSectionCardProps {
  * Consistent card shell used across profile tab sections: a titled header
  * (with optional action slot) and padded body.
  */
-export function ProfileSectionCard({ title, description, action, children, sx }: ProfileSectionCardProps) {
+export function ProfileSectionCard({
+  title,
+  description,
+  action,
+  children,
+  sx,
+}: ProfileSectionCardProps) {
   const theme = useTheme();
   const { text } = theme.palette;
 

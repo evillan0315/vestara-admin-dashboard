@@ -7,10 +7,19 @@ import {
   type Theme,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { Controller, type ControllerProps, type FieldPath, type FieldValues, type PathValue } from 'react-hook-form';
+import {
+  Controller,
+  type ControllerProps,
+  type FieldPath,
+  type FieldValues,
+  type PathValue,
+} from 'react-hook-form';
 import { useState, type ReactNode } from 'react';
 
-export interface FormInputProps<T extends FieldValues> extends Omit<ControllerProps<T>, 'render' | 'control' | 'name'> {
+export interface FormInputProps<T extends FieldValues> extends Omit<
+  ControllerProps<T>,
+  'render' | 'control' | 'name'
+> {
   name: FieldPath<T>;
   label?: string;
   placeholder?: string;
@@ -151,7 +160,11 @@ export function FormInput<T extends FieldValues>({
                     tabIndex={-1}
                     size="small"
                   >
-                    {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+                    {showPassword ? (
+                      <VisibilityOff fontSize="small" />
+                    ) : (
+                      <Visibility fontSize="small" />
+                    )}
                   </IconButton>
                 </InputAdornment>
               ) : rightIcon ? (

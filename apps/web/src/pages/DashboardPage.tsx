@@ -1,14 +1,6 @@
 import { useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Box,
-  Typography,
-  Grid,
-  styled,
-  Chip,
-  Button,
-  useTheme,
-} from '@mui/material';
+import { Box, Typography, Grid, styled, Chip, Button, useTheme } from '@mui/material';
 import { LineChart, PieChart, BarChart } from '@mui/x-charts';
 import {
   People as PeopleIcon,
@@ -153,7 +145,9 @@ export function DashboardPage() {
   const currentEvents = analytics.total;
   const prevEvents = prevCountQuery.data ?? 0;
   const eventsChange =
-    prevEvents > 0 ? Math.round(((currentEvents - prevEvents) / prevEvents) * 1000) / 10 : undefined;
+    prevEvents > 0
+      ? Math.round(((currentEvents - prevEvents) / prevEvents) * 1000) / 10
+      : undefined;
 
   const activityItems = (auditQuery.data?.data ?? []).map(toActivityItem);
 
@@ -272,7 +266,11 @@ export function DashboardPage() {
                 </Typography>
               </Box>
               <SparklineBar values={daily.values} color={theme.palette.primary.main} />
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mt: 0.5, display: 'block' }}
+              >
                 {daily.values.reduce((a, b) => a + b, 0)} total events
               </Typography>
             </ChartCard>
@@ -287,7 +285,12 @@ export function DashboardPage() {
               </Box>
               <Typography variant="h5" fontWeight={700}>
                 {activeUsers}
-                <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 0.5 }}>
+                <Typography
+                  component="span"
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ ml: 0.5 }}
+                >
                   / {totalUsers} active
                 </Typography>
               </Typography>
@@ -310,8 +313,14 @@ export function DashboardPage() {
                   }}
                 />
               </Box>
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                {totalUsers > 0 ? `${Math.round((activeUsers / totalUsers) * 100)}% active` : 'No users'}
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mt: 0.5, display: 'block' }}
+              >
+                {totalUsers > 0
+                  ? `${Math.round((activeUsers / totalUsers) * 100)}% active`
+                  : 'No users'}
               </Typography>
             </ChartCard>
           </Grid>
@@ -348,11 +357,7 @@ export function DashboardPage() {
         {/* Recent activity feed */}
         <Grid size={{ xs: 12, lg: 4 }}>
           <ChartCard sx={{ p: 0, overflow: 'hidden' }}>
-            <ActivityFeed
-              items={activityItems}
-              title="Recent Activity"
-              maxItems={6}
-            />
+            <ActivityFeed items={activityItems} title="Recent Activity" maxItems={6} />
           </ChartCard>
         </Grid>
       </Grid>
@@ -370,7 +375,12 @@ export function DashboardPage() {
                 series={[
                   {
                     data: [
-                      { id: 'active', value: activeUsers, label: 'Active', color: theme.palette.success.main },
+                      {
+                        id: 'active',
+                        value: activeUsers,
+                        label: 'Active',
+                        color: theme.palette.success.main,
+                      },
                       {
                         id: 'inactive',
                         value: inactiveUsers,
@@ -384,7 +394,10 @@ export function DashboardPage() {
                   },
                 ]}
                 slotProps={{
-                  legend: { direction: 'horizontal', position: { vertical: 'bottom', horizontal: 'center' } },
+                  legend: {
+                    direction: 'horizontal',
+                    position: { vertical: 'bottom', horizontal: 'center' },
+                  },
                 }}
                 onItemClick={handlePieClick}
               />

@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-  type ReactNode,
-} from 'react';
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../auth/AuthContext';
 import { useWebSocketEvent } from '../../websocket/hooks';
@@ -27,7 +20,9 @@ interface LiveNotificationsContextValue {
   refresh: () => void;
 }
 
-const LiveNotificationsContext = createContext<LiveNotificationsContextValue | undefined>(undefined);
+const LiveNotificationsContext = createContext<LiveNotificationsContextValue | undefined>(
+  undefined,
+);
 
 function dedupeById(items: Notification[]): Notification[] {
   const seen = new Set<string>();

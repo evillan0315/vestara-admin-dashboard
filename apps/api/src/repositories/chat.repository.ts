@@ -83,9 +83,7 @@ export class ChatRepository extends BaseRepository {
       ...(isArchived !== undefined ? { isArchived } : { isArchived: false }),
       ...(search
         ? {
-            OR: [
-              { title: { contains: search, mode: 'insensitive' } },
-            ],
+            OR: [{ title: { contains: search, mode: 'insensitive' } }],
           }
         : {}),
     };

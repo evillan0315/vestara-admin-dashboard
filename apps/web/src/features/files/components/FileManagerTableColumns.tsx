@@ -30,7 +30,8 @@ function getFileColor(mimeType: string): string {
   if (mimeType.startsWith('image/')) return '#1976d2';
   if (mimeType.startsWith('video/')) return '#7b1fa2';
   if (mimeType.includes('pdf')) return '#d32f2f';
-  if (mimeType.startsWith('text/') || mimeType.includes('json') || mimeType.includes('xml')) return '#2e7d32';
+  if (mimeType.startsWith('text/') || mimeType.includes('json') || mimeType.includes('xml'))
+    return '#2e7d32';
   return '#757575';
 }
 
@@ -60,7 +61,12 @@ export function createFileManagerColumns({
       sortable: true,
       render: (_value, row) => (
         <Box
-          sx={{ display: 'flex', alignItems: 'center', gap: 1.5, cursor: isImageFile(row.mimeType) ? 'pointer' : 'default' }}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+            cursor: isImageFile(row.mimeType) ? 'pointer' : 'default',
+          }}
           onClick={() => isImageFile(row.mimeType) && onPreview(row)}
         >
           <Avatar
@@ -118,7 +124,13 @@ export function createFileManagerColumns({
       sortable: true,
       render: (value) => (
         <Typography variant="body2" color="text.secondary">
-          {value ? new Date(value as string).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '—'}
+          {value
+            ? new Date(value as string).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              })
+            : '—'}
         </Typography>
       ),
     },
@@ -129,29 +141,59 @@ export function createFileManagerColumns({
       render: (_value, row) => (
         <Box sx={{ display: 'flex', gap: 0.25 }}>
           <Tooltip title="Download">
-            <IconButton size="small" onClick={(e) => { e.stopPropagation(); onDownload(row); }}>
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDownload(row);
+              }}
+            >
               <DownloadIcon fontSize="small" />
             </IconButton>
           </Tooltip>
           <Tooltip title="Rename">
-            <IconButton size="small" onClick={(e) => { e.stopPropagation(); onRenameOpen(row); }}>
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRenameOpen(row);
+              }}
+            >
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
           <Tooltip title="Move to folder">
-            <IconButton size="small" onClick={(e) => { e.stopPropagation(); onMoveSingle(row); }}>
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                onMoveSingle(row);
+              }}
+            >
               <MoveIcon fontSize="small" />
             </IconButton>
           </Tooltip>
           {isImageFile(row.mimeType) && (
             <Tooltip title="Preview">
-              <IconButton size="small" onClick={(e) => { e.stopPropagation(); onPreview(row); }}>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onPreview(row);
+                }}
+              >
                 <ImageIcon fontSize="small" />
               </IconButton>
             </Tooltip>
           )}
           <Tooltip title="Delete">
-            <IconButton size="small" onClick={(e) => { e.stopPropagation(); onDeleteRequest(row); }}>
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDeleteRequest(row);
+              }}
+            >
               <DeleteIcon fontSize="small" color="error" />
             </IconButton>
           </Tooltip>

@@ -7,13 +7,13 @@
 // ── Colour primaries the user can choose from ──
 
 export type ThemePrimaryColor =
-  | 'gold'      // Vestara signature gold (#D8A441)
-  | 'blue'      // Professional blue (#3B82F6)
-  | 'purple'    // Royal purple (#8B5CF6)
-  | 'green'     // Emerald (#22C55E)
-  | 'red'       // Ruby (#EF4444)
-  | 'indigo'    // Indigo (#6366F1)
-  | 'teal';     // Teal (#14B8A6)
+  | 'gold' // Vestara signature gold (#D8A441)
+  | 'blue' // Professional blue (#3B82F6)
+  | 'purple' // Royal purple (#8B5CF6)
+  | 'green' // Emerald (#22C55E)
+  | 'red' // Ruby (#EF4444)
+  | 'indigo' // Indigo (#6366F1)
+  | 'teal'; // Teal (#14B8A6)
 
 // ── Density / layout spacing ──
 
@@ -21,11 +21,7 @@ export type ThemeDensity = 'compact' | 'comfortable' | 'spacious';
 
 // ── Font family options ──
 
-export type ThemeFontFamily =
-  | 'inter'
-  | 'plus-jakarta-sans'
-  | 'roboto'
-  | 'system';
+export type ThemeFontFamily = 'inter' | 'plus-jakarta-sans' | 'roboto' | 'system';
 
 // ── Sidebar variant ──
 

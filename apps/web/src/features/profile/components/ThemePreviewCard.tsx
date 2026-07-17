@@ -1,4 +1,12 @@
-import { Box, Checkbox, FormControlLabel, TextField, Typography, useTheme, alpha } from '@mui/material';
+import {
+  Box,
+  Checkbox,
+  FormControlLabel,
+  TextField,
+  Typography,
+  useTheme,
+  alpha,
+} from '@mui/material';
 import { Button } from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
 
@@ -20,14 +28,10 @@ export function ThemePreviewCard() {
           borderBottom: `1px solid ${divider}`,
         }}
       >
-        <Typography
-          sx={{ fontWeight: 700, color: text.primary, fontSize: 16, m: 0 }}
-        >
+        <Typography sx={{ fontWeight: 700, color: text.primary, fontSize: 16, m: 0 }}>
           Live Preview
         </Typography>
-        <Typography
-          sx={{ color: text.secondary, fontSize: 13, mt: 0.25 }}
-        >
+        <Typography sx={{ color: text.secondary, fontSize: 13, mt: 0.25 }}>
           Sample UI rendered with your current selections — changes apply immediately.
         </Typography>
       </Box>
@@ -56,11 +60,7 @@ export function ThemePreviewCard() {
 
         {/* Input + Checkbox */}
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
-          <TextField
-            size="small"
-            placeholder="Sample input"
-            sx={{ minWidth: 180 }}
-          />
+          <TextField size="small" placeholder="Sample input" sx={{ minWidth: 180 }} />
           <FormControlLabel
             control={<Checkbox size="small" />}
             label="Option"
@@ -98,5 +98,3 @@ export function ThemePreviewCard() {
     </Card>
   );
 }
-
-

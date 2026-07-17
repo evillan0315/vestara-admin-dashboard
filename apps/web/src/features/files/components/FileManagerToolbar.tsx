@@ -41,10 +41,19 @@ export function FileManagerToolbar({
       </Button>
       {selectedCount > 0 && (
         <>
-          <Button variant="outlined" startIcon={<MoveIcon />} onClick={() => onMoveOpen(selectedIds)}>
+          <Button
+            variant="outlined"
+            startIcon={<MoveIcon />}
+            onClick={() => onMoveOpen(selectedIds)}
+          >
             Move ({selectedCount})
           </Button>
-          <Button variant="outlined" color="error" startIcon={<DeleteIcon />} onClick={onBulkDeleteOpen}>
+          <Button
+            variant="outlined"
+            color="error"
+            startIcon={<DeleteIcon />}
+            onClick={onBulkDeleteOpen}
+          >
             Delete ({selectedCount})
           </Button>
         </>

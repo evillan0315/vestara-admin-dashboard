@@ -1,8 +1,25 @@
-import { Checkbox as MuiCheckbox, FormControlLabel, FormGroup, FormControl, FormLabel, styled, type SxProps, type Theme } from '@mui/material';
-import { Controller, type ControllerProps, type FieldPath, type FieldValues } from 'react-hook-form';
+import {
+  Checkbox as MuiCheckbox,
+  FormControlLabel,
+  FormGroup,
+  FormControl,
+  FormLabel,
+  styled,
+  type SxProps,
+  type Theme,
+} from '@mui/material';
+import {
+  Controller,
+  type ControllerProps,
+  type FieldPath,
+  type FieldValues,
+} from 'react-hook-form';
 import type { ReactNode } from 'react';
 
-export interface FormCheckboxProps<T extends FieldValues> extends Omit<ControllerProps<T>, 'render' | 'control' | 'name'> {
+export interface FormCheckboxProps<T extends FieldValues> extends Omit<
+  ControllerProps<T>,
+  'render' | 'control' | 'name'
+> {
   name: FieldPath<T>;
   label?: ReactNode;
   size?: 'small' | 'medium';
@@ -51,7 +68,11 @@ export const FormCheckbox = <T extends FieldValues>({
         return (
           <FormControl component="fieldset" sx={sx}>
             {label && (
-              <FormLabel component="legend" required={required} sx={{ mb: 0.75, fontSize: '0.875rem' }}>
+              <FormLabel
+                component="legend"
+                required={required}
+                sx={{ mb: 0.75, fontSize: '0.875rem' }}
+              >
                 {label}
               </FormLabel>
             )}
@@ -76,7 +97,9 @@ export const FormCheckbox = <T extends FieldValues>({
                 style={{
                   marginTop: '0.5rem',
                   fontSize: '0.75rem',
-                  color: fieldState.error ? 'var(--mui-palette-error-main)' : 'var(--mui-palette-text-secondary)',
+                  color: fieldState.error
+                    ? 'var(--mui-palette-error-main)'
+                    : 'var(--mui-palette-text-secondary)',
                 }}
                 id={`${name}-helper-text`}
               >

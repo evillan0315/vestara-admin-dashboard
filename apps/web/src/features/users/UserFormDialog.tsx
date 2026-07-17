@@ -38,9 +38,19 @@ interface UserFormDialogProps {
 }
 
 const roles: { value: UserRole; label: string; color: string; bgColor: string }[] = [
-  { value: 'super_admin' as UserRole, label: 'Super Admin', color: colors.error, bgColor: colors.errorSoft },
+  {
+    value: 'super_admin' as UserRole,
+    label: 'Super Admin',
+    color: colors.error,
+    bgColor: colors.errorSoft,
+  },
   { value: 'admin' as UserRole, label: 'Admin', color: colors.gold, bgColor: colors.goldSoft },
-  { value: 'moderator' as UserRole, label: 'Moderator', color: colors.purple, bgColor: colors.purpleSoft },
+  {
+    value: 'moderator' as UserRole,
+    label: 'Moderator',
+    color: colors.purple,
+    bgColor: colors.purpleSoft,
+  },
   { value: 'support' as UserRole, label: 'Support', color: colors.teal, bgColor: colors.tealSoft },
 ];
 
@@ -174,12 +184,13 @@ export function UserFormDialog({
   };
 
   const selectedRole = roles.find((r) => r.value === formData.role);
-  const initials = [formData.firstName, formData.lastName]
-    .filter(Boolean)
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2) || '?';
+  const initials =
+    [formData.firstName, formData.lastName]
+      .filter(Boolean)
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2) || '?';
 
   return (
     <Dialog
@@ -328,7 +339,9 @@ export function UserFormDialog({
               value={formData.password}
               onChange={handleChange('password')}
               error={!!errors.password}
-              helperText={errors.password || 'At least 8 characters with uppercase, lowercase, and number'}
+              helperText={
+                errors.password || 'At least 8 characters with uppercase, lowercase, and number'
+              }
               fullWidth
               size="small"
               required
@@ -345,7 +358,17 @@ export function UserFormDialog({
 
           {/* Role Selector */}
           <Box>
-            <Typography sx={{ fontWeight: 500, color: colors.text, fontSize: 13, mb: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Typography
+              sx={{
+                fontWeight: 500,
+                color: colors.text,
+                fontSize: 13,
+                mb: 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+              }}
+            >
               <Shield size={14} color={colors.gold} />
               Role
             </Typography>
@@ -416,7 +439,9 @@ export function UserFormDialog({
               sx={textFieldStyles}
             >
               <MenuItem value="">
-                <Typography sx={{ color: colors.muted, fontSize: 13 }}>Select organization</Typography>
+                <Typography sx={{ color: colors.muted, fontSize: 13 }}>
+                  Select organization
+                </Typography>
               </MenuItem>
               {organizations.map((org) => (
                 <MenuItem key={org.id} value={org.id}>

@@ -12,7 +12,12 @@ interface AuthState {
 
 interface AuthContextValue extends AuthState {
   login: (email: string, password: string) => Promise<void>;
-  register: (data: { email: string; password: string; firstName: string; lastName: string }) => Promise<void>;
+  register: (data: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+  }) => Promise<void>;
   logout: () => Promise<void>;
   updateUser: (user: UserDTO) => void;
   deleteAccount: () => void;
@@ -115,23 +120,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [setUser]);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const res = await apiClient.post<AuthResponseDTO>('/auth/login', { email, password });
-    if (res.data) {
-      localStorage.setItem('accessToken', res.data.tokens.accessToken);
-      localStorage.setItem('refreshToken', res.data.tokens.refreshToken);
-      setUser(res.data.user);
-    }
-  }, [setUser]);
+  const login = useCallback(
+    async (email: string, password: string) => {
+      const res = await apiClient.post<AuthResponseDTO>('/auth/login', { email, password });
+      if (res.data) {
+        localStorage.setItem('accessToken', res.data.tokens.accessToken);
+        localStorage.setItem('refreshToken', res.data.tokens.refreshToken);
+        setUser(res.data.user);
+      }
+    },
+    [setUser],
+  );
 
-  const register = useCallback(async (data: { email: string; password: string; firstName: string; lastName: string }) => {
-    const res = await apiClient.post<AuthResponseDTO>('/auth/register', data);
-    if (res.data) {
-      localStorage.setItem('accessToken', res.data.tokens.accessToken);
-      localStorage.setItem('refreshToken', res.data.tokens.refreshToken);
-      setUser(res.data.user);
-    }
-  }, [setUser]);
+  const register = useCallback(
+    async (data: { email: string; password: string; firstName: string; lastName: string }) => {
+      const res = await apiClient.post<AuthResponseDTO>('/auth/register', data);
+      if (res.data) {
+        localStorage.setItem('accessToken', res.data.tokens.accessToken);
+        localStorage.setItem('refreshToken', res.data.tokens.refreshToken);
+        setUser(res.data.user);
+      }
+    },
+    [setUser],
+  );
 
   const updateUser = useCallback((updatedUser: UserDTO) => {
     setState((prev) => ({
@@ -175,25 +186,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    * Handle the OAuth callback by storing tokens and fetching the current user.
    * Called from the /auth/callback page after the backend redirects back.
    */
-  const handleOAuthCallback = useCallback(async (accessToken: string, refreshToken: string) => {
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
+  const handleOAuthCallback = useCallback(
+    async (accessToken: string, refreshToken: string) => {
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
 
-    // Fetch the current user with the new token
-    const res = await apiClient.get<{ user: UserDTO }>('/auth/me');
-    if (res.data?.user) {
-      setUser(res.data.user);
-    } else {
-      // Token was invalid — clean up
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      setUser(null);
-      throw new Error('Failed to authenticate with OAuth provider');
-    }
-  }, [setUser]);
+      // Fetch the current user with the new token
+      const res = await apiClient.get<{ user: UserDTO }>('/auth/me');
+      if (res.data?.user) {
+        setUser(res.data.user);
+      } else {
+        // Token was invalid — clean up
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        setUser(null);
+        throw new Error('Failed to authenticate with OAuth provider');
+      }
+    },
+    [setUser],
+  );
 
   return (
-    <AuthContext.Provider value={{ ...state, login, register, logout, updateUser, deleteAccount, oauthRedirect, handleOAuthCallback }}>
+    <AuthContext.Provider
+      value={{
+        ...state,
+        login,
+        register,
+        logout,
+        updateUser,
+        deleteAccount,
+        oauthRedirect,
+        handleOAuthCallback,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

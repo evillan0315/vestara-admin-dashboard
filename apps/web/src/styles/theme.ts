@@ -17,13 +17,13 @@ import { primaryColors, densitySpacing, fontFamilyValues, shadows } from '../the
 // ── Dark & light background palettes ──
 
 const darkBackground = {
-  default: '#0D0F12',   // Main content — near-black
-  paper: '#151923',     // Elevated surfaces (cards, dialogs)
-  card: '#111419',      // Card base
-  sidebar: '#0F1219',   // Sidebar panel
-  input: '#1A1F2B',     // Input fields
-  hover: '#1A1F2B',     // Hover states
-  selected: '#1E2533',  // Selected/active states
+  default: '#0D0F12', // Main content — near-black
+  paper: '#151923', // Elevated surfaces (cards, dialogs)
+  card: '#111419', // Card base
+  sidebar: '#0F1219', // Sidebar panel
+  input: '#1A1F2B', // Input fields
+  hover: '#1A1F2B', // Hover states
+  selected: '#1E2533', // Selected/active states
 };
 
 const lightBackground = {
@@ -39,9 +39,9 @@ const lightBackground = {
 // ── Dark & light text palettes ──
 
 const darkText = {
-  primary: '#E8E8ED',    // Off-white, not pure white
-  secondary: '#7A7F8E',  // Muted gray
-  disabled: '#3A3F4C',   // Very muted
+  primary: '#E8E8ED', // Off-white, not pure white
+  secondary: '#7A7F8E', // Muted gray
+  disabled: '#3A3F4C', // Very muted
 };
 
 const lightText = {
@@ -177,7 +177,12 @@ export function createAppTheme(config: ThemeConfig): Theme {
         styleOverrides: {
           root: {
             borderRadius: density.borderRadius,
-            padding: density.padding === 1.5 ? '6px 16px' : density.padding === 2 ? '8px 20px' : '10px 24px',
+            padding:
+              density.padding === 1.5
+                ? '6px 16px'
+                : density.padding === 2
+                  ? '8px 20px'
+                  : '10px 24px',
             fontWeight: 600,
             fontSize: scaleFontSize(14),
             letterSpacing: '0.01em',
@@ -313,9 +318,7 @@ export function createAppTheme(config: ThemeConfig): Theme {
             fontWeight: 600,
             fontSize: scaleFontSize(12),
             ...(config.maintenanceMode && {
-              backgroundColor: config.maintenanceMode
-                ? '#DA374320'
-                : undefined,
+              backgroundColor: config.maintenanceMode ? '#DA374320' : undefined,
               color: config.maintenanceMode ? '#DA3743' : undefined,
             }),
           },
@@ -336,7 +339,12 @@ export function createAppTheme(config: ThemeConfig): Theme {
       MuiTableCell: {
         styleOverrides: {
           root: {
-            padding: density.padding === 1.5 ? '8px 12px' : density.padding === 2 ? '12px 16px' : '16px 20px',
+            padding:
+              density.padding === 1.5
+                ? '8px 12px'
+                : density.padding === 2
+                  ? '12px 16px'
+                  : '16px 20px',
             borderColor: divider,
             fontSize: scaleFontSize(13),
             ...(config.maintenanceMode && {
@@ -796,12 +804,14 @@ export function createAppTheme(config: ThemeConfig): Theme {
     },
 
     shape: {
-      borderRadius: config.borderRadiusScale > 1
-        ? Math.round(density.borderRadius * config.borderRadiusScale)
-        : density.borderRadius,
+      borderRadius:
+        config.borderRadiusScale > 1
+          ? Math.round(density.borderRadius * config.borderRadiusScale)
+          : density.borderRadius,
     },
 
-    spacing: (factor: number) => `${factor * (density.padding === 1.5 ? 8 : density.padding === 2 ? 8 : 8)}px`,
+    spacing: (factor: number) =>
+      `${factor * (density.padding === 1.5 ? 8 : density.padding === 2 ? 8 : 8)}px`,
 
     shadows: [
       'none',

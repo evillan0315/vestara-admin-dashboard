@@ -1,5 +1,16 @@
 import { useState, useRef } from 'react';
-import { Box, Grid, Chip, IconButton, LinearProgress, TextField, MenuItem, Link, useTheme, alpha } from '@mui/material';
+import {
+  Box,
+  Grid,
+  Chip,
+  IconButton,
+  LinearProgress,
+  TextField,
+  MenuItem,
+  Link,
+  useTheme,
+  alpha,
+} from '@mui/material';
 import {
   Upload,
   Trash2,
@@ -12,11 +23,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
 import { useToast } from '../../../components/feedback/Toast';
-import {
-  useSubmitKyc,
-  useUploadKycDocument,
-  useDeleteKycDocument,
-} from '../hooks';
+import { useSubmitKyc, useUploadKycDocument, useDeleteKycDocument } from '../hooks';
 import type { ProfileResponse } from '../../../api/profile';
 import type { KycDocumentType } from '@vestara/types';
 import { ProfileSectionCard, useGold } from './ProfileSectionCard';
@@ -112,7 +119,12 @@ export function IdentityTab({ profile }: IdentityTabProps) {
             gap: 2,
             p: 2,
             borderRadius: 2,
-            bgcolor: status.color === 'success' ? alpha(theme.palette.success.main, 0.1) : status.color === 'warning' ? alpha(theme.palette.warning.main, 0.1) : alpha(theme.palette.text.disabled, 0.08),
+            bgcolor:
+              status.color === 'success'
+                ? alpha(theme.palette.success.main, 0.1)
+                : status.color === 'warning'
+                  ? alpha(theme.palette.warning.main, 0.1)
+                  : alpha(theme.palette.text.disabled, 0.08),
             border: `1px solid ${status.color === 'success' ? alpha(theme.palette.success.main, 0.3) : status.color === 'warning' ? alpha(theme.palette.warning.main, 0.3) : theme.palette.divider}`,
           }}
         >
@@ -131,7 +143,11 @@ export function IdentityTab({ profile }: IdentityTabProps) {
               <Box component="span" sx={{ fontWeight: 700, color: 'text.primary', fontSize: 15 }}>
                 {status.label}
               </Box>
-              <Chip size="small" label={profile.kycStatus} sx={{ height: 20, fontSize: 10, textTransform: 'capitalize' }} />
+              <Chip
+                size="small"
+                label={profile.kycStatus}
+                sx={{ height: 20, fontSize: 10, textTransform: 'capitalize' }}
+              />
             </Box>
             {profile.kycSubmittedAt && (
               <Box component="span" sx={{ color: 'text.secondary', fontSize: 12 }}>
@@ -187,7 +203,9 @@ export function IdentityTab({ profile }: IdentityTabProps) {
               size="small"
             >
               {DOCUMENT_TYPES.map((d) => (
-                <MenuItem key={d.value} value={d.value}>{d.label}</MenuItem>
+                <MenuItem key={d.value} value={d.value}>
+                  {d.label}
+                </MenuItem>
               ))}
             </TextField>
           </Grid>
@@ -207,7 +225,13 @@ export function IdentityTab({ profile }: IdentityTabProps) {
 
         {uploading && <LinearProgress sx={{ mb: 2, borderRadius: 1 }} />}
         {uploadError && (
-          <Chip icon={<AlertCircle size={14} />} label={uploadError} color="error" variant="outlined" sx={{ mb: 2 }} />
+          <Chip
+            icon={<AlertCircle size={14} />}
+            label={uploadError}
+            color="error"
+            variant="outlined"
+            sx={{ mb: 2 }}
+          />
         )}
 
         {/* Document list */}
@@ -257,17 +281,35 @@ export function IdentityTab({ profile }: IdentityTabProps) {
                 </Box>
                 <Box sx={{ flex: 1, minWidth: 0 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Box component="span" sx={{ fontWeight: 600, color: 'text.primary', fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <Box
+                      component="span"
+                      sx={{
+                        fontWeight: 600,
+                        color: 'text.primary',
+                        fontSize: 13,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
                       {doc.fileName}
                     </Box>
                     <Chip
                       size="small"
                       label={doc.documentType.replace(/_/g, ' ')}
-                      sx={{ height: 20, fontSize: 10, textTransform: 'capitalize', bgcolor: goldSoft, color: gold, border: `1px solid ${goldBorder}` }}
+                      sx={{
+                        height: 20,
+                        fontSize: 10,
+                        textTransform: 'capitalize',
+                        bgcolor: goldSoft,
+                        color: gold,
+                        border: `1px solid ${goldBorder}`,
+                      }}
                     />
                   </Box>
                   <Box component="span" sx={{ color: 'text.secondary', fontSize: 11 }}>
-                    {doc.fileSize ? `${(doc.fileSize / 1024).toFixed(0)} KB` : ''} • Uploaded {new Date(doc.createdAt).toLocaleDateString()}
+                    {doc.fileSize ? `${(doc.fileSize / 1024).toFixed(0)} KB` : ''} • Uploaded{' '}
+                    {new Date(doc.createdAt).toLocaleDateString()}
                   </Box>
                 </Box>
                 <Chip
@@ -278,7 +320,12 @@ export function IdentityTab({ profile }: IdentityTabProps) {
                   sx={{ height: 22, fontSize: 11 }}
                 />
                 {doc.fileUrl && (
-                  <Link href={doc.fileUrl} target="_blank" rel="noreferrer" sx={{ fontSize: 13, fontWeight: 600 }}>
+                  <Link
+                    href={doc.fileUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    sx={{ fontSize: 13, fontWeight: 600 }}
+                  >
                     View
                   </Link>
                 )}
@@ -286,7 +333,10 @@ export function IdentityTab({ profile }: IdentityTabProps) {
                   size="small"
                   onClick={() => handleDelete(doc.id)}
                   disabled={deleteDoc.isPending}
-                  sx={{ color: 'error.main', '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.12) } }}
+                  sx={{
+                    color: 'error.main',
+                    '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.12) },
+                  }}
                 >
                   <Trash2 size={16} />
                 </IconButton>

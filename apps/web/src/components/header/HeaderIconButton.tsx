@@ -1,6 +1,6 @@
-import type { JSX, ReactNode } from "react";
+import type { JSX, ReactNode } from 'react';
 
-import { Badge, IconButton, Tooltip, useTheme, alpha } from "@mui/material";
+import { Badge, IconButton, Tooltip, useTheme, alpha } from '@mui/material';
 
 export interface HeaderIconButtonProps {
   /**
@@ -53,7 +53,7 @@ export default function HeaderIconButton({
 
   // Default badge color uses the theme error palette unless overridden.
   const resolvedBadgeColor = badgeColor ?? error.main;
-  const resolvedBadgeText = badgeTextColor ?? "#FFFFFF";
+  const resolvedBadgeText = badgeTextColor ?? '#FFFFFF';
 
   const content =
     badgeContent !== undefined ? (
@@ -61,14 +61,14 @@ export default function HeaderIconButton({
         badgeContent={badgeContent}
         overlap="circular"
         sx={{
-          "& .MuiBadge-badge": {
+          '& .MuiBadge-badge': {
             bgcolor: resolvedBadgeColor,
             color: resolvedBadgeText,
             fontSize: 9,
             fontWeight: 700,
             minWidth: 18,
             height: 18,
-            borderRadius: "999px",
+            borderRadius: '999px',
             border: `2px solid ${background.paper}`,
           },
         }}
@@ -89,17 +89,17 @@ export default function HeaderIconButton({
           sx={{
             width: 40,
             height: 40,
-            borderRadius: "12px",
+            borderRadius: '12px',
             color: text.secondary,
             border: `1px solid transparent`,
-            transition: "all .2s ease",
-            "&:hover": {
+            transition: 'all .2s ease',
+            '&:hover': {
               bgcolor: alpha(text.primary, 0.06),
               color: text.primary,
               borderColor: divider,
             },
-            "&:active": {
-              transform: "scale(.96)",
+            '&:active': {
+              transform: 'scale(.96)',
             },
           }}
         >

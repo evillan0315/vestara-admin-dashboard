@@ -188,16 +188,22 @@ export class AgentService {
     });
   }
 
-  async fetch(organizationId: string, userId: string, id: string): Promise<DataSourceFetchResultDTO> {
+  async fetch(
+    organizationId: string,
+    userId: string,
+    id: string,
+  ): Promise<DataSourceFetchResultDTO> {
     const row = await prisma.dataSource.findUnique({ where: { id, organizationId } });
     if (!row) throw new NotFoundError(`Data source '${id}' not found`);
 
-    const headers: Record<string, string> = { ...((row.headers as Record<string, string> | null) ?? {}) };
+    const headers: Record<string, string> = {
+      ...((row.headers as Record<string, string> | null) ?? {}),
+    };
     const url = applyAuth(
       buildUrl(row.baseUrl, row.path),
       headers,
       row.authType,
-      row.authConfig as Record<string, unknown> | null ?? undefined,
+      (row.authConfig as Record<string, unknown> | null) ?? undefined,
     );
 
     const json = await fetchJson(url, {

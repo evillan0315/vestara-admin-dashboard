@@ -1,6 +1,6 @@
-import React from "react";
-import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
-import { BRAND, FONT_FAMILY } from "../theme";
+import React from 'react';
+import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
+import { BRAND, FONT_FAMILY } from '../theme';
 
 /**
  * The Vestara wordmark: a gold gem/diamond glyph followed by the name in
@@ -14,19 +14,19 @@ export const VestaraLogo: React.FC<{
   const { fps } = useVideoConfig();
   const pop = spring({ frame, fps, config: { damping: 160 } });
   const gemRotate = interpolate(frame, [0, 40], [-20, 0], {
-    extrapolateRight: "clamp",
+    extrapolateRight: 'clamp',
   });
 
   return (
     <div
       style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
         gap: 6 * size,
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 12 * size }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 * size }}>
         {/* Gold gem glyph */}
         <div
           style={{
@@ -34,8 +34,7 @@ export const VestaraLogo: React.FC<{
             height: 34 * size,
             transform: `rotate(${gemRotate}deg) scale(${pop})`,
             background: `linear-gradient(135deg, ${BRAND.goldBright}, ${BRAND.goldDeep})`,
-            clipPath:
-              "polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)",
+            clipPath: 'polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)',
             boxShadow: `0 0 18px rgba(212,175,55,0.6)`,
           }}
         />
@@ -46,7 +45,7 @@ export const VestaraLogo: React.FC<{
             fontSize: 40 * size,
             letterSpacing: 2 * size,
             color: BRAND.platinum,
-            textShadow: "0 2px 18px rgba(0,0,0,0.5)",
+            textShadow: '0 2px 18px rgba(0,0,0,0.5)',
           }}
         >
           VESTARA
@@ -59,7 +58,7 @@ export const VestaraLogo: React.FC<{
             fontSize: 13 * size,
             letterSpacing: 3 * size,
             color: BRAND.goldSoft,
-            textTransform: "uppercase",
+            textTransform: 'uppercase',
           }}
         >
           Build · Trade · Earn · Grow
@@ -84,9 +83,9 @@ export const ModuleBadge: React.FC<{
   return (
     <div
       style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
         gap: 8,
         opacity: enter,
         transform: `translateY(${interpolate(enter, [0, 1], [16, 0])}px)`,
@@ -96,10 +95,10 @@ export const ModuleBadge: React.FC<{
         style={{
           width: 72,
           height: 72,
-          borderRadius: "50%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           fontSize: 32,
           background: `radial-gradient(circle at 30% 30%, ${color}33, rgba(255,255,255,0.04))`,
           border: `1.5px solid ${color}77`,

@@ -1,18 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Box,
-  Typography,
-  Grid,
-  Chip,
-  Button,
-  useTheme,
-} from '@mui/material';
-import {
-  LineChart,
-  PieChart,
-  BarChart,
-} from '@mui/x-charts';
+import { Box, Typography, Grid, Chip, Button, useTheme } from '@mui/material';
+import { LineChart, PieChart, BarChart } from '@mui/x-charts';
 import {
   People as PeopleIcon,
   Assessment as AssessmentIcon,
@@ -112,18 +101,16 @@ export function AnalyticsPage() {
     return result.slice(0, 10);
   }, [logs, filteredAction, filteredEntity]);
 
-  const activityItems = useMemo(
-    () => filteredLogs.map(toActivityItem),
-    [filteredLogs],
-  );
+  const activityItems = useMemo(() => filteredLogs.map(toActivityItem), [filteredLogs]);
 
   // ── Chart click handlers ──────────────────────
   const handleActionBarClick = (_event: unknown, item: { dataIndex?: number }) => {
     if (item.dataIndex !== undefined && byAction[item.dataIndex]) {
       const label = byAction[item.dataIndex].label;
       // Find the matching AuditAction from the label map
-      const actionKey = Object.keys(actionLabelLookup)
-        .find((k) => actionLabelLookup(k) === label) as AuditAction | undefined;
+      const actionKey = Object.keys(actionLabelLookup).find(
+        (k) => actionLabelLookup(k) === label,
+      ) as AuditAction | undefined;
       if (actionKey) {
         setFilteredAction((prev) => (prev === actionKey ? null : actionKey));
         setFilteredEntity(null);
@@ -134,8 +121,9 @@ export function AnalyticsPage() {
   const handleEntityBarClick = (_event: unknown, item: { dataIndex?: number }) => {
     if (item.dataIndex !== undefined && byEntity[item.dataIndex]) {
       const label = byEntity[item.dataIndex].label;
-      const entityKey = Object.keys(entityLabelLookup)
-        .find((k) => entityLabelLookup(k) === label) as EntityType | undefined;
+      const entityKey = Object.keys(entityLabelLookup).find(
+        (k) => entityLabelLookup(k) === label,
+      ) as EntityType | undefined;
       if (entityKey) {
         setFilteredEntity((prev) => (prev === entityKey ? null : entityKey));
         setFilteredAction(null);
@@ -185,12 +173,7 @@ export function AnalyticsPage() {
       {hasActiveFilter && (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <FilterAltIcon sx={{ fontSize: 18, color: 'primary.main' }} />
-          <Chip
-            label={filterLabel}
-            color="primary"
-            size="small"
-            onDelete={clearFilters}
-          />
+          <Chip label={filterLabel} color="primary" size="small" onDelete={clearFilters} />
           <Typography variant="caption" color="text.secondary">
             {filteredLogs.length} matching events shown in feed below
           </Typography>
@@ -289,8 +272,18 @@ export function AnalyticsPage() {
                 series={[
                   {
                     data: [
-                      { id: 'active', value: userStatsQuery.data?.active ?? 0, label: 'Active', color: theme.palette.success.main },
-                      { id: 'inactive', value: userStatsQuery.data?.inactive ?? 0, label: 'Inactive', color: theme.palette.grey[400] },
+                      {
+                        id: 'active',
+                        value: userStatsQuery.data?.active ?? 0,
+                        label: 'Active',
+                        color: theme.palette.success.main,
+                      },
+                      {
+                        id: 'inactive',
+                        value: userStatsQuery.data?.inactive ?? 0,
+                        label: 'Inactive',
+                        color: theme.palette.grey[400],
+                      },
                     ],
                     innerRadius: 50,
                     paddingAngle: 3,
@@ -298,7 +291,10 @@ export function AnalyticsPage() {
                   },
                 ]}
                 slotProps={{
-                  legend: { direction: 'horizontal', position: { vertical: 'bottom', horizontal: 'center' } },
+                  legend: {
+                    direction: 'horizontal',
+                    position: { vertical: 'bottom', horizontal: 'center' },
+                  },
                 }}
               />
             )}
@@ -332,7 +328,11 @@ export function AnalyticsPage() {
         <Grid size={{ xs: 12, md: 6 }}>
           <ChartCard
             title="Activity by Action"
-            subtitle={filteredAction ? `Filtered: ${actionLabelLookup(filteredAction)} — click another bar or clear` : 'Click a bar to filter the activity feed'}
+            subtitle={
+              filteredAction
+                ? `Filtered: ${actionLabelLookup(filteredAction)} — click another bar or clear`
+                : 'Click a bar to filter the activity feed'
+            }
           >
             {chartsLoading ? (
               <ChartSkeleton height={280} />
@@ -365,7 +365,11 @@ export function AnalyticsPage() {
         <Grid size={{ xs: 12, md: 4 }}>
           <ChartCard
             title="Activity by Entity"
-            subtitle={filteredEntity ? `Filtered: ${entityLabelLookup(filteredEntity)}` : 'Click a bar to filter'}
+            subtitle={
+              filteredEntity
+                ? `Filtered: ${entityLabelLookup(filteredEntity)}`
+                : 'Click a bar to filter'
+            }
           >
             {chartsLoading ? (
               <ChartSkeleton height={240} />
@@ -407,22 +411,24 @@ export function AnalyticsPage() {
                   sx={{ '& .MuiCardContent-root': { p: 2 } }}
                 />
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
-                  {Object.entries(storageStats.byMimeType ?? {}).slice(0, 5).map(([mime, count]) => (
-                    <Box
-                      key={mime}
-                      sx={{
-                        px: 1.5,
-                        py: 0.5,
-                        borderRadius: 1,
-                        bgcolor: 'action.hover',
-                        fontSize: '0.75rem',
-                        fontWeight: 600,
-                        color: 'text.secondary',
-                      }}
-                    >
-                      {mime.split('/').pop()}: {count}
-                    </Box>
-                  ))}
+                  {Object.entries(storageStats.byMimeType ?? {})
+                    .slice(0, 5)
+                    .map(([mime, count]) => (
+                      <Box
+                        key={mime}
+                        sx={{
+                          px: 1.5,
+                          py: 0.5,
+                          borderRadius: 1,
+                          bgcolor: 'action.hover',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          color: 'text.secondary',
+                        }}
+                      >
+                        {mime.split('/').pop()}: {count}
+                      </Box>
+                    ))}
                 </Box>
               </Box>
             ) : (
@@ -467,7 +473,11 @@ export function AnalyticsPage() {
                 {/* Mini bar showing ratio of active vs total */}
                 {(chatStats.totalConversations ?? 0) > 0 && (
                   <Box sx={{ mt: 1 }}>
-                    <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block' }}>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ mb: 0.5, display: 'block' }}
+                    >
                       Active / Total Conversations
                     </Typography>
                     <Box
@@ -505,7 +515,9 @@ export function AnalyticsPage() {
           <ChartCard sx={{ p: 0, overflow: 'hidden' }}>
             <ActivityFeed
               items={activityItems}
-              title={hasActiveFilter ? `Filtered Activity (${activityItems.length})` : 'Recent Activity'}
+              title={
+                hasActiveFilter ? `Filtered Activity (${activityItems.length})` : 'Recent Activity'
+              }
               maxItems={10}
             />
           </ChartCard>

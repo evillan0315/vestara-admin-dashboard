@@ -30,11 +30,12 @@ router.get('/conversations', async (req, res, next) => {
     const search = req.query.search as string | undefined;
     const isArchived = req.query.isArchived === 'true' ? true : undefined;
 
-    const result = await chatService.listConversations(
-      req.user!.id,
-      req.user!.organizationId,
-      { page, perPage, search, isArchived },
-    );
+    const result = await chatService.listConversations(req.user!.id, req.user!.organizationId, {
+      page,
+      perPage,
+      search,
+      isArchived,
+    });
 
     sendSuccess(res, {
       conversations: result.conversations,
@@ -134,11 +135,7 @@ router.patch('/conversations/:id/archive', async (req, res, next) => {
  */
 router.delete('/conversations/:id', async (req, res, next) => {
   try {
-    await chatService.deleteConversation(
-      req.params.id,
-      req.user!.id,
-      req.user!.organizationId,
-    );
+    await chatService.deleteConversation(req.params.id, req.user!.id, req.user!.organizationId);
     sendSuccess(res, { success: true });
   } catch (error) {
     next(error);

@@ -1,17 +1,17 @@
-import { useState, useEffect, useRef } from "react";
-import { Box, Drawer, useTheme } from "@mui/material";
-import { Outlet } from "react-router-dom";
-import type { ReactNode } from "react";
-import { useLocation } from "react-router-dom";
-import Sidebar from "../components/layout/Sidebar";
-import Header from "../components/header/Header";
-import { getRouteTitle } from "./routeTitles";
-import { ThemeSettings } from "../theme/ThemeSettings";
-import { useThemeContext } from "../providers/ThemeProvider";
-import { useLiveNotifications } from "../features/realtime/LiveNotificationsProvider";
-import { densitySpacing } from "../theme/tokens";
-import GlobalSearchDialog from "../components/layout/GlobalSearchDialog";
-import { FloatingChatWidget } from "../features/chat/FloatingChatWidget";
+import { useState, useEffect, useRef } from 'react';
+import { Box, Drawer, useTheme } from '@mui/material';
+import { Outlet } from 'react-router-dom';
+import type { ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
+import Sidebar from '../components/layout/Sidebar';
+import Header from '../components/header/Header';
+import { getRouteTitle } from './routeTitles';
+import { ThemeSettings } from '../theme/ThemeSettings';
+import { useThemeContext } from '../providers/ThemeProvider';
+import { useLiveNotifications } from '../features/realtime/LiveNotificationsProvider';
+import { densitySpacing } from '../theme/tokens';
+import GlobalSearchDialog from '../components/layout/GlobalSearchDialog';
+import { FloatingChatWidget } from '../features/chat/FloatingChatWidget';
 
 const SIDEBAR_MOBILE_WIDTH = 320;
 
@@ -22,7 +22,7 @@ interface DashboardLayoutProps {
 }
 
 export default function DashboardLayout({
-  title = "Dashboard",
+  title = 'Dashboard',
   subtitle,
   children,
 }: DashboardLayoutProps) {
@@ -50,7 +50,7 @@ export default function DashboardLayout({
     setMobileOpen(false);
   };
 
-  const isHidden = themeCtx.sidebarVariant === "hidden";
+  const isHidden = themeCtx.sidebarVariant === 'hidden';
 
   // Global search keyboard shortcut (Cmd/Ctrl + K)
   useEffect(() => {
@@ -58,7 +58,10 @@ export default function DashboardLayout({
       if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
         // Don't open if already in an input field
         const activeElement = document.activeElement;
-        if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+        if (
+          activeElement &&
+          (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')
+        ) {
           return;
         }
         event.preventDefault();
@@ -84,8 +87,8 @@ export default function DashboardLayout({
   return (
     <Box
       sx={{
-        display: "flex",
-        height: "100vh",
+        display: 'flex',
+        height: '100vh',
         bgcolor: theme.palette.background.default,
       }}
     >
@@ -94,10 +97,10 @@ export default function DashboardLayout({
         <>
           <Box
             sx={{
-              display: { xs: "none", lg: "block" },
+              display: { xs: 'none', lg: 'block' },
               flexShrink: 0,
               width: sidebarWidth,
-              transition: "width 0.2s ease",
+              transition: 'width 0.2s ease',
             }}
           >
             <Sidebar />
@@ -110,11 +113,11 @@ export default function DashboardLayout({
             onClose={handleDrawerToggle}
             ModalProps={{ keepMounted: true }}
             sx={{
-              display: { xs: "block", lg: "none" },
-              "& .MuiDrawer-paper": {
-                boxSizing: "border-box",
-                width: { xs: "100%", sm: SIDEBAR_MOBILE_WIDTH },
-                maxWidth: "100vw",
+              display: { xs: 'block', lg: 'none' },
+              '& .MuiDrawer-paper': {
+                boxSizing: 'border-box',
+                width: { xs: '100%', sm: SIDEBAR_MOBILE_WIDTH },
+                maxWidth: '100vw',
                 bgcolor: theme.palette.background.paper,
                 borderRight: `1px solid ${theme.palette.divider}`,
               },
@@ -130,9 +133,9 @@ export default function DashboardLayout({
         sx={{
           flex: 1,
           minWidth: 0,
-          display: "flex",
-          flexDirection: "column",
-          width: "100%",
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
         }}
       >
         <Header
@@ -145,10 +148,10 @@ export default function DashboardLayout({
           sx={{
             flex: 1,
             p: { xs: 2, sm: 3, md: 3.5 },
-            display: "flex",
-            flexDirection: "column",
+            display: 'flex',
+            flexDirection: 'column',
             gap: { xs: 2, sm: 3 },
-            overflow: "auto",
+            overflow: 'auto',
           }}
         >
           {children ?? <Outlet />}

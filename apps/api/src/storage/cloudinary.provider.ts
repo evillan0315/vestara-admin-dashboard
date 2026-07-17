@@ -43,7 +43,9 @@ export class CloudinaryStorageProvider extends BaseStorageProvider {
     this.config = config;
 
     if (!config.cloudinaryCloudName || !config.cloudinaryApiKey || !config.cloudinaryApiSecret) {
-      throw new Error('Cloudinary configuration is incomplete. Required: cloudName, apiKey, apiSecret');
+      throw new Error(
+        'Cloudinary configuration is incomplete. Required: cloudName, apiKey, apiSecret',
+      );
     }
 
     cloudinary.config({
@@ -81,7 +83,7 @@ export class CloudinaryStorageProvider extends BaseStorageProvider {
               bytes: result.bytes,
             },
           });
-        }
+        },
       );
 
       uploadStream.end(buffer);
@@ -111,7 +113,9 @@ export class CloudinaryStorageProvider extends BaseStorageProvider {
         },
       };
     } catch (error) {
-      throw new Error(`Failed to get Cloudinary metadata: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to get Cloudinary metadata: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     }
   }
 
@@ -148,7 +152,9 @@ export class CloudinaryStorageProvider extends BaseStorageProvider {
         continuationToken: result.next_cursor,
       };
     } catch (error) {
-      throw new Error(`Failed to list Cloudinary resources: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to list Cloudinary resources: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     }
   }
 
@@ -156,7 +162,9 @@ export class CloudinaryStorageProvider extends BaseStorageProvider {
     try {
       await cloudinary.uploader.destroy(options.key);
     } catch (error) {
-      throw new Error(`Failed to delete Cloudinary resource: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to delete Cloudinary resource: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     }
   }
 

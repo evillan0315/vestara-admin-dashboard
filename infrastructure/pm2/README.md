@@ -4,8 +4,8 @@ Process definition for running the Express API as a managed background service.
 
 ## Files
 
-| File | Purpose |
-|------|---------|
+| File                   | Purpose                                            |
+| ---------------------- | -------------------------------------------------- |
 | `ecosystem.config.cjs` | PM2 ecosystem config for the `vestara-api` process |
 
 ## Behavior

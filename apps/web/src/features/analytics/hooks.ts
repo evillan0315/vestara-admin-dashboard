@@ -59,11 +59,18 @@ export interface AuditActivity {
  * Aggregates audit logs within a window into the daily time-series,
  * action/entity distributions, and top-user distribution.
  */
-export function useAuditActivity(startDate: string, endDate: string, rangeDays: number): AuditActivity {
+export function useAuditActivity(
+  startDate: string,
+  endDate: string,
+  rangeDays: number,
+): AuditActivity {
   const query = useAuditLogsRange(startDate, endDate);
   const logs = query.data ?? [];
 
-  const daily = useMemo(() => buildDailySeries(logs, rangeDays, endDate), [logs, rangeDays, endDate]);
+  const daily = useMemo(
+    () => buildDailySeries(logs, rangeDays, endDate),
+    [logs, rangeDays, endDate],
+  );
   const byAction = useMemo(
     () =>
       buildDistribution(

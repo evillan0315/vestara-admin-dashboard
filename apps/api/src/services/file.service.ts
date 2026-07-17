@@ -101,13 +101,13 @@ export class FileService {
   async updateStorageSettings(
     organizationId: string,
     settings: StorageSettings,
-    updatedBy: string
+    updatedBy: string,
   ): Promise<StorageSettings> {
     await settingsRepository.upsert(
       'storage',
       settings as unknown as Record<string, unknown>,
       updatedBy,
-      organizationId
+      organizationId,
     );
 
     // Clear factory cache to force new provider instance
@@ -130,10 +130,10 @@ export class FileService {
    */
   private buildProviderConfig(settings: StorageSettings): StorageProviderConfig {
     const providerMap: Record<string, StorageProviderConfigType> = {
-      'LOCAL': 'local',
-      'CLOUDINARY': 'cloudinary',
-      'S3': 's3',
-      'GOOGLE_DRIVE': 'google_drive',
+      LOCAL: 'local',
+      CLOUDINARY: 'cloudinary',
+      S3: 's3',
+      GOOGLE_DRIVE: 'google_drive',
     };
 
     const baseConfig: StorageProviderConfig = {
@@ -145,14 +145,17 @@ export class FileService {
     if (settings.provider === 'LOCAL') {
       baseConfig.localPath = baseConfig.localPath || process.env.UPLOAD_PATH || './uploads';
     } else if (settings.provider === 'CLOUDINARY') {
-      baseConfig.cloudinaryCloudName = baseConfig.cloudinaryCloudName || process.env.CLOUDINARY_CLOUD_NAME;
+      baseConfig.cloudinaryCloudName =
+        baseConfig.cloudinaryCloudName || process.env.CLOUDINARY_CLOUD_NAME;
       baseConfig.cloudinaryApiKey = baseConfig.cloudinaryApiKey || process.env.CLOUDINARY_API_KEY;
-      baseConfig.cloudinaryApiSecret = baseConfig.cloudinaryApiSecret || process.env.CLOUDINARY_API_SECRET;
+      baseConfig.cloudinaryApiSecret =
+        baseConfig.cloudinaryApiSecret || process.env.CLOUDINARY_API_SECRET;
     } else if (settings.provider === 'S3') {
       baseConfig.s3Bucket = baseConfig.s3Bucket || process.env.S3_BUCKET;
       baseConfig.s3Region = baseConfig.s3Region || process.env.S3_REGION;
       baseConfig.s3AccessKeyId = baseConfig.s3AccessKeyId || process.env.S3_ACCESS_KEY_ID;
-      baseConfig.s3SecretAccessKey = baseConfig.s3SecretAccessKey || process.env.S3_SECRET_ACCESS_KEY;
+      baseConfig.s3SecretAccessKey =
+        baseConfig.s3SecretAccessKey || process.env.S3_SECRET_ACCESS_KEY;
       baseConfig.s3Endpoint = baseConfig.s3Endpoint || process.env.S3_ENDPOINT;
     }
 
@@ -181,7 +184,7 @@ export class FileService {
     file: Buffer,
     originalName: string,
     mimeType: string,
-    folderId?: string | null
+    folderId?: string | null,
   ): Promise<FileUploadResult> {
     const provider = await this.getProvider(organizationId);
     const storageKey = this.generateStorageKey(originalName, folderId);
@@ -247,7 +250,12 @@ export class FileService {
   /**
    * Create a folder
    */
-  async createFolder(organizationId: string, userId: string, name: string, parentFolderId?: string | null): Promise<FolderResult> {
+  async createFolder(
+    organizationId: string,
+    userId: string,
+    name: string,
+    parentFolderId?: string | null,
+  ): Promise<FolderResult> {
     // Validate parent folder exists if provided
     if (parentFolderId) {
       const parentFolder = await fileRepository.findById(parentFolderId, organizationId);
@@ -314,31 +322,48 @@ export class FileService {
   /**
    * List files with pagination
    */
-  async listFiles(organizationId: string, params: {
-    folderId?: string | null;
-    mimeType?: string;
-    search?: string;
-    page?: number;
-    perPage?: number;
-    sort?: string;
-    order?: 'asc' | 'desc';
-  }): Promise<FileListResult> {
+  async listFiles(
+    organizationId: string,
+    params: {
+      folderId?: string | null;
+      mimeType?: string;
+      search?: string;
+      page?: number;
+      perPage?: number;
+      sort?: string;
+      order?: 'asc' | 'desc';
+    },
+  ): Promise<FileListResult> {
     const { items, total } = await fileRepository.findMany({ organizationId, ...params });
 
     return {
-      items: items.map((file: { id: string; name: string; originalName: string; mimeType: string; size: bigint; path: string; url: string | null; provider: string; folderId: string | null; createdAt: Date; updatedAt: Date }) => ({
-        id: file.id,
-        name: file.name,
-        originalName: file.originalName,
-        mimeType: file.mimeType,
-        size: file.size,
-        path: file.path,
-        url: file.url,
-        provider: file.provider,
-        folderId: file.folderId || undefined,
-        createdAt: file.createdAt,
-        updatedAt: file.updatedAt,
-      })),
+      items: items.map(
+        (file: {
+          id: string;
+          name: string;
+          originalName: string;
+          mimeType: string;
+          size: bigint;
+          path: string;
+          url: string | null;
+          provider: string;
+          folderId: string | null;
+          createdAt: Date;
+          updatedAt: Date;
+        }) => ({
+          id: file.id,
+          name: file.name,
+          originalName: file.originalName,
+          mimeType: file.mimeType,
+          size: file.size,
+          path: file.path,
+          url: file.url,
+          provider: file.provider,
+          folderId: file.folderId || undefined,
+          createdAt: file.createdAt,
+          updatedAt: file.updatedAt,
+        }),
+      ),
       total,
     };
   }
@@ -346,14 +371,22 @@ export class FileService {
   /**
    * Get folder contents (files + subfolders)
    */
-  async getFolderContents(organizationId: string, folderId: string | null): Promise<FolderContentsResult> {
+  async getFolderContents(
+    organizationId: string,
+    folderId: string | null,
+  ): Promise<FolderContentsResult> {
     return fileRepository.getFolderContents(organizationId, folderId);
   }
 
   /**
    * Update file metadata
    */
-  async updateFile(organizationId: string, fileId: string, userId: string, data: { name?: string; folderId?: string | null }) {
+  async updateFile(
+    organizationId: string,
+    fileId: string,
+    userId: string,
+    data: { name?: string; folderId?: string | null },
+  ) {
     // If moving to a folder, validate it exists
     if (data.folderId !== undefined && data.folderId !== null) {
       const folder = await fileRepository.findById(data.folderId, organizationId);
@@ -452,7 +485,12 @@ export class FileService {
   /**
    * Move files to folder
    */
-  async moveFiles(organizationId: string, fileIds: string[], folderId: string | null, userId: string) {
+  async moveFiles(
+    organizationId: string,
+    fileIds: string[],
+    folderId: string | null,
+    userId: string,
+  ) {
     // Validate target folder exists if provided
     if (folderId) {
       const folder = await fileRepository.findById(folderId, organizationId);

@@ -72,10 +72,7 @@ export function RegisterPage() {
       });
       navigate('/', { replace: true });
     } catch (err) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : 'Registration failed. Please try again.';
+      const message = err instanceof Error ? err.message : 'Registration failed. Please try again.';
       setError(message);
     } finally {
       setIsSubmitting(false);
@@ -144,9 +141,7 @@ export function RegisterPage() {
             >
               <Check size={9} color={colors.success} strokeWidth={3} />
             </Box>
-            <Typography
-              sx={{ fontSize: 12, color: colors.secondary, lineHeight: 1.5 }}
-            >
+            <Typography sx={{ fontSize: 12, color: colors.secondary, lineHeight: 1.5 }}>
               {p}
             </Typography>
           </Box>
@@ -178,9 +173,7 @@ export function RegisterPage() {
 
       <Box sx={{ my: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
         <Box sx={{ flex: 1, height: 1, bgcolor: colors.border }} />
-        <Typography sx={{ fontSize: 12, color: colors.muted }}>
-          or sign up with email
-        </Typography>
+        <Typography sx={{ fontSize: 12, color: colors.muted }}>or sign up with email</Typography>
         <Box sx={{ flex: 1, height: 1, bgcolor: colors.border }} />
       </Box>
 
@@ -257,9 +250,7 @@ export function RegisterPage() {
             />
           }
           label={
-            <Typography
-              sx={{ fontSize: 12.5, color: colors.secondary, lineHeight: 1.6 }}
-            >
+            <Typography sx={{ fontSize: 12.5, color: colors.secondary, lineHeight: 1.6 }}>
               I agree to Vestara&apos;s{' '}
               <Box
                 component="a"
@@ -289,9 +280,7 @@ export function RegisterPage() {
           }
         />
         {termsError && (
-          <Typography
-            sx={{ fontSize: 12, color: colors.error, mb: 2, ml: 0.5 }}
-          >
+          <Typography sx={{ fontSize: 12, color: colors.error, mb: 2, ml: 0.5 }}>
             {termsError}
           </Typography>
         )}

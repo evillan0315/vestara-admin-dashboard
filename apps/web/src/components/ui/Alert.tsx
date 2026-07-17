@@ -6,13 +6,7 @@ import {
   type AlertColor,
   type AlertProps as MuiAlertProps,
 } from '@mui/material';
-import {
-  Close,
-  CheckCircle,
-  Error,
-  Warning,
-  Info,
-} from '@mui/icons-material';
+import { Close, CheckCircle, Error, Warning, Info } from '@mui/icons-material';
 import { type ReactNode, forwardRef } from 'react';
 
 export interface AlertProps extends Omit<MuiAlertProps, 'severity' | 'icon' | 'action'> {
@@ -43,10 +37,7 @@ const severityIcons: Record<AlertColor, ReactNode> = {
 
 const StyledAlert = styled(MuiAlert, {
   shouldForwardProp: (prop) =>
-    prop !== 'severity' &&
-    prop !== 'variant' &&
-    prop !== 'dismissible' &&
-    prop !== 'showIcon',
+    prop !== 'severity' && prop !== 'variant' && prop !== 'dismissible' && prop !== 'showIcon',
 })<{
   severity?: AlertColor;
   variant?: 'standard' | 'filled' | 'outlined';
@@ -83,7 +74,8 @@ const StyledAlert = styled(MuiAlert, {
   const iconStyles = {
     flexShrink: 0,
     marginTop: 2,
-    color: variant === 'filled' ? theme.palette[severity].contrastText : theme.palette[severity].main,
+    color:
+      variant === 'filled' ? theme.palette[severity].contrastText : theme.palette[severity].main,
   };
 
   return {
@@ -102,11 +94,15 @@ const StyledAlert = styled(MuiAlert, {
       padding: 0,
       '& .MuiIconButton-root': {
         padding: theme.spacing(0.5),
-        color: variant === 'filled' ? theme.palette[severity].contrastText : theme.palette[severity].main,
+        color:
+          variant === 'filled'
+            ? theme.palette[severity].contrastText
+            : theme.palette[severity].main,
         '&:hover': {
-          backgroundColor: variant === 'filled'
-            ? `${theme.palette[severity].contrastText}15`
-            : `${theme.palette[severity].main}15`,
+          backgroundColor:
+            variant === 'filled'
+              ? `${theme.palette[severity].contrastText}15`
+              : `${theme.palette[severity].main}15`,
         },
       },
     },
@@ -145,7 +141,7 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(
       sx,
       ...props
     },
-    ref
+    ref,
   ) => {
     const handleDismiss = () => {
       onDismiss?.();
@@ -160,24 +156,22 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(
         showIcon={showIcon}
         action={
           dismissible ? (
-            <IconButton
-              size="small"
-              onClick={handleDismiss}
-              aria-label="Dismiss alert"
-              edge="end"
-            >
+            <IconButton size="small" onClick={handleDismiss} aria-label="Dismiss alert" edge="end">
               <Close fontSize="small" />
             </IconButton>
-          ) : action
+          ) : (
+            action
+          )
         }
         className={className}
         sx={{
           ...sx,
-          ...(action && !dismissible && {
-            '& .MuiAlert-action': {
-              marginLeft: 'auto',
-            },
-          }),
+          ...(action &&
+            !dismissible && {
+              '& .MuiAlert-action': {
+                marginLeft: 'auto',
+              },
+            }),
         }}
         {...props}
       >
@@ -188,7 +182,7 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(
         </div>
       </StyledAlert>
     );
-  }
+  },
 );
 
 Alert.displayName = 'Alert';
@@ -198,11 +192,7 @@ export interface InlineAlertProps extends AlertProps {
   open?: boolean;
 }
 
-export const InlineAlert = ({
-  open = true,
-  onDismiss,
-  ...props
-}: InlineAlertProps) => {
+export const InlineAlert = ({ open = true, onDismiss, ...props }: InlineAlertProps) => {
   if (!open) return null;
 
   return <Alert onDismiss={onDismiss} {...props} />;

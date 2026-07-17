@@ -61,8 +61,7 @@ export function loadConfig(): ScreenshotConfig {
     viewport: { width: 1440, height: 900 },
     fullPage: bool(process.env.VESTARA_SCREENSHOT_FULL_PAGE, true),
     themes: (process.env.VESTARA_SCREENSHOT_THEMES?.split(',') as
-      | Array<'dark' | 'light'>
-      | undefined) ?? ['dark', 'light'],
+      Array<'dark' | 'light'> | undefined) ?? ['dark', 'light'],
     targets: [
       { path: '/', name: 'dashboard', waitForSelector: 'main', settleMs: 1500 },
       {

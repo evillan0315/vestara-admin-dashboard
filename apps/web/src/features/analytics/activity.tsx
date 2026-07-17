@@ -14,13 +14,7 @@ import {
 import { AuditAction, EntityType, type AuditLogDTO } from '@vestara/types';
 import type { ActivityItem } from '../../components/data/ActivityFeed';
 
-export type ActivityColor =
-  | 'primary'
-  | 'secondary'
-  | 'success'
-  | 'error'
-  | 'warning'
-  | 'info';
+export type ActivityColor = 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info';
 
 export function actionVerb(action: AuditAction): string {
   switch (action) {

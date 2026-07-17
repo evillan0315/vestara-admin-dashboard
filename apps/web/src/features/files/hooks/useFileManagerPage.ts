@@ -19,9 +19,7 @@ interface BreadcrumbItem {
 export function useFileManagerPage() {
   const { showSuccess, showError } = useToast();
 
-  const [folderStack, setFolderStack] = useState<BreadcrumbItem[]>([
-    { id: null, label: 'Files' },
-  ]);
+  const [folderStack, setFolderStack] = useState<BreadcrumbItem[]>([{ id: null, label: 'Files' }]);
   const currentFolderId = folderStack[folderStack.length - 1]?.id ?? null;
 
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
@@ -86,14 +84,11 @@ export function useFileManagerPage() {
 
   // ── Navigation ──
 
-  const navigateToFolder = useCallback(
-    (folderId: string, folderName: string) => {
-      setFolderStack((prev) => [...prev, { id: folderId, label: folderName }]);
-      setSelectedIds([]);
-      setSearch('');
-    },
-    [],
-  );
+  const navigateToFolder = useCallback((folderId: string, folderName: string) => {
+    setFolderStack((prev) => [...prev, { id: folderId, label: folderName }]);
+    setSelectedIds([]);
+    setSearch('');
+  }, []);
 
   const navigateToBreadcrumb = useCallback((index: number) => {
     setFolderStack((prev) => prev.slice(0, index + 1));
@@ -297,18 +292,15 @@ export function useFileManagerPage() {
     setIsDragActive(false);
   }, []);
 
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      setIsDragActive(false);
-      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        setUploadFiles((prev) => [...prev, ...Array.from(e.dataTransfer.files)]);
-        setUploadDialogOpen(true);
-      }
-    },
-    [],
-  );
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      setUploadFiles((prev) => [...prev, ...Array.from(e.dataTransfer.files)]);
+      setUploadDialogOpen(true);
+    }
+  }, []);
 
   return {
     folderStack,

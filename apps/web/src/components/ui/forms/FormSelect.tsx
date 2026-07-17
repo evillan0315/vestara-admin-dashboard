@@ -1,5 +1,19 @@
-import { Select as MuiSelect, MenuItem, FormControl, InputLabel, FormHelperText, styled, type SxProps, type Theme } from '@mui/material';
-import { Controller, type ControllerProps, type FieldPath, type FieldValues } from 'react-hook-form';
+import {
+  Select as MuiSelect,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  FormHelperText,
+  styled,
+  type SxProps,
+  type Theme,
+} from '@mui/material';
+import {
+  Controller,
+  type ControllerProps,
+  type FieldPath,
+  type FieldValues,
+} from 'react-hook-form';
 import { forwardRef, type ForwardedRef } from 'react';
 
 export interface FormSelectOption {
@@ -8,7 +22,10 @@ export interface FormSelectOption {
   disabled?: boolean;
 }
 
-export interface FormSelectProps<T extends FieldValues> extends Omit<ControllerProps<T>, 'render' | 'control' | 'name'> {
+export interface FormSelectProps<T extends FieldValues> extends Omit<
+  ControllerProps<T>,
+  'render' | 'control' | 'name'
+> {
   name: FieldPath<T>;
   label?: string;
   placeholder?: string;
@@ -129,7 +146,7 @@ export const FormSelect = forwardRef<HTMLSelectElement, FormSelectComponentProps
         }}
       />
     );
-  }
+  },
 );
 
 FormSelect.displayName = 'FormSelect';

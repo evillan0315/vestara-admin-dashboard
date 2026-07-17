@@ -63,7 +63,7 @@ export function useCreateUser() {
             data: [optimisticUser, ...old.data],
             meta: old.meta ? { ...old.meta, total: old.meta.total + 1 } : undefined,
           };
-        }
+        },
       );
       return { previousUsers };
     },
@@ -93,10 +93,10 @@ export function useUpdateUser() {
           return {
             ...old,
             data: old.data.map((user) =>
-              user.id === id ? { ...user, ...data, updatedAt: new Date().toISOString() } : user
+              user.id === id ? { ...user, ...data, updatedAt: new Date().toISOString() } : user,
             ),
           };
-        }
+        },
       );
       return { previousUsers };
     },
@@ -127,7 +127,7 @@ export function useDeleteUser() {
             data: old.data.filter((user) => user.id !== id),
             meta: old.meta ? { ...old.meta, total: old.meta.total - 1 } : undefined,
           };
-        }
+        },
       );
       return { previousUsers };
     },
@@ -156,10 +156,12 @@ export function useToggleUserStatus() {
           return {
             ...old,
             data: old.data.map((user) =>
-              user.id === id ? { ...user, isActive: !user.isActive, updatedAt: new Date().toISOString() } : user
+              user.id === id
+                ? { ...user, isActive: !user.isActive, updatedAt: new Date().toISOString() }
+                : user,
             ),
           };
-        }
+        },
       );
       return { previousUsers };
     },
@@ -190,7 +192,7 @@ export function useBulkDeleteUsers() {
             data: old.data.filter((user) => !ids.includes(user.id)),
             meta: old.meta ? { ...old.meta, total: old.meta.total - ids.length } : undefined,
           };
-        }
+        },
       );
       return { previousUsers };
     },
@@ -221,10 +223,12 @@ export function useBulkUpdateUserStatus() {
           return {
             ...old,
             data: old.data.map((user) =>
-              ids.includes(user.id) ? { ...user, isActive: newIsActive, updatedAt: new Date().toISOString() } : user
+              ids.includes(user.id)
+                ? { ...user, isActive: newIsActive, updatedAt: new Date().toISOString() }
+                : user,
             ),
           };
-        }
+        },
       );
       return { previousUsers };
     },

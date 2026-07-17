@@ -59,25 +59,51 @@ export function PrivacyTab({ profile }: PrivacyTabProps) {
         description="Control who can see your profile and how your information is shared."
       >
         <Box sx={{ mb: 3 }}>
-          <Box component="p" sx={{ fontWeight: 500, color: 'text.primary', fontSize: 13, m: 0, mb: 1 }}>Profile Visibility</Box>
+          <Box
+            component="p"
+            sx={{ fontWeight: 500, color: 'text.primary', fontSize: 13, m: 0, mb: 1 }}
+          >
+            Profile Visibility
+          </Box>
           <TextField
             select
             value={profileVisibility}
-            onChange={(e) => setProfileVisibility(e.target.value as ProfileResponse['profile']['profileVisibility'])}
+            onChange={(e) =>
+              setProfileVisibility(
+                e.target.value as ProfileResponse['profile']['profileVisibility'],
+              )
+            }
             fullWidth
             size="small"
             sx={fieldSx}
           >
             {VISIBILITY_OPTIONS.map((o) => (
-              <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>
+              <MenuItem key={o.value} value={o.value}>
+                {o.label}
+              </MenuItem>
             ))}
           </TextField>
         </Box>
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           {[
-            { label: 'Show Email', desc: 'Allow others to see your contact email', checked: showEmail, onChange: setShowEmail },
-            { label: 'Show Activity', desc: 'Include your actions in shared activity feeds', checked: showActivity, onChange: setShowActivity },
-            { label: 'Discoverable', desc: 'Allow others to find you via search', checked: searchable, onChange: setSearchable },
+            {
+              label: 'Show Email',
+              desc: 'Allow others to see your contact email',
+              checked: showEmail,
+              onChange: setShowEmail,
+            },
+            {
+              label: 'Show Activity',
+              desc: 'Include your actions in shared activity feeds',
+              checked: showActivity,
+              onChange: setShowActivity,
+            },
+            {
+              label: 'Discoverable',
+              desc: 'Allow others to find you via search',
+              checked: searchable,
+              onChange: setSearchable,
+            },
           ].map((pref, i) => (
             <Box
               key={pref.label}
@@ -91,8 +117,15 @@ export function PrivacyTab({ profile }: PrivacyTabProps) {
               }}
             >
               <Box>
-                <Box component="p" sx={{ fontWeight: 500, color: 'text.primary', fontSize: 14, m: 0 }}>{pref.label}</Box>
-                <Box component="p" sx={{ color: 'text.secondary', fontSize: 12, m: 0 }}>{pref.desc}</Box>
+                <Box
+                  component="p"
+                  sx={{ fontWeight: 500, color: 'text.primary', fontSize: 14, m: 0 }}
+                >
+                  {pref.label}
+                </Box>
+                <Box component="p" sx={{ color: 'text.secondary', fontSize: 12, m: 0 }}>
+                  {pref.desc}
+                </Box>
               </Box>
               <Switch checked={pref.checked} onChange={(e) => pref.onChange(e.target.checked)} />
             </Box>

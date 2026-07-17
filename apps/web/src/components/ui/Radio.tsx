@@ -33,11 +33,7 @@ const StyledRadio = styled(MuiRadio)`
   }
 `;
 
-export const Radio: FC<RadioProps> = ({
-  size = 'medium',
-  sx,
-  ...props
-}) => {
+export const Radio: FC<RadioProps> = ({ size = 'medium', sx, ...props }) => {
   return <StyledRadio size={size} sx={sx} {...props} />;
 };
 

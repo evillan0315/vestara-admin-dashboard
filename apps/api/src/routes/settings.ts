@@ -18,18 +18,14 @@ router.use(authenticate);
  * GET /settings — Get all settings as a key-value map
  * Access: SUPER_ADMIN, ADMIN
  */
-router.get(
-  '/',
-  requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN),
-  async (_req, res, next) => {
-    try {
-      const settings = await settingsService.getAllAsMap(_req.user!.organizationId);
-      sendSuccess(res, { settings });
-    } catch (error) {
-      next(error);
-    }
-  },
-);
+router.get('/', requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN), async (_req, res, next) => {
+  try {
+    const settings = await settingsService.getAllAsMap(_req.user!.organizationId);
+    sendSuccess(res, { settings });
+  } catch (error) {
+    next(error);
+  }
+});
 
 /**
  * GET /settings/export — Export all settings as downloadable JSON
@@ -70,62 +66,61 @@ router.get(
  * POST /settings/import — Import settings from JSON
  * Access: SUPER_ADMIN only
  */
-router.post(
-  '/import',
-  requireRole(UserRole.SUPER_ADMIN),
-  async (req, res, next) => {
-    try {
-      const { settings } = req.body as { settings?: Record<string, unknown> };
+router.post('/import', requireRole(UserRole.SUPER_ADMIN), async (req, res, next) => {
+  try {
+    const { settings } = req.body as { settings?: Record<string, unknown> };
 
-      if (!settings || typeof settings !== 'object' || Array.isArray(settings)) {
+    if (!settings || typeof settings !== 'object' || Array.isArray(settings)) {
+      res.status(400).json({
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'settings must be a JSON object with key-value pairs',
+        },
+      });
+      return;
+    }
+
+    // Validate each value is an object (JSON-compatible)
+    for (const [key, value] of Object.entries(settings)) {
+      if (typeof value !== 'object' || value === null) {
         res.status(400).json({
           success: false,
-          error: { code: 'VALIDATION_ERROR', message: 'settings must be a JSON object with key-value pairs' },
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: `Setting "${key}" must be a JSON object, got ${typeof value}`,
+          },
         });
         return;
       }
-
-      // Validate each value is an object (JSON-compatible)
-      for (const [key, value] of Object.entries(settings)) {
-        if (typeof value !== 'object' || value === null) {
-          res.status(400).json({
-            success: false,
-            error: {
-              code: 'VALIDATION_ERROR',
-              message: `Setting "${key}" must be a JSON object, got ${typeof value}`,
-            },
-          });
-          return;
-        }
-        if (key.length > 100) {
-          res.status(400).json({
-            success: false,
-            error: {
-              code: 'VALIDATION_ERROR',
-              message: `Setting key "${key}" exceeds 100 characters`,
-            },
-          });
-          return;
-        }
+      if (key.length > 100) {
+        res.status(400).json({
+          success: false,
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: `Setting key "${key}" exceeds 100 characters`,
+          },
+        });
+        return;
       }
-
-      const results = await settingsService.importSettings(
-        settings,
-        req.user?.id,
-        req.user!.organizationId,
-      );
-
-      sendSuccess(res, {
-        imported: results.length,
-        created: results.filter((r) => r.action === 'created').length,
-        updated: results.filter((r) => r.action === 'updated').length,
-        details: results,
-      });
-    } catch (error) {
-      next(error);
     }
-  },
-);
+
+    const results = await settingsService.importSettings(
+      settings,
+      req.user?.id,
+      req.user!.organizationId,
+    );
+
+    sendSuccess(res, {
+      imported: results.length,
+      created: results.filter((r) => r.action === 'created').length,
+      updated: results.filter((r) => r.action === 'updated').length,
+      details: results,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
 /**
  * GET /settings/audit-history — Get audit history for settings changes
@@ -143,10 +138,14 @@ router.get(
       const sort = (req.query.sort as string) || 'createdAt';
       const order = (req.query.order as 'asc' | 'desc') || 'desc';
 
-      const { logs, total } = await settingsService.getAuditHistory(
-        req.user!.organizationId,
-        { page, perPage, startDate, endDate, sort, order },
-      );
+      const { logs, total } = await settingsService.getAuditHistory(req.user!.organizationId, {
+        page,
+        perPage,
+        startDate,
+        endDate,
+        sort,
+        order,
+      });
 
       sendSuccess(res, {
         logs,
@@ -168,19 +167,15 @@ router.get(
  * Returns 200 with null data when the key doesn't exist (optional setting).
  * Access: SUPER_ADMIN, ADMIN
  */
-router.get(
-  '/:key',
-  requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN),
-  async (req, res, next) => {
-    try {
-      const key = param(req.params.key);
-      const setting = await settingsService.findByKey(key, req.user!.organizationId);
-      sendSuccess(res, { setting: setting ?? null });
-    } catch (error) {
-      next(error);
-    }
-  },
-);
+router.get('/:key', requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN), async (req, res, next) => {
+  try {
+    const key = param(req.params.key);
+    const setting = await settingsService.findByKey(key, req.user!.organizationId);
+    sendSuccess(res, { setting: setting ?? null });
+  } catch (error) {
+    next(error);
+  }
+});
 
 /**
  * PUT /settings/:key — Upsert a setting
@@ -210,18 +205,14 @@ router.put(
  * DELETE /settings/:key — Delete a setting
  * Access: SUPER_ADMIN
  */
-router.delete(
-  '/:key',
-  requireRole(UserRole.SUPER_ADMIN),
-  async (req, res, next) => {
-    try {
-      const key = param(req.params.key);
-      await settingsService.delete(key, req.user!.organizationId, req.user?.id);
-      sendNoContent(res);
-    } catch (error) {
-      next(error);
-    }
-  },
-);
+router.delete('/:key', requireRole(UserRole.SUPER_ADMIN), async (req, res, next) => {
+  try {
+    const key = param(req.params.key);
+    await settingsService.delete(key, req.user!.organizationId, req.user?.id);
+    sendNoContent(res);
+  } catch (error) {
+    next(error);
+  }
+});
 
 export default router;

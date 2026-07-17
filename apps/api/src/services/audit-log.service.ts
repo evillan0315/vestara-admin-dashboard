@@ -5,19 +5,21 @@ export class AuditLogService {
   /**
    * Get all audit logs with filtering and pagination.
    */
-  async findAll(params: {
-    page?: number;
-    perPage?: number;
-    userId?: string;
-    action?: AuditAction;
-    entity?: EntityType;
-    entityId?: string;
-    ipAddress?: string;
-    startDate?: Date;
-    endDate?: Date;
-    sort?: string;
-    order?: 'asc' | 'desc';
-  } = {}) {
+  async findAll(
+    params: {
+      page?: number;
+      perPage?: number;
+      userId?: string;
+      action?: AuditAction;
+      entity?: EntityType;
+      entityId?: string;
+      ipAddress?: string;
+      startDate?: Date;
+      endDate?: Date;
+      sort?: string;
+      order?: 'asc' | 'desc';
+    } = {},
+  ) {
     const { page = 1, perPage = 20 } = params;
 
     const result = await auditLogRepository.findAll({

@@ -31,7 +31,9 @@ export interface DialogProps {
 const StyledDialog = styled(Dialog)`
   & .MuiDialog-paper {
     border-radius: 16px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 8px 16px -8px rgba(0, 0, 0, 0.15);
+    box-shadow:
+      0 25px 50px -12px rgba(0, 0, 0, 0.25),
+      0 8px 16px -8px rgba(0, 0, 0, 0.15);
     max-height: 90vh;
   }
 
@@ -90,7 +92,7 @@ export const SimpleDialog = forwardRef<HTMLDivElement, DialogProps>(
       sx,
       ...props
     },
-    ref
+    ref,
   ) => {
     const handleClose = (event: React.SyntheticEvent, reason: string) => {
       if (disableBackdropClick && reason === 'backdropClick') {
@@ -124,26 +126,30 @@ export const SimpleDialog = forwardRef<HTMLDivElement, DialogProps>(
             }}
           >
             <Box sx={{ flex: 1, minWidth: 0 }}>
-              {title && <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>{title}</Typography>}
+              {title && (
+                <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+                  {title}
+                </Typography>
+              )}
             </Box>
             {showCloseButton && (
-              <CloseButton
-                onClick={onClose}
-                aria-label={closeButtonAriaLabel}
-                size="small"
-              >
+              <CloseButton onClick={onClose} aria-label={closeButtonAriaLabel} size="small">
                 <Close fontSize="medium" />
               </CloseButton>
             )}
           </DialogTitle>
         )}
         <DialogContent dividers={!!title}>
-          {typeof children === 'string' ? <DialogContentText>{children}</DialogContentText> : children}
+          {typeof children === 'string' ? (
+            <DialogContentText>{children}</DialogContentText>
+          ) : (
+            children
+          )}
         </DialogContent>
         {actions && <DialogActions>{actions}</DialogActions>}
       </StyledDialog>
     );
-  }
+  },
 );
 
 SimpleDialog.displayName = 'SimpleDialog';
@@ -256,19 +262,13 @@ export const AlertDialog = ({
       showCloseButton
     >
       <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-        <Box sx={{ flexShrink: 0, marginTop: 0.5 }}>
-          {icon || defaultIcons[severity]}
-        </Box>
+        <Box sx={{ flexShrink: 0, marginTop: 0.5 }}>{icon || defaultIcons[severity]}</Box>
         <Typography variant="body1" color="text.secondary" paragraph>
           {message}
         </Typography>
       </Box>
       <DialogActions>
-        <Button
-          onClick={onClose}
-          variant="contained"
-          color={severityColors[severity]}
-        >
+        <Button onClick={onClose} variant="contained" color={severityColors[severity]}>
           {confirmText}
         </Button>
       </DialogActions>

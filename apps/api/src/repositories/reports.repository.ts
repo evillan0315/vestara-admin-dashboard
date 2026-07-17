@@ -83,11 +83,7 @@ export class ReportsRepository {
     });
   }
 
-  async fetchUsers(params: {
-    organizationId: string;
-    startDate: Date;
-    endDate: Date;
-  }) {
+  async fetchUsers(params: { organizationId: string; startDate: Date; endDate: Date }) {
     return await prisma.user.findMany({
       where: {
         organizationId: params.organizationId,
@@ -115,11 +111,7 @@ export class ReportsRepository {
     });
   }
 
-  async fetchSystemLogs(params: {
-    organizationId: string;
-    startDate: Date;
-    endDate: Date;
-  }) {
+  async fetchSystemLogs(params: { organizationId: string; startDate: Date; endDate: Date }) {
     return await prisma.auditLog.findMany({
       where: {
         organizationId: params.organizationId,
@@ -127,11 +119,7 @@ export class ReportsRepository {
           gte: params.startDate,
           lte: params.endDate,
         },
-        OR: [
-          { action: 'error' },
-          { entity: 'api' },
-          { entity: 'system' },
-        ],
+        OR: [{ action: 'error' }, { entity: 'api' }, { entity: 'system' }],
       },
       include: {
         user: {

@@ -1,4 +1,13 @@
-import { Box, Typography, Divider, Collapse, IconButton, styled, type SxProps, type Theme } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Divider,
+  Collapse,
+  IconButton,
+  styled,
+  type SxProps,
+  type Theme,
+} from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
 import { useState, type ReactNode } from 'react';
 
@@ -74,21 +83,33 @@ export function FormSection({
         <SectionHeader onClick={collapsible ? handleToggle : undefined}>
           <SectionTitle color={error ? 'error' : 'inherit'}>
             {title}
-            {required && (
-              <span style={{ color: 'var(--mui-palette-error-main)' }}>*</span>
-            )}
+            {required && <span style={{ color: 'var(--mui-palette-error-main)' }}>*</span>}
             {collapsible && (
-              <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleToggle(); }} aria-label="Toggle section">
-                <ExpandMore sx={{ transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleToggle();
+                }}
+                aria-label="Toggle section"
+              >
+                <ExpandMore
+                  sx={{
+                    transform: expanded ? 'rotate(180deg)' : 'none',
+                    transition: 'transform 0.2s',
+                  }}
+                />
               </IconButton>
             )}
           </SectionTitle>
         </SectionHeader>
       )}
-      {!collapsible && <SectionTitle color={error ? 'error' : 'inherit'}>{
-        title
-      }{required && <span style={{ color: 'var(--mui-palette-error-main)' }}>*</span>}
-      </SectionTitle>}
+      {!collapsible && (
+        <SectionTitle color={error ? 'error' : 'inherit'}>
+          {title}
+          {required && <span style={{ color: 'var(--mui-palette-error-main)' }}>*</span>}
+        </SectionTitle>
+      )}
       {description && <SectionDescription>{description}</SectionDescription>}
       <Collapse in={!collapsible || expanded}>
         <SectionContent data-collapsed={!expanded && collapsible}>{children}</SectionContent>

@@ -54,7 +54,7 @@ export class AIService {
       'gpt-4o-mini': 'openai',
       'claude-sonnet-4-20250514': 'anthropic',
       'claude-haiku-3.5': 'anthropic',
-      'mock': 'mock',
+      mock: 'mock',
     };
 
     const providerName = modelProviderMap[model] ?? 'opencode';

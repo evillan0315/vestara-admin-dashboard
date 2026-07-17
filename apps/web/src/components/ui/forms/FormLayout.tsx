@@ -20,13 +20,18 @@ export function FormLayout({
 }: FormLayoutProps) {
   const gridSx: SxProps<Theme> = {
     display: 'grid',
-    gridTemplateColumns: columns === 1 ? '1fr' : columns === 2 ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+    gridTemplateColumns:
+      columns === 1 ? '1fr' : columns === 2 ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
     gap: gap,
     width: fullWidth ? '100%' : 'auto',
     ...sx,
   };
 
-  return <Box sx={gridSx} className={className}>{children}</Box>;
+  return (
+    <Box sx={gridSx} className={className}>
+      {children}
+    </Box>
+  );
 }
 
 export default FormLayout;

@@ -144,7 +144,15 @@ class ReportsService {
     fileSize?: number,
     completedAt?: string,
   ): void {
-    const payload: WsReportStatusPayload = { reportId, name, status, error, fileUrl, fileSize, completedAt };
+    const payload: WsReportStatusPayload = {
+      reportId,
+      name,
+      status,
+      error,
+      fileUrl,
+      fileSize,
+      completedAt,
+    };
     getWebSocketManager().broadcastReportStatus(organizationId, payload);
   }
 
@@ -275,7 +283,10 @@ class ReportsService {
     return COLUMN_DEFS[type] ?? [];
   }
 
-  private async fetchAuditLogs(params: CreateReportParams, organizationId: string): Promise<ReportDataRow[]> {
+  private async fetchAuditLogs(
+    params: CreateReportParams,
+    organizationId: string,
+  ): Promise<ReportDataRow[]> {
     const auditLogs = await prisma.auditLog.findMany({
       where: {
         organizationId,
@@ -310,16 +321,27 @@ class ReportsService {
     }));
   }
 
-  private async fetchUsers(params: CreateReportParams, organizationId: string): Promise<ReportDataRow[]> {
+  private async fetchUsers(
+    params: CreateReportParams,
+    organizationId: string,
+  ): Promise<ReportDataRow[]> {
     const users = await prisma.user.findMany({
       where: {
         organizationId,
         createdAt: { gte: params.startDate, lte: params.endDate },
       },
       select: {
-        id: true, email: true, firstName: true, lastName: true,
-        role: true, isActive: true, avatarUrl: true, provider: true,
-        lastLoginAt: true, createdAt: true, updatedAt: true,
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        isActive: true,
+        avatarUrl: true,
+        provider: true,
+        lastLoginAt: true,
+        createdAt: true,
+        updatedAt: true,
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -340,7 +362,10 @@ class ReportsService {
     }));
   }
 
-  private async fetchActivity(params: CreateReportParams, organizationId: string): Promise<ReportDataRow[]> {
+  private async fetchActivity(
+    params: CreateReportParams,
+    organizationId: string,
+  ): Promise<ReportDataRow[]> {
     const auditLogs = await prisma.auditLog.findMany({
       where: {
         organizationId,
@@ -370,7 +395,10 @@ class ReportsService {
     }));
   }
 
-  private async fetchSystemLogs(params: CreateReportParams, organizationId: string): Promise<ReportDataRow[]> {
+  private async fetchSystemLogs(
+    params: CreateReportParams,
+    organizationId: string,
+  ): Promise<ReportDataRow[]> {
     const auditLogs = await prisma.auditLog.findMany({
       where: {
         organizationId,
@@ -398,7 +426,11 @@ class ReportsService {
     }));
   }
 
-  private async generateFile(data: ReportDataRow[], format: ReportFormat, fileName: string): Promise<Buffer> {
+  private async generateFile(
+    data: ReportDataRow[],
+    format: ReportFormat,
+    fileName: string,
+  ): Promise<Buffer> {
     switch (format) {
       case 'csv':
         return this.generateCSV(data);
@@ -454,7 +486,15 @@ class ReportsService {
         worksheet.addRow(headers.map((h) => row[h] ?? ''));
       }
 
-      (worksheet.columns as Array<{ eachCell: (opts: { includeEmpty: boolean }, cb: (cell: { value: unknown }) => void) => void; width: number }>).forEach((column) => {
+      (
+        worksheet.columns as Array<{
+          eachCell: (
+            opts: { includeEmpty: boolean },
+            cb: (cell: { value: unknown }) => void,
+          ) => void;
+          width: number;
+        }>
+      ).forEach((column) => {
         let maxLength = 10;
         column.eachCell({ includeEmpty: true }, (cell) => {
           const val = cell.value;
@@ -498,7 +538,10 @@ class ReportsService {
       // Title
       doc.fontSize(20).fillColor('#D4A843').text(fileName, { align: 'center' });
       doc.moveDown();
-      doc.fontSize(10).fillColor('#666').text(`Generated on ${new Date().toLocaleString()}`, { align: 'center' });
+      doc
+        .fontSize(10)
+        .fillColor('#666')
+        .text(`Generated on ${new Date().toLocaleString()}`, { align: 'center' });
       doc.moveDown(2);
 
       if (data.length === 0) {
@@ -706,7 +749,8 @@ class ReportsService {
     },
   ) {
     const template = await prisma.reportTemplate.findUnique({ where: { id } });
-    if (!template || template.organizationId !== organizationId) throw new Error('Template not found');
+    if (!template || template.organizationId !== organizationId)
+      throw new Error('Template not found');
 
     return await prisma.reportTemplate.update({
       where: { id },
@@ -722,7 +766,8 @@ class ReportsService {
 
   async deleteTemplate(id: string, organizationId: string) {
     const template = await prisma.reportTemplate.findUnique({ where: { id } });
-    if (!template || template.organizationId !== organizationId) throw new Error('Template not found');
+    if (!template || template.organizationId !== organizationId)
+      throw new Error('Template not found');
     await prisma.reportTemplate.delete({ where: { id } });
   }
 

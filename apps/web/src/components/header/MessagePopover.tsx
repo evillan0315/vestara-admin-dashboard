@@ -1,7 +1,7 @@
-import type { JSX } from "react";
-import { Box, Divider, Popover, Typography, useTheme } from "@mui/material";
-import MessageList from "./MessageList";
-import type { Message } from "./types";
+import type { JSX } from 'react';
+import { Box, Divider, Popover, Typography, useTheme } from '@mui/material';
+import MessageList from './MessageList';
+import type { Message } from './types';
 
 interface MessagePopoverProps {
   anchorEl: HTMLElement | null;
@@ -26,8 +26,8 @@ export default function MessagePopover({
       open={open}
       anchorEl={anchorEl}
       onClose={onClose}
-      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      transformOrigin={{ vertical: "top", horizontal: "right" }}
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       slotProps={{
         paper: {
           sx: {
@@ -35,8 +35,8 @@ export default function MessagePopover({
             width: 380,
             bgcolor: background.paper,
             border: `1px solid ${divider}`,
-            borderRadius: "14px",
-            overflow: "hidden",
+            borderRadius: '14px',
+            overflow: 'hidden',
           },
         },
       }}
@@ -45,9 +45,9 @@ export default function MessagePopover({
         sx={{
           px: 2,
           py: 1.75,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
         <Typography sx={{ fontWeight: 700, fontSize: 15, color: text.primary }}>

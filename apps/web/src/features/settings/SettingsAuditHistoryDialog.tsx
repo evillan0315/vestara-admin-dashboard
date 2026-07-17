@@ -60,11 +60,26 @@ const ActionIcon = styled(Box)(({ theme: _theme }) => ({
 const getActionConfig = (action: string) => {
   switch (action) {
     case 'settings_update':
-      return { label: 'Updated', icon: EditIcon, color: 'primary' as const, bgColor: 'primary.light' };
+      return {
+        label: 'Updated',
+        icon: EditIcon,
+        color: 'primary' as const,
+        bgColor: 'primary.light',
+      };
     case 'settings_delete':
-      return { label: 'Deleted', icon: DeleteIcon, color: 'error' as const, bgColor: 'error.light' };
+      return {
+        label: 'Deleted',
+        icon: DeleteIcon,
+        color: 'error' as const,
+        bgColor: 'error.light',
+      };
     case 'settings_import':
-      return { label: 'Imported', icon: AddIcon, color: 'success' as const, bgColor: 'success.light' };
+      return {
+        label: 'Imported',
+        icon: AddIcon,
+        color: 'success' as const,
+        bgColor: 'success.light',
+      };
     default:
       return { label: action, icon: EditIcon, color: 'info' as const, bgColor: 'grey.300' };
   }
@@ -182,9 +197,7 @@ export function SettingsAuditHistoryDialog({
                       )}
                     </Box>
                     <Typography variant="caption" color="text.secondary">
-                      {log.user
-                        ? `${log.user.firstName} ${log.user.lastName}`
-                        : 'System'}
+                      {log.user ? `${log.user.firstName} ${log.user.lastName}` : 'System'}
                       {' · '}
                       {formatDate(log.createdAt)}
                     </Typography>

@@ -5,7 +5,8 @@ import type { CreateConversationRequestDTO, SendMessageRequestDTO } from '@vesta
 export const chatKeys = {
   all: ['chat'] as const,
   models: () => [...chatKeys.all, 'models'] as const,
-  conversations: (params?: ConversationListParams) => [...chatKeys.all, 'conversations', params] as const,
+  conversations: (params?: ConversationListParams) =>
+    [...chatKeys.all, 'conversations', params] as const,
   conversation: (id: string) => [...chatKeys.all, 'conversations', id] as const,
   messages: (conversationId: string, params?: { page?: number; perPage?: number }) =>
     [...chatKeys.all, 'conversations', conversationId, 'messages', params] as const,
@@ -46,7 +47,10 @@ export function useConversation(id: string) {
 /**
  * List messages in a conversation.
  */
-export function useChatMessages(conversationId: string, params?: { page?: number; perPage?: number }) {
+export function useChatMessages(
+  conversationId: string,
+  params?: { page?: number; perPage?: number },
+) {
   return useQuery({
     queryKey: chatKeys.messages(conversationId, params),
     queryFn: () => chatApi.listMessages(conversationId, params),

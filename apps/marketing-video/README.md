@@ -6,13 +6,13 @@ design language.
 
 The ad sequences five beats with crossfades and a persistent brand bar:
 
-| # | Beat | Frames | ~Time |
-|---|------|--------|-------|
-| 1 | Hook — "One platform. Every transaction." | 0–90 | 0–3s |
-| 2 | Module grid — Wallet · Marketplace · Rewards · Bookings | 90–270 | 3–9s |
-| 3 | AI Assistant spotlight (RAG + floating widget + connectors) | 270–450 | 9–15s |
-| 4 | Admin Analytics spotlight (live dashboards, multi-tenant, exports) | 450–630 | 15–21s |
-| 5 | Transition recap → CTA "Build. Trade. Earn. Grow." + early access | 630–900 | 21–30s |
+| #   | Beat                                                               | Frames  | ~Time  |
+| --- | ------------------------------------------------------------------ | ------- | ------ |
+| 1   | Hook — "One platform. Every transaction."                          | 0–90    | 0–3s   |
+| 2   | Module grid — Wallet · Marketplace · Rewards · Bookings            | 90–270  | 3–9s   |
+| 3   | AI Assistant spotlight (RAG + floating widget + connectors)        | 270–450 | 9–15s  |
+| 4   | Admin Analytics spotlight (live dashboards, multi-tenant, exports) | 450–630 | 15–21s |
+| 5   | Transition recap → CTA "Build. Trade. Earn. Grow." + early access  | 630–900 | 21–30s |
 
 Resolution: **1920×1080**, 30fps, 900 frames.
 
@@ -38,12 +38,12 @@ pnpm install
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Open the Remotion Studio to preview/scrub the ad in the browser |
-| `pnpm render` | Render the ad to `out/vestara-ad.mp4` (requires Chrome/Chromium) |
+| Command             | Description                                                              |
+| ------------------- | ------------------------------------------------------------------------ |
+| `pnpm dev`          | Open the Remotion Studio to preview/scrub the ad in the browser          |
+| `pnpm render`       | Render the ad to `out/vestara-ad.mp4` (requires Chrome/Chromium)         |
 | `pnpm render:still` | Export a single PNG thumbnail (frame 120) to `out/vestara-thumbnail.png` |
-| `pnpm typecheck` | TypeScript strict type-check (no emit) |
+| `pnpm typecheck`    | TypeScript strict type-check (no emit)                                   |
 
 > Rendering needs a Chromium binary. Remotion downloads one automatically on
 > first `render`; if you prefer a system browser, set `chromiumBinary` in

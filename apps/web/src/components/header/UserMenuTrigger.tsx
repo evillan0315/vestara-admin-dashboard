@@ -1,42 +1,32 @@
-import { type JSX, useMemo } from "react";
+import { type JSX, useMemo } from 'react';
 
-import {
-  Box,
-  Typography,
-  useTheme,
-  alpha,
-} from "@mui/material";
+import { Box, Typography, useTheme, alpha } from '@mui/material';
 
-import { ChevronDown } from "lucide-react";
+import { ChevronDown } from 'lucide-react';
 
-import type { UserDTO } from "@vestara/types";
-import AvatarUpload from "../common/AvatarUpload";
+import type { UserDTO } from '@vestara/types';
+import AvatarUpload from '../common/AvatarUpload';
 
 export interface UserMenuTriggerProps {
   user: UserDTO | null;
   onClick: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
-export default function UserMenuTrigger({
-  user,
-  onClick,
-}: UserMenuTriggerProps): JSX.Element {
+export default function UserMenuTrigger({ user, onClick }: UserMenuTriggerProps): JSX.Element {
   const theme = useTheme();
   const { primary, text } = theme.palette;
 
   const initials = useMemo(() => {
-    const name = user
-      ? `${user.firstName} ${user.lastName}`.trim()
-      : "";
+    const name = user ? `${user.firstName} ${user.lastName}`.trim() : '';
 
     if (!name) {
-      return "U";
+      return 'U';
     }
 
     return name
-      .split(" ")
+      .split(' ')
       .map((part: string) => part[0])
-      .join("")
+      .join('')
       .slice(0, 2)
       .toUpperCase();
   }, [user]);
@@ -45,23 +35,23 @@ export default function UserMenuTrigger({
     <Box
       onClick={onClick}
       sx={{
-        display: "flex",
-        alignItems: "center",
+        display: 'flex',
+        alignItems: 'center',
         gap: 1.5,
         pl: 2,
         ml: 1,
         borderLeft: `1px solid ${theme.palette.divider}`,
-        cursor: "pointer",
-        borderRadius: "10px",
-        transition: "all .2s ease",
-        position: "relative",
+        cursor: 'pointer',
+        borderRadius: '10px',
+        transition: 'all .2s ease',
+        position: 'relative',
 
-        "&:hover": {
+        '&:hover': {
           bgcolor: alpha(primary.main, 0.08),
         },
       }}
     >
-      <Box sx={{ position: "relative" }}>
+      <Box sx={{ position: 'relative' }}>
         <AvatarUpload
           src={user?.avatarUrl}
           size={42}
@@ -71,15 +61,15 @@ export default function UserMenuTrigger({
 
         <Box
           sx={{
-            position: "absolute",
+            position: 'absolute',
             bottom: 0,
             right: 0,
             width: 12,
             height: 12,
-            borderRadius: "50%",
+            borderRadius: '50%',
             border: `2px solid ${theme.palette.background.paper}`,
-            bgcolor: user?.isActive ? "#2EA043" : "#4A5060",
-            display: { xs: "block", md: "none" },
+            bgcolor: user?.isActive ? '#2EA043' : '#4A5060',
+            display: { xs: 'block', md: 'none' },
           }}
         />
       </Box>
@@ -87,8 +77,8 @@ export default function UserMenuTrigger({
       <Box
         sx={{
           display: {
-            xs: "none",
-            md: "block",
+            xs: 'none',
+            md: 'block',
           },
         }}
       >
@@ -100,17 +90,17 @@ export default function UserMenuTrigger({
             lineHeight: 1.2,
           }}
         >
-          {user ? `${user.firstName} ${user.lastName}` : ""}
+          {user ? `${user.firstName} ${user.lastName}` : ''}
         </Typography>
 
         <Typography
           sx={{
             fontSize: 11.5,
             color: text.secondary,
-            textTransform: "capitalize",
+            textTransform: 'capitalize',
           }}
         >
-          {user?.role?.replace("_", " ")}
+          {user?.role?.replace('_', ' ')}
         </Typography>
       </Box>
 

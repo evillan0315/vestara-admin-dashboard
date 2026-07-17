@@ -1,5 +1,9 @@
 import apiClient from './client';
-import type { OrganizationDTO, CreateOrganizationRequestDTO, UpdateOrganizationRequestDTO } from '@vestara/types';
+import type {
+  OrganizationDTO,
+  CreateOrganizationRequestDTO,
+  UpdateOrganizationRequestDTO,
+} from '@vestara/types';
 
 export const organizationsApi = {
   list() {

@@ -25,19 +25,10 @@ const StyledCheckbox = styled(MuiCheckbox)`
   }
 `;
 
-export const Checkbox: FC<CheckboxProps> = ({
-  label,
-  size = 'medium',
-  sx,
-  ...props
-}) => {
+export const Checkbox: FC<CheckboxProps> = ({ label, size = 'medium', sx, ...props }) => {
   if (label) {
     return (
-      <FormControlLabel
-        control={<StyledCheckbox size={size} {...props} />}
-        label={label}
-        sx={sx}
-      />
+      <FormControlLabel control={<StyledCheckbox size={size} {...props} />} label={label} sx={sx} />
     );
   }
 

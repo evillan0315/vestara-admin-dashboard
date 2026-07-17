@@ -77,7 +77,10 @@ export class OnboardingService {
     // Check if organization slug exists
     const existingOrg = await organizationRepository.findBySlug(organizationSlug);
     if (existingOrg) {
-      throw new ConflictError('Organization slug already taken', ERROR_CODES.ORGANIZATION_SLUG_EXISTS);
+      throw new ConflictError(
+        'Organization slug already taken',
+        ERROR_CODES.ORGANIZATION_SLUG_EXISTS,
+      );
     }
 
     // Hash password if provided (for local registration)

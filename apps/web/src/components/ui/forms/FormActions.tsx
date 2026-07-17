@@ -9,18 +9,20 @@ export interface FormActionsProps {
   align?: 'flex-start' | 'center' | 'flex-end' | 'space-between';
 }
 
-const ActionsContainer = styled(Box)<{ $fullWidth?: boolean; $align?: FormActionsProps['align']; $spacing?: number }>(
-  ({ theme, $fullWidth, $align = 'flex-end', $spacing = 2 }) => ({
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: theme.spacing($spacing),
-    justifyContent: $align,
-    width: $fullWidth ? '100%' : 'auto',
-    mt: 3,
-    pt: 2,
-    borderTop: `1px solid ${theme.palette.divider}`,
-  })
-);
+const ActionsContainer = styled(Box)<{
+  $fullWidth?: boolean;
+  $align?: FormActionsProps['align'];
+  $spacing?: number;
+}>(({ theme, $fullWidth, $align = 'flex-end', $spacing = 2 }) => ({
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: theme.spacing($spacing),
+  justifyContent: $align,
+  width: $fullWidth ? '100%' : 'auto',
+  mt: 3,
+  pt: 2,
+  borderTop: `1px solid ${theme.palette.divider}`,
+}));
 
 export function FormActions({
   children,
@@ -29,7 +31,11 @@ export function FormActions({
   spacing = 2,
   align = 'flex-end',
 }: FormActionsProps) {
-  return <ActionsContainer $fullWidth={fullWidth} $align={align} $spacing={spacing} sx={sx}>{children}</ActionsContainer>;
+  return (
+    <ActionsContainer $fullWidth={fullWidth} $align={align} $spacing={spacing} sx={sx}>
+      {children}
+    </ActionsContainer>
+  );
 }
 
 export interface FormSubmitProps extends Omit<ButtonProps, 'type' | 'children'> {

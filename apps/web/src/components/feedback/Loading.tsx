@@ -19,7 +19,8 @@ const OverlayContainer = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  backgroundColor: theme.palette.mode === 'light' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(15, 23, 42, 0.8)',
+  backgroundColor:
+    theme.palette.mode === 'light' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(15, 23, 42, 0.8)',
   zIndex: theme.zIndex.modal + 1,
   backdropFilter: 'blur(4px)',
 }));
@@ -163,8 +164,6 @@ export const ContentLoading = ({ message }: { message?: string }) => (
   </Box>
 );
 
-export const ButtonLoading = () => (
-  <CircularProgress size={16} color="inherit" />
-);
+export const ButtonLoading = () => <CircularProgress size={16} color="inherit" />;
 
 export default Loading;

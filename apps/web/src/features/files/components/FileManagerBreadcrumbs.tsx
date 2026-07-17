@@ -1,6 +1,10 @@
 import { Box, Link, Typography, IconButton, Tooltip } from '@mui/material';
 import { Breadcrumbs as MuiBreadcrumbs } from '@mui/material';
-import { NavigateNext, GridView as GridViewIcon, ViewList as ViewListIcon } from '@mui/icons-material';
+import {
+  NavigateNext,
+  GridView as GridViewIcon,
+  ViewList as ViewListIcon,
+} from '@mui/icons-material';
 
 interface BreadcrumbItem {
   id: string | null;

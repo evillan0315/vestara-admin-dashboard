@@ -1,4 +1,12 @@
-import { getOrgUserSummary, getRecentAuditLogs, getSystemSettings, getOrgFileStats, getOrgInfo, getDashboardKPIs, getUserActivity } from './data-access.js';
+import {
+  getOrgUserSummary,
+  getRecentAuditLogs,
+  getSystemSettings,
+  getOrgFileStats,
+  getOrgInfo,
+  getDashboardKPIs,
+  getUserActivity,
+} from './data-access.js';
 
 /**
  * Context Builder Service
@@ -83,7 +91,9 @@ export async function buildContext(options: ContextOptions): Promise<string> {
   }
 
   // User Summary
-  sections.push(`USERS: ${userSummary.total} total (${userSummary.active} active, ${userSummary.inactive} inactive)`);
+  sections.push(
+    `USERS: ${userSummary.total} total (${userSummary.active} active, ${userSummary.inactive} inactive)`,
+  );
   if (Object.keys(userSummary.byRole).length > 0) {
     const roleStr = Object.entries(userSummary.byRole)
       .filter(([, count]) => count > 0)
@@ -94,7 +104,9 @@ export async function buildContext(options: ContextOptions): Promise<string> {
 
   // Dashboard KPIs
   sections.push(`DASHBOARD KPIs:`);
-  sections.push(`  Users: ${dashboardKPIs.users.total} total, ${dashboardKPIs.users.active} active`);
+  sections.push(
+    `  Users: ${dashboardKPIs.users.total} total, ${dashboardKPIs.users.active} active`,
+  );
   sections.push(`  Activity: ${dashboardKPIs.activity.totalAuditLogs} recent audit events`);
   if (Object.keys(dashboardKPIs.activity.actionsByType).length > 0) {
     const actionStr = Object.entries(dashboardKPIs.activity.actionsByType)
@@ -103,7 +115,9 @@ export async function buildContext(options: ContextOptions): Promise<string> {
     sections.push(`  Action Types: ${actionStr}`);
   }
   sections.push(`  Errors (24h): ${dashboardKPIs.activity.errorsLast24h}`);
-  sections.push(`  Storage: ${dashboardKPIs.storage.totalFiles} files, ${dashboardKPIs.storage.totalSizeFormatted}`);
+  sections.push(
+    `  Storage: ${dashboardKPIs.storage.totalFiles} files, ${dashboardKPIs.storage.totalSizeFormatted}`,
+  );
 
   // Recent Audit Logs
   if (recentAuditLogs.length > 0) {
@@ -118,7 +132,8 @@ export async function buildContext(options: ContextOptions): Promise<string> {
   const settingKeys = Object.keys(systemSettings);
   if (settingKeys.length > 0) {
     sections.push(`SYSTEM SETTINGS (${settingKeys.length} configured):`);
-    for (const key of settingKeys.slice(0, 15)) { // Limit to first 15
+    for (const key of settingKeys.slice(0, 15)) {
+      // Limit to first 15
       const value = systemSettings[key];
       const displayValue = typeof value === 'object' ? JSON.stringify(value) : String(value);
       const truncated = displayValue.length > 80 ? displayValue.slice(0, 80) + '...' : displayValue;
@@ -142,7 +157,12 @@ export async function buildContext(options: ContextOptions): Promise<string> {
     sections.push(`  Recent Uploads:`);
     for (const f of fileStats.recentUploads.slice(0, 3)) {
       const size = Number(f.size);
-      const formatted = size < 1024 ? `${size} B` : size < 1024 * 1024 ? `${(size / 1024).toFixed(1)} KB` : `${(size / 1024 / 1024).toFixed(1)} MB`;
+      const formatted =
+        size < 1024
+          ? `${size} B`
+          : size < 1024 * 1024
+            ? `${(size / 1024).toFixed(1)} KB`
+            : `${(size / 1024 / 1024).toFixed(1)} MB`;
       sections.push(`    - ${f.name} (${formatted})`);
     }
   }

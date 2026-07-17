@@ -1,20 +1,16 @@
 import { useCallback, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Box, Button, Chip, Stack, Typography } from '@mui/material';
 import {
-  Box,
-  Button,
-  Chip,
-  Stack,
-  Typography,
-} from '@mui/material';
-import { Add as AddIcon, Explore as ExploreIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+  Add as AddIcon,
+  Explore as ExploreIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+} from '@mui/icons-material';
 import { DataTable, type Column } from '../components/data/DataTable';
 import { ConfirmDialog } from '../components/ui/Modal';
 import { useToast } from '../components/feedback/Toast';
-import {
-  useDataSources,
-  useDeleteDataSource,
-} from '../features/integrations/hooks';
+import { useDataSources, useDeleteDataSource } from '../features/integrations/hooks';
 import DataSourceFormDialog from '../features/integrations/DataSourceFormDialog';
 import type { DataSourceDTO } from '@vestara/types';
 
@@ -66,15 +62,31 @@ export default function IntegrationsPage() {
       label: 'Method',
       sortable: true,
       render: (_, row) => (
-        <Chip size="small" label={row.method} color={row.method === 'POST' ? 'secondary' : 'default'} />
+        <Chip
+          size="small"
+          label={row.method}
+          color={row.method === 'POST' ? 'secondary' : 'default'}
+        />
       ),
     },
-    { id: 'baseUrl', label: 'Base URL', sortable: true, render: (_, row) => <code>{row.baseUrl}{row.path}</code> },
+    {
+      id: 'baseUrl',
+      label: 'Base URL',
+      sortable: true,
+      render: (_, row) => (
+        <code>
+          {row.baseUrl}
+          {row.path}
+        </code>
+      ),
+    },
     {
       id: 'authType',
       label: 'Auth',
       sortable: true,
-      render: (_, row) => <Chip size="small" variant="outlined" label={AUTH_LABELS[row.authType] ?? row.authType} />,
+      render: (_, row) => (
+        <Chip size="small" variant="outlined" label={AUTH_LABELS[row.authType] ?? row.authType} />
+      ),
     },
     {
       id: 'lastFetchedAt',
@@ -88,7 +100,11 @@ export default function IntegrationsPage() {
       sortable: false,
       render: (_, row) => (
         <Stack direction="row" spacing={1}>
-          <Button size="small" startIcon={<ExploreIcon />} onClick={() => navigate(`/integrations/${row.id}`)}>
+          <Button
+            size="small"
+            startIcon={<ExploreIcon />}
+            onClick={() => navigate(`/integrations/${row.id}`)}
+          >
             Explore
           </Button>
           {tryEdit(row)}
@@ -103,13 +119,17 @@ export default function IntegrationsPage() {
         <Button size="small" startIcon={<EditIcon />} onClick={() => handleEdit(row)}>
           Edit
         </Button>
-        <Button size="small" color="error" startIcon={<DeleteIcon />} onClick={() => setDeleteTarget(row)}>
+        <Button
+          size="small"
+          color="error"
+          startIcon={<DeleteIcon />}
+          onClick={() => setDeleteTarget(row)}
+        >
           Delete
         </Button>
       </>
     );
   }
-
 
   const actions: ReactNode = (
     <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
@@ -146,7 +166,11 @@ export default function IntegrationsPage() {
         pagination={{ page: 1, perPage: sources.length || 1, total: sources.length }}
       />
 
-      <DataSourceFormDialog open={dialogOpen} onClose={() => setDialogOpen(false)} dataSource={editing} />
+      <DataSourceFormDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        dataSource={editing}
+      />
 
       <ConfirmDialog
         open={!!deleteTarget}

@@ -1,6 +1,26 @@
-import { Box, Typography, IconButton, Menu, MenuItem, styled, Tooltip, useTheme, Divider } from '@mui/material';
+import {
+  Box,
+  Typography,
+  IconButton,
+  Menu,
+  MenuItem,
+  styled,
+  Tooltip,
+  useTheme,
+  Divider,
+} from '@mui/material';
 import AvatarUpload from '../common/AvatarUpload';
-import { Menu as MenuIcon, DarkMode, LightMode, Person, Settings, Logout, Search, Notifications, Settings as SettingsIcon } from '@mui/icons-material';
+import {
+  Menu as MenuIcon,
+  DarkMode,
+  LightMode,
+  Person,
+  Settings,
+  Logout,
+  Search,
+  Notifications,
+  Settings as SettingsIcon,
+} from '@mui/icons-material';
 import { useState, type ReactNode, type ReactElement } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../features/auth/AuthContext';
@@ -214,9 +234,7 @@ export const Header = ({
         )}
 
         <TitleContainer>
-          <TitleText variant="h6">
-            {title}
-          </TitleText>
+          <TitleText variant="h6">{title}</TitleText>
           {subtitle && <SubtitleText variant="body2">{subtitle}</SubtitleText>}
         </TitleContainer>
 
@@ -229,11 +247,7 @@ export const Header = ({
                 }}
               >
                 <Search />
-                <SearchInput
-                  type="text"
-                  placeholder="Search..."
-                  aria-label="Search"
-                />
+                <SearchInput type="text" placeholder="Search..." aria-label="Search" />
               </SearchContainer>
             </Tooltip>
           )}

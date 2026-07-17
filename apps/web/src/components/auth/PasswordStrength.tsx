@@ -41,9 +41,7 @@ export default function PasswordStrength({ password }: { password: string }) {
             }}
           />
         ))}
-        <Typography
-          sx={{ fontSize: 11.5, fontWeight: 700, color, ml: 1, width: 44 }}
-        >
+        <Typography sx={{ fontSize: 11.5, fontWeight: 700, color, ml: 1, width: 44 }}>
           {label}
         </Typography>
       </Box>

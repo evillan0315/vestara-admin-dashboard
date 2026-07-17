@@ -1,6 +1,8 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
 
-export async function uploadImage(file: File): Promise<{ success: boolean; data?: { url: string }; error?: string }> {
+export async function uploadImage(
+  file: File,
+): Promise<{ success: boolean; data?: { url: string }; error?: string }> {
   const formData = new FormData();
   formData.append('file', file);
 

@@ -151,7 +151,7 @@ export const filesApi = {
         };
 
         xhr.send(formData);
-      }
+      },
     );
   },
 
@@ -188,7 +188,7 @@ export const filesApi = {
   /** Get storage settings */
   getStorageSettings() {
     return apiClient.get<{ settings: { provider: string; config: Record<string, unknown> } }>(
-      '/files/storage/settings'
+      '/files/storage/settings',
     );
   },
 

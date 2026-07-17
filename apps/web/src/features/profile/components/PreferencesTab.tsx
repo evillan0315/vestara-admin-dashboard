@@ -135,18 +135,27 @@ export function PreferencesTab({ profile }: PreferencesTabProps) {
   const [dateFormat, setDateFormat] = useState(profile.dateFormat);
 
   // ── Theme ──
-  const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'system'>(profile.themeMode as 'light' | 'dark' | 'system');
+  const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'system'>(
+    profile.themeMode as 'light' | 'dark' | 'system',
+  );
 
   // ── Custom theming ──
   const [fontFamily, setFontFamily] = useState<'inter' | 'plus-jakarta-sans' | 'roboto' | 'system'>(
-    (profile.fontFamily ?? THEME_DEFAULTS.fontFamily) as 'inter' | 'plus-jakarta-sans' | 'roboto' | 'system',
+    (profile.fontFamily ?? THEME_DEFAULTS.fontFamily) as
+      'inter' | 'plus-jakarta-sans' | 'roboto' | 'system',
   );
-  const [fontSizeScale, setFontSizeScale] = useState(profile.fontSizeScale ?? THEME_DEFAULTS.fontSizeScale);
+  const [fontSizeScale, setFontSizeScale] = useState(
+    profile.fontSizeScale ?? THEME_DEFAULTS.fontSizeScale,
+  );
   const [fontWeight, setFontWeight] = useState<'light' | 'normal' | 'medium' | 'semibold' | 'bold'>(
-    (profile.fontWeight ?? THEME_DEFAULTS.fontWeight) as 'light' | 'normal' | 'medium' | 'semibold' | 'bold',
+    (profile.fontWeight ?? THEME_DEFAULTS.fontWeight) as
+      'light' | 'normal' | 'medium' | 'semibold' | 'bold',
   );
-  const [primaryColor, setPrimaryColor] = useState<'gold' | 'blue' | 'purple' | 'green' | 'red' | 'indigo' | 'teal'>(
-    (profile.primaryColor ?? THEME_DEFAULTS.primaryColor) as 'gold' | 'blue' | 'purple' | 'green' | 'red' | 'indigo' | 'teal',
+  const [primaryColor, setPrimaryColor] = useState<
+    'gold' | 'blue' | 'purple' | 'green' | 'red' | 'indigo' | 'teal'
+  >(
+    (profile.primaryColor ?? THEME_DEFAULTS.primaryColor) as
+      'gold' | 'blue' | 'purple' | 'green' | 'red' | 'indigo' | 'teal',
   );
   const [density, setDensity] = useState<'compact' | 'comfortable' | 'spacious'>(
     (profile.density ?? THEME_DEFAULTS.density) as 'compact' | 'comfortable' | 'spacious',
@@ -154,7 +163,9 @@ export function PreferencesTab({ profile }: PreferencesTabProps) {
   const [sidebarVariant, setSidebarVariant] = useState<'default' | 'compact' | 'hidden'>(
     (profile.sidebarVariant ?? THEME_DEFAULTS.sidebarVariant) as 'default' | 'compact' | 'hidden',
   );
-  const [borderRadiusScale, setBorderRadiusScale] = useState(profile.borderRadiusScale ?? THEME_DEFAULTS.borderRadiusScale);
+  const [borderRadiusScale, setBorderRadiusScale] = useState(
+    profile.borderRadiusScale ?? THEME_DEFAULTS.borderRadiusScale,
+  );
   const [contrastLevel, setContrastLevel] = useState<'normal' | 'high'>(
     (profile.contrastLevel ?? THEME_DEFAULTS.contrastLevel) as 'normal' | 'high',
   );
@@ -236,10 +247,22 @@ export function PreferencesTab({ profile }: PreferencesTabProps) {
       contrastLevel !== s.contrastLevel
     );
   }, [
-    emailNotifications, pushNotifications, loginAlerts, marketingEmails,
-    language, timezone, dateFormat, themeMode,
-    fontFamily, fontSizeScale, fontWeight, primaryColor,
-    density, sidebarVariant, borderRadiusScale, contrastLevel,
+    emailNotifications,
+    pushNotifications,
+    loginAlerts,
+    marketingEmails,
+    language,
+    timezone,
+    dateFormat,
+    themeMode,
+    fontFamily,
+    fontSizeScale,
+    fontWeight,
+    primaryColor,
+    density,
+    sidebarVariant,
+    borderRadiusScale,
+    contrastLevel,
   ]);
 
   // ── Apply a set of theme values to ThemeContext (used by undo/reset) ──
@@ -256,9 +279,15 @@ export function PreferencesTab({ profile }: PreferencesTabProps) {
       contrastLevel: string;
     }) => {
       themeCtx.setMode(vals.themeMode as 'light' | 'dark' | 'system');
-      themeCtx.setPrimaryColor(vals.primaryColor as 'gold' | 'blue' | 'purple' | 'green' | 'red' | 'indigo' | 'teal');
-      themeCtx.setFontFamily(vals.fontFamily as 'inter' | 'plus-jakarta-sans' | 'roboto' | 'system');
-      themeCtx.setFontWeight?.(vals.fontWeight as 'light' | 'normal' | 'medium' | 'semibold' | 'bold');
+      themeCtx.setPrimaryColor(
+        vals.primaryColor as 'gold' | 'blue' | 'purple' | 'green' | 'red' | 'indigo' | 'teal',
+      );
+      themeCtx.setFontFamily(
+        vals.fontFamily as 'inter' | 'plus-jakarta-sans' | 'roboto' | 'system',
+      );
+      themeCtx.setFontWeight?.(
+        vals.fontWeight as 'light' | 'normal' | 'medium' | 'semibold' | 'bold',
+      );
       themeCtx.setDensity(vals.density as 'compact' | 'comfortable' | 'spacious');
       themeCtx.setSidebarVariant(vals.sidebarVariant as 'default' | 'compact' | 'hidden');
       themeCtx.setFontSizeScale(vals.fontSizeScale);
@@ -282,7 +311,9 @@ export function PreferencesTab({ profile }: PreferencesTabProps) {
     setFontFamily(s.fontFamily as 'inter' | 'plus-jakarta-sans' | 'roboto' | 'system');
     setFontSizeScale(s.fontSizeScale as number);
     setFontWeight(s.fontWeight as 'light' | 'normal' | 'medium' | 'semibold' | 'bold');
-    setPrimaryColor(s.primaryColor as 'gold' | 'blue' | 'purple' | 'green' | 'red' | 'indigo' | 'teal');
+    setPrimaryColor(
+      s.primaryColor as 'gold' | 'blue' | 'purple' | 'green' | 'red' | 'indigo' | 'teal',
+    );
     setDensity(s.density as 'compact' | 'comfortable' | 'spacious');
     setSidebarVariant(s.sidebarVariant as 'default' | 'compact' | 'hidden');
     setBorderRadiusScale(s.borderRadiusScale as number);
@@ -387,7 +418,9 @@ export function PreferencesTab({ profile }: PreferencesTabProps) {
     themeCtx.setFontWeight(v);
   };
 
-  const onPrimaryColorChange = (v: 'gold' | 'blue' | 'purple' | 'green' | 'red' | 'indigo' | 'teal') => {
+  const onPrimaryColorChange = (
+    v: 'gold' | 'blue' | 'purple' | 'green' | 'red' | 'indigo' | 'teal',
+  ) => {
     setPrimaryColor(v);
     themeCtx.setPrimaryColor(v);
   };
@@ -418,10 +451,30 @@ export function PreferencesTab({ profile }: PreferencesTabProps) {
       >
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           {[
-            { label: 'Email Notifications', desc: 'Receive account and activity updates via email', checked: emailNotifications, onChange: setEmailNotifications },
-            { label: 'Push Notifications', desc: 'Receive push notifications in your browser', checked: pushNotifications, onChange: setPushNotifications },
-            { label: 'Login Alerts', desc: 'Get notified of new sign-ins to your account', checked: loginAlerts, onChange: setLoginAlerts },
-            { label: 'Marketing Emails', desc: 'Receive product updates and promotional offers', checked: marketingEmails, onChange: setMarketingEmails },
+            {
+              label: 'Email Notifications',
+              desc: 'Receive account and activity updates via email',
+              checked: emailNotifications,
+              onChange: setEmailNotifications,
+            },
+            {
+              label: 'Push Notifications',
+              desc: 'Receive push notifications in your browser',
+              checked: pushNotifications,
+              onChange: setPushNotifications,
+            },
+            {
+              label: 'Login Alerts',
+              desc: 'Get notified of new sign-ins to your account',
+              checked: loginAlerts,
+              onChange: setLoginAlerts,
+            },
+            {
+              label: 'Marketing Emails',
+              desc: 'Receive product updates and promotional offers',
+              checked: marketingEmails,
+              onChange: setMarketingEmails,
+            },
           ].map((pref, i) => (
             <Box
               key={pref.label}
@@ -435,8 +488,15 @@ export function PreferencesTab({ profile }: PreferencesTabProps) {
               }}
             >
               <Box>
-                <Box component="p" sx={{ fontWeight: 500, color: 'text.primary', fontSize: 14, m: 0 }}>{pref.label}</Box>
-                <Box component="p" sx={{ color: 'text.secondary', fontSize: 12, m: 0 }}>{pref.desc}</Box>
+                <Box
+                  component="p"
+                  sx={{ fontWeight: 500, color: 'text.primary', fontSize: 14, m: 0 }}
+                >
+                  {pref.label}
+                </Box>
+                <Box component="p" sx={{ color: 'text.secondary', fontSize: 12, m: 0 }}>
+                  {pref.desc}
+                </Box>
               </Box>
               <Switch checked={pref.checked} onChange={(e) => pref.onChange(e.target.checked)} />
             </Box>
@@ -450,15 +510,34 @@ export function PreferencesTab({ profile }: PreferencesTabProps) {
           <ProfileSectionCard title="Language & Localization">
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
               <Box>
-                <Box component="p" sx={{ fontWeight: 500, color: 'text.primary', fontSize: 13, m: 0, mb: 1 }}>Language</Box>
-                <TextField select value={language} onChange={(e) => setLanguage(e.target.value)} fullWidth size="small" sx={fieldSx}>
+                <Box
+                  component="p"
+                  sx={{ fontWeight: 500, color: 'text.primary', fontSize: 13, m: 0, mb: 1 }}
+                >
+                  Language
+                </Box>
+                <TextField
+                  select
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                  fullWidth
+                  size="small"
+                  sx={fieldSx}
+                >
                   {LANGUAGES.map((l) => (
-                    <MenuItem key={l.code} value={l.code}>{l.label}</MenuItem>
+                    <MenuItem key={l.code} value={l.code}>
+                      {l.label}
+                    </MenuItem>
                   ))}
                 </TextField>
               </Box>
               <Box>
-                <Box component="p" sx={{ fontWeight: 500, color: 'text.primary', fontSize: 13, m: 0, mb: 1 }}>Timezone</Box>
+                <Box
+                  component="p"
+                  sx={{ fontWeight: 500, color: 'text.primary', fontSize: 13, m: 0, mb: 1 }}
+                >
+                  Timezone
+                </Box>
                 <TextField
                   value={timezone}
                   onChange={(e) => setTimezone(e.target.value)}
@@ -469,10 +548,24 @@ export function PreferencesTab({ profile }: PreferencesTabProps) {
                 />
               </Box>
               <Box>
-                <Box component="p" sx={{ fontWeight: 500, color: 'text.primary', fontSize: 13, m: 0, mb: 1 }}>Date Format</Box>
-                <TextField select value={dateFormat} onChange={(e) => setDateFormat(e.target.value)} fullWidth size="small" sx={fieldSx}>
+                <Box
+                  component="p"
+                  sx={{ fontWeight: 500, color: 'text.primary', fontSize: 13, m: 0, mb: 1 }}
+                >
+                  Date Format
+                </Box>
+                <TextField
+                  select
+                  value={dateFormat}
+                  onChange={(e) => setDateFormat(e.target.value)}
+                  fullWidth
+                  size="small"
+                  sx={fieldSx}
+                >
                   {DATE_FORMATS.map((f) => (
-                    <MenuItem key={f.value} value={f.value}>{f.label}</MenuItem>
+                    <MenuItem key={f.value} value={f.value}>
+                      {f.label}
+                    </MenuItem>
                   ))}
                 </TextField>
               </Box>
@@ -485,7 +578,12 @@ export function PreferencesTab({ profile }: PreferencesTabProps) {
           <ProfileSectionCard title="Appearance">
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
               <Box>
-                <Box component="p" sx={{ fontWeight: 500, color: 'text.primary', fontSize: 13, m: 0, mb: 1 }}>Theme Mode</Box>
+                <Box
+                  component="p"
+                  sx={{ fontWeight: 500, color: 'text.primary', fontSize: 13, m: 0, mb: 1 }}
+                >
+                  Theme Mode
+                </Box>
                 <TextField
                   select
                   value={themeMode}
@@ -495,12 +593,19 @@ export function PreferencesTab({ profile }: PreferencesTabProps) {
                   sx={fieldSx}
                 >
                   {THEMES.map((t) => (
-                    <MenuItem key={t.value} value={t.value}>{t.label}</MenuItem>
+                    <MenuItem key={t.value} value={t.value}>
+                      {t.label}
+                    </MenuItem>
                   ))}
                 </TextField>
               </Box>
               <Box>
-                <Box component="p" sx={{ fontWeight: 500, color: 'text.primary', fontSize: 13, m: 0, mb: 1 }}>Contrast Level</Box>
+                <Box
+                  component="p"
+                  sx={{ fontWeight: 500, color: 'text.primary', fontSize: 13, m: 0, mb: 1 }}
+                >
+                  Contrast Level
+                </Box>
                 <ToggleButtonGroup
                   value={contrastLevel}
                   exclusive
@@ -539,27 +644,66 @@ export function PreferencesTab({ profile }: PreferencesTabProps) {
         <Grid container spacing={3}>
           <Grid size={{ xs: 12, md: 4 }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-              <Box component="p" sx={{ fontWeight: 500, color: 'text.primary', fontSize: 13, m: 0 }}>Font Family</Box>
-              <TextField select value={fontFamily} onChange={(e) => onFontFamilyChange(e.target.value as 'inter' | 'plus-jakarta-sans' | 'roboto' | 'system')} fullWidth size="small" sx={fieldSx}>
+              <Box
+                component="p"
+                sx={{ fontWeight: 500, color: 'text.primary', fontSize: 13, m: 0 }}
+              >
+                Font Family
+              </Box>
+              <TextField
+                select
+                value={fontFamily}
+                onChange={(e) =>
+                  onFontFamilyChange(
+                    e.target.value as 'inter' | 'plus-jakarta-sans' | 'roboto' | 'system',
+                  )
+                }
+                fullWidth
+                size="small"
+                sx={fieldSx}
+              >
                 {FONT_FAMILIES.map((f) => (
-                  <MenuItem key={f.value} value={f.value}>{f.label}</MenuItem>
+                  <MenuItem key={f.value} value={f.value}>
+                    {f.label}
+                  </MenuItem>
                 ))}
               </TextField>
             </Box>
           </Grid>
           <Grid size={{ xs: 12, md: 4 }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-              <Box component="p" sx={{ fontWeight: 500, color: 'text.primary', fontSize: 13, m: 0 }}>Font Weight</Box>
-              <TextField select value={fontWeight} onChange={(e) => onFontWeightChange(e.target.value as 'light' | 'normal' | 'medium' | 'semibold' | 'bold')} fullWidth size="small" sx={fieldSx}>
+              <Box
+                component="p"
+                sx={{ fontWeight: 500, color: 'text.primary', fontSize: 13, m: 0 }}
+              >
+                Font Weight
+              </Box>
+              <TextField
+                select
+                value={fontWeight}
+                onChange={(e) =>
+                  onFontWeightChange(
+                    e.target.value as 'light' | 'normal' | 'medium' | 'semibold' | 'bold',
+                  )
+                }
+                fullWidth
+                size="small"
+                sx={fieldSx}
+              >
                 {FONT_WEIGHTS.map((f) => (
-                  <MenuItem key={f.value} value={f.value}>{f.label}</MenuItem>
+                  <MenuItem key={f.value} value={f.value}>
+                    {f.label}
+                  </MenuItem>
                 ))}
               </TextField>
             </Box>
           </Grid>
           <Grid size={{ xs: 12, md: 4 }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-              <Box component="p" sx={{ fontWeight: 500, color: 'text.primary', fontSize: 13, m: 0 }}>
+              <Box
+                component="p"
+                sx={{ fontWeight: 500, color: 'text.primary', fontSize: 13, m: 0 }}
+              >
                 Font Size Scale
                 <Box component="span" sx={{ color: 'text.secondary', ml: 0.5, fontSize: 12 }}>
                   {fontSizeScale.toFixed(2)}×
@@ -578,8 +722,12 @@ export function PreferencesTab({ profile }: PreferencesTabProps) {
                 }}
               />
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Box component="span" sx={{ color: text.disabled, fontSize: 11 }}>Smaller</Box>
-                <Box component="span" sx={{ color: text.disabled, fontSize: 11 }}>Larger</Box>
+                <Box component="span" sx={{ color: text.disabled, fontSize: 11 }}>
+                  Smaller
+                </Box>
+                <Box component="span" sx={{ color: text.disabled, fontSize: 11 }}>
+                  Larger
+                </Box>
               </Box>
             </Box>
           </Grid>
@@ -599,12 +747,14 @@ export function PreferencesTab({ profile }: PreferencesTabProps) {
                   borderRadius: '50%',
                   bgcolor: c.hex,
                   cursor: 'pointer',
-                  border: primaryColor === c.value
-                    ? `3px solid ${text.primary}`
-                    : `3px solid transparent`,
-                  boxShadow: primaryColor === c.value
-                    ? `0 0 0 2px ${c.hex}, 0 4px 12px ${alpha(c.hex, 0.4)}`
-                    : 'none',
+                  border:
+                    primaryColor === c.value
+                      ? `3px solid ${text.primary}`
+                      : `3px solid transparent`,
+                  boxShadow:
+                    primaryColor === c.value
+                      ? `0 0 0 2px ${c.hex}, 0 4px 12px ${alpha(c.hex, 0.4)}`
+                      : 'none',
                   transition: 'all .2s ease',
                   '&:hover': {
                     transform: 'scale(1.15)',
@@ -629,9 +779,7 @@ export function PreferencesTab({ profile }: PreferencesTabProps) {
                   sx={{
                     p: 1.5,
                     borderRadius: 2,
-                    border: density === d.value
-                      ? `1.5px solid ${primary.main}`
-                      : `1px solid`,
+                    border: density === d.value ? `1.5px solid ${primary.main}` : `1px solid`,
                     borderColor: density === d.value ? alpha(primary.main, 0.4) : 'divider',
                     bgcolor: density === d.value ? alpha(primary.main, 0.06) : 'transparent',
                     cursor: 'pointer',
@@ -639,7 +787,10 @@ export function PreferencesTab({ profile }: PreferencesTabProps) {
                     '&:hover': { bgcolor: alpha(primary.main, 0.04) },
                   }}
                 >
-                  <Box component="p" sx={{ fontWeight: 600, color: 'text.primary', fontSize: 13, m: 0 }}>
+                  <Box
+                    component="p"
+                    sx={{ fontWeight: 600, color: 'text.primary', fontSize: 13, m: 0 }}
+                  >
                     {d.label}
                   </Box>
                   <Box component="p" sx={{ color: 'text.secondary', fontSize: 12, m: 0, mt: 0.25 }}>
@@ -661,9 +812,8 @@ export function PreferencesTab({ profile }: PreferencesTabProps) {
                   sx={{
                     p: 1.5,
                     borderRadius: 2,
-                    border: sidebarVariant === v.value
-                      ? `1.5px solid ${primary.main}`
-                      : `1px solid`,
+                    border:
+                      sidebarVariant === v.value ? `1.5px solid ${primary.main}` : `1px solid`,
                     borderColor: sidebarVariant === v.value ? alpha(primary.main, 0.4) : 'divider',
                     bgcolor: sidebarVariant === v.value ? alpha(primary.main, 0.06) : 'transparent',
                     cursor: 'pointer',
@@ -671,7 +821,10 @@ export function PreferencesTab({ profile }: PreferencesTabProps) {
                     '&:hover': { bgcolor: alpha(primary.main, 0.04) },
                   }}
                 >
-                  <Box component="p" sx={{ fontWeight: 600, color: 'text.primary', fontSize: 13, m: 0 }}>
+                  <Box
+                    component="p"
+                    sx={{ fontWeight: 600, color: 'text.primary', fontSize: 13, m: 0 }}
+                  >
                     {v.label}
                   </Box>
                   <Box component="p" sx={{ color: 'text.secondary', fontSize: 12, m: 0, mt: 0.25 }}>
@@ -707,8 +860,12 @@ export function PreferencesTab({ profile }: PreferencesTabProps) {
             }}
           />
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Box component="span" sx={{ color: text.disabled, fontSize: 11 }}>Sharp</Box>
-            <Box component="span" sx={{ color: text.disabled, fontSize: 11 }}>Rounded</Box>
+            <Box component="span" sx={{ color: text.disabled, fontSize: 11 }}>
+              Sharp
+            </Box>
+            <Box component="span" sx={{ color: text.disabled, fontSize: 11 }}>
+              Rounded
+            </Box>
           </Box>
         </Box>
       </ProfileSectionCard>

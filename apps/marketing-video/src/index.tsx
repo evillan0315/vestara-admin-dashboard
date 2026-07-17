@@ -1,6 +1,6 @@
-import React from "react";
-import { Composition, registerRoot } from "remotion";
-import { VestaraEcosystemAd } from "./VestaraEcosystemAd";
+import React from 'react';
+import { Composition, registerRoot } from 'remotion';
+import { VestaraEcosystemAd } from './VestaraEcosystemAd';
 
 /**
  * Remotion entry point. Registers the 30-second Vestara ecosystem overview ad.

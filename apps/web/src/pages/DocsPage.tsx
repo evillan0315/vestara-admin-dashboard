@@ -2,15 +2,7 @@ import { useMemo, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useSearchParams } from 'react-router-dom';
-import {
-  Box,
-  Divider,
-  List,
-  ListItemButton,
-  ListItemText,
-  Paper,
-  Typography,
-} from '@mui/material';
+import { Box, Divider, List, ListItemButton, ListItemText, Paper, Typography } from '@mui/material';
 import { BookText } from 'lucide-react';
 import { docGroups, getDocById, resolveDocHref } from '../features/docs/docsContent';
 import '../styles/markdown.css';

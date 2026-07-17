@@ -108,14 +108,10 @@ async function captureRoute(
     });
 
     if (target.waitForSelector) {
-      await page
-        .waitForSelector(target.waitForSelector, { timeout: 30_000 })
-        .catch(() => {
-          // If the selector never appears (e.g. slow data fetch), still capture.
-          console.warn(
-            `  ⚠ "${target.waitForSelector}" not found on ${target.path} (${theme})`,
-          );
-        });
+      await page.waitForSelector(target.waitForSelector, { timeout: 30_000 }).catch(() => {
+        // If the selector never appears (e.g. slow data fetch), still capture.
+        console.warn(`  ⚠ "${target.waitForSelector}" not found on ${target.path} (${theme})`);
+      });
     }
 
     if (target.settleMs) {
@@ -191,9 +187,7 @@ async function main(): Promise<void> {
       : '🌐 Using Playwright-managed Chromium',
   );
 
-  const launchOptions = executablePath
-    ? { executablePath, headless: true }
-    : { headless: true };
+  const launchOptions = executablePath ? { executablePath, headless: true } : { headless: true };
 
   const browser: Browser = await chromium.launch(launchOptions);
 

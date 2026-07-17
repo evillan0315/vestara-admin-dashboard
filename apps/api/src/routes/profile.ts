@@ -36,7 +36,11 @@ router.use(authenticate);
  * Resolve the storage provider (Cloudinary if configured, else local dev).
  */
 function getStorageProvider(): CloudinaryStorageProvider | LocalStorageProvider {
-  if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+  if (
+    process.env.CLOUDINARY_CLOUD_NAME &&
+    process.env.CLOUDINARY_API_KEY &&
+    process.env.CLOUDINARY_API_SECRET
+  ) {
     return new CloudinaryStorageProvider({
       provider: 'cloudinary',
       cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
@@ -95,7 +99,10 @@ router.put('/', validate(updateProfileSchema), async (req, res, next) => {
       metadata: { updatedFields: Object.keys(req.body) },
     });
 
-    sendSuccess(res, { user: await userRepository.findByIdOrThrow(userId), profile: toUserProfileDTO(profile) });
+    sendSuccess(res, {
+      user: await userRepository.findByIdOrThrow(userId),
+      profile: toUserProfileDTO(profile),
+    });
   } catch (error) {
     next(error);
   }
@@ -263,79 +270,90 @@ router.post('/kyc/submit', validate(submitKycSchema), async (req, res, next) => 
 /**
  * POST /profile/documents — Upload a KYC document (multipart, field 'file').
  */
-router.post('/documents', uploadSingle('file'), validate(addKycDocumentSchema), async (req, res, next) => {
-  try {
-    const userId = req.user!.id;
-    const organizationId = req.user!.organizationId;
-    const documentType = req.body.documentType || 'other';
+router.post(
+  '/documents',
+  uploadSingle('file'),
+  validate(addKycDocumentSchema),
+  async (req, res, next) => {
+    try {
+      const userId = req.user!.id;
+      const organizationId = req.user!.organizationId;
+      const documentType = req.body.documentType || 'other';
 
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        error: { code: 'NO_FILE', message: 'No file uploaded' },
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          error: { code: 'NO_FILE', message: 'No file uploaded' },
+        });
+      }
+
+      const file = req.file;
+      const allowedTypes = [
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+        'image/svg+xml',
+        'application/pdf',
+      ];
+      if (!allowedTypes.includes(file.mimetype)) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_FILE_TYPE',
+            message: 'Only JPEG, PNG, WebP, SVG, and PDF files are allowed',
+          },
+        });
+      }
+
+      const provider = getStorageProvider();
+      const result: UploadResult = await provider.upload(file.buffer, {
+        filename: file.originalname,
+        contentType: file.mimetype,
+        folder: 'kyc',
       });
-    }
 
-    const file = req.file;
-    const allowedTypes = [
-      'image/jpeg',
-      'image/png',
-      'image/webp',
-      'image/svg+xml',
-      'application/pdf',
-    ];
-    if (!allowedTypes.includes(file.mimetype)) {
-      return res.status(400).json({
-        success: false,
-        error: { code: 'INVALID_FILE_TYPE', message: 'Only JPEG, PNG, WebP, SVG, and PDF files are allowed' },
+      const storedFile = await fileRepository.create({
+        name: `kyc-${documentType}-${Date.now()}`,
+        originalName: file.originalname,
+        mimeType: file.mimetype,
+        size: BigInt(file.size),
+        path: result.key,
+        url: result.url,
+        provider: result.provider,
+        providerId: (result.metadata?.id as string | undefined) ?? null,
+        folderId: null,
+        uploadedBy: userId,
+        organizationId,
       });
+
+      const profile = await userProfileRepository.findOrCreateByUserId(userId, organizationId);
+      const doc = await userProfileRepository.addKycDocument({
+        userId,
+        profileId: profile.id,
+        fileId: storedFile.id,
+        organizationId,
+        documentType,
+      });
+
+      await auditLogRepository.create({
+        action: AuditAction.KYC_DOCUMENT_UPLOAD,
+        entity: 'kyc_document',
+        entityId: doc.id,
+        userId,
+        organizationId,
+        metadata: { documentType, fileName: file.originalname },
+      });
+
+      const updatedProfile = await userProfileRepository.findOrCreateByUserId(
+        userId,
+        organizationId,
+      );
+      sendSuccess(res, { profile: toUserProfileDTO(updatedProfile) });
+    } catch (error) {
+      next(error);
     }
-
-    const provider = getStorageProvider();
-    const result: UploadResult = await provider.upload(file.buffer, {
-      filename: file.originalname,
-      contentType: file.mimetype,
-      folder: 'kyc',
-    });
-
-    const storedFile = await fileRepository.create({
-      name: `kyc-${documentType}-${Date.now()}`,
-      originalName: file.originalname,
-      mimeType: file.mimetype,
-      size: BigInt(file.size),
-      path: result.key,
-      url: result.url,
-      provider: result.provider,
-      providerId: result.metadata?.id as string | undefined ?? null,
-      folderId: null,
-      uploadedBy: userId,
-      organizationId,
-    });
-
-    const profile = await userProfileRepository.findOrCreateByUserId(userId, organizationId);
-    const doc = await userProfileRepository.addKycDocument({
-      userId,
-      profileId: profile.id,
-      fileId: storedFile.id,
-      organizationId,
-      documentType,
-    });
-
-    await auditLogRepository.create({
-      action: AuditAction.KYC_DOCUMENT_UPLOAD,
-      entity: 'kyc_document',
-      entityId: doc.id,
-      userId,
-      organizationId,
-      metadata: { documentType, fileName: file.originalname },
-    });
-
-    const updatedProfile = await userProfileRepository.findOrCreateByUserId(userId, organizationId);
-    sendSuccess(res, { profile: toUserProfileDTO(updatedProfile) });
-  } catch (error) {
-    next(error);
-  }
-});
+  },
+);
 
 /**
  * DELETE /profile/documents/:id — Remove a KYC document. Ownership enforced.

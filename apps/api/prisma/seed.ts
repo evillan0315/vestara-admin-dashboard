@@ -1,6 +1,6 @@
-import dotenv from "dotenv";
-import { resolve } from "path";
-import { PrismaPg } from "@prisma/adapter-pg";
+import dotenv from 'dotenv';
+import { resolve } from 'path';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient, UserRole } from '../generated/prisma/client';
 import bcrypt from 'bcryptjs';
 
@@ -54,16 +54,53 @@ async function main(): Promise<void> {
   // Users: 1 admin, 1 moderator, 1 support per org
   const userData = [
     // Vestara organization (index 0)
-    { email: 'admin@vestara.com', firstName: 'Admin', lastName: 'User', role: UserRole.admin, orgIndex: 0 },
-    { email: 'moderator@vestara.com', firstName: 'Moderator', lastName: 'User', role: UserRole.moderator, orgIndex: 0 },
-    { email: 'support@vestara.com', firstName: 'Support', lastName: 'Agent', role: UserRole.support, orgIndex: 0 },
+    {
+      email: 'admin@vestara.com',
+      firstName: 'Admin',
+      lastName: 'User',
+      role: UserRole.admin,
+      orgIndex: 0,
+    },
+    {
+      email: 'moderator@vestara.com',
+      firstName: 'Moderator',
+      lastName: 'User',
+      role: UserRole.moderator,
+      orgIndex: 0,
+    },
+    {
+      email: 'support@vestara.com',
+      firstName: 'Support',
+      lastName: 'Agent',
+      role: UserRole.support,
+      orgIndex: 0,
+    },
     // Acme Corporation organization (index 1)
-    { email: 'admin@acme.com', firstName: 'Admin', lastName: 'Acme', role: UserRole.admin, orgIndex: 1 },
-    { email: 'moderator@acme.com', firstName: 'Moderator', lastName: 'Acme', role: UserRole.moderator, orgIndex: 1 },
-    { email: 'support@acme.com', firstName: 'Support', lastName: 'Acme', role: UserRole.support, orgIndex: 1 },
+    {
+      email: 'admin@acme.com',
+      firstName: 'Admin',
+      lastName: 'Acme',
+      role: UserRole.admin,
+      orgIndex: 1,
+    },
+    {
+      email: 'moderator@acme.com',
+      firstName: 'Moderator',
+      lastName: 'Acme',
+      role: UserRole.moderator,
+      orgIndex: 1,
+    },
+    {
+      email: 'support@acme.com',
+      firstName: 'Support',
+      lastName: 'Acme',
+      role: UserRole.support,
+      orgIndex: 1,
+    },
   ];
 
-  const createdUsers: Array<{ id: string; email: string; organizationId: string; role: UserRole }> = [];
+  const createdUsers: Array<{ id: string; email: string; organizationId: string; role: UserRole }> =
+    [];
 
   for (const user of userData) {
     const org = createdOrgs[user.orgIndex];
@@ -80,7 +117,12 @@ async function main(): Promise<void> {
         isActive: true,
       },
     });
-    createdUsers.push({ id: userRecord.id, email: userRecord.email, organizationId: org.id, role: userRecord.role });
+    createdUsers.push({
+      id: userRecord.id,
+      email: userRecord.email,
+      organizationId: org.id,
+      role: userRecord.role,
+    });
 
     // Create a demo user profile (1:1) so the profile module has data.
     await prisma.userProfile.upsert({
@@ -144,7 +186,9 @@ async function main(): Promise<void> {
   ];
 
   for (const org of createdOrgs) {
-    const orgAdmin = createdUsers.find(u => u.organizationId === org.id && u.role === UserRole.admin);
+    const orgAdmin = createdUsers.find(
+      (u) => u.organizationId === org.id && u.role === UserRole.admin,
+    );
     const settingCreator = orgAdmin?.id || createdUsers[0].id;
 
     for (const setting of defaultSettings) {
@@ -168,7 +212,7 @@ async function main(): Promise<void> {
   const logEntities = ['user', 'user', 'user', 'user', 'setting'];
 
   for (const org of createdOrgs) {
-    const orgUsers = createdUsers.filter(u => u.organizationId === org.id);
+    const orgUsers = createdUsers.filter((u) => u.organizationId === org.id);
     const auditUser = orgUsers[0]?.id || createdUsers[0].id;
 
     const now = Date.now();

@@ -74,9 +74,18 @@ interface UploadDialogProps {
 }
 
 export function UploadDialog({
-  open, uploadFiles, uploadProgress, isDragActive, uploading,
-  onClose, onFilesSelected, onRemoveFile, onSubmit,
-  onDragOver, onDragLeave, onDrop,
+  open,
+  uploadFiles,
+  uploadProgress,
+  isDragActive,
+  uploading,
+  onClose,
+  onFilesSelected,
+  onRemoveFile,
+  onSubmit,
+  onDragOver,
+  onDragLeave,
+  onDrop,
 }: UploadDialogProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -98,7 +107,9 @@ export function UploadDialog({
           sx={{ mb: 2 }}
         >
           <CloudUploadIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 1 }} />
-          <Typography variant="body1" fontWeight={600}>Drag & drop files here</Typography>
+          <Typography variant="body1" fontWeight={600}>
+            Drag & drop files here
+          </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
             or click to browse &mdash; up to 100MB per file
           </Typography>
@@ -121,14 +132,30 @@ export function UploadDialog({
             {uploadFiles.map((file, index) => (
               <Box
                 key={`${file.name}-${index}`}
-                sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 0.75, px: 1, borderRadius: 1, '&:hover': { bgcolor: 'action.hover' } }}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.5,
+                  py: 0.75,
+                  px: 1,
+                  borderRadius: 1,
+                  '&:hover': { bgcolor: 'action.hover' },
+                }}
               >
                 <FileIcon fontSize="small" color="action" />
                 <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography variant="body2" noWrap>{file.name}</Typography>
-                  <Typography variant="caption" color="text.secondary">{formatFileSize(file.size)}</Typography>
+                  <Typography variant="body2" noWrap>
+                    {file.name}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {formatFileSize(file.size)}
+                  </Typography>
                 </Box>
-                <IconButton size="small" onClick={() => onRemoveFile(index)} disabled={uploadProgress !== null}>
+                <IconButton
+                  size="small"
+                  onClick={() => onRemoveFile(index)}
+                  disabled={uploadProgress !== null}
+                >
                   <CloseIcon fontSize="small" />
                 </IconButton>
               </Box>
@@ -146,8 +173,15 @@ export function UploadDialog({
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={uploading}>Cancel</Button>
-        <Button variant="contained" startIcon={<UploadIcon />} onClick={onSubmit} disabled={uploadFiles.length === 0 || uploading}>
+        <Button onClick={onClose} disabled={uploading}>
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          startIcon={<UploadIcon />}
+          onClick={onSubmit}
+          disabled={uploadFiles.length === 0 || uploading}
+        >
           Upload {uploadFiles.length > 0 ? `(${uploadFiles.length})` : ''}
         </Button>
       </DialogActions>
@@ -166,7 +200,14 @@ interface CreateFolderDialogProps {
   onSubmit: () => void;
 }
 
-export function CreateFolderDialog({ open, folderName, loading, onClose, onNameChange, onSubmit }: CreateFolderDialogProps) {
+export function CreateFolderDialog({
+  open,
+  folderName,
+  loading,
+  onClose,
+  onNameChange,
+  onSubmit,
+}: CreateFolderDialogProps) {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
       <DialogTitle>Create Folder</DialogTitle>
@@ -177,7 +218,9 @@ export function CreateFolderDialog({ open, folderName, loading, onClose, onNameC
           label="Folder name"
           value={folderName}
           onChange={(e) => onNameChange(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') onSubmit(); }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') onSubmit();
+          }}
           sx={{ mt: 1 }}
         />
       </DialogContent>
@@ -202,7 +245,14 @@ interface RenameDialogProps {
   onSubmit: () => void;
 }
 
-export function RenameDialog({ open, value, loading, onClose, onChange, onSubmit }: RenameDialogProps) {
+export function RenameDialog({
+  open,
+  value,
+  loading,
+  onClose,
+  onChange,
+  onSubmit,
+}: RenameDialogProps) {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
       <DialogTitle>Rename</DialogTitle>
@@ -213,7 +263,9 @@ export function RenameDialog({ open, value, loading, onClose, onChange, onSubmit
           label="New name"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') onSubmit(); }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') onSubmit();
+          }}
           sx={{ mt: 1 }}
         />
       </DialogContent>
@@ -242,12 +294,21 @@ interface MoveDialogProps {
 }
 
 export function MoveDialog({
-  open, targetCount, availableFolders, selectedFolderId, loading, moveTargetIds,
-  onClose, onSelect, onSubmit,
+  open,
+  targetCount,
+  availableFolders,
+  selectedFolderId,
+  loading,
+  moveTargetIds,
+  onClose,
+  onSelect,
+  onSubmit,
 }: MoveDialogProps) {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Move {targetCount} item{targetCount === 1 ? '' : 's'}</DialogTitle>
+      <DialogTitle>
+        Move {targetCount} item{targetCount === 1 ? '' : 's'}
+      </DialogTitle>
       <DialogContent>
         {loading ? (
           <Loading variant="inline" message="Loading folders..." />
@@ -257,7 +318,12 @@ export function MoveDialog({
               variant="outlined"
               onClick={() => onSelect(null)}
               sx={{
-                p: 1.5, borderRadius: 2, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 1.5,
+                p: 1.5,
+                borderRadius: 2,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1.5,
                 borderColor: selectedFolderId === null ? 'primary.main' : 'divider',
                 bgcolor: selectedFolderId === null ? 'action.selected' : 'transparent',
                 '&:hover': { bgcolor: 'action.hover' },
@@ -265,10 +331,16 @@ export function MoveDialog({
             >
               <FolderIcon color="warning" />
               <Box>
-                <Typography variant="body2" fontWeight={600}>Root folder</Typography>
-                <Typography variant="caption" color="text.secondary">Move to the top level</Typography>
+                <Typography variant="body2" fontWeight={600}>
+                  Root folder
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Move to the top level
+                </Typography>
               </Box>
-              {selectedFolderId === null && <CheckCircleIcon fontSize="small" color="primary" sx={{ ml: 'auto' }} />}
+              {selectedFolderId === null && (
+                <CheckCircleIcon fontSize="small" color="primary" sx={{ ml: 'auto' }} />
+              )}
             </Paper>
 
             {availableFolders
@@ -279,7 +351,12 @@ export function MoveDialog({
                   variant="outlined"
                   onClick={() => onSelect(folder.id)}
                   sx={{
-                    p: 1.5, borderRadius: 2, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 1.5,
+                    p: 1.5,
+                    borderRadius: 2,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1.5,
                     borderColor: selectedFolderId === folder.id ? 'primary.main' : 'divider',
                     bgcolor: selectedFolderId === folder.id ? 'action.selected' : 'transparent',
                     '&:hover': { bgcolor: 'action.hover' },
@@ -287,7 +364,9 @@ export function MoveDialog({
                 >
                   <FolderIcon color="warning" />
                   <Box>
-                    <Typography variant="body2" fontWeight={600}>{folder.name}</Typography>
+                    <Typography variant="body2" fontWeight={600}>
+                      {folder.name}
+                    </Typography>
                   </Box>
                   {selectedFolderId === folder.id && (
                     <CheckCircleIcon fontSize="small" color="primary" sx={{ ml: 'auto' }} />
@@ -296,7 +375,11 @@ export function MoveDialog({
               ))}
 
             {availableFolders.length === 0 && (
-              <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ py: 2, textAlign: 'center' }}
+              >
                 No other folders available in this directory.
               </Typography>
             )}
@@ -324,7 +407,14 @@ interface DeleteConfirmDialogProps {
   onClose: () => void;
 }
 
-export function DeleteConfirmDialog({ open, itemName, isFolder, loading, onConfirm, onClose }: DeleteConfirmDialogProps) {
+export function DeleteConfirmDialog({
+  open,
+  itemName,
+  isFolder,
+  loading,
+  onConfirm,
+  onClose,
+}: DeleteConfirmDialogProps) {
   return (
     <ConfirmDialog
       open={open}
@@ -349,7 +439,13 @@ interface BulkDeleteConfirmDialogProps {
   onClose: () => void;
 }
 
-export function BulkDeleteConfirmDialog({ open, count, loading, onConfirm, onClose }: BulkDeleteConfirmDialogProps) {
+export function BulkDeleteConfirmDialog({
+  open,
+  count,
+  loading,
+  onConfirm,
+  onClose,
+}: BulkDeleteConfirmDialogProps) {
   return (
     <ConfirmDialog
       open={open}
@@ -388,7 +484,9 @@ export function PreviewDialog({ file, onClose, onDownload }: PreviewDialogProps)
         <Typography variant="subtitle1" fontWeight={600} sx={{ flex: 1 }}>
           {file.originalName}
         </Typography>
-        <IconButton onClick={onClose}><CloseIcon /></IconButton>
+        <IconButton onClick={onClose}>
+          <CloseIcon />
+        </IconButton>
       </DialogTitle>
       <DialogContent sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
         <Box

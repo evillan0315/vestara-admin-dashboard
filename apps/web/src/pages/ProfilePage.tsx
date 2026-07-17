@@ -2,10 +2,7 @@ import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, useTheme, alpha } from '@mui/material';
 import { useProfile, useUpdateProfile } from '../features/profile/hooks';
-import {
-  profileTabs,
-  getProfileTabFromPath,
-} from '../features/profile/tabs';
+import { profileTabs, getProfileTabFromPath } from '../features/profile/tabs';
 import { uploadImage } from '../api/upload';
 import AvatarUpload from '../components/common/AvatarUpload';
 import { Card } from '../components/ui/Card';
@@ -70,7 +67,12 @@ export default function ProfilePage() {
   const renderTabContent = () => {
     switch (activeTab) {
       case 'personal':
-        return <PersonalInfoTab profile={profile} user={{ firstName: profileUser.firstName, lastName: profileUser.lastName }} />;
+        return (
+          <PersonalInfoTab
+            profile={profile}
+            user={{ firstName: profileUser.firstName, lastName: profileUser.lastName }}
+          />
+        );
       case 'address':
         return <AddressTab profile={profile} />;
       case 'preferences':
@@ -106,7 +108,14 @@ export default function ProfilePage() {
           border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 3,
+            flexWrap: { xs: 'wrap', sm: 'nowrap' },
+          }}
+        >
           {/* Avatar with upload */}
           <AvatarUpload
             src={profileUser.avatarUrl}
@@ -121,8 +130,13 @@ export default function ProfilePage() {
 
           {/* Profile Info */}
           <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5, flexWrap: 'wrap' }}>
-              <Box component="h1" sx={{ fontSize: 24, fontWeight: 700, color: 'text.primary', m: 0 }}>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5, flexWrap: 'wrap' }}
+            >
+              <Box
+                component="h1"
+                sx={{ fontSize: 24, fontWeight: 700, color: 'text.primary', m: 0 }}
+              >
                 {profileUser.firstName} {profileUser.lastName}
               </Box>
               <VerificationStatusBadge status={profile.kycStatus} size="medium" />
@@ -131,7 +145,10 @@ export default function ProfilePage() {
               {profileUser.email}
             </Box>
             {profile.bio && (
-              <Box component="p" sx={{ color: 'text.secondary', fontSize: 13, m: 0, lineHeight: 1.5 }}>
+              <Box
+                component="p"
+                sx={{ color: 'text.secondary', fontSize: 13, m: 0, lineHeight: 1.5 }}
+              >
                 {profile.bio}
               </Box>
             )}

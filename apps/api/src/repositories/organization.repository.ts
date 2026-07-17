@@ -99,10 +99,7 @@ export class OrganizationRepository extends BaseRepository {
   /**
    * Update an organization's mutable fields.
    */
-  async update(
-    id: string,
-    data: { name?: string; logoUrl?: string },
-  ) {
+  async update(id: string, data: { name?: string; logoUrl?: string }) {
     return this.prisma.organization.update({
       where: { id },
       data: {

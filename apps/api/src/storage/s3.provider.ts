@@ -2,7 +2,16 @@
 // S3 Storage Provider (Placeholder)
 // ──────────────────────────────────────────────
 
-import type { StorageProvider, StorageProviderConfig, UploadOptions, UploadResult, FileMetadata, ListOptions, ListResult, DeleteOptions } from './types.js';
+import type {
+  StorageProvider,
+  StorageProviderConfig,
+  UploadOptions,
+  UploadResult,
+  FileMetadata,
+  ListOptions,
+  ListResult,
+  DeleteOptions,
+} from './types.js';
 
 export class S3StorageProvider implements StorageProvider {
   public readonly type = 'S3' as const;
@@ -11,8 +20,15 @@ export class S3StorageProvider implements StorageProvider {
   constructor(config: StorageProviderConfig) {
     this.config = config;
 
-    if (!config.s3Region || !config.s3Bucket || !config.s3AccessKeyId || !config.s3SecretAccessKey) {
-      throw new Error('S3 configuration is incomplete. Required: region, bucket, accessKeyId, secretAccessKey');
+    if (
+      !config.s3Region ||
+      !config.s3Bucket ||
+      !config.s3AccessKeyId ||
+      !config.s3SecretAccessKey
+    ) {
+      throw new Error(
+        'S3 configuration is incomplete. Required: region, bucket, accessKeyId, secretAccessKey',
+      );
     }
 
     // TODO: Initialize S3 client

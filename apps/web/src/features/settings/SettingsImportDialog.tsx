@@ -147,7 +147,9 @@ export function SettingsImportDialog({ open, onClose }: SettingsImportDialogProp
         return;
       }
       setResult(data);
-      showSuccess(`Imported ${data.imported} settings (${data.created} created, ${data.updated} updated)`);
+      showSuccess(
+        `Imported ${data.imported} settings (${data.created} created, ${data.updated} updated)`,
+      );
     } catch (err) {
       showError(err instanceof Error ? err.message : 'Import failed');
     }
@@ -165,11 +167,11 @@ export function SettingsImportDialog({ open, onClose }: SettingsImportDialogProp
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ fontWeight: 700, fontSize: '1.125rem' }}>
-        Import Settings
-      </DialogTitle>
+      <DialogTitle sx={{ fontWeight: 700, fontSize: '1.125rem' }}>Import Settings</DialogTitle>
 
-      <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: '16px !important' }}>
+      <DialogContent
+        sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: '16px !important' }}
+      >
         {result ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Alert severity="success" icon={<SuccessIcon />}>
@@ -179,9 +181,23 @@ export function SettingsImportDialog({ open, onClose }: SettingsImportDialogProp
               Created: {result.created} | Updated: {result.updated}
             </Typography>
             {result.details.length > 0 && (
-              <Box sx={{ maxHeight: 200, overflow: 'auto', border: 1, borderColor: 'divider', borderRadius: 1, p: 1 }}>
+              <Box
+                sx={{
+                  maxHeight: 200,
+                  overflow: 'auto',
+                  border: 1,
+                  borderColor: 'divider',
+                  borderRadius: 1,
+                  p: 1,
+                }}
+              >
                 {result.details.map((d) => (
-                  <Typography key={d.key} variant="caption" display="block" sx={{ fontFamily: 'monospace' }}>
+                  <Typography
+                    key={d.key}
+                    variant="caption"
+                    display="block"
+                    sx={{ fontFamily: 'monospace' }}
+                  >
                     {d.action === 'created' ? '+' : '~'} {d.key}
                   </Typography>
                 ))}
@@ -191,8 +207,8 @@ export function SettingsImportDialog({ open, onClose }: SettingsImportDialogProp
         ) : (
           <>
             <Typography variant="body2" color="text.secondary">
-              Upload a JSON file containing settings to import. The file should be a JSON object with
-              key-value pairs, or an export file from this system.
+              Upload a JSON file containing settings to import. The file should be a JSON object
+              with key-value pairs, or an export file from this system.
             </Typography>
 
             <DropZone

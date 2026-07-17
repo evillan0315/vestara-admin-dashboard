@@ -67,7 +67,15 @@ export class AuthService {
     organizationSlug: string;
     organizationLogoUrl?: string;
   }) {
-    const { email, password, firstName, lastName, organizationName, organizationSlug, organizationLogoUrl } = data;
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      organizationName,
+      organizationSlug,
+      organizationLogoUrl,
+    } = data;
 
     const existingUser = await userRepository.findByEmail(email);
     if (existingUser) {
@@ -77,7 +85,10 @@ export class AuthService {
     // Check if organization slug exists
     const existingOrg = await organizationRepository.findBySlug(organizationSlug);
     if (existingOrg) {
-      throw new ConflictError('Organization slug already taken', ERROR_CODES.ORGANIZATION_SLUG_EXISTS);
+      throw new ConflictError(
+        'Organization slug already taken',
+        ERROR_CODES.ORGANIZATION_SLUG_EXISTS,
+      );
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
@@ -291,10 +302,7 @@ export class AuthService {
       unlockedBy: adminUserId,
     });
 
-    logger.info(
-      { targetUserId, adminUserId },
-      'Account unlocked by admin',
-    );
+    logger.info({ targetUserId, adminUserId }, 'Account unlocked by admin');
 
     return { success: true };
   }
@@ -330,7 +338,8 @@ export class AuthService {
     ipAddress?: string;
     userAgent?: string;
   }) {
-    const { provider, providerId, email, firstName, lastName, avatarUrl, ipAddress, userAgent } = data;
+    const { provider, providerId, email, firstName, lastName, avatarUrl, ipAddress, userAgent } =
+      data;
 
     // 1. Check if a user already exists for this provider+providerId
     const user = await userRepository.findByProvider(provider, providerId);
@@ -357,10 +366,16 @@ export class AuthService {
         userAgent,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       });
-      await this.logAudit('OAUTH_LOGIN', 'user', existingByEmail.id, existingByEmail.organizationId, {
-        provider,
-        linked: true,
-      });
+      await this.logAudit(
+        'OAUTH_LOGIN',
+        'user',
+        existingByEmail.id,
+        existingByEmail.organizationId,
+        {
+          provider,
+          linked: true,
+        },
+      );
       return { user: existingByEmail, ...tokens };
     }
 

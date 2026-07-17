@@ -93,13 +93,13 @@ Determine whether the repository is:
 
 Use the following signals to classify:
 
-| Signal | Implies |
-|--------|---------|
-| `README.md` with comprehensive project metadata | Existing application with established context |
-| Multiple `package.json` files across `apps/` and `packages/` | Monorepo, likely existing application |
-| Prisma schema + migrations | Database-backed application |
-| CI/CD workflows (`.github/workflows/`) | Production or near-production |
-| Lock files (`pnpm-lock.yaml`, `package-lock.json`) | Dependencies already installed |
+| Signal                                                       | Implies                                       |
+| ------------------------------------------------------------ | --------------------------------------------- |
+| `README.md` with comprehensive project metadata              | Existing application with established context |
+| Multiple `package.json` files across `apps/` and `packages/` | Monorepo, likely existing application         |
+| Prisma schema + migrations                                   | Database-backed application                   |
+| CI/CD workflows (`.github/workflows/`)                       | Production or near-production                 |
+| Lock files (`pnpm-lock.yaml`, `package-lock.json`)           | Dependencies already installed                |
 
 Explain your reasoning briefly.
 

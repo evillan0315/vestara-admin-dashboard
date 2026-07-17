@@ -21,7 +21,11 @@ export class AppError extends Error {
  * 400 Bad Request
  */
 export class BadRequestError extends AppError {
-  constructor(message = 'Bad request', code: string = ERROR_CODES.INVALID_INPUT, details?: unknown) {
+  constructor(
+    message = 'Bad request',
+    code: string = ERROR_CODES.INVALID_INPUT,
+    details?: unknown,
+  ) {
     super(message, HTTP_STATUS.BAD_REQUEST, code, details);
     this.name = 'BadRequestError';
   }

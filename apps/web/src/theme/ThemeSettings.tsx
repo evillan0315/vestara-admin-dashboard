@@ -29,17 +29,8 @@ import {
 } from '@mui/icons-material';
 import { type ReactElement } from 'react';
 import { useThemeContext } from './ThemeContext';
-import {
-  primaryColors,
-  densitySpacing,
-  fontFamilyValues,
-} from './tokens';
-import type {
-  ThemePrimaryColor,
-  ThemeDensity,
-  ThemeFontFamily,
-  SidebarVariant,
-} from './types';
+import { primaryColors, densitySpacing, fontFamilyValues } from './tokens';
+import type { ThemePrimaryColor, ThemeDensity, ThemeFontFamily, SidebarVariant } from './types';
 
 // ── Styled ──
 
@@ -153,7 +144,10 @@ export function ThemeSettings(): ReactElement {
   const theme = useTheme();
   const ctx = useThemeContext();
 
-  const colorEntries = Object.entries(primaryColors) as [ThemePrimaryColor, typeof primaryColors.gold][];
+  const colorEntries = Object.entries(primaryColors) as [
+    ThemePrimaryColor,
+    typeof primaryColors.gold,
+  ][];
 
   return (
     <Drawer
@@ -203,7 +197,11 @@ export function ThemeSettings(): ReactElement {
             ))}
           </ToggleButtonGroup>
           {ctx.mode === 'system' && (
-            <Typography variant="caption" color="text.secondary" sx={{ mt: 0.75, display: 'block' }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ mt: 0.75, display: 'block' }}
+            >
               Currently: {ctx.resolvedMode === 'dark' ? 'Dark' : 'Light'} mode
             </Typography>
           )}
@@ -260,7 +258,8 @@ export function ThemeSettings(): ReactElement {
                 Preview
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                Sidebar: {densitySpacing[ctx.density].sidebarWidth}px · Radius: {densitySpacing[ctx.density].borderRadius}px
+                Sidebar: {densitySpacing[ctx.density].sidebarWidth}px · Radius:{' '}
+                {densitySpacing[ctx.density].borderRadius}px
               </Typography>
             </Box>
           </PreviewBox>
@@ -285,10 +284,7 @@ export function ThemeSettings(): ReactElement {
             ))}
           </ToggleButtonGroup>
           <PreviewBox>
-            <Typography
-              variant="body2"
-              sx={{ fontFamily: fontFamilyValues[ctx.fontFamily] }}
-            >
+            <Typography variant="body2" sx={{ fontFamily: fontFamilyValues[ctx.fontFamily] }}>
               Aa Bb Cc — The quick brown fox jumps over the lazy dog.
             </Typography>
           </PreviewBox>
@@ -314,8 +310,12 @@ export function ThemeSettings(): ReactElement {
             sx={{ mx: 1 }}
           />
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Typography variant="caption" color="text.secondary">75%</Typography>
-            <Typography variant="caption" color="text.secondary">125%</Typography>
+            <Typography variant="caption" color="text.secondary">
+              75%
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              125%
+            </Typography>
           </Box>
         </Section>
 
@@ -339,8 +339,12 @@ export function ThemeSettings(): ReactElement {
             sx={{ mx: 1 }}
           />
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Typography variant="caption" color="text.secondary">Sharp</Typography>
-            <Typography variant="caption" color="text.secondary">Rounded</Typography>
+            <Typography variant="caption" color="text.secondary">
+              Sharp
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Rounded
+            </Typography>
           </Box>
         </Section>
 

@@ -86,11 +86,14 @@ function useUserPreferences() {
     setSidebarVariant(preferences.sidebarVariant);
   }, [preferences.sidebarVariant, setSidebarVariant]);
 
-  const savePreferences = useCallback((newPreferences: Partial<Preferences>) => {
-    const updated = { ...preferences, ...newPreferences };
-    setPreferences(updated);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-  }, [preferences]);
+  const savePreferences = useCallback(
+    (newPreferences: Partial<Preferences>) => {
+      const updated = { ...preferences, ...newPreferences };
+      setPreferences(updated);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    },
+    [preferences],
+  );
 
   const resetPreferences = useCallback(() => {
     setPreferences(DEFAULT_PREFERENCES);
@@ -101,14 +104,37 @@ function useUserPreferences() {
 }
 
 const THEME_MODES = [
-  { value: 'light' as const, label: 'Light', description: 'Always light mode', icon: <LightMode fontSize="large" /> },
-  { value: 'dark' as const, label: 'Dark', description: 'Always dark mode', icon: <DarkMode fontSize="large" /> },
-  { value: 'system' as const, label: 'System', description: 'Follow system preference', icon: <BrightnessAuto fontSize="large" /> },
+  {
+    value: 'light' as const,
+    label: 'Light',
+    description: 'Always light mode',
+    icon: <LightMode fontSize="large" />,
+  },
+  {
+    value: 'dark' as const,
+    label: 'Dark',
+    description: 'Always dark mode',
+    icon: <DarkMode fontSize="large" />,
+  },
+  {
+    value: 'system' as const,
+    label: 'System',
+    description: 'Follow system preference',
+    icon: <BrightnessAuto fontSize="large" />,
+  },
 ];
 
 const DENSITY_OPTIONS = [
-  { value: 'compact' as ThemeDensity, label: 'Compact', description: 'More content, smaller spacing' },
-  { value: 'comfortable' as ThemeDensity, label: 'Comfortable', description: 'Balanced spacing (default)' },
+  {
+    value: 'compact' as ThemeDensity,
+    label: 'Compact',
+    description: 'More content, smaller spacing',
+  },
+  {
+    value: 'comfortable' as ThemeDensity,
+    label: 'Comfortable',
+    description: 'Balanced spacing (default)',
+  },
   { value: 'spacious' as ThemeDensity, label: 'Spacious', description: 'More breathing room' },
 ];
 
@@ -139,7 +165,11 @@ const TABS = [
   { id: 'localization', label: 'Localization', icon: <Language fontSize="small" /> },
 ];
 
-export default function UserPreferencesModal({ open, onClose, ...props }: UserPreferencesModalProps) {
+export default function UserPreferencesModal({
+  open,
+  onClose,
+  ...props
+}: UserPreferencesModalProps) {
   const { preferences, savePreferences, resetPreferences } = useUserPreferences();
   const [activeTab, setActiveTab] = useState(0);
 
@@ -262,14 +292,21 @@ function AppearanceTab({
                 color: preferences.theme === mode.value ? '#0A0F18' : colors.text,
                 borderColor: preferences.theme === mode.value ? colors.gold : colors.border,
                 '&:hover': {
-                  bgcolor: preferences.theme === mode.value ? colors.goldHover : 'rgba(255,255,255,0.03)',
+                  bgcolor:
+                    preferences.theme === mode.value ? colors.goldHover : 'rgba(255,255,255,0.03)',
                 },
               }}
             >
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
+              <Box
+                sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}
+              >
                 {mode.icon}
-                <Typography variant="body2" fontWeight={600}>{mode.label}</Typography>
-                <Typography variant="caption" color="text.secondary">{mode.description}</Typography>
+                <Typography variant="body2" fontWeight={600}>
+                  {mode.label}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {mode.description}
+                </Typography>
               </Box>
             </Button>
           ))}
@@ -299,9 +336,15 @@ function AppearanceTab({
                 borderColor: preferences.density === density.value ? colors.gold : colors.border,
               }}
             >
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
-                <Typography variant="body2" fontWeight={600}>{density.label}</Typography>
-                <Typography variant="caption" color="text.secondary">{density.description}</Typography>
+              <Box
+                sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}
+              >
+                <Typography variant="body2" fontWeight={600}>
+                  {density.label}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {density.description}
+                </Typography>
               </Box>
             </Button>
           ))}
@@ -331,7 +374,9 @@ function AppearanceTab({
             control={
               <Switch
                 checked={preferences.sidebarVariant === 'hidden'}
-                onChange={(e) => savePreferences({ sidebarVariant: e.target.checked ? 'hidden' : 'default' })}
+                onChange={(e) =>
+                  savePreferences({ sidebarVariant: e.target.checked ? 'hidden' : 'default' })
+                }
                 color="primary"
               />
             }
@@ -441,8 +486,12 @@ function LocalizationTab({
                 borderColor: preferences.dateFormat === format.value ? colors.gold : colors.border,
               }}
             >
-              <Typography variant="body2" fontWeight={600}>{format.label}</Typography>
-              <Typography variant="caption" color="text.secondary">{format.example}</Typography>
+              <Typography variant="body2" fontWeight={600}>
+                {format.label}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {format.example}
+              </Typography>
             </Button>
           ))}
         </Box>
@@ -469,8 +518,12 @@ function LocalizationTab({
                 borderColor: preferences.timeFormat === format.value ? colors.gold : colors.border,
               }}
             >
-              <Typography variant="body2" fontWeight={600}>{format.label}</Typography>
-              <Typography variant="caption" color="text.secondary">{format.example}</Typography>
+              <Typography variant="body2" fontWeight={600}>
+                {format.label}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {format.example}
+              </Typography>
             </Button>
           ))}
         </Box>

@@ -9,13 +9,7 @@
 
 import { useEffect, useState } from 'react';
 import type { JSX } from 'react';
-import {
-  Box,
-  Typography,
-  Chip,
-  Skeleton,
-  useTheme,
-} from '@mui/material';
+import { Box, Typography, Chip, Skeleton, useTheme } from '@mui/material';
 import { Activity } from 'lucide-react';
 
 interface ApiStatus {
@@ -118,11 +112,7 @@ export default function ApiStatusWidget(): JSX.Element {
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
         {status.status === 'loading' ? (
           <>
-            <Activity
-              size={14}
-              color={theme.palette.info.main}
-              className="animate-pulse"
-            />
+            <Activity size={14} color={theme.palette.info.main} className="animate-pulse" />
             <Typography
               sx={{
                 fontSize: 12,
@@ -240,9 +230,7 @@ export default function ApiStatusWidget(): JSX.Element {
           borderRadius: 1,
           bgcolor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.05)',
           border: `1px solid ${
-            status.status === 'error'
-              ? theme.palette.error.main
-              : theme.palette.success.main
+            status.status === 'error' ? theme.palette.error.main : theme.palette.success.main
           }`,
         }}
       >
@@ -253,9 +241,7 @@ export default function ApiStatusWidget(): JSX.Element {
               height: 6,
               borderRadius: '50%',
               bgcolor:
-                status.status === 'error'
-                  ? theme.palette.error.main
-                  : theme.palette.success.main,
+                status.status === 'error' ? theme.palette.error.main : theme.palette.success.main,
               boxShadow:
                 status.status === 'error'
                   ? `0 0 4px ${theme.palette.error.main}80`
@@ -266,9 +252,7 @@ export default function ApiStatusWidget(): JSX.Element {
             sx={{
               fontSize: '0.625rem',
               color:
-                status.status === 'error'
-                  ? theme.palette.error.main
-                  : theme.palette.success.main,
+                status.status === 'error' ? theme.palette.error.main : theme.palette.success.main,
               fontWeight: 600,
             }}
           >

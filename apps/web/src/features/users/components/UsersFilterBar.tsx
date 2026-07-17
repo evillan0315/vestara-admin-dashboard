@@ -1,4 +1,14 @@
-import { TextField, InputAdornment, IconButton, Select, MenuItem, FormControl, Button, Paper, styled } from '@mui/material';
+import {
+  TextField,
+  InputAdornment,
+  IconButton,
+  Select,
+  MenuItem,
+  FormControl,
+  Button,
+  Paper,
+  styled,
+} from '@mui/material';
 import { Search as SearchIcon, Clear as ClearIcon } from '@mui/icons-material';
 import type { UserRole } from '@vestara/types';
 import { UserRole as UserRoleEnum } from '@vestara/types';
@@ -86,7 +96,11 @@ export function UsersFilterBar({
           sx={{ borderRadius: '8px', fontSize: '0.8125rem' }}
         >
           {ROLE_OPTIONS.map((option) => (
-            <MenuItem key={String(option.value)} value={option.value} sx={{ fontSize: '0.8125rem' }}>
+            <MenuItem
+              key={String(option.value)}
+              value={option.value}
+              sx={{ fontSize: '0.8125rem' }}
+            >
               {option.label}
             </MenuItem>
           ))}
@@ -106,7 +120,11 @@ export function UsersFilterBar({
           sx={{ borderRadius: '8px', fontSize: '0.8125rem' }}
         >
           {STATUS_OPTIONS.map((option) => (
-            <MenuItem key={String(option.value)} value={String(option.value)} sx={{ fontSize: '0.8125rem' }}>
+            <MenuItem
+              key={String(option.value)}
+              value={String(option.value)}
+              sx={{ fontSize: '0.8125rem' }}
+            >
               {option.label}
             </MenuItem>
           ))}
@@ -114,12 +132,7 @@ export function UsersFilterBar({
       </FormControl>
 
       {hasActiveFilters && (
-        <Button
-          size="small"
-          startIcon={<ClearIcon />}
-          onClick={onClearFilters}
-          sx={{ ml: 'auto' }}
-        >
+        <Button size="small" startIcon={<ClearIcon />} onClick={onClearFilters} sx={{ ml: 'auto' }}>
           Clear filters
         </Button>
       )}

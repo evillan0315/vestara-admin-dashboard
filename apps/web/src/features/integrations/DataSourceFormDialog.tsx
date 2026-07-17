@@ -79,7 +79,11 @@ function parseJsonObject(text: string): Record<string, unknown> | undefined {
   return JSON.parse(text) as Record<string, unknown>;
 }
 
-export default function DataSourceFormDialog({ open, onClose, dataSource }: DataSourceFormDialogProps) {
+export default function DataSourceFormDialog({
+  open,
+  onClose,
+  dataSource,
+}: DataSourceFormDialogProps) {
   const { showSuccess } = useToast();
   const createMut = useCreateDataSource();
   const updateMut = useUpdateDataSource();

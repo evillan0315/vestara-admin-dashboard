@@ -195,7 +195,8 @@ export type ProfileSidebarVariant = 'default' | 'compact' | 'hidden';
 export type ProfileFontWeight = 'light' | 'normal' | 'medium' | 'semibold' | 'bold';
 export type ProfileContrastLevel = 'normal' | 'high';
 export type VerificationStatus = 'unverified' | 'pending' | 'verified' | 'rejected';
-export type KycDocumentType = 'passport' | 'driver_license' | 'proof_of_address' | 'selfie' | 'other';
+export type KycDocumentType =
+  'passport' | 'driver_license' | 'proof_of_address' | 'selfie' | 'other';
 
 /**
  * Extended personalization / identity / KYC data for a user. Returned
@@ -595,12 +596,7 @@ export type ThemeModeUnion = 'light' | 'dark' | 'system';
  * Client-side connection lifecycle states surfaced to the UI.
  */
 export type WebSocketConnectionStatus =
-  | 'connecting'
-  | 'connected'
-  | 'disconnected'
-  | 'reconnecting'
-  | 'error'
-  | 'unavailable';
+  'connecting' | 'connected' | 'disconnected' | 'reconnecting' | 'error' | 'unavailable';
 
 /**
  * Canonical WebSocket event type identifiers exchanged between server and client.
@@ -685,5 +681,3 @@ export type ClientToServerMessage =
   | { type: typeof WS_EVENT.SUBSCRIBE; payload: { room: string } }
   | { type: typeof WS_EVENT.UNSUBSCRIBE; payload: { room: string } }
   | { type: typeof WS_EVENT.PING; payload: { timestamp: number } };
-
-

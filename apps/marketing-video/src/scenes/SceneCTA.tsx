@@ -1,9 +1,9 @@
-import React from "react";
-import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
-import { BRAND, FONT_FAMILY } from "../theme";
-import { Background } from "../components/Background";
-import { GoldText, GoldDivider } from "../components/Glass";
-import { VestaraLogo } from "../components/Logo";
+import React from 'react';
+import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
+import { BRAND, FONT_FAMILY } from '../theme';
+import { Background } from '../components/Background';
+import { GoldText, GoldDivider } from '../components/Glass';
+import { VestaraLogo } from '../components/Logo';
 
 /**
  * Scene 5 — Call to action (frames 720–900, ~6s)
@@ -18,21 +18,17 @@ export const SceneCTA: React.FC = () => {
   const lineIn = spring({ frame: local - 12, fps, config: { damping: 170 } });
   const btnIn = spring({ frame: local - 26, fps, config: { damping: 180 } });
 
-  const cta = "Get early access";
-  const btnOpacity = interpolate(
-    btnIn,
-    [0, 1],
-    [0, 1]
-  );
+  const cta = 'Get early access';
+  const btnOpacity = interpolate(btnIn, [0, 1], [0, 1]);
 
   return (
-    <AbsoluteFill style={{ justifyContent: "center", alignItems: "center" }}>
+    <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>
       <Background />
       <div
         style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
           gap: 28,
         }}
       >
@@ -40,7 +36,12 @@ export const SceneCTA: React.FC = () => {
           <VestaraLogo size={1.2} />
         </div>
 
-        <div style={{ opacity: lineIn, transform: `translateY(${interpolate(lineIn, [0, 1], [20, 0])}px)` }}>
+        <div
+          style={{
+            opacity: lineIn,
+            transform: `translateY(${interpolate(lineIn, [0, 1], [20, 0])}px)`,
+          }}
+        >
           <GoldText fontSize={60} weight={800}>
             Build. Trade. Earn. Grow.
           </GoldText>
@@ -55,7 +56,7 @@ export const SceneCTA: React.FC = () => {
             opacity: btnOpacity,
             transform: `scale(${btnIn}) translateY(${interpolate(btnIn, [0, 1], [16, 0])}px)`,
             marginTop: 10,
-            padding: "16px 40px",
+            padding: '16px 40px',
             borderRadius: 999,
             background: `linear-gradient(135deg, ${BRAND.goldBright}, ${BRAND.goldDeep})`,
             color: BRAND.bgDeep,
@@ -77,8 +78,8 @@ export const SceneCTA: React.FC = () => {
             letterSpacing: 1,
             marginTop: 6,
             opacity: interpolate(local, [40, 70], [0, 1], {
-              extrapolateLeft: "clamp",
-              extrapolateRight: "clamp",
+              extrapolateLeft: 'clamp',
+              extrapolateRight: 'clamp',
             }),
           }}
         >

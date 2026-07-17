@@ -1,4 +1,11 @@
-import { userRepository, auditLogRepository, settingsRepository, fileRepository, organizationRepository, chatRepository } from '../../repositories/index.js';
+import {
+  userRepository,
+  auditLogRepository,
+  settingsRepository,
+  fileRepository,
+  organizationRepository,
+  chatRepository,
+} from '../../repositories/index.js';
 import type { UserRole } from '../../generated/prisma/client.js';
 
 /**
@@ -109,16 +116,26 @@ export async function getRecentAuditLogs(
     sort: 'createdAt',
   });
 
-  return logs.map((log: { action: string; entity: string; entityId: string; user?: { firstName?: string | null; lastName?: string | null } | null; createdAt: Date; metadata?: unknown }) => ({
-    action: log.action,
-    entity: log.entity,
-    entityId: log.entityId,
-    userName: log.user?.firstName && log.user?.lastName
-      ? `${log.user.firstName} ${log.user.lastName}`
-      : 'System',
-    timestamp: log.createdAt.toISOString(),
-    metadata: (log.metadata as Record<string, unknown>) ?? undefined,
-  }));
+  return logs.map(
+    (log: {
+      action: string;
+      entity: string;
+      entityId: string;
+      user?: { firstName?: string | null; lastName?: string | null } | null;
+      createdAt: Date;
+      metadata?: unknown;
+    }) => ({
+      action: log.action,
+      entity: log.entity,
+      entityId: log.entityId,
+      userName:
+        log.user?.firstName && log.user?.lastName
+          ? `${log.user.firstName} ${log.user.lastName}`
+          : 'System',
+      timestamp: log.createdAt.toISOString(),
+      metadata: (log.metadata as Record<string, unknown>) ?? undefined,
+    }),
+  );
 }
 
 /**
@@ -172,12 +189,14 @@ export async function getOrgFileStats(organizationId: string): Promise<OrgFileSt
     totalSizeFormatted: formatBytes(stats.totalSize),
     byProvider: stats.byProvider,
     byMimeType: stats.byMimeType,
-    recentUploads: recentFiles.map((f: { id: string; name: string; size: bigint; createdAt: Date }) => ({
-      id: f.id,
-      name: f.name,
-      size: f.size,
-      createdAt: f.createdAt.toISOString(),
-    })),
+    recentUploads: recentFiles.map(
+      (f: { id: string; name: string; size: bigint; createdAt: Date }) => ({
+        id: f.id,
+        name: f.name,
+        size: f.size,
+        createdAt: f.createdAt.toISOString(),
+      }),
+    ),
   };
 }
 
@@ -274,18 +293,22 @@ export async function searchUsers(
   organizationId: string,
   query: string,
   limit = 10,
-): Promise<Array<{ id: string; email: string; firstName: string; lastName: string; role: string }>> {
+): Promise<
+  Array<{ id: string; email: string; firstName: string; lastName: string; role: string }>
+> {
   const { users } = await userRepository.findAll({
     organizationId,
     search: query,
     perPage: limit,
   });
 
-  return users.map((u: { id: string; email: string; firstName: string; lastName: string; role: string }) => ({
-    id: u.id,
-    email: u.email,
-    firstName: u.firstName,
-    lastName: u.lastName,
-    role: u.role,
-  }));
+  return users.map(
+    (u: { id: string; email: string; firstName: string; lastName: string; role: string }) => ({
+      id: u.id,
+      email: u.email,
+      firstName: u.firstName,
+      lastName: u.lastName,
+      role: u.role,
+    }),
+  );
 }

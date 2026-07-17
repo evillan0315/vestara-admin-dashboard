@@ -62,11 +62,7 @@ export function FormError({
         </ErrorList>
       );
     default:
-      return (
-        <ErrorText sx={sx}>
-          {messages[0]}
-        </ErrorText>
-      );
+      return <ErrorText sx={sx}>{messages[0]}</ErrorText>;
   }
 }
 

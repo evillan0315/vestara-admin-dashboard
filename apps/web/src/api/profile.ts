@@ -1,9 +1,5 @@
 import apiClient from './client';
-import type {
-  UserDTO,
-  UserProfileDTO,
-  KycDocumentType,
-} from '@vestara/types';
+import type { UserDTO, UserProfileDTO, KycDocumentType } from '@vestara/types';
 
 export interface ProfileResponse {
   user: UserDTO;

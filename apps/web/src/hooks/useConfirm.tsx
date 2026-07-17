@@ -24,16 +24,13 @@ export function useConfirm(): UseConfirmReturn {
   const [options, setOptions] = useState<ConfirmOptions | null>(null);
   const [resolvePromise, setResolvePromise] = useState<((value: boolean) => void) | null>(null);
 
-  const confirm = useCallback(
-    (confirmOptions: ConfirmOptions): Promise<boolean> => {
-      return new Promise((resolve) => {
-        setOptions(confirmOptions);
-        setResolvePromise(() => resolve);
-        setOpen(true);
-      });
-    },
-    []
-  );
+  const confirm = useCallback((confirmOptions: ConfirmOptions): Promise<boolean> => {
+    return new Promise((resolve) => {
+      setOptions(confirmOptions);
+      setResolvePromise(() => resolve);
+      setOpen(true);
+    });
+  }, []);
 
   const close = useCallback(() => {
     setOpen(false);

@@ -106,9 +106,7 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
-    allowedHosts: [
-      'vestara.meetlily.org',
-    ],
+    allowedHosts: ['vestara.meetlily.org'],
     // Allow the dev server to read the repo-root `docs/` folder that the
     // documentation page imports at build time via `?raw` imports.
     fs: {

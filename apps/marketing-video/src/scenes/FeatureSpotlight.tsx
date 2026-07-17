@@ -1,9 +1,9 @@
-import React from "react";
-import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
-import { BRAND, FONT_FAMILY } from "../theme";
-import { Background } from "../components/Background";
-import { GlassCard, GoldText } from "../components/Glass";
-import { ModuleBadge } from "../components/Logo";
+import React from 'react';
+import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
+import { BRAND, FONT_FAMILY } from '../theme';
+import { Background } from '../components/Background';
+import { GlassCard, GoldText } from '../components/Glass';
+import { ModuleBadge } from '../components/Logo';
 
 interface SpotlightProps {
   startFrame: number;
@@ -36,12 +36,12 @@ export const FeatureSpotlight: React.FC<SpotlightProps> = ({
   const titleIn = spring({ frame: local - 10, fps, config: { damping: 170 } });
 
   return (
-    <AbsoluteFill style={{ justifyContent: "center", alignItems: "center" }}>
+    <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>
       <Background />
       <div
         style={{
-          display: "flex",
-          alignItems: "center",
+          display: 'flex',
+          alignItems: 'center',
           gap: 56,
           paddingLeft: 80,
           paddingRight: 80,
@@ -54,9 +54,9 @@ export const FeatureSpotlight: React.FC<SpotlightProps> = ({
               width: 200,
               height: 200,
               borderRadius: 28,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               fontSize: 88,
               background: `radial-gradient(circle at 30% 30%, ${color}2e, rgba(255,255,255,0.03))`,
               border: `1.5px solid ${color}77`,
@@ -76,7 +76,7 @@ export const FeatureSpotlight: React.FC<SpotlightProps> = ({
               fontSize: 15,
               fontWeight: 700,
               letterSpacing: 2,
-              textTransform: "uppercase",
+              textTransform: 'uppercase',
             }}
           >
             {eyebrow}
@@ -86,7 +86,7 @@ export const FeatureSpotlight: React.FC<SpotlightProps> = ({
               {title}
             </GoldText>
           </div>
-          <div style={{ marginTop: 22, display: "flex", flexDirection: "column", gap: 14 }}>
+          <div style={{ marginTop: 22, display: 'flex', flexDirection: 'column', gap: 14 }}>
             {bullets.map((b, i) => {
               const bi = spring({
                 frame: local - 18 - i * 8,
@@ -97,8 +97,8 @@ export const FeatureSpotlight: React.FC<SpotlightProps> = ({
                 <div
                   key={b}
                   style={{
-                    display: "flex",
-                    alignItems: "center",
+                    display: 'flex',
+                    alignItems: 'center',
                     gap: 12,
                     opacity: bi,
                     transform: `translateX(${interpolate(bi, [0, 1], [18, 0])}px)`,
@@ -108,7 +108,7 @@ export const FeatureSpotlight: React.FC<SpotlightProps> = ({
                     style={{
                       width: 8,
                       height: 8,
-                      borderRadius: "50%",
+                      borderRadius: '50%',
                       background: color,
                       boxShadow: `0 0 10px ${color}`,
                       flexShrink: 0,

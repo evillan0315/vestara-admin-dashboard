@@ -217,7 +217,8 @@ router.post('/password-strength', (req, res) => {
     feedback.push('This password is too common or has appeared in a known breach');
   }
 
-  const strength = password.length === 0 ? 'none' : score < 3 ? 'weak' : score === 3 ? 'medium' : 'strong';
+  const strength =
+    password.length === 0 ? 'none' : score < 3 ? 'weak' : score === 3 ? 'medium' : 'strong';
 
   res.json({
     success: true,

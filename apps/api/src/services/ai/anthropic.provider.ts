@@ -37,11 +37,14 @@ export class AnthropicProvider implements AIProvider {
 
   async complete(request: AICompletionRequest): Promise<AICompletionResponse> {
     if (!this.isAvailable()) {
-      throw new Error('Anthropic API key not configured. Set ANTHROPIC_API_KEY environment variable.');
+      throw new Error(
+        'Anthropic API key not configured. Set ANTHROPIC_API_KEY environment variable.',
+      );
     }
 
     // Anthropic requires system prompt as a separate parameter
-    const systemPrompt = request.systemPrompt ?? 'You are a helpful AI assistant for the Vestara Admin Dashboard.';
+    const systemPrompt =
+      request.systemPrompt ?? 'You are a helpful AI assistant for the Vestara Admin Dashboard.';
 
     // Convert messages to Anthropic format (exclude system messages)
     const messages = request.messages

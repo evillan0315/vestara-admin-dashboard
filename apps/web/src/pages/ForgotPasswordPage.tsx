@@ -2,18 +2,9 @@ import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Box,
-  Typography,
-  Button,
-  Alert,
-  CircularProgress,
-} from '@mui/material';
+import { Box, Typography, Button, Alert, CircularProgress } from '@mui/material';
 import { Mail, ArrowRight, ArrowLeft } from 'lucide-react';
-import {
-  forgotPasswordSchema,
-  type ForgotPasswordInput,
-} from '@vestara/validation';
+import { forgotPasswordSchema, type ForgotPasswordInput } from '@vestara/validation';
 import { apiClient } from '../api/client';
 import AuthField from '../components/auth/AuthField';
 import { colors } from '../theme/tokens';
@@ -45,9 +36,7 @@ export function ForgotPasswordPage() {
       setIsSuccess(true);
     } catch (err) {
       const message =
-        err instanceof Error
-          ? err.message
-          : 'Failed to send reset email. Please try again.';
+        err instanceof Error ? err.message : 'Failed to send reset email. Please try again.';
       setError(message);
     } finally {
       setIsSubmitting(false);

@@ -25,19 +25,10 @@ const StyledSwitch = styled(MuiSwitch)`
   }
 `;
 
-export const Switch: FC<SwitchProps> = ({
-  label,
-  size = 'medium',
-  sx,
-  ...props
-}) => {
+export const Switch: FC<SwitchProps> = ({ label, size = 'medium', sx, ...props }) => {
   if (label) {
     return (
-      <FormControlLabel
-        control={<StyledSwitch size={size} {...props} />}
-        label={label}
-        sx={sx}
-      />
+      <FormControlLabel control={<StyledSwitch size={size} {...props} />} label={label} sx={sx} />
     );
   }
 
@@ -58,13 +49,7 @@ export interface SwitchGroupProps {
   sx?: SxProps<Theme>;
 }
 
-export const SwitchGroup: FC<SwitchGroupProps> = ({
-  label,
-  options,
-  value = [],
-  onChange,
-  sx,
-}) => {
+export const SwitchGroup: FC<SwitchGroupProps> = ({ label, options, value = [], onChange, sx }) => {
   const handleChange = (checked: boolean, optionValue: string) => {
     if (!onChange) return;
     if (checked) {

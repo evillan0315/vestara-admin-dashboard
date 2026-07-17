@@ -88,7 +88,10 @@ class SocketIoManager {
 
     // socket.io's `cors.origin` must follow the engine.io `(origin, callback)`
     // contract — returning a boolean is ignored and the handshake hangs.
-    const corsOrigin = (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void): void => {
+    const corsOrigin = (
+      origin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void,
+    ): void => {
       if (!origin) return callback(null, true);
       if (origin.endsWith('.vercel.app')) return callback(null, true);
       const allowed = (process.env.CORS_ORIGIN ?? '')
@@ -137,8 +140,9 @@ class SocketIoManager {
 
   private async handleConnection(socket: SocketConnection['socket']): Promise<void> {
     // ── Rate limit connection attempts by IP ──────────────────────────
-    const clientIp = (socket.handshake.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim()
-      ?? socket.handshake.address;
+    const clientIp =
+      (socket.handshake.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ??
+      socket.handshake.address;
     if (this.isRateLimited(clientIp)) {
       logger.warn({ ip: clientIp }, '[socket.io] connection rate-limited');
       socket.emit(WS_EVENT.ERROR, { message: 'Too many connection attempts' });
@@ -243,7 +247,11 @@ class SocketIoManager {
 
   broadcastToOrganization(
     organizationId: string,
-    event: typeof WS_EVENT.AUDIT_CREATED | typeof WS_EVENT.PRESENCE_UPDATE | typeof WS_EVENT.NOTIFICATION | typeof WS_EVENT.REPORT_STATUS,
+    event:
+      | typeof WS_EVENT.AUDIT_CREATED
+      | typeof WS_EVENT.PRESENCE_UPDATE
+      | typeof WS_EVENT.NOTIFICATION
+      | typeof WS_EVENT.REPORT_STATUS,
     payload: AuditLogDTO | WsPresencePayload | WsNotificationPayload | WsReportStatusPayload,
   ): void {
     if (!this.io) return;
@@ -281,8 +289,7 @@ class SocketIoManager {
       metadata: a.metadata as AuditLogDTO['metadata'],
       ipAddress: typeof a.ipAddress === 'string' ? a.ipAddress : undefined,
       userAgent: typeof a.userAgent === 'string' ? a.userAgent : undefined,
-      createdAt:
-        a.createdAt instanceof Date ? a.createdAt.toISOString() : String(a.createdAt),
+      createdAt: a.createdAt instanceof Date ? a.createdAt.toISOString() : String(a.createdAt),
     };
   }
 

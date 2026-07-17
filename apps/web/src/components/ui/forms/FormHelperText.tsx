@@ -1,4 +1,9 @@
-import { FormHelperText as MuiFormHelperText, styled, type SxProps, type Theme } from '@mui/material';
+import {
+  FormHelperText as MuiFormHelperText,
+  styled,
+  type SxProps,
+  type Theme,
+} from '@mui/material';
 
 export interface FormHelperTextProps {
   children?: React.ReactNode;
@@ -17,10 +22,19 @@ const StyledHelperText = styled(MuiFormHelperText)(({ theme, error, disabled }) 
       : theme.palette.text.secondary,
 }));
 
-export function FormHelperText({ children, error = false, disabled = false, sx }: FormHelperTextProps) {
+export function FormHelperText({
+  children,
+  error = false,
+  disabled = false,
+  sx,
+}: FormHelperTextProps) {
   if (!children) return null;
 
-  return <StyledHelperText error={error} disabled={disabled} sx={sx}>{children}</StyledHelperText>;
+  return (
+    <StyledHelperText error={error} disabled={disabled} sx={sx}>
+      {children}
+    </StyledHelperText>
+  );
 }
 
 export default FormHelperText;

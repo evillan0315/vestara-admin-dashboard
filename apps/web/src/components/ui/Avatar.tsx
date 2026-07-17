@@ -27,22 +27,9 @@ const StyledAvatar = styled(MuiAvatar, {
   fontSize: avatarSize === 'small' ? '0.875rem' : avatarSize === 'large' ? '1.5rem' : '1rem',
 }));
 
-export const Avatar: FC<AvatarProps> = ({
-  size = 'medium',
-  src,
-  alt,
-  children,
-  sx,
-  ...props
-}) => {
+export const Avatar: FC<AvatarProps> = ({ size = 'medium', src, alt, children, sx, ...props }) => {
   return (
-    <StyledAvatar
-      avatarSize={size}
-      src={src}
-      alt={alt}
-      sx={sx}
-      {...props}
-    >
+    <StyledAvatar avatarSize={size} src={src} alt={alt} sx={sx} {...props}>
       {children}
     </StyledAvatar>
   );
@@ -67,12 +54,7 @@ const StyledAvatarGroup = styled(MuiAvatarGroup)`
   }
 `;
 
-export const AvatarGroup: FC<AvatarGroupProps> = ({
-  max = 4,
-  total,
-  children,
-  sx,
-}) => {
+export const AvatarGroup: FC<AvatarGroupProps> = ({ max = 4, total, children, sx }) => {
   return (
     <StyledAvatarGroup max={max} total={total} sx={sx}>
       {children}

@@ -1,4 +1,4 @@
-import { UserRole } from "@vestara/types";
+import { UserRole } from '@vestara/types';
 import {
   LayoutDashboard,
   BarChart3,
@@ -21,7 +21,7 @@ import {
   BookText,
   FileBarChart,
   ShieldCheck,
-} from "lucide-react";
+} from 'lucide-react';
 
 export interface NavItem {
   label: string;
@@ -40,123 +40,121 @@ export interface NavGroup {
 
 export const navGroups: NavGroup[] = [
   {
-    title: "MAIN MENU",
+    title: 'MAIN MENU',
     items: [
-      { label: "Dashboard", icon: LayoutDashboard, path: "/" },
-      { label: "Analytics", icon: BarChart3, path: "/analytics" },
+      { label: 'Dashboard', icon: LayoutDashboard, path: '/' },
+      { label: 'Analytics', icon: BarChart3, path: '/analytics' },
       {
-        label: "Reports",
+        label: 'Reports',
         icon: FileBarChart,
-        path: "/reports",
+        path: '/reports',
       },
     ],
   },
   {
-    title: "WALLET & PAYMENTS",
+    title: 'WALLET & PAYMENTS',
     items: [
-      { label: "Digital Wallet", icon: Wallet, path: "/wallet", soon: true },
-      { label: "Payments", icon: CreditCard, path: "/payments", soon: true },
+      { label: 'Digital Wallet', icon: Wallet, path: '/wallet', soon: true },
+      { label: 'Payments', icon: CreditCard, path: '/payments', soon: true },
       {
-        label: "Transactions",
+        label: 'Transactions',
         icon: ReceiptText,
-        path: "/transactions",
+        path: '/transactions',
         soon: true,
       },
     ],
   },
   {
-    title: "MARKETPLACE",
+    title: 'MARKETPLACE',
     items: [
-      { label: "Marketplace", icon: Store, path: "/marketplace", soon: true },
-      { label: "Orders", icon: ShoppingCart, path: "/orders", soon: true },
+      { label: 'Marketplace', icon: Store, path: '/marketplace', soon: true },
+      { label: 'Orders', icon: ShoppingCart, path: '/orders', soon: true },
     ],
   },
   {
-    title: "BOOKINGS",
+    title: 'BOOKINGS',
     items: [
       {
-        label: "Bookings",
+        label: 'Bookings',
         icon: CalendarDays,
-        path: "/bookings",
+        path: '/bookings',
         soon: true,
       },
     ],
   },
   {
-    title: "REWARDS",
-    items: [
-      { label: "Vestara Points", icon: Gift, path: "/rewards", soon: true },
-    ],
+    title: 'REWARDS',
+    items: [{ label: 'Vestara Points', icon: Gift, path: '/rewards', soon: true }],
   },
   {
-    title: "AI SERVICES",
+    title: 'AI SERVICES',
     items: [
-      { label: "AI Chat", icon: MessageSquare, path: "/chat" },
+      { label: 'AI Chat', icon: MessageSquare, path: '/chat' },
       {
-        label: "Integrations",
+        label: 'Integrations',
         icon: Plug,
-        path: "/integrations",
+        path: '/integrations',
         allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR],
       },
       {
-        label: "Data Explorer",
+        label: 'Data Explorer',
         icon: Database,
-        path: "/data-explorer",
+        path: '/data-explorer',
         allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MODERATOR],
       },
     ],
   },
   {
-    title: "MANAGEMENT",
+    title: 'MANAGEMENT',
     items: [
       {
-        label: "Users & Roles",
+        label: 'Users & Roles',
         icon: Users,
-        path: "/users",
+        path: '/users',
         allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
       },
       {
-        label: "Organizations",
+        label: 'Organizations',
         icon: Building2,
-        path: "/organizations",
+        path: '/organizations',
         allowedRoles: [UserRole.SUPER_ADMIN],
       },
     ],
   },
   {
-    title: "SYSTEM",
+    title: 'SYSTEM',
     items: [
-      { label: "Settings", icon: Settings, path: "/settings" },
+      { label: 'Settings', icon: Settings, path: '/settings' },
       {
-        label: "File Manager",
+        label: 'File Manager',
         icon: FolderOpen,
-        path: "/files",
+        path: '/files',
       },
       {
-        label: "System Logs",
+        label: 'System Logs',
         icon: ScrollText,
-        path: "/system-logs",
+        path: '/system-logs',
         allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
       },
       {
-        label: "Admin",
+        label: 'Admin',
         icon: Wrench,
-        path: "/admin",
+        path: '/admin',
       },
       {
-        label: "Documentation",
+        label: 'Documentation',
         icon: BookText,
-        path: "/docs",
+        path: '/docs',
       },
     ],
   },
   {
-    title: "SECURITY",
+    title: 'SECURITY',
     items: [
       {
-        label: "Security Center",
+        label: 'Security Center',
         icon: ShieldCheck,
-        path: "/security-center",
+        path: '/security-center',
         soon: true,
         allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
       },

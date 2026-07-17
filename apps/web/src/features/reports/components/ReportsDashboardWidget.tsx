@@ -31,16 +31,27 @@ export function ReportsDashboardWidget() {
   const { data: reportsData } = useReports({ page: 1, perPage: 5 });
 
   type ApiResponse<T> = { data?: T };
-  const stats = (statsData as ApiResponse<{ total: number; completed: number; generating: number; failed: number }> | undefined)?.data;
-  const recentReports = ((reportsData as ApiResponse<unknown[]> | undefined)?.data ?? []).slice(0, 5);
+  const stats = (
+    statsData as
+      | ApiResponse<{ total: number; completed: number; generating: number; failed: number }>
+      | undefined
+  )?.data;
+  const recentReports = ((reportsData as ApiResponse<unknown[]> | undefined)?.data ?? []).slice(
+    0,
+    5,
+  );
 
   const statusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'success';
-      case 'failed': return 'error';
+      case 'completed':
+        return 'success';
+      case 'failed':
+        return 'error';
       case 'generating':
-      case 'pending': return 'warning';
-      default: return 'default';
+      case 'pending':
+        return 'warning';
+      default:
+        return 'default';
     }
   };
 
@@ -58,33 +69,54 @@ export function ReportsDashboardWidget() {
       <Grid container spacing={1}>
         <Grid size={6}>
           <StatBox>
-            <Typography variant="caption" color="text.secondary">Total</Typography>
-            <Typography variant="body2" fontWeight={700}>{stats?.total ?? '—'}</Typography>
+            <Typography variant="caption" color="text.secondary">
+              Total
+            </Typography>
+            <Typography variant="body2" fontWeight={700}>
+              {stats?.total ?? '—'}
+            </Typography>
           </StatBox>
         </Grid>
         <Grid size={6}>
           <StatBox>
-            <Typography variant="caption" color="text.secondary">Completed</Typography>
-            <Typography variant="body2" fontWeight={700} color="success.main">{stats?.completed ?? '—'}</Typography>
+            <Typography variant="caption" color="text.secondary">
+              Completed
+            </Typography>
+            <Typography variant="body2" fontWeight={700} color="success.main">
+              {stats?.completed ?? '—'}
+            </Typography>
           </StatBox>
         </Grid>
         <Grid size={6}>
           <StatBox>
-            <Typography variant="caption" color="text.secondary">In Progress</Typography>
-            <Typography variant="body2" fontWeight={700} color="warning.main">{stats?.generating ?? '—'}</Typography>
+            <Typography variant="caption" color="text.secondary">
+              In Progress
+            </Typography>
+            <Typography variant="body2" fontWeight={700} color="warning.main">
+              {stats?.generating ?? '—'}
+            </Typography>
           </StatBox>
         </Grid>
         <Grid size={6}>
           <StatBox>
-            <Typography variant="caption" color="text.secondary">Failed</Typography>
-            <Typography variant="body2" fontWeight={700} color="error.main">{stats?.failed ?? '—'}</Typography>
+            <Typography variant="caption" color="text.secondary">
+              Failed
+            </Typography>
+            <Typography variant="body2" fontWeight={700} color="error.main">
+              {stats?.failed ?? '—'}
+            </Typography>
           </StatBox>
         </Grid>
       </Grid>
 
       {recentReports.length > 0 && (
         <Box>
-          <Typography variant="caption" fontWeight={600} color="text.secondary" sx={{ mb: 0.5, display: 'block' }}>
+          <Typography
+            variant="caption"
+            fontWeight={600}
+            color="text.secondary"
+            sx={{ mb: 0.5, display: 'block' }}
+          >
             Recent Reports
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>

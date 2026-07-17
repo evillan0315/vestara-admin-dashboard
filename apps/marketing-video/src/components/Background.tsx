@@ -1,6 +1,6 @@
-import React from "react";
-import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
-import { BRAND } from "../theme";
+import React from 'react';
+import { AbsoluteFill, interpolate, useCurrentFrame } from 'remotion';
+import { BRAND } from '../theme';
 
 /**
  * Animated dark-luxury background: deep navy base with two slow-drifting
@@ -9,13 +9,13 @@ import { BRAND } from "../theme";
 export const Background: React.FC = () => {
   const frame = useCurrentFrame();
   const orbX = interpolate(frame, [0, 900], [120, 220], {
-    extrapolateRight: "clamp",
+    extrapolateRight: 'clamp',
   });
   const orbY = interpolate(frame, [0, 900], [160, 90], {
-    extrapolateRight: "clamp",
+    extrapolateRight: 'clamp',
   });
   const orb2X = interpolate(frame, [0, 900], [900, 800], {
-    extrapolateRight: "clamp",
+    extrapolateRight: 'clamp',
   });
 
   return (
@@ -41,7 +41,7 @@ export const Background: React.FC = () => {
       <AbsoluteFill
         style={{
           background:
-            "radial-gradient(120% 100% at 50% 50%, transparent 55%, rgba(0,0,0,0.55) 100%)",
+            'radial-gradient(120% 100% at 50% 50%, transparent 55%, rgba(0,0,0,0.55) 100%)',
         }}
       />
     </AbsoluteFill>

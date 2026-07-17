@@ -64,7 +64,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
       sx,
       ...props
     },
-    ref
+    ref,
   ) => {
     return (
       <StyledFormControl
@@ -90,11 +90,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
             </MenuItem>
           )}
           {options.map((option) => (
-            <MenuItem
-              key={option.value}
-              value={option.value}
-              disabled={option.disabled}
-            >
+            <MenuItem key={option.value} value={option.value} disabled={option.disabled}>
               {option.label}
             </MenuItem>
           ))}
@@ -102,7 +98,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
         {helperText && <FormHelperText>{error ? helperText : ' '}</FormHelperText>}
       </StyledFormControl>
     );
-  }
+  },
 );
 
 Select.displayName = 'Select';

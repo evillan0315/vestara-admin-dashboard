@@ -4,8 +4,8 @@ Production reverse-proxy / static-host config for the self-hosted deployment.
 
 ## Files
 
-| File | Purpose |
-|------|---------|
+| File                        | Purpose                                             |
+| --------------------------- | --------------------------------------------------- |
 | `vestara.meetlily.org.conf` | Single-domain Nginx site for `vestara.meetlily.org` |
 
 ## Topology

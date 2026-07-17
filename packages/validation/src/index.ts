@@ -22,8 +22,14 @@ export function scorePasswordStrength(password: string): number {
 
 const passwordField = z
   .string()
-  .min(PASSWORD_POLICY.MIN_LENGTH, `Password must be at least ${PASSWORD_POLICY.MIN_LENGTH} characters`)
-  .max(PASSWORD_POLICY.MAX_LENGTH, `Password must be at most ${PASSWORD_POLICY.MAX_LENGTH} characters`)
+  .min(
+    PASSWORD_POLICY.MIN_LENGTH,
+    `Password must be at least ${PASSWORD_POLICY.MIN_LENGTH} characters`,
+  )
+  .max(
+    PASSWORD_POLICY.MAX_LENGTH,
+    `Password must be at most ${PASSWORD_POLICY.MAX_LENGTH} characters`,
+  )
   .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
   .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
   .regex(/[0-9]/, 'Password must contain at least one number')
@@ -190,11 +196,26 @@ export const organizationIdParamSchema = z.object({
 
 export const onboardSchema = z.object({
   email: z.string().email('Invalid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters').regex(/[A-Z]/, 'Password must contain at least one uppercase letter').regex(/[a-z]/, 'Password must contain at least one lowercase letter').regex(/[0-9]/, 'Password must contain at least one number'),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number'),
   firstName: nameField('First name'),
   lastName: nameField('Last name'),
-  organizationName: z.string().min(2, 'Organization name must be at least 2 characters').max(100, 'Organization name must be at most 100 characters'),
-  organizationSlug: z.string().min(2, 'Slug must be at least 2 characters').max(60, 'Slug must be at most 60 characters').regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase alphanumeric with optional hyphens'),
+  organizationName: z
+    .string()
+    .min(2, 'Organization name must be at least 2 characters')
+    .max(100, 'Organization name must be at most 100 characters'),
+  organizationSlug: z
+    .string()
+    .min(2, 'Slug must be at least 2 characters')
+    .max(60, 'Slug must be at most 60 characters')
+    .regex(
+      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+      'Slug must be lowercase alphanumeric with optional hyphens',
+    ),
   organizationLogoUrl: z.string().url('Invalid logo URL').optional().or(z.literal('')),
 });
 
@@ -261,7 +282,12 @@ export const createDataSourceSchema = z.object({
   body: z.record(z.unknown()).optional(),
   authType: z.enum(['none', 'bearer', 'basic', 'apiKey']).default('none'),
   authConfig: dataSourceAuthConfigSchema,
-  refreshInterval: z.number().int().min(0, 'Refresh interval must be non-negative').max(86400, 'Refresh interval must be at most 86400 seconds').optional(),
+  refreshInterval: z
+    .number()
+    .int()
+    .min(0, 'Refresh interval must be non-negative')
+    .max(86400, 'Refresh interval must be at most 86400 seconds')
+    .optional(),
 });
 
 export const updateDataSourceSchema = createDataSourceSchema.partial();

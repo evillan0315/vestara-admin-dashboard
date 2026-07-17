@@ -10,7 +10,12 @@ import {
   History as HistoryIcon,
 } from '@mui/icons-material';
 import { useState, useCallback, type ReactElement } from 'react';
-import { useSettings, useUpsertSetting, useDeleteSetting, useExportSettings } from '../features/settings/hooks';
+import {
+  useSettings,
+  useUpsertSetting,
+  useDeleteSetting,
+  useExportSettings,
+} from '../features/settings/hooks';
 import { useToast } from '../components/feedback/Toast';
 import { Loading } from '../components/feedback/Loading';
 import { EmptyState } from '../components/feedback/EmptyState';
@@ -70,7 +75,8 @@ const HeaderBox = styled(Box)(({ theme }) => ({
   justifyContent: 'space-between',
   padding: theme.spacing(2, 3),
   borderBottom: `1px solid ${theme.palette.divider}`,
-  backgroundColor: theme.palette.mode === 'light' ? theme.palette.grey[50] : theme.palette.background.default,
+  backgroundColor:
+    theme.palette.mode === 'light' ? theme.palette.grey[50] : theme.palette.background.default,
 }));
 
 // ── Component ──
@@ -228,12 +234,7 @@ export function SettingsPage(): ReactElement {
                 <RefreshIcon fontSize="small" />
               </IconButton>
             </Tooltip>
-            <Button
-              variant="contained"
-              size="small"
-              startIcon={<AddIcon />}
-              onClick={handleCreate}
-            >
+            <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={handleCreate}>
               Add Setting
             </Button>
           </Box>
@@ -251,7 +252,9 @@ export function SettingsPage(): ReactElement {
         ) : (
           settingsEntries.map(([key, value]) => (
             <SettingRow key={key}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, flex: 1, minWidth: 0 }}>
+              <Box
+                sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, flex: 1, minWidth: 0 }}
+              >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <KeyLabel>{key}</KeyLabel>
                   <Chip
@@ -295,16 +298,10 @@ export function SettingsPage(): ReactElement {
       />
 
       {/* Import Dialog */}
-      <SettingsImportDialog
-        open={importOpen}
-        onClose={() => setImportOpen(false)}
-      />
+      <SettingsImportDialog open={importOpen} onClose={() => setImportOpen(false)} />
 
       {/* Audit History Dialog */}
-      <SettingsAuditHistoryDialog
-        open={auditOpen}
-        onClose={() => setAuditOpen(false)}
-      />
+      <SettingsAuditHistoryDialog open={auditOpen} onClose={() => setAuditOpen(false)} />
 
       {/* Delete Confirmation */}
       <ConfirmDialog

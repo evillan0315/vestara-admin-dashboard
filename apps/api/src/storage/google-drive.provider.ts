@@ -2,7 +2,16 @@
 // Google Drive Storage Provider (Placeholder)
 // ──────────────────────────────────────────────
 
-import type { StorageProvider, StorageProviderConfig, UploadOptions, UploadResult, FileMetadata, ListOptions, ListResult, DeleteOptions } from './types.js';
+import type {
+  StorageProvider,
+  StorageProviderConfig,
+  UploadOptions,
+  UploadResult,
+  FileMetadata,
+  ListOptions,
+  ListResult,
+  DeleteOptions,
+} from './types.js';
 
 export class GoogleDriveStorageProvider implements StorageProvider {
   public readonly type = 'GOOGLE_DRIVE' as const;
@@ -11,8 +20,14 @@ export class GoogleDriveStorageProvider implements StorageProvider {
   constructor(config: StorageProviderConfig) {
     this.config = config;
 
-    if (!config.googleDriveClientId || !config.googleDriveClientSecret || !config.googleDriveRefreshToken) {
-      throw new Error('Google Drive configuration is incomplete. Required: clientId, clientSecret, refreshToken');
+    if (
+      !config.googleDriveClientId ||
+      !config.googleDriveClientSecret ||
+      !config.googleDriveRefreshToken
+    ) {
+      throw new Error(
+        'Google Drive configuration is incomplete. Required: clientId, clientSecret, refreshToken',
+      );
     }
 
     // TODO: Initialize Google Drive API client

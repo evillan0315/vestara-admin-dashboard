@@ -24,13 +24,13 @@ This guide complements the [API documentation](../api/README.md) and the [Archit
 
 ## Prerequisites
 
-| Tool | Version | Notes |
-|------|---------|-------|
-| Node.js | 22+ | Defined in `package.json` `engines` |
-| pnpm | 10+ | Use `corepack enable` or `npm i -g pnpm` |
-| Prisma Postgres | Hosted | Managed PostgreSQL; no local Postgres required |
-| Redis | 8+ | Optional locally; used for cache/sessions (currently unused by deployed API) |
-| Git | latest | — |
+| Tool            | Version | Notes                                                                        |
+| --------------- | ------- | ---------------------------------------------------------------------------- |
+| Node.js         | 22+     | Defined in `package.json` `engines`                                          |
+| pnpm            | 10+     | Use `corepack enable` or `npm i -g pnpm`                                     |
+| Prisma Postgres | Hosted  | Managed PostgreSQL; no local Postgres required                               |
+| Redis           | 8+      | Optional locally; used for cache/sessions (currently unused by deployed API) |
+| Git             | latest  | —                                                                            |
 
 ---
 
@@ -108,13 +108,13 @@ vestara-admin-dashboard/
 
 ### Shared Packages (`packages/*`)
 
-| Package | Purpose |
-|---------|---------|
-| `@vestara/types` | DTOs, enums, shared interfaces |
-| `@vestara/validation` | Zod schemas + validation helpers |
-| `@vestara/constants` | HTTP status codes, error codes, route paths |
-| `@vestara/utils` | Shared utility functions |
-| `@vestara/config` | Shared configuration helpers |
+| Package               | Purpose                                     |
+| --------------------- | ------------------------------------------- |
+| `@vestara/types`      | DTOs, enums, shared interfaces              |
+| `@vestara/validation` | Zod schemas + validation helpers            |
+| `@vestara/constants`  | HTTP status codes, error codes, route paths |
+| `@vestara/utils`      | Shared utility functions                    |
+| `@vestara/config`     | Shared configuration helpers                |
 
 These are consumed via workspace aliases (`workspace:*`) and resolved by both `tsconfig.json` `paths` and Vite aliases (`@vestara/*`).
 
@@ -124,27 +124,27 @@ These are consumed via workspace aliases (`workspace:*`) and resolved by both `t
 
 Run from the repository root unless noted. Turbo fans commands out to the workspaces.
 
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Run web + api together (persistent watchers) |
-| `pnpm dev:web` | Run only the Vite dev server |
-| `pnpm dev:api` | Run only the API (`tsx watch src/index.ts`) |
-| `pnpm build` | Build all apps/packages (`turbo build`) |
-| `pnpm typecheck` | Strict TypeScript check across the repo |
-| `pnpm lint` | ESLint across all packages |
-| `pnpm format` | Prettier write |
-| `pnpm format:check` | Prettier check (CI) |
-| `pnpm test` | Run all tests (`turbo test` → `vitest run`) |
-| `pnpm prisma:generate` | Regenerate Prisma Client after schema changes |
-| `pnpm prisma:migrate` | Create/apply a migration |
-| `pnpm prisma:studio` | Open Prisma Studio |
-| `pnpm prisma:seed` | Seed development data |
-| `pnpm screenshot` | Capture dark + light PNGs of every dashboard route (localhost dev) |
-| `pnpm screenshot:dev` | Capture only the dark theme (faster preview) |
-| `pnpm --filter=@vestara/marketing-video dev` | Open the Remotion Studio to preview the 30s ad |
-| `pnpm --filter=@vestara/marketing-video render` | Render the ad to `out/vestara-ad.mp4` |
-| `pnpm --filter=@vestara/marketing-video typecheck` | TypeScript check for the marketing app |
-| `pnpm clean` | Remove build artifacts + `node_modules` |
+| Command                                            | Description                                                        |
+| -------------------------------------------------- | ------------------------------------------------------------------ |
+| `pnpm dev`                                         | Run web + api together (persistent watchers)                       |
+| `pnpm dev:web`                                     | Run only the Vite dev server                                       |
+| `pnpm dev:api`                                     | Run only the API (`tsx watch src/index.ts`)                        |
+| `pnpm build`                                       | Build all apps/packages (`turbo build`)                            |
+| `pnpm typecheck`                                   | Strict TypeScript check across the repo                            |
+| `pnpm lint`                                        | ESLint across all packages                                         |
+| `pnpm format`                                      | Prettier write                                                     |
+| `pnpm format:check`                                | Prettier check (CI)                                                |
+| `pnpm test`                                        | Run all tests (`turbo test` → `vitest run`)                        |
+| `pnpm prisma:generate`                             | Regenerate Prisma Client after schema changes                      |
+| `pnpm prisma:migrate`                              | Create/apply a migration                                           |
+| `pnpm prisma:studio`                               | Open Prisma Studio                                                 |
+| `pnpm prisma:seed`                                 | Seed development data                                              |
+| `pnpm screenshot`                                  | Capture dark + light PNGs of every dashboard route (localhost dev) |
+| `pnpm screenshot:dev`                              | Capture only the dark theme (faster preview)                       |
+| `pnpm --filter=@vestara/marketing-video dev`       | Open the Remotion Studio to preview the 30s ad                     |
+| `pnpm --filter=@vestara/marketing-video render`    | Render the ad to `out/vestara-ad.mp4`                              |
+| `pnpm --filter=@vestara/marketing-video typecheck` | TypeScript check for the marketing app                             |
+| `pnpm clean`                                       | Remove build artifacts + `node_modules`                            |
 
 ### Screenshot Tooling
 
@@ -175,16 +175,16 @@ located automatically (system install, Playwright cache, or
 
 Override any default via environment variables:
 
-| Variable | Default | Purpose |
-|----------|---------|---------|
-| `VESTARA_SCREENSHOT_BASE_URL` | `http://localhost:5173` | Dev server origin |
-| `VESTARA_SCREENSHOT_API_URL` | `http://localhost:5000/api/v1` | API origin |
-| `VESTARA_SCREENSHOT_EMAIL` | `admin@vestara.com` | Login email (matches seed) |
-| `VESTARA_SCREENSHOT_PASSWORD` | `Admin123!` | Login password (matches seed) |
-| `VESTARA_SCREENSHOT_OUT_DIR` | `<repo>/screens` | Output directory |
-| `VESTARA_SCREENSHOT_CHROME` | _auto-detected_ | Explicit Chromium executable path |
-| `VESTARA_SCREENSHOT_THEMES` | `dark,light` | Comma-separated themes |
-| `VESTARA_SCREENSHOT_FULL_PAGE` | `true` | Capture full scrollable page |
+| Variable                       | Default                        | Purpose                           |
+| ------------------------------ | ------------------------------ | --------------------------------- |
+| `VESTARA_SCREENSHOT_BASE_URL`  | `http://localhost:5173`        | Dev server origin                 |
+| `VESTARA_SCREENSHOT_API_URL`   | `http://localhost:5000/api/v1` | API origin                        |
+| `VESTARA_SCREENSHOT_EMAIL`     | `admin@vestara.com`            | Login email (matches seed)        |
+| `VESTARA_SCREENSHOT_PASSWORD`  | `Admin123!`                    | Login password (matches seed)     |
+| `VESTARA_SCREENSHOT_OUT_DIR`   | `<repo>/screens`               | Output directory                  |
+| `VESTARA_SCREENSHOT_CHROME`    | _auto-detected_                | Explicit Chromium executable path |
+| `VESTARA_SCREENSHOT_THEMES`    | `dark,light`                   | Comma-separated themes            |
+| `VESTARA_SCREENSHOT_FULL_PAGE` | `true`                         | Capture full scrollable page      |
 
 Filter to a single workspace when needed:
 
@@ -238,15 +238,15 @@ The API reads variables from `.env` at the repo root (loaded by `apps/api/src/co
 
 See [`.env.example`](../../.env.example) for the full list. The most important:
 
-| Variable | Purpose |
-|----------|---------|
-| `DATABASE_URL` | Prisma Postgres connection string |
-| `JWT_SECRET` / `JWT_REFRESH_SECRET` | Signing secrets for access/refresh tokens |
-| `JWT_EXPIRES_IN` / `JWT_REFRESH_EXPIRES_IN` | Token TTLs (`15m` / `30d`) |
-| `CLIENT_URL` / `CORS_ORIGIN` | Allowed frontend origin for CORS |
-| `API_URL` | Public API base URL (used for OAuth callback URLs) |
-| `GOOGLE_*` / `GITHUB_*` | OAuth provider credentials (optional) |
-| `REDIS_URL`, `SMTP_*`, `S3_*` | Cache / email / storage (optional) |
+| Variable                                    | Purpose                                            |
+| ------------------------------------------- | -------------------------------------------------- |
+| `DATABASE_URL`                              | Prisma Postgres connection string                  |
+| `JWT_SECRET` / `JWT_REFRESH_SECRET`         | Signing secrets for access/refresh tokens          |
+| `JWT_EXPIRES_IN` / `JWT_REFRESH_EXPIRES_IN` | Token TTLs (`15m` / `30d`)                         |
+| `CLIENT_URL` / `CORS_ORIGIN`                | Allowed frontend origin for CORS                   |
+| `API_URL`                                   | Public API base URL (used for OAuth callback URLs) |
+| `GOOGLE_*` / `GITHUB_*`                     | OAuth provider credentials (optional)              |
+| `REDIS_URL`, `SMTP_*`, `S3_*`               | Cache / email / storage (optional)                 |
 
 > **Never commit `.env`.** A `.env.example` is committed; real secrets live in the Vercel dashboard (see [Deployment Guide](./DEPLOYMENT.md)).
 
@@ -254,13 +254,13 @@ See [`.env.example`](../../.env.example) for the full list. The most important:
 
 The AI chatbot uses a pluggable provider architecture. At minimum, configure one provider API key (or use the built-in mock for development).
 
-| Variable | Required | Purpose |
-|----------|----------|---------|
-| `OPENCODE_API_KEY` | Recommended | OpenCode API key — enables free-tier models (`mimo-v2.5-free`, `deepseek-v4-flash-free`, `nemotron-3-ultra-free`, `north-mini-code-free`) |
-| `OPENCODE_BASE_URL` | No | OpenCode API base URL (default: `https://opencode.ai/zen/v1`) |
-| `OPENAI_API_KEY` | No | OpenAI API key — enables `gpt-4`, `gpt-4o-mini` |
-| `OPENAI_BASE_URL` | No | OpenAI-compatible base URL (for proxies or self-hosted endpoints) |
-| `ANTHROPIC_API_KEY` | No | Anthropic API key — enables `claude-sonnet-4-20250514`, `claude-haiku-3.5` |
+| Variable            | Required    | Purpose                                                                                                                                   |
+| ------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `OPENCODE_API_KEY`  | Recommended | OpenCode API key — enables free-tier models (`mimo-v2.5-free`, `deepseek-v4-flash-free`, `nemotron-3-ultra-free`, `north-mini-code-free`) |
+| `OPENCODE_BASE_URL` | No          | OpenCode API base URL (default: `https://opencode.ai/zen/v1`)                                                                             |
+| `OPENAI_API_KEY`    | No          | OpenAI API key — enables `gpt-4`, `gpt-4o-mini`                                                                                           |
+| `OPENAI_BASE_URL`   | No          | OpenAI-compatible base URL (for proxies or self-hosted endpoints)                                                                         |
+| `ANTHROPIC_API_KEY` | No          | Anthropic API key — enables `claude-sonnet-4-20250514`, `claude-haiku-3.5`                                                                |
 
 **Provider priority** (automatic fallback): OpenCode → OpenAI → Anthropic → Mock
 
@@ -292,10 +292,10 @@ The Integrations feature lets admins connect external REST APIs and auto-visuali
 
 ### Web variables
 
-| Variable | Purpose |
-|----------|---------|
-| `VITE_API_URL` | API base URL the browser calls (e.g. `https://vestara-admin-api.vercel.app`). Falls back to `/api/v1` (proxied in dev). |
-| `VITE_APP_NAME` | Application display name |
+| Variable        | Purpose                                                                                                                 |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `VITE_API_URL`  | API base URL the browser calls (e.g. `https://vestara-admin-api.vercel.app`). Falls back to `/api/v1` (proxied in dev). |
+| `VITE_APP_NAME` | Application display name                                                                                                |
 
 In dev, `vite.config.ts` proxies `/api` → `http://localhost:5000`, so local frontend calls work without `VITE_API_URL`.
 
@@ -342,7 +342,9 @@ Example: a new resource `reports`.
      try {
        const result = await reportService.list(req.query);
        res.json({ success: true, data: result.data, meta: result.meta });
-     } catch (err) { next(err); }
+     } catch (err) {
+       next(err);
+     }
    });
    export default router;
    ```
@@ -360,9 +362,9 @@ Example: a new resource `reports`.
 
 ## Adding a Frontend Feature
 
- Example: a new admin page `Analytics`.
+Example: a new admin page `Analytics`.
 
- 1. **API hook** — add a typed query/mutation in `apps/web/src/api/` (axios client + TanStack Query). The Analytics page has no dedicated endpoint; it derives everything from existing audit-logs, users, and settings endpoints via the shared `apps/web/src/features/analytics` module (`useAuditActivity`, `useAuditCount`, `getPreviousRange`, plus chart/activity mapping helpers).
+1.  **API hook** — add a typed query/mutation in `apps/web/src/api/` (axios client + TanStack Query). The Analytics page has no dedicated endpoint; it derives everything from existing audit-logs, users, and settings endpoints via the shared `apps/web/src/features/analytics` module (`useAuditActivity`, `useAuditCount`, `getPreviousRange`, plus chart/activity mapping helpers).
 
     ```ts
     import { useAuditActivity, useAuditCount, getPreviousRange } from '@/features/analytics';
@@ -372,11 +374,11 @@ Example: a new resource `reports`.
     const { data: prevEvents } = useAuditCount(...getPreviousRange(30, endDate));
     ```
 
- 2. **Page** — create `apps/web/src/pages/AnalyticsPage.tsx`. Call `useLiveDashboard()` to refresh on org-scoped WebSocket events.
+2.  **Page** — create `apps/web/src/pages/AnalyticsPage.tsx`. Call `useLiveDashboard()` to refresh on org-scoped WebSocket events.
 
- 3. **Route** — register it in `apps/web/src/routes/index.tsx` wrapped in `<ProtectedRoute>`.
+3.  **Route** — register it in `apps/web/src/routes/index.tsx` wrapped in `<ProtectedRoute>`.
 
- 4. **Nav** — add an entry to `apps/web/src/layouts/navConfig.ts` if it should appear in the sidebar. Sidebar items are grouped into platform-domain categories (MAIN MENU, WALLET & PAYMENTS, MARKETPLACE, BOOKINGS, REWARDS, AI SERVICES, MANAGEMENT, SYSTEM, SECURITY). Set `allowedRoles` to restrict by role, and set `soon: true` for documented-but-not-yet-built modules (rendered dimmed with a "Soon" badge and non-clickable).
+4.  **Nav** — add an entry to `apps/web/src/layouts/navConfig.ts` if it should appear in the sidebar. Sidebar items are grouped into platform-domain categories (MAIN MENU, WALLET & PAYMENTS, MARKETPLACE, BOOKINGS, REWARDS, AI SERVICES, MANAGEMENT, SYSTEM, SECURITY). Set `allowedRoles` to restrict by role, and set `soon: true` for documented-but-not-yet-built modules (rendered dimmed with a "Soon" badge and non-clickable).
 
 ### Conventions
 
@@ -417,7 +419,11 @@ export function DeleteUserButton({ userId }: { userId: string }) {
     }
   };
 
-  return <Button onClick={handleDelete} color="error">Delete</Button>;
+  return (
+    <Button onClick={handleDelete} color="error">
+      Delete
+    </Button>
+  );
 }
 
 // Toast variants:
@@ -457,7 +463,9 @@ export function DeleteUserButton({ userId, onDeleted }: { userId: string; onDele
 
   return (
     <>
-      <Button onClick={handleDelete} color="error">Delete</Button>
+      <Button onClick={handleDelete} color="error">
+        Delete
+      </Button>
       {ConfirmDialog}
     </>
   );
@@ -497,17 +505,31 @@ export function UserFormDialog({ onClose, defaultValues }) {
   const form = useFormWithZod({ schema, defaultValues });
 
   return (
-    <form onSubmit={form.handleSubmit(async (data) => { /* submit */ })}>
+    <form
+      onSubmit={form.handleSubmit(async (data) => {
+        /* submit */
+      })}
+    >
       <FormSection title="User Details">
         <FormLayout columns={2}>
           <FormInput {...form.register('name')} label="Name" placeholder="John Doe" />
-          <FormInput {...form.register('email')} label="Email" type="email" placeholder="john@example.com" />
+          <FormInput
+            {...form.register('email')}
+            label="Email"
+            type="email"
+            placeholder="john@example.com"
+          />
         </FormLayout>
-        <FormSelect {...form.register('role')} label="Role" options={[
-          { value: 'admin', label: 'Admin' },
-          { value: 'moderator', label: 'Moderator' },
-          { value: 'support', label: 'Support' },
-        ]} placeholder="Select role" />
+        <FormSelect
+          {...form.register('role')}
+          label="Role"
+          options={[
+            { value: 'admin', label: 'Admin' },
+            { value: 'moderator', label: 'Moderator' },
+            { value: 'support', label: 'Support' },
+          ]}
+          placeholder="Select role"
+        />
         <FormTextarea {...form.register('bio')} label="Bio" placeholder="Optional bio" rows={3} />
       </FormSection>
       <FormSection title="Preferences">
@@ -555,14 +577,14 @@ export function UserFormDialog({ onClose, defaultValues }) {
 
 ## Troubleshooting
 
-| Symptom | Likely cause / fix |
-|---------|--------------------|
-| `Cannot find module '@vestara/types'` | Run `pnpm install` (workspace symlinks) and ensure `tsc --noEmit` (which runs `prisma generate`). |
-| `PrismaClientInitializationError` / `Pxxxx` | `DATABASE_URL` missing or stale. Re-run `pnpm prisma generate` and check `.env`. |
-| API returns 500 on `/auth/refresh` after restart | Refresh-token rotation inserts a new token; ensure the `RefreshToken` table has no leftover unique constraint violations (fixed in `auth.service.ts`). |
-| Web build fails with `TS2304: Cannot find name 'fontSize'` or `TS1117` in `theme.ts` | The theme factory expects a `scaleFontSize` helper and a single `components` block — see `apps/web/src/styles/theme.ts`. |
-| CORS errors from the browser | Set `CLIENT_URL`/`CORS_ORIGIN` (API) and `VITE_API_URL` (web) to the correct origins for the environment. |
-| OAuth redirect mismatch | Ensure `GOOGLE_CALLBACK_URL` / `GITHUB_CALLBACK_URL` (or `API_URL`) match the provider's allowed redirect URIs exactly. |
+| Symptom                                                                              | Likely cause / fix                                                                                                                                     |
+| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `Cannot find module '@vestara/types'`                                                | Run `pnpm install` (workspace symlinks) and ensure `tsc --noEmit` (which runs `prisma generate`).                                                      |
+| `PrismaClientInitializationError` / `Pxxxx`                                          | `DATABASE_URL` missing or stale. Re-run `pnpm prisma generate` and check `.env`.                                                                       |
+| API returns 500 on `/auth/refresh` after restart                                     | Refresh-token rotation inserts a new token; ensure the `RefreshToken` table has no leftover unique constraint violations (fixed in `auth.service.ts`). |
+| Web build fails with `TS2304: Cannot find name 'fontSize'` or `TS1117` in `theme.ts` | The theme factory expects a `scaleFontSize` helper and a single `components` block — see `apps/web/src/styles/theme.ts`.                               |
+| CORS errors from the browser                                                         | Set `CLIENT_URL`/`CORS_ORIGIN` (API) and `VITE_API_URL` (web) to the correct origins for the environment.                                              |
+| OAuth redirect mismatch                                                              | Ensure `GOOGLE_CALLBACK_URL` / `GITHUB_CALLBACK_URL` (or `API_URL`) match the provider's allowed redirect URIs exactly.                                |
 
 ---
 

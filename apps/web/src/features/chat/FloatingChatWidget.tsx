@@ -58,138 +58,50 @@ interface RouteSuggestions {
 }
 
 const DEFAULT_SUGGESTIONS: RouteSuggestions = {
-  primary: [
-    'How do I manage users?',
-    'Explain the dashboard',
-    'Security best practices',
-  ],
-  secondary: [
-    'What is Vestara?',
-    'How to export data?',
-    'Application settings guide',
-  ],
+  primary: ['How do I manage users?', 'Explain the dashboard', 'Security best practices'],
+  secondary: ['What is Vestara?', 'How to export data?', 'Application settings guide'],
 };
 
 const ROUTE_SUGGESTIONS: Record<string, RouteSuggestions> = {
   '/': {
-    primary: [
-      'Explain the dashboard KPIs',
-      'Show recent activity',
-      'What do the metrics mean?',
-    ],
-    secondary: [
-      'How many users are active?',
-      'Any errors recently?',
-      'Storage overview',
-    ],
+    primary: ['Explain the dashboard KPIs', 'Show recent activity', 'What do the metrics mean?'],
+    secondary: ['How many users are active?', 'Any errors recently?', 'Storage overview'],
   },
   '/users': {
-    primary: [
-      'How do I manage users?',
-      'Create a new admin user',
-      'Show active users',
-    ],
-    secondary: [
-      'What roles are available?',
-      'Export user list',
-      'Bulk user operations',
-    ],
+    primary: ['How do I manage users?', 'Create a new admin user', 'Show active users'],
+    secondary: ['What roles are available?', 'Export user list', 'Bulk user operations'],
   },
   '/settings': {
-    primary: [
-      'What settings are configured?',
-      'How to export settings?',
-      'Explain JSON values',
-    ],
-    secondary: [
-      'Import settings guide',
-      'Settings audit history',
-      'Security-related settings',
-    ],
+    primary: ['What settings are configured?', 'How to export settings?', 'Explain JSON values'],
+    secondary: ['Import settings guide', 'Settings audit history', 'Security-related settings'],
   },
   '/files': {
-    primary: [
-      'Show file storage stats',
-      'Recent uploads',
-      'How to organize files?',
-    ],
-    secondary: [
-      'File size breakdown',
-      'Storage provider info',
-      'Upload best practices',
-    ],
+    primary: ['Show file storage stats', 'Recent uploads', 'How to organize files?'],
+    secondary: ['File size breakdown', 'Storage provider info', 'Upload best practices'],
   },
   '/chat': {
-    primary: [
-      'How does the AI work?',
-      'What models are available?',
-      'Change AI model',
-    ],
-    secondary: [
-      'Conversation management',
-      'Chat history tips',
-      'Keyboard shortcuts',
-    ],
+    primary: ['How does the AI work?', 'What models are available?', 'Change AI model'],
+    secondary: ['Conversation management', 'Chat history tips', 'Keyboard shortcuts'],
   },
   '/system-logs': {
-    primary: [
-      'Explain audit logs',
-      'Filter by action type',
-      'Error log analysis',
-    ],
-    secondary: [
-      'Security events',
-      'User activity tracking',
-      'Log retention settings',
-    ],
+    primary: ['Explain audit logs', 'Filter by action type', 'Error log analysis'],
+    secondary: ['Security events', 'User activity tracking', 'Log retention settings'],
   },
   '/analytics': {
-    primary: [
-      'Analytics overview',
-      'User growth trends',
-      'Platform metrics',
-    ],
-    secondary: [
-      'Revenue data',
-      'Engagement stats',
-      'Report generation',
-    ],
+    primary: ['Analytics overview', 'User growth trends', 'Platform metrics'],
+    secondary: ['Revenue data', 'Engagement stats', 'Report generation'],
   },
   '/organizations': {
-    primary: [
-      'Organization management',
-      'Multi-tenancy overview',
-      'Organization settings',
-    ],
-    secondary: [
-      'Create organization',
-      'Member management',
-      'Org roles and permissions',
-    ],
+    primary: ['Organization management', 'Multi-tenancy overview', 'Organization settings'],
+    secondary: ['Create organization', 'Member management', 'Org roles and permissions'],
   },
   '/profile': {
-    primary: [
-      'Update my profile',
-      'Change my password',
-      'Account security',
-    ],
-    secondary: [
-      'OAuth linked accounts',
-      'Profile settings',
-      'Notification preferences',
-    ],
+    primary: ['Update my profile', 'Change my password', 'Account security'],
+    secondary: ['OAuth linked accounts', 'Profile settings', 'Notification preferences'],
   },
   '/docs': {
-    primary: [
-      'Find documentation',
-      'API reference',
-      'Developer guide',
-    ],
-    secondary: [
-      'Deployment guide',
-      'Architecture docs',
-      'Getting started',
-    ],
+    primary: ['Find documentation', 'API reference', 'Developer guide'],
+    secondary: ['Deployment guide', 'Architecture docs', 'Getting started'],
   },
 };
 
@@ -290,15 +202,16 @@ function MiniMessageBubble({
           sx={{
             p: 1.25,
             borderRadius: 2,
-            bgcolor: isUser
-              ? theme.palette.primary.main
-              : alpha(theme.palette.grey[500], 0.06),
+            bgcolor: isUser ? theme.palette.primary.main : alpha(theme.palette.grey[500], 0.06),
             color: isUser ? theme.palette.primary.contrastText : theme.palette.text.primary,
             border: isUser ? 'none' : `1px solid ${theme.palette.divider}`,
           }}
         >
           {isUser ? (
-            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: '0.8125rem' }}>
+            <Typography
+              variant="body2"
+              sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: '0.8125rem' }}
+            >
               {message.content}
             </Typography>
           ) : (
@@ -358,19 +271,32 @@ function MiniMessageBubble({
                   fontSize: '0.8125rem',
                 },
                 '& a': { color: theme.palette.primary.main, wordBreak: 'break-all' },
-                '& hr': { border: 'none', borderTop: `1px solid ${theme.palette.divider}`, my: 0.5 },
+                '& hr': {
+                  border: 'none',
+                  borderTop: `1px solid ${theme.palette.divider}`,
+                  my: 0.5,
+                },
               }}
             >
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {message.content}
-              </ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
             </Box>
           )}
         </Paper>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25, mt: 0.25, justifyContent: isUser ? 'flex-end' : 'flex-start' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.25,
+            mt: 0.25,
+            justifyContent: isUser ? 'flex-end' : 'flex-start',
+          }}
+        >
           <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.625rem' }}>
-            {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            {new Date(message.createdAt).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
           </Typography>
           {!isUser && isLatest && (
             <Tooltip title={copied ? 'Copied!' : 'Copy'}>
@@ -524,7 +450,8 @@ export function FloatingChatWidget() {
   }, [messages]);
 
   const lastMessagePreview = lastAssistantMessage
-    ? lastAssistantMessage.content.replace(/[*#`>\[\]]/g, '').slice(0, 80) + (lastAssistantMessage.content.length > 80 ? '...' : '')
+    ? lastAssistantMessage.content.replace(/[*#`>\[\]]/g, '').slice(0, 80) +
+      (lastAssistantMessage.content.length > 80 ? '...' : '')
     : null;
 
   // ── Keyboard shortcut (Cmd/Ctrl + Shift + K) ────────────────────────────
@@ -533,7 +460,12 @@ export function FloatingChatWidget() {
       if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key === 'K') {
         // Don't toggle if the user is typing in an input/textarea
         const activeElement = document.activeElement;
-        if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA' || activeElement.getAttribute('contenteditable') === 'true')) {
+        if (
+          activeElement &&
+          (activeElement.tagName === 'INPUT' ||
+            activeElement.tagName === 'TEXTAREA' ||
+            activeElement.getAttribute('contenteditable') === 'true')
+        ) {
           return;
         }
         event.preventDefault();
@@ -600,16 +532,19 @@ export function FloatingChatWidget() {
     }
   }, [open, minimized, activeConversationId, conversations]);
 
-  const handleSuggestionClick = useCallback((text: string) => {
-    setInputValue(text);
-    setTimeout(() => {
-      if (minimized) {
-        minimizedInputRef.current?.focus();
-      } else {
-        inputRef.current?.focus();
-      }
-    }, 50);
-  }, [minimized]);
+  const handleSuggestionClick = useCallback(
+    (text: string) => {
+      setInputValue(text);
+      setTimeout(() => {
+        if (minimized) {
+          minimizedInputRef.current?.focus();
+        } else {
+          inputRef.current?.focus();
+        }
+      }, 50);
+    },
+    [minimized],
+  );
 
   const handleSend = useCallback(async () => {
     const content = inputValue.trim();
@@ -709,17 +644,30 @@ export function FloatingChatWidget() {
         >
           <SparkleIcon sx={{ color: theme.palette.primary.main, fontSize: 18, flexShrink: 0 }} />
           <Box sx={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-            <Typography variant="caption" fontWeight={700} noWrap sx={{ fontSize: '0.7rem', lineHeight: 1.2 }}>
-              {activeConversationId
-                ? (conversationData?.title ?? 'AI Assistant')
-                : 'AI Assistant'}
+            <Typography
+              variant="caption"
+              fontWeight={700}
+              noWrap
+              sx={{ fontSize: '0.7rem', lineHeight: 1.2 }}
+            >
+              {activeConversationId ? (conversationData?.title ?? 'AI Assistant') : 'AI Assistant'}
             </Typography>
             {lastMessagePreview ? (
-              <Typography variant="caption" color="text.secondary" noWrap sx={{ fontSize: '0.65rem', lineHeight: 1.2 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                noWrap
+                sx={{ fontSize: '0.65rem', lineHeight: 1.2 }}
+              >
                 {lastMessagePreview}
               </Typography>
             ) : (
-              <Typography variant="caption" color="text.disabled" noWrap sx={{ fontSize: '0.65rem', lineHeight: 1.2 }}>
+              <Typography
+                variant="caption"
+                color="text.disabled"
+                noWrap
+                sx={{ fontSize: '0.65rem', lineHeight: 1.2 }}
+              >
                 Tap to open assistant...
               </Typography>
             )}
@@ -787,30 +735,25 @@ export function FloatingChatWidget() {
             }}
           >
             <SparkleIcon sx={{ color: theme.palette.primary.main, fontSize: 18 }} />
-            <Typography variant="subtitle2" fontWeight={700} sx={{ flex: 1, fontSize: '0.85rem' }} noWrap>
-              {activeConversationId
-                ? (conversationData?.title ?? 'Loading...')
-                : 'AI Assistant'}
+            <Typography
+              variant="subtitle2"
+              fontWeight={700}
+              sx={{ flex: 1, fontSize: '0.85rem' }}
+              noWrap
+            >
+              {activeConversationId ? (conversationData?.title ?? 'Loading...') : 'AI Assistant'}
             </Typography>
 
             {/* Minimize to bar */}
             <Tooltip title="Minimize (⌘⇧K)">
-              <IconButton
-                size="small"
-                onClick={handleMinimize}
-                sx={{ width: 28, height: 28 }}
-              >
+              <IconButton size="small" onClick={handleMinimize} sx={{ width: 28, height: 28 }}>
                 <ExpandMoreIcon sx={{ fontSize: 16 }} />
               </IconButton>
             </Tooltip>
 
             {/* Open in full page */}
             <Tooltip title="Open in full page">
-              <IconButton
-                size="small"
-                onClick={handleOpenFullPage}
-                sx={{ width: 28, height: 28 }}
-              >
+              <IconButton size="small" onClick={handleOpenFullPage} sx={{ width: 28, height: 28 }}>
                 <OpenInNewIcon sx={{ fontSize: 14 }} />
               </IconButton>
             </Tooltip>
@@ -828,11 +771,7 @@ export function FloatingChatWidget() {
             )}
 
             <Tooltip title="Close">
-              <IconButton
-                size="small"
-                onClick={handleClose}
-                sx={{ width: 28, height: 28 }}
-              >
+              <IconButton size="small" onClick={handleClose} sx={{ width: 28, height: 28 }}>
                 <CloseIcon sx={{ fontSize: 16 }} />
               </IconButton>
             </Tooltip>
@@ -863,7 +802,14 @@ export function FloatingChatWidget() {
                     </Box>
                   ))
                 ) : messages.length === 0 ? (
-                  <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Box
+                    sx={{
+                      flex: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
                     <Typography variant="caption" color="text.secondary">
                       Start a conversation
                     </Typography>
@@ -936,9 +882,7 @@ export function FloatingChatWidget() {
                           width: 28,
                           height: 28,
                           '&:hover': {
-                            bgcolor: inputValue.trim()
-                              ? theme.palette.primary.dark
-                              : undefined,
+                            bgcolor: inputValue.trim() ? theme.palette.primary.dark : undefined,
                           },
                         }}
                       >

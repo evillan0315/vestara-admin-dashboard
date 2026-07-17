@@ -1,5 +1,11 @@
 import { Box, Typography, Button, styled } from '@mui/material';
-import { Inbox, SearchOff, FolderOff, ErrorOutline, type SvgIconComponent } from '@mui/icons-material';
+import {
+  Inbox,
+  SearchOff,
+  FolderOff,
+  ErrorOutline,
+  type SvgIconComponent,
+} from '@mui/icons-material';
 import { type ReactNode, type ReactElement } from 'react';
 
 export interface EmptyStateProps {
@@ -34,7 +40,8 @@ const IconContainer = styled(Box)(({ theme }) => ({
   width: 80,
   height: 80,
   borderRadius: '50%',
-  backgroundColor: theme.palette.mode === 'light' ? 'rgba(37, 99, 235, 0.08)' : 'rgba(59, 130, 246, 0.12)',
+  backgroundColor:
+    theme.palette.mode === 'light' ? 'rgba(37, 99, 235, 0.08)' : 'rgba(59, 130, 246, 0.12)',
   marginBottom: theme.spacing(3),
   '& svg': {
     fontSize: 40,
@@ -77,9 +84,7 @@ export const EmptyState = ({
 
   return (
     <Container>
-      <IconContainer>
-        {icon || <IconComponent />}
-      </IconContainer>
+      <IconContainer>{icon || <IconComponent />}</IconContainer>
 
       <Title variant="h6">{title}</Title>
 
@@ -101,21 +106,10 @@ export const EmptyState = ({
 };
 
 export const NoData = ({ message = 'No data available' }: { message?: string }) => (
-  <EmptyState
-    iconComponent={Inbox}
-    title="No Data"
-    description={message}
-    variant="minimal"
-  />
+  <EmptyState iconComponent={Inbox} title="No Data" description={message} variant="minimal" />
 );
 
-export const NoSearchResults = ({
-  query,
-  onClear,
-}: {
-  query?: string;
-  onClear?: () => void;
-}) => (
+export const NoSearchResults = ({ query, onClear }: { query?: string; onClear?: () => void }) => (
   <EmptyState
     iconComponent={SearchOff}
     title="No Results Found"
@@ -146,12 +140,7 @@ export const EmptyFolder = ({
   description?: string;
   action?: EmptyStateProps['action'];
 }) => (
-  <EmptyState
-    iconComponent={FolderOff}
-    title={title}
-    description={description}
-    action={action}
-  />
+  <EmptyState iconComponent={FolderOff} title={title} description={description} action={action} />
 );
 
 export const ErrorState = ({

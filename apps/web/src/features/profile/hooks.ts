@@ -42,7 +42,9 @@ export function useChangeEmail() {
     onSuccess: (res) => {
       queryClient.setQueryData(profileKeys.all, (old: unknown) => {
         const prev = old as { user: { email: string } } | undefined;
-        return prev && res.data ? { ...prev, user: { ...prev.user, email: res.data.user.email } } : old;
+        return prev && res.data
+          ? { ...prev, user: { ...prev.user, email: res.data.user.email } }
+          : old;
       });
     },
   });

@@ -96,87 +96,80 @@ const IconBadge = styled(Box, {
     iconColor === 'primary'
       ? `${theme.palette.primary.main}15`
       : iconColor === 'secondary'
-      ? `${theme.palette.secondary.main}15`
-      : iconColor === 'success'
-      ? `${theme.palette.success.main}15`
-      : iconColor === 'error'
-      ? `${theme.palette.error.main}15`
-      : iconColor === 'warning'
-      ? `${theme.palette.warning.main}15`
-      : `${theme.palette.info.main}15`,
+        ? `${theme.palette.secondary.main}15`
+        : iconColor === 'success'
+          ? `${theme.palette.success.main}15`
+          : iconColor === 'error'
+            ? `${theme.palette.error.main}15`
+            : iconColor === 'warning'
+              ? `${theme.palette.warning.main}15`
+              : `${theme.palette.info.main}15`,
   '& svg': {
     fontSize: 14,
     color:
       iconColor === 'primary'
         ? theme.palette.primary.main
         : iconColor === 'secondary'
-        ? theme.palette.secondary.main
-        : iconColor === 'success'
-        ? theme.palette.success.main
-        : iconColor === 'error'
-        ? theme.palette.error.main
-        : iconColor === 'warning'
-        ? theme.palette.warning.main
-        : theme.palette.info.main,
+          ? theme.palette.secondary.main
+          : iconColor === 'success'
+            ? theme.palette.success.main
+            : iconColor === 'error'
+              ? theme.palette.error.main
+              : iconColor === 'warning'
+                ? theme.palette.warning.main
+                : theme.palette.info.main,
   },
 }));
 
 export const ActivityFeed = memo(
-  ({
-    items,
-    title = 'Recent Activity',
-    maxItems = 10,
-    sx,
-  }: ActivityFeedProps): ReactElement => {
-  const displayItems = items.slice(0, maxItems);
+  ({ items, title = 'Recent Activity', maxItems = 10, sx }: ActivityFeedProps): ReactElement => {
+    const displayItems = items.slice(0, maxItems);
 
-  return (
-    <FeedContainer sx={sx}>
-      <FeedHeader>
-        <Typography variant="h6" fontWeight={600}>
-          {title}
-        </Typography>
-        <Typography variant="caption" color="text.secondary">
-          {items.length} {items.length === 1 ? 'event' : 'events'}
-        </Typography>
-      </FeedHeader>
-      <FeedList>
-        {displayItems.length === 0 ? (
-          <Box sx={{ p: 3, textAlign: 'center' }}>
-            <Typography variant="body2" color="text.secondary">
-              No recent activity
-            </Typography>
-          </Box>
-        ) : (
-          displayItems.map((item) => (
-            <FeedItem key={item.id}>
-              <ItemAvatar src={item.user.avatar}>
-                {item.user.initials || item.user.name.charAt(0).toUpperCase()}
-              </ItemAvatar>
-              <ItemContent>
-                <ItemText>
-                  <strong>{item.user.name}</strong> {item.action}
-                  {item.target && (
-                    <>
-                      {' '}
-                      <strong>{item.target}</strong>
-                    </>
-                  )}
-                </ItemText>
-                <ItemTimestamp>{item.timestamp}</ItemTimestamp>
-              </ItemContent>
-              {item.icon && (
-                <IconBadge iconColor={item.iconColor || 'primary'}>
-                  {item.icon}
-                </IconBadge>
-              )}
-            </FeedItem>
-          ))
-        )}
-      </FeedList>
-    </FeedContainer>
-  );
-},
+    return (
+      <FeedContainer sx={sx}>
+        <FeedHeader>
+          <Typography variant="h6" fontWeight={600}>
+            {title}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {items.length} {items.length === 1 ? 'event' : 'events'}
+          </Typography>
+        </FeedHeader>
+        <FeedList>
+          {displayItems.length === 0 ? (
+            <Box sx={{ p: 3, textAlign: 'center' }}>
+              <Typography variant="body2" color="text.secondary">
+                No recent activity
+              </Typography>
+            </Box>
+          ) : (
+            displayItems.map((item) => (
+              <FeedItem key={item.id}>
+                <ItemAvatar src={item.user.avatar}>
+                  {item.user.initials || item.user.name.charAt(0).toUpperCase()}
+                </ItemAvatar>
+                <ItemContent>
+                  <ItemText>
+                    <strong>{item.user.name}</strong> {item.action}
+                    {item.target && (
+                      <>
+                        {' '}
+                        <strong>{item.target}</strong>
+                      </>
+                    )}
+                  </ItemText>
+                  <ItemTimestamp>{item.timestamp}</ItemTimestamp>
+                </ItemContent>
+                {item.icon && (
+                  <IconBadge iconColor={item.iconColor || 'primary'}>{item.icon}</IconBadge>
+                )}
+              </FeedItem>
+            ))
+          )}
+        </FeedList>
+      </FeedContainer>
+    );
+  },
 );
 
 export default ActivityFeed;

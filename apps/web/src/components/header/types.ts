@@ -8,16 +8,16 @@ export interface Message {
 }
 
 export type NotificationType =
-  | "booking"
-  | "payment"
-  | "membership"
-  | "companion"
-  | "security"
-  | "system"
-  | "user"
-  | "setting"
-  | "auth"
-  | "activity";
+  | 'booking'
+  | 'payment'
+  | 'membership'
+  | 'companion'
+  | 'security'
+  | 'system'
+  | 'user'
+  | 'setting'
+  | 'auth'
+  | 'activity';
 
 export interface Notification {
   id: string;

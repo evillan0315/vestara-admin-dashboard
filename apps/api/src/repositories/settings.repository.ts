@@ -6,7 +6,9 @@ export class SettingsRepository extends BaseRepository {
    * Find a setting by key within an organization.
    */
   async findByKey(key: string, organizationId: string) {
-    return this.prisma.systemSetting.findUnique({ where: { organizationId_key: { organizationId, key } } });
+    return this.prisma.systemSetting.findUnique({
+      where: { organizationId_key: { organizationId, key } },
+    });
   }
 
   /**
@@ -45,7 +47,12 @@ export class SettingsRepository extends BaseRepository {
   /**
    * Upsert a setting (create or update) within an organization.
    */
-  async upsert(key: string, value: Record<string, unknown>, updatedBy: string | undefined, organizationId: string) {
+  async upsert(
+    key: string,
+    value: Record<string, unknown>,
+    updatedBy: string | undefined,
+    organizationId: string,
+  ) {
     return this.prisma.systemSetting.upsert({
       where: { organizationId_key: { organizationId, key } },
       create: { key, value: value as Prisma.InputJsonValue, updatedBy, organizationId },
@@ -57,6 +64,8 @@ export class SettingsRepository extends BaseRepository {
    * Delete a setting by key within an organization.
    */
   async delete(key: string, organizationId: string) {
-    await this.prisma.systemSetting.delete({ where: { organizationId_key: { organizationId, key } } });
+    await this.prisma.systemSetting.delete({
+      where: { organizationId_key: { organizationId, key } },
+    });
   }
 }

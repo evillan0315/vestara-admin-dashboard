@@ -14,7 +14,11 @@ router.use(authenticate);
  * Check whether Cloudinary credentials are available in this environment.
  */
 function hasCloudinaryCredentials(): boolean {
-  return !!(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET);
+  return !!(
+    process.env.CLOUDINARY_CLOUD_NAME &&
+    process.env.CLOUDINARY_API_KEY &&
+    process.env.CLOUDINARY_API_SECRET
+  );
 }
 
 /**
@@ -60,7 +64,10 @@ router.post('/image', uploadSingle('file'), async (req, res, next) => {
     if (!allowedTypes.includes(file.mimetype)) {
       return res.status(400).json({
         success: false,
-        error: { code: 'INVALID_FILE_TYPE', message: 'Only JPEG, PNG, WebP, and SVG images are allowed' },
+        error: {
+          code: 'INVALID_FILE_TYPE',
+          message: 'Only JPEG, PNG, WebP, and SVG images are allowed',
+        },
       });
     }
 

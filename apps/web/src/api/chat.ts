@@ -54,14 +54,22 @@ export const chatApi = {
       pagination: PaginationMeta;
     }>(`/chat/conversations${qs ? `?${qs}` : ''}`);
 
-    return res.data ?? { conversations: [], pagination: { page: 1, perPage: 20, total: 0, totalPages: 0 } };
+    return (
+      res.data ?? {
+        conversations: [],
+        pagination: { page: 1, perPage: 20, total: 0, totalPages: 0 },
+      }
+    );
   },
 
   /**
    * Create a new conversation.
    */
   async createConversation(data: CreateConversationRequestDTO): Promise<ChatConversationDTO> {
-    const res = await apiClient.post<{ conversation: ChatConversationDTO }>('/chat/conversations', data);
+    const res = await apiClient.post<{ conversation: ChatConversationDTO }>(
+      '/chat/conversations',
+      data,
+    );
     if (!res.data?.conversation) {
       throw new Error('Failed to create conversation');
     }
@@ -72,7 +80,9 @@ export const chatApi = {
    * Get a conversation by ID.
    */
   async getConversation(id: string): Promise<ChatConversationDTO> {
-    const res = await apiClient.get<{ conversation: ChatConversationDTO }>(`/chat/conversations/${id}`);
+    const res = await apiClient.get<{ conversation: ChatConversationDTO }>(
+      `/chat/conversations/${id}`,
+    );
     if (!res.data?.conversation) {
       throw new Error('Conversation not found');
     }
@@ -121,7 +131,9 @@ export const chatApi = {
       pagination: PaginationMeta;
     }>(`/chat/conversations/${conversationId}/messages${qs ? `?${qs}` : ''}`);
 
-    return res.data ?? { messages: [], pagination: { page: 1, perPage: 50, total: 0, totalPages: 0 } };
+    return (
+      res.data ?? { messages: [], pagination: { page: 1, perPage: 50, total: 0, totalPages: 0 } }
+    );
   },
 
   /**

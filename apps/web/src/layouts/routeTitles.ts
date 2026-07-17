@@ -1,5 +1,5 @@
-import { navGroups, type NavItem } from "./navConfig";
-import { profileTabs } from "../features/profile/tabs";
+import { navGroups, type NavItem } from './navConfig';
+import { profileTabs } from '../features/profile/tabs';
 
 export interface RouteTitle {
   title: string;
@@ -26,7 +26,7 @@ const navItemByPath: Record<string, NavItem> = navGroups.reduce(
 /** Profile sub-routes (Overview, Security, Permissions, Activity, …). */
 const profileTitleByPath: Record<string, RouteTitle> = profileTabs.reduce(
   (acc, tab) => {
-    acc[tab.path] = { title: tab.label, subtitle: "Profile" };
+    acc[tab.path] = { title: tab.label, subtitle: 'Profile' };
     return acc;
   },
   {} as Record<string, RouteTitle>,
@@ -46,8 +46,8 @@ export function getRouteTitle(pathname: string): RouteTitle {
 
   const navItem = navItemByPath[pathname];
   if (navItem) {
-    return { title: navItem.label, subtitle: "" };
+    return { title: navItem.label, subtitle: '' };
   }
 
-  return { title: "Dashboard", subtitle: "" };
+  return { title: 'Dashboard', subtitle: '' };
 }

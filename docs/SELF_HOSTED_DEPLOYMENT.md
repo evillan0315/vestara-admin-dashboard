@@ -8,10 +8,10 @@ required.
 
 The application is a pnpm/Turborepo monorepo:
 
-| App | Stack | What it is |
-|-----|-------|------------|
+| App        | Stack                                   | What it is                                                   |
+| ---------- | --------------------------------------- | ------------------------------------------------------------ |
 | `apps/api` | Express 5 + Prisma + PostgreSQL + Redis | The REST + WebSocket API. Runs as a long-lived Node process. |
-| `apps/web` | React 19 + Vite + MUI | A static SPA. Built once and served by Nginx. |
+| `apps/web` | React 19 + Vite + MUI                   | A static SPA. Built once and served by Nginx.                |
 
 Why a long-running Node process? The API hosts **live features over
 WebSockets** (`/api/v1/ws`) and **background jobs via BullMQ** (report
@@ -75,12 +75,12 @@ used by the real-time Socket.IO layer) to the API process:
 
 **Key addresses (single-domain):**
 
-| Path | Served by |
-|------|-----------|
-| `https://vestara.meetlily.org/` | SPA (`apps/web/dist`) |
-| `https://vestara.meetlily.org/api/v1/*` | API (`apps/api`) |
-| `https://vestara.meetlily.org/socket.io/*` | Real-time Socket.IO endpoint |
-| `https://vestara.meetlily.org/api/v1/health` | Health check |
+| Path                                         | Served by                    |
+| -------------------------------------------- | ---------------------------- |
+| `https://vestara.meetlily.org/`              | SPA (`apps/web/dist`)        |
+| `https://vestara.meetlily.org/api/v1/*`      | API (`apps/api`)             |
+| `https://vestara.meetlily.org/socket.io/*`   | Real-time Socket.IO endpoint |
+| `https://vestara.meetlily.org/api/v1/health` | Health check                 |
 
 Because the frontend uses a **relative** API base (`/api/v1` by default), no
 frontend environment variable is required for the single-domain setup. OAuth
@@ -95,13 +95,13 @@ redirects are derived from `window.location.origin`, so they also just work.
 
 ## Server Requirements
 
-| Resource | Minimum | Recommended (production) |
-|----------|---------|--------------------------|
-| CPU | 1 vCPU | 2–4 vCPU |
-| RAM | 1 GB | 4 GB |
-| Disk | 20 GB SSD | 40 GB SSD |
-| OS | Ubuntu 24.04 LTS | Ubuntu 24.04 LTS |
-| Network | IPv4 + DNS A/AAAA records | — |
+| Resource | Minimum                   | Recommended (production) |
+| -------- | ------------------------- | ------------------------ |
+| CPU      | 1 vCPU                    | 2–4 vCPU                 |
+| RAM      | 1 GB                      | 4 GB                     |
+| Disk     | 20 GB SSD                 | 40 GB SSD                |
+| OS       | Ubuntu 24.04 LTS          | Ubuntu 24.04 LTS         |
+| Network  | IPv4 + DNS A/AAAA records | —                        |
 
 Open ports: `22` (SSH), `80` (HTTP→HTTPS), `443` (HTTPS). The API port `5000`
 stays bound to `127.0.0.1` and is **not** exposed publicly.
@@ -332,17 +332,19 @@ The process definition is version-controlled at
 ```js
 // infrastructure/pm2/ecosystem.config.cjs (excerpt)
 module.exports = {
-  apps: [{
-    name: 'vestara-api',
-    cwd: '/var/www/app',
-    script: 'apps/api/dist/index.js',
-    exec_mode: 'fork',     // single instance: WebSocket + BullMQ share in-process state
-    instances: 1,
-    env: { /* merged from .env.deploy */ NODE_ENV: 'production' },
-    error_file: '/var/www/logs/api-error.log',
-    out_file: '/var/www/logs/api-out.log',
-    log_date_format: 'YYYY-MM-DD HH:mm:ss',
-  }],
+  apps: [
+    {
+      name: 'vestara-api',
+      cwd: '/var/www/app',
+      script: 'apps/api/dist/index.js',
+      exec_mode: 'fork', // single instance: WebSocket + BullMQ share in-process state
+      instances: 1,
+      env: { /* merged from .env.deploy */ NODE_ENV: 'production' },
+      error_file: '/var/www/logs/api-error.log',
+      out_file: '/var/www/logs/api-out.log',
+      log_date_format: 'YYYY-MM-DD HH:mm:ss',
+    },
+  ],
 };
 ```
 
@@ -408,14 +410,13 @@ redirect. Reload Nginx once more, then visit `https://vestara.meetlily.org`.
 
 ## OAuth (Google / GitHub)
 
-1. Create an OAuth app in the provider console.
-   2. Set the **Authorized redirect URI** to:
-    - Google: `https://vestara.meetlily.org/api/v1/auth/oauth/google/callback`
-    - GitHub: `https://vestara.meetlily.org/api/v1/auth/oauth/github/callback`
-3. Paste the client ID/secret into the root `.env`
+1. Create an OAuth app in the provider console. 2. Set the **Authorized redirect URI** to:
+   - Google: `https://vestara.meetlily.org/api/v1/auth/oauth/google/callback`
+   - GitHub: `https://vestara.meetlily.org/api/v1/auth/oauth/github/callback`
+2. Paste the client ID/secret into the root `.env`
    (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_CALLBACK_URL`, and the
    GitHub equivalents).
-4. Restart the API: `pnpm exec pm2 start infrastructure/pm2/ecosystem.config.cjs --env production --update-env || pnpm exec pm2 restart vestara-api`.
+3. Restart the API: `pnpm exec pm2 start infrastructure/pm2/ecosystem.config.cjs --env production --update-env || pnpm exec pm2 restart vestara-api`.
 
 If you change `API_URL` or use a separate API domain, make sure each
 `*_CALLBACK_URL` matches the exact origin the browser uses — the backend
@@ -487,16 +488,16 @@ cp deploy.env.example deploy.env
 $EDITOR deploy.env
 ```
 
-| Variable | Meaning |
-|----------|---------|
-| `DEPLOY_HOST` | Server IP or domain (required) |
-| `DEPLOY_USER` | SSH user (default `deployer`) |
-| `DEPLOY_SSH_KEY` | Path to the **private** key used for auth |
-| `DEPLOY_REMOTE_PORT` | SSH port (default `22`) |
-| `DEPLOY_WEB_PATH` | Remote Nginx web root (default `/var/www/vestara`) |
-| `DEPLOY_RELEASES_DIR` | Where timestamped releases are stored (default `/var/www/releases`) |
-| `DEPLOY_KEEP_RELEASES` | How many past releases to keep (default `5`) |
-| `DEPLOY_WEB_ROOT_GROUP` | Group that should own web files (default `www-data`) |
+| Variable                         | Meaning                                                                                                     |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `DEPLOY_HOST`                    | Server IP or domain (required)                                                                              |
+| `DEPLOY_USER`                    | SSH user (default `deployer`)                                                                               |
+| `DEPLOY_SSH_KEY`                 | Path to the **private** key used for auth                                                                   |
+| `DEPLOY_REMOTE_PORT`             | SSH port (default `22`)                                                                                     |
+| `DEPLOY_WEB_PATH`                | Remote Nginx web root (default `/var/www/vestara`)                                                          |
+| `DEPLOY_RELEASES_DIR`            | Where timestamped releases are stored (default `/var/www/releases`)                                         |
+| `DEPLOY_KEEP_RELEASES`           | How many past releases to keep (default `5`)                                                                |
+| `DEPLOY_WEB_ROOT_GROUP`          | Group that should own web files (default `www-data`)                                                        |
 | `DEPLOY_API` / `DEPLOY_API_PATH` | Also copy `.env.deploy` + pull/build/restart the API remotely via `infrastructure/pm2/ecosystem.config.cjs` |
 
 ### 3. Deploy
@@ -535,12 +536,12 @@ What the script does:
 `scripts/deploy.sh --no-build` on every push to `main` (for web-relevant
 changes). Add these **repository secrets** (Settings → Secrets → Actions):
 
-| Secret | Value |
-|--------|-------|
-| `DEPLOY_HOST` | Server host |
-| `DEPLOY_USER` | SSH user (`deployer`) |
-| `DEPLOY_WEB_PATH` | Remote web root (`/var/www/vestara`) |
-| `DEPLOY_SSH_KEY` | The **private** key contents (`vestara_deploy`) |
+| Secret            | Value                                           |
+| ----------------- | ----------------------------------------------- |
+| `DEPLOY_HOST`     | Server host                                     |
+| `DEPLOY_USER`     | SSH user (`deployer`)                           |
+| `DEPLOY_WEB_PATH` | Remote web root (`/var/www/vestara`)            |
+| `DEPLOY_SSH_KEY`  | The **private** key contents (`vestara_deploy`) |
 
 Trigger an API redeploy from a workflow run with the **API** input enabled, or
 set `DEPLOY_API=true` in `deploy.env`. The private key is written to a
@@ -600,21 +601,21 @@ External monitoring (optional): point Uptime-Kuma / Healthchecks.io at
 
 ## Troubleshooting
 
-| Symptom | Likely cause / fix |
-|---------|--------------------|
-| `502 Bad Gateway` on `/api/*` | API not running or wrong port. Check `pm2 status` and that `PORT=5000` matches the Nginx `proxy_pass`. |
-| `502` only on first load after restart | Brief restart window; expected. Use `pm2 reload` for graceful restart. |
-| CORS error in browser console | `CORS_ORIGIN` doesn't match the browser origin. Set it to the exact `https://vestara.meetlily.org`. |
-| `ERR_ERL_UNEXPECTED_X_FORWARDED_FOR` in API logs | Nginx sends `X-Forwarded-For` but Express doesn't trust it. The fix is `app.set('trust proxy', 1)` in `apps/api/src/app.ts` (already applied). |
-| `GET /settings/:key` returns 404 for optional settings | The setting doesn't exist yet. The fix is to use the non-throwing `findByKey()` in `SettingsService` (already applied) — returns `null` gracefully. |
-| `401` immediately after login on reload | Access token expired and refresh failed. Ensure `JWT_REFRESH_SECRET` matches across restarts and `REDIS_URL` is reachable (refresh tokens/sessions may use Redis). |
-| `PrismaClientInitializationError` | `DATABASE_URL` missing or wrong. Run Prisma from repo root where `.env` lives. |
-| Migrations fail | Use `prisma migrate deploy` (not `dev`) in production; ensure DB user has DDL rights. |
-| WebSocket not connecting | Nginx missing `Upgrade`/`Connection` headers, or behind a proxy that strips them. Verify the `/api/` block. |
-| Static page blank / routes 404 | Nginx missing `try_files $uri $uri/ /index.html;` SPA fallback. |
-| OAuth redirect mismatch | `*_CALLBACK_URL` must exactly equal the provider's configured redirect URI and the browser origin. |
-| API build produces no output / stale dist | Stale `tsconfig.tsbuildinfo` from a previous build with different `rootDir`. Run `find packages/ apps/api/ -name tsconfig.tsbuildinfo -delete` before rebuilding. The deploy script handles this automatically. |
-| `EACCES: permission denied` on API dist | A previous `sudo` build left root-owned files. Run `sudo chown -R deployer:deployer apps/api/dist apps/api/src/generated` before rebuilding. The deploy script handles this automatically. |
+| Symptom                                                | Likely cause / fix                                                                                                                                                                                              |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `502 Bad Gateway` on `/api/*`                          | API not running or wrong port. Check `pm2 status` and that `PORT=5000` matches the Nginx `proxy_pass`.                                                                                                          |
+| `502` only on first load after restart                 | Brief restart window; expected. Use `pm2 reload` for graceful restart.                                                                                                                                          |
+| CORS error in browser console                          | `CORS_ORIGIN` doesn't match the browser origin. Set it to the exact `https://vestara.meetlily.org`.                                                                                                             |
+| `ERR_ERL_UNEXPECTED_X_FORWARDED_FOR` in API logs       | Nginx sends `X-Forwarded-For` but Express doesn't trust it. The fix is `app.set('trust proxy', 1)` in `apps/api/src/app.ts` (already applied).                                                                  |
+| `GET /settings/:key` returns 404 for optional settings | The setting doesn't exist yet. The fix is to use the non-throwing `findByKey()` in `SettingsService` (already applied) — returns `null` gracefully.                                                             |
+| `401` immediately after login on reload                | Access token expired and refresh failed. Ensure `JWT_REFRESH_SECRET` matches across restarts and `REDIS_URL` is reachable (refresh tokens/sessions may use Redis).                                              |
+| `PrismaClientInitializationError`                      | `DATABASE_URL` missing or wrong. Run Prisma from repo root where `.env` lives.                                                                                                                                  |
+| Migrations fail                                        | Use `prisma migrate deploy` (not `dev`) in production; ensure DB user has DDL rights.                                                                                                                           |
+| WebSocket not connecting                               | Nginx missing `Upgrade`/`Connection` headers, or behind a proxy that strips them. Verify the `/api/` block.                                                                                                     |
+| Static page blank / routes 404                         | Nginx missing `try_files $uri $uri/ /index.html;` SPA fallback.                                                                                                                                                 |
+| OAuth redirect mismatch                                | `*_CALLBACK_URL` must exactly equal the provider's configured redirect URI and the browser origin.                                                                                                              |
+| API build produces no output / stale dist              | Stale `tsconfig.tsbuildinfo` from a previous build with different `rootDir`. Run `find packages/ apps/api/ -name tsconfig.tsbuildinfo -delete` before rebuilding. The deploy script handles this automatically. |
+| `EACCES: permission denied` on API dist                | A previous `sudo` build left root-owned files. Run `sudo chown -R deployer:deployer apps/api/dist apps/api/src/generated` before rebuilding. The deploy script handles this automatically.                      |
 
 For local debugging, run the API in dev mode:
 

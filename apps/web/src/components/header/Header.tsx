@@ -1,15 +1,15 @@
 /// <reference types="react/jsx-runtime" />
-import { useState } from "react";
-import { Box, Typography, Button, IconButton, useTheme, alpha } from "@mui/material";
-import { Menu, PanelLeftClose, PanelLeft } from "lucide-react";
-import { useAuth } from "../../features/auth/AuthContext";
-import { useLiveNotifications } from "../../features/realtime/LiveNotificationsProvider";
-import { useThemeContext } from "../../providers/ThemeProvider";
-import { useNavigate } from "react-router-dom";
-import HeaderActions from "./HeaderActions";
-import NotificationPopover from "./NotificationPopover";
-import MessagePopover from "./MessagePopover";
-import type { Message } from "./types";
+import { useState } from 'react';
+import { Box, Typography, Button, IconButton, useTheme, alpha } from '@mui/material';
+import { Menu, PanelLeftClose, PanelLeft } from 'lucide-react';
+import { useAuth } from '../../features/auth/AuthContext';
+import { useLiveNotifications } from '../../features/realtime/LiveNotificationsProvider';
+import { useThemeContext } from '../../providers/ThemeProvider';
+import { useNavigate } from 'react-router-dom';
+import HeaderActions from './HeaderActions';
+import NotificationPopover from './NotificationPopover';
+import MessagePopover from './MessagePopover';
+import type { Message } from './types';
 
 interface HeaderProps {
   title: string;
@@ -38,7 +38,7 @@ export default function Header({
 
   const handleLogout = async () => {
     await logout();
-    navigate("/login", { replace: true });
+    navigate('/login', { replace: true });
   };
 
   const handleNotifClick = (e: React.MouseEvent<HTMLElement>) => {
@@ -55,32 +55,30 @@ export default function Header({
   const handleMsgClose = () => setMsgAnchor(null);
 
   const handleMessageClick = (message: Message) => {
-    setMessages((prev) =>
-      prev.map((m) => (m.id === message.id ? { ...m, unread: false } : m)),
-    );
+    setMessages((prev) => prev.map((m) => (m.id === message.id ? { ...m, unread: false } : m)));
   };
 
   return (
     <Box
       component="header"
       sx={{
-        position: "sticky",
+        position: 'sticky',
         top: 0,
         zIndex: 10,
         bgcolor: alpha(background.default, 0.85),
-        backdropFilter: "blur(10px)",
+        backdropFilter: 'blur(10px)',
         borderBottom: `1px solid ${divider}`,
         py: 2.25,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
         gap: 2,
       }}
     >
       <Box
         sx={{
-          display: "flex",
-          alignItems: "center",
+          display: 'flex',
+          alignItems: 'center',
           gap: 1.5,
           minWidth: 0,
           pl: { xs: 2, sm: 0 },
@@ -92,7 +90,7 @@ export default function Header({
           aria-label="open drawer"
           edge="start"
           onClick={onMenuToggle}
-          sx={{ mr: 0.5, display: { lg: "none" }, color: text.primary, ml: { xs: 0, sm: 0 } }}
+          sx={{ mr: 0.5, display: { lg: 'none' }, color: text.primary, ml: { xs: 0, sm: 0 } }}
         >
           <Menu size={22} />
         </IconButton>
@@ -100,13 +98,13 @@ export default function Header({
         {/* Desktop collapse button — aligned with sidebar edge */}
         <IconButton
           color="inherit"
-          aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           onClick={toggleSidebar}
           sx={{
-            display: { xs: "none", lg: "inline-flex" },
+            display: { xs: 'none', lg: 'inline-flex' },
             color: text.primary,
-            transition: "transform .2s ease",
-            "&:hover": { transform: "scale(1.05)" },
+            transition: 'transform .2s ease',
+            '&:hover': { transform: 'scale(1.05)' },
           }}
         >
           {sidebarCollapsed ? <PanelLeft size={22} /> : <PanelLeftClose size={22} />}
@@ -120,9 +118,9 @@ export default function Header({
               fontSize: { xs: 18, sm: 22 },
               color: text.primary,
               lineHeight: 1.2,
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
             }}
           >
             {title}
@@ -132,9 +130,9 @@ export default function Header({
               fontSize: 12.5,
               color: primary.main,
               fontWeight: 600,
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
             }}
           >
             {subtitle}
@@ -144,7 +142,15 @@ export default function Header({
 
       {/* Removed search box and date range picker from here */}
 
-      <Box sx={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 1.5, pr: { xs: 2, sm: 3.5 } }}>
+      <Box
+        sx={{
+          flexShrink: 0,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1.5,
+          pr: { xs: 2, sm: 3.5 },
+        }}
+      >
         {isAuthenticated ? (
           <>
             <HeaderActions
@@ -173,13 +179,13 @@ export default function Header({
             />
           </>
         ) : (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             <Button
               variant="text"
-              onClick={() => navigate("/login")}
+              onClick={() => navigate('/login')}
               sx={{
                 color: text.primary,
-                textTransform: "none",
+                textTransform: 'none',
                 fontWeight: 600,
                 fontSize: 13,
               }}
@@ -189,16 +195,16 @@ export default function Header({
 
             <Button
               variant="contained"
-              onClick={() => navigate("/register")}
+              onClick={() => navigate('/register')}
               sx={{
                 bgcolor: primary.main,
                 color: primary.contrastText,
-                textTransform: "none",
+                textTransform: 'none',
                 fontWeight: 700,
                 fontSize: 13,
-                borderRadius: "8px",
+                borderRadius: '8px',
                 px: { xs: 1.5, sm: 2.5 },
-                "&:hover": { bgcolor: alpha(primary.main, 0.85) },
+                '&:hover': { bgcolor: alpha(primary.main, 0.85) },
               }}
             >
               Register

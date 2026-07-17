@@ -101,10 +101,7 @@ function diffDays(startISO: string, endISO: string): number {
   return Math.max(1, Math.round(ms / 86_400_000) + 1);
 }
 
-const MONTHS = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-];
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 /** Format a date as "Jun 18, 2026". */
 function formatLong(date: Date): string {
@@ -116,9 +113,7 @@ function buildLabel(range: DateRangeValue): string {
   const start = new Date(range.startDate);
   const end = new Date(range.endDate);
   const sameYear = start.getFullYear() === end.getFullYear();
-  const startStr = sameYear
-    ? `${MONTHS[start.getMonth()]} ${start.getDate()}`
-    : formatLong(start);
+  const startStr = sameYear ? `${MONTHS[start.getMonth()]} ${start.getDate()}` : formatLong(start);
   return `${startStr} – ${formatLong(end)}`;
 }
 
@@ -168,11 +163,7 @@ export function DateRangeProvider({ children }: DateRangeProviderProps) {
     [range, setRange, setRangeFromDates, resetRange],
   );
 
-  return (
-    <DateRangeContext.Provider value={value}>
-      {children}
-    </DateRangeContext.Provider>
-  );
+  return <DateRangeContext.Provider value={value}>{children}</DateRangeContext.Provider>;
 }
 
 /** Access the dashboard date range. Throws if used outside the provider. */

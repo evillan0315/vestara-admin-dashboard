@@ -1,23 +1,10 @@
 import { useState } from 'react';
-import {
-  Link as RouterLink,
-  useSearchParams,
-  useNavigate,
-} from 'react-router-dom';
+import { Link as RouterLink, useSearchParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Box,
-  Typography,
-  Button,
-  Alert,
-  CircularProgress,
-} from '@mui/material';
+import { Box, Typography, Button, Alert, CircularProgress } from '@mui/material';
 import { Lock, ArrowRight, ArrowLeft, CheckCircle } from 'lucide-react';
-import {
-  resetPasswordSchema,
-  type ResetPasswordInput,
-} from '@vestara/validation';
+import { resetPasswordSchema, type ResetPasswordInput } from '@vestara/validation';
 import { apiClient } from '../api/client';
 import AuthField from '../components/auth/AuthField';
 import PasswordStrength from '../components/auth/PasswordStrength';
@@ -77,11 +64,8 @@ export function ResetPasswordPage() {
         >
           Invalid reset link
         </Typography>
-        <Typography
-          sx={{ fontSize: 14, color: colors.secondary, mb: 4, lineHeight: 1.7 }}
-        >
-          This password reset link is invalid or has expired. Please request a
-          new one.
+        <Typography sx={{ fontSize: 14, color: colors.secondary, mb: 4, lineHeight: 1.7 }}>
+          This password reset link is invalid or has expired. Please request a new one.
         </Typography>
 
         <Button
@@ -148,9 +132,7 @@ export function ResetPasswordPage() {
       setIsSuccess(true);
     } catch (err) {
       const message =
-        err instanceof Error
-          ? err.message
-          : 'Failed to reset password. Please try again.';
+        err instanceof Error ? err.message : 'Failed to reset password. Please try again.';
       setError(message);
     } finally {
       setIsSubmitting(false);
@@ -186,11 +168,8 @@ export function ResetPasswordPage() {
         >
           Password reset successful
         </Typography>
-        <Typography
-          sx={{ fontSize: 14, color: colors.secondary, mb: 4, lineHeight: 1.7 }}
-        >
-          Your password has been updated. You can now sign in with your new
-          password.
+        <Typography sx={{ fontSize: 14, color: colors.secondary, mb: 4, lineHeight: 1.7 }}>
+          Your password has been updated. You can now sign in with your new password.
         </Typography>
 
         <Button

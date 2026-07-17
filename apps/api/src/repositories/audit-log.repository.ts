@@ -23,9 +23,8 @@ export class AuditLogRepository extends BaseRepository {
         entityId: data.entityId,
         userId: data.userId,
         organizationId: data.organizationId,
-        metadata: data.metadata !== undefined
-          ? (data.metadata as Prisma.InputJsonValue)
-          : Prisma.JsonNull,
+        metadata:
+          data.metadata !== undefined ? (data.metadata as Prisma.InputJsonValue) : Prisma.JsonNull,
         ipAddress: data.ipAddress ?? null,
         userAgent: data.userAgent ?? null,
       },

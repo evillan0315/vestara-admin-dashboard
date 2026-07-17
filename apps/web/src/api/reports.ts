@@ -58,7 +58,13 @@ export interface ReportTemplate {
 
 export const reportsApi = {
   // List reports with search, sort, pagination
-  list(params?: { page?: number; perPage?: number; search?: string; sortField?: string; sortDirection?: string }) {
+  list(params?: {
+    page?: number;
+    perPage?: number;
+    search?: string;
+    sortField?: string;
+    sortDirection?: string;
+  }) {
     const searchParams = new URLSearchParams();
     if (params?.page) searchParams.set('page', String(params.page));
     if (params?.perPage) searchParams.set('perPage', String(params.perPage));
@@ -67,9 +73,10 @@ export const reportsApi = {
     if (params?.sortDirection) searchParams.set('sortDirection', params.sortDirection);
 
     const qs = searchParams.toString();
-    return apiClient.get<{ data: Report[]; meta: { total: number; page: number; perPage: number } }>(
-      `/reports${qs ? `?${qs}` : ''}`,
-    );
+    return apiClient.get<{
+      data: Report[];
+      meta: { total: number; page: number; perPage: number };
+    }>(`/reports${qs ? `?${qs}` : ''}`);
   },
 
   // Get report stats
@@ -113,11 +120,26 @@ export const reportsApi = {
     return apiClient.get<{ data: ReportTemplate[] }>('/reports/templates');
   },
 
-  createTemplate(data: { name: string; description?: string; type: Report['type']; format: Report['format']; config?: Record<string, unknown> }) {
+  createTemplate(data: {
+    name: string;
+    description?: string;
+    type: Report['type'];
+    format: Report['format'];
+    config?: Record<string, unknown>;
+  }) {
     return apiClient.post<{ data: ReportTemplate }>('/reports/templates', data);
   },
 
-  updateTemplate(id: string, data: Partial<{ name: string; description: string; type: Report['type']; format: Report['format']; config: Record<string, unknown> }>) {
+  updateTemplate(
+    id: string,
+    data: Partial<{
+      name: string;
+      description: string;
+      type: Report['type'];
+      format: Report['format'];
+      config: Record<string, unknown>;
+    }>,
+  ) {
     return apiClient.put<{ data: ReportTemplate }>(`/reports/templates/${id}`, data);
   },
 

@@ -52,8 +52,8 @@ Whether users are purchasing products, transferring funds, earning rewards, book
 
 ## Admin Dashboard
 
-| Dashboard Overview | Full HD Dashboard |
-|--------------------|-------------------|
+| Dashboard Overview                                                                           | Full HD Dashboard                                                                                     |
+| -------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | <img src="./assets/Vestara  Dashboard Elite.png" width="100%" alt="Vestara Admin Dashboard"> | <img src="./assets/Vestara Full HD Dashboard Elite.png" width="100%" alt="Vestara Full HD Dashboard"> |
 
 The admin dashboard is fully data-driven and real-time:
@@ -66,64 +66,64 @@ The admin dashboard is fully data-driven and real-time:
 
 ## Elite Companion Dashboard
 
-| Dashboard Overview | Elite Companion |
-|--------------------|-----------------|
+| Dashboard Overview                                                                          | Elite Companion                                                                                                    |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | <img src="./assets/vestara-elite-dashboard.png" width="100%" alt="Vestara Elite Dashboard"> | <img src="./assets/Vestara Elite Companion Dsahboard 01.png" width="100%" alt="Vestara Elite Companion Dashboard"> |
 
 ---
 
 ## Landing Pages
 
-| Main Landing | Companion Page |
-|--------------|----------------|
+| Main Landing                                                                     | Companion Page                                                                                 |
+| -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | <img src="./assets/Landing Page 01.png" width="100%" alt="Vestara Landing Page"> | <img src="./assets/Landing Page Companion Page.png" width="100%" alt="Vestara Companion Page"> |
 
-| Individual Companion | Elite Companions |
-|----------------------|------------------|
+| Individual Companion                                                                                            | Elite Companions                                                                             |
+| --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | <img src="./assets/Landing Page Companion Page Individual.png" width="100%" alt="Vestara Individual Companion"> | <img src="./assets/Full Elite Companions Hero.png" width="100%" alt="Full Elite Companions"> |
 
 ---
 
 ## Elite Companions Platform
 
-| Elite Companion | Premium Companion |
-|-----------------|-------------------|
+| Elite Companion                                                                                | Premium Companion                                                                                  |
+| ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | <img src="./assets/Vestara Elite Companion Marionette.png" width="100%" alt="Elite Companion"> | <img src="./assets/Vestara Elite Companion Solo marionette.png" width="100%" alt="Solo Companion"> |
 
-| Companion Services | Luxury Companion |
-|--------------------|------------------|
+| Companion Services                                                                  | Luxury Companion                                                                                 |
+| ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | <img src="./assets/vestara-companion-02.png" width="100%" alt="Companion Services"> | <img src="./assets/Luxury Cocktail Companion Female 01.png" width="100%" alt="Luxury Companion"> |
 
 ---
 
 ## Elite Screenshots (Detailed)
 
-| Dashboard Overview | Client Management |
-|--------------------|-------------------|
+| Dashboard Overview                                                                                           | Client Management                                                                                   |
+| ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
 | <img src="./screens/vestara-admin-elite-dashboard-overview.png" width="100%" alt="Elite Dashboard Overview"> | <img src="./screens/vestara-admin-elite-dashboard-client.png" width="100%" alt="Client Management"> |
 
-| Companion Management | Membership |
-|----------------------|------------|
+| Companion Management                                                                                      | Membership                                                                                                  |
+| --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | <img src="./screens/vestara-admin-elite-dashboard-companion.png" width="100%" alt="Companion Management"> | <img src="./screens/vestara-admin-elite-dashboard-membership.png" width="100%" alt="Membership Management"> |
 
-| Bookings | Payments & Payouts |
-|----------|--------------------|
+| Bookings                                                                                              | Payments & Payouts                                                                                              |
+| ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | <img src="./screens/vestara-admin-elite-dashboard-booking.png" width="100%" alt="Booking Management"> | <img src="./screens/vestara-admin-elite-dashboard-payments-payout.png" width="100%" alt="Payments and Payouts"> |
 
-| User Profile | User Settings |
-|--------------|---------------|
+| User Profile                                                                                         | User Settings                                                                                          |
+| ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | <img src="./screens/vestara-admin-elite-dashboard-user-profile.png" width="100%" alt="User Profile"> | <img src="./screens/vestara-admin-elite-dashboard-user-settings.png" width="100%" alt="User Settings"> |
 
 ---
 
 ## Marketing & Promotional
 
-| FB Post | Promotional Content |
-|---------|---------------------|
+| FB Post                                                                                     | Promotional Content                                                                                    |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | <img src="./assets/Vestara Companion Elite FB post.png" width="100%" alt="Vestara FB Post"> | <img src="./assets/Vestara Promotional Content 03.png" width="100%" alt="Vestara Promotional Content"> |
 
-| Marketing | Investor Marketing |
-|-----------|-------------------|
+| Marketing                                                                                             | Investor Marketing                                                                                  |
+| ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
 | <img src="./assets/vestara-elite-marketing-recruitment.png" width="100%" alt="Marketing Recruitment"> | <img src="./assets/vestara-elite-investor-marketing-ads.png" width="100%" alt="Investor Marketing"> |
 
 ### Video Assets (`apps/marketing-video`)
@@ -148,12 +148,12 @@ Vestara Elite Companions branding.
 
 ## Elite Companion Profiles
 
-| Luxury Evening Gown | Executive Business |
-|---------------------|-------------------|
+| Luxury Evening Gown                                                                               | Executive Business                                                                                    |
+| ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | <img src="./assets/Luxury Evening Gown Female.png" width="100%" alt="Luxury Evening Gown Female"> | <img src="./assets/Executive Business Companion.png" width="100%" alt="Executive Business Companion"> |
 
-| Filipino Elite | Resort Companion |
-|----------------|------------------|
+| Filipino Elite                                                                                               | Resort Companion                                                              |
+| ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
 | <img src="./assets/Filipino Elite Evening Companion Female.png" width="100%" alt="Filipino Elite Companion"> | <img src="./assets/Resort Companion.png" width="100%" alt="Resort Companion"> |
 
 ---
@@ -202,20 +202,20 @@ Vestara focuses on:
 
 Vestara combines multiple products into one ecosystem.
 
-| Platform | Description |
-|-----------|-------------|
-| 💳 **Digital Wallet** | Secure wallets supporting balances, transfers, deposits, withdrawals, and statements |
-| 🛍️ **Marketplace** | Buy and sell products, services, and future digital assets |
-| ⭐ **Vestara Points (VP)** | Loyalty and rewards engine integrated across the platform |
-| 💰 **Payments** | Internal transfers with future support for banking and e-wallet providers |
-| 📊 **Administration** | Enterprise dashboards, monitoring, reporting, moderation, and analytics |
-| 📅 **Bookings** | Reservation platform for premium experiences, hospitality, and future service marketplaces |
-| 👥 **User Profiles** | Identity management, personalization, and KYC preparation |
-| 📈 **Investments (Roadmap)** | Stocks, crypto, crowdfunding, and tokenized assets |
-| 🤖 **AI Chatbot** | In-app AI assistant powered by OpenCode (free models) with multi-provider fallback |
-| 🤖 **AI Assistant RAG** | Data-aware AI with real-time org context injection — answers questions about users, activity, settings, storage, and KPIs |
-| 🤖 **Floating Chat Widget** | AI assistant accessible from every screen via FAB, keyboard shortcut (`Cmd+Shift+K`), page-aware suggestions, minimized bar, and full-page navigation |
-| 🔌 **AI Data Connector** | Configure external REST APIs, auto-fetch + analyze JSON, and render AI-assisted charts — secrets stored server-side, charts render via heuristic even without an AI key |
+| Platform                     | Description                                                                                                                                                             |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 💳 **Digital Wallet**        | Secure wallets supporting balances, transfers, deposits, withdrawals, and statements                                                                                    |
+| 🛍️ **Marketplace**           | Buy and sell products, services, and future digital assets                                                                                                              |
+| ⭐ **Vestara Points (VP)**   | Loyalty and rewards engine integrated across the platform                                                                                                               |
+| 💰 **Payments**              | Internal transfers with future support for banking and e-wallet providers                                                                                               |
+| 📊 **Administration**        | Enterprise dashboards, monitoring, reporting, moderation, and analytics                                                                                                 |
+| 📅 **Bookings**              | Reservation platform for premium experiences, hospitality, and future service marketplaces                                                                              |
+| 👥 **User Profiles**         | Identity management, personalization, and KYC preparation                                                                                                               |
+| 📈 **Investments (Roadmap)** | Stocks, crypto, crowdfunding, and tokenized assets                                                                                                                      |
+| 🤖 **AI Chatbot**            | In-app AI assistant powered by OpenCode (free models) with multi-provider fallback                                                                                      |
+| 🤖 **AI Assistant RAG**      | Data-aware AI with real-time org context injection — answers questions about users, activity, settings, storage, and KPIs                                               |
+| 🤖 **Floating Chat Widget**  | AI assistant accessible from every screen via FAB, keyboard shortcut (`Cmd+Shift+K`), page-aware suggestions, minimized bar, and full-page navigation                   |
+| 🔌 **AI Data Connector**     | Configure external REST APIs, auto-fetch + analyze JSON, and render AI-assisted charts — secrets stored server-side, charts render via heuristic even without an AI key |
 
 ---
 
@@ -223,17 +223,17 @@ Vestara combines multiple products into one ecosystem.
 
 The admin dashboard sidebar is organized into domain groups that mirror the platform highlights above. Implemented modules are fully navigable; documented roadmap modules are shown with a **Soon** badge and do not navigate until built.
 
-| Group | Items |
-|-------|-------|
-| **MAIN MENU** | Dashboard (`/`), Analytics (`/analytics`), Reports (`/reports`) |
-| **WALLET & PAYMENTS** | Digital Wallet *(Soon)*, Payments *(Soon)*, Transactions *(Soon)* |
-| **MARKETPLACE** | Marketplace *(Soon)*, Orders *(Soon)* |
-| **BOOKINGS** | Bookings *(Soon)* |
-| **REWARDS** | Vestara Points *(Soon)* |
-| **AI SERVICES** | AI Chat (`/chat`), Integrations (`/integrations`), Data Explorer (`/integrations`) |
-| **MANAGEMENT** | Users & Roles (`/users`), Organizations (`/organizations`) |
-| **SYSTEM** | Settings (`/settings`), File Manager (`/files`), System Logs (`/system-logs`), Admin (`/admin`), Documentation (`/docs`) |
-| **SECURITY** | Security Center *(Soon)* |
+| Group                 | Items                                                                                                                    |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **MAIN MENU**         | Dashboard (`/`), Analytics (`/analytics`), Reports (`/reports`)                                                          |
+| **WALLET & PAYMENTS** | Digital Wallet _(Soon)_, Payments _(Soon)_, Transactions _(Soon)_                                                        |
+| **MARKETPLACE**       | Marketplace _(Soon)_, Orders _(Soon)_                                                                                    |
+| **BOOKINGS**          | Bookings _(Soon)_                                                                                                        |
+| **REWARDS**           | Vestara Points _(Soon)_                                                                                                  |
+| **AI SERVICES**       | AI Chat (`/chat`), Integrations (`/integrations`), Data Explorer (`/integrations`)                                       |
+| **MANAGEMENT**        | Users & Roles (`/users`), Organizations (`/organizations`)                                                               |
+| **SYSTEM**            | Settings (`/settings`), File Manager (`/files`), System Logs (`/system-logs`), Admin (`/admin`), Documentation (`/docs`) |
+| **SECURITY**          | Security Center _(Soon)_                                                                                                 |
 
 Navigation items respect role-based access control (`requireRole`): administrative and organization-scoped entries are restricted to `SUPER_ADMIN` / `ADMIN` (and `MODERATOR` for integrations), while roadmap items are visible to all authenticated users but disabled.
 
@@ -432,7 +432,6 @@ The architecture intentionally supports future expansion into:
 - Contributing
 - License
 - Disclaimer
-
 
 ## 🧩 Platform Modules & Features
 
@@ -798,13 +797,13 @@ OpenCode → OpenAI → Anthropic → Mock (fallback)
 
 ### Environment Variables
 
-| Variable | Purpose |
-|----------|---------|
-| `OPENCODE_API_KEY` | OpenCode API key (required for OpenCode provider) |
+| Variable            | Purpose                                                       |
+| ------------------- | ------------------------------------------------------------- |
+| `OPENCODE_API_KEY`  | OpenCode API key (required for OpenCode provider)             |
 | `OPENCODE_BASE_URL` | OpenCode API base URL (default: `https://opencode.ai/zen/v1`) |
-| `OPENAI_API_KEY` | OpenAI API key (optional) |
-| `OPENAI_BASE_URL` | OpenAI-compatible base URL (optional) |
-| `ANTHROPIC_API_KEY` | Anthropic API key (optional) |
+| `OPENAI_API_KEY`    | OpenAI API key (optional)                                     |
+| `OPENAI_BASE_URL`   | OpenAI-compatible base URL (optional)                         |
+| `ANTHROPIC_API_KEY` | Anthropic API key (optional)                                  |
 
 ## Floating Chat Widget (Implemented)
 
@@ -837,19 +836,19 @@ Connect external REST APIs and visualize their JSON automatically. Admins config
 
 Routes are mounted under `/api/v1/integrations`:
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| `GET` | `/integrations` | user | List data sources for the current org |
-| `POST` | `/integrations` | admin+ | Create a data source |
-| `GET` | `/integrations/:id` | user | Get a data source by id |
-| `PUT` | `/integrations/:id` | admin+ | Update a data source |
-| `DELETE` | `/integrations/:id` | admin+ | Delete a data source |
-| `POST` | `/integrations/:id/fetch` | user | Fetch the external API and return analyzed data |
+| Method   | Path                      | Auth   | Description                                     |
+| -------- | ------------------------- | ------ | ----------------------------------------------- |
+| `GET`    | `/integrations`           | user   | List data sources for the current org           |
+| `POST`   | `/integrations`           | admin+ | Create a data source                            |
+| `GET`    | `/integrations/:id`       | user   | Get a data source by id                         |
+| `PUT`    | `/integrations/:id`       | admin+ | Update a data source                            |
+| `DELETE` | `/integrations/:id`       | admin+ | Delete a data source                            |
+| `POST`   | `/integrations/:id/fetch` | user   | Fetch the external API and return analyzed data |
 
 ### Environment Variables
 
-| Variable | Purpose |
-|----------|---------|
+| Variable           | Purpose                                                            |
+| ------------------ | ------------------------------------------------------------------ |
 | `OPENCODE_API_KEY` | Optional — enables AI-assisted chart enhancement for the connector |
 
 ## Planned AI Features
@@ -916,6 +915,7 @@ flowchart TD
     REDIS --> SHARED
     QUEUE --> SHARED
 ```
+
 ---
 
 # 🏛 Monorepo Architecture
@@ -961,57 +961,57 @@ vestara/
 
 ## Frontend
 
-| Technology | Purpose |
-|------------|---------|
-| React 19 | User Interface |
-| TypeScript | Type Safety |
-| Vite | Build Tool |
-| Material UI v7 | Component Library |
-| Tailwind CSS v4 | Utility Styling |
-| React Router | Routing |
-| Zustand | Client State |
-| TanStack Query | Server State |
-| React Hook Form | Forms |
-| Zod | Validation |
-| Axios | HTTP Client |
+| Technology      | Purpose           |
+| --------------- | ----------------- |
+| React 19        | User Interface    |
+| TypeScript      | Type Safety       |
+| Vite            | Build Tool        |
+| Material UI v7  | Component Library |
+| Tailwind CSS v4 | Utility Styling   |
+| React Router    | Routing           |
+| Zustand         | Client State      |
+| TanStack Query  | Server State      |
+| React Hook Form | Forms             |
+| Zod             | Validation        |
+| Axios           | HTTP Client       |
 
 ---
 
 ## Backend
 
-| Technology | Purpose |
-|------------|---------|
-| Express | API Framework |
-| TypeScript | Backend Logic |
+| Technology          | Purpose                          |
+| ------------------- | -------------------------------- |
+| Express             | API Framework                    |
+| TypeScript          | Backend Logic                    |
 | Prisma 7 (Postgres) | Database ORM (hosted PostgreSQL) |
-| Redis | Cache & Sessions |
-| BullMQ | Background Jobs |
-| JWT | Authentication |
-| OpenAPI | API Documentation |
-| Pino | Logging |
+| Redis               | Cache & Sessions                 |
+| BullMQ              | Background Jobs                  |
+| JWT                 | Authentication                   |
+| OpenAPI             | API Documentation                |
+| Pino                | Logging                          |
 
 ---
 
 ## Infrastructure
 
-| Technology | Purpose |
-|------------|---------|
-| Docker | Containerization |
-| GitHub Actions | CI/CD |
-| Vercel | Frontend Hosting |
-| Railway / VPS | Backend Hosting |
-| Nginx | Reverse Proxy |
-| S3 Compatible Storage | Object Storage |
-| Cloudflare | CDN & Security |
+| Technology            | Purpose          |
+| --------------------- | ---------------- |
+| Docker                | Containerization |
+| GitHub Actions        | CI/CD            |
+| Vercel                | Frontend Hosting |
+| Railway / VPS         | Backend Hosting  |
+| Nginx                 | Reverse Proxy    |
+| S3 Compatible Storage | Object Storage   |
+| Cloudflare            | CDN & Security   |
 
 ---
 
 ## Database
 
-| Technology | Purpose |
-|------------|---------|
-| PostgreSQL 17 | Primary Database (via Prisma Postgres) |
-| Prisma 7 | Type-safe Database ORM with Multi-Tenant Support |
+| Technology    | Purpose                                          |
+| ------------- | ------------------------------------------------ |
+| PostgreSQL 17 | Primary Database (via Prisma Postgres)           |
+| Prisma 7      | Type-safe Database ORM with Multi-Tenant Support |
 
 ### Schema Highlights
 
@@ -1104,16 +1104,16 @@ vestara/
 
 The repository is organized into reusable workspaces.
 
-| Workspace | Purpose |
-|-----------|---------|
-| apps/web | Admin Dashboard Frontend (React 19) |
-| apps/api | Admin Dashboard Backend (Express 5) |
+| Workspace            | Purpose                                           |
+| -------------------- | ------------------------------------------------- |
+| apps/web             | Admin Dashboard Frontend (React 19)               |
+| apps/api             | Admin Dashboard Backend (Express 5)               |
 | apps/marketing-video | Remotion ad studio — 30s ecosystem overview video |
-| packages/types | Shared TypeScript types, enums, DTOs |
-| packages/constants | Shared global constants |
-| packages/validation | Zod validation schemas |
-| packages/utils | Shared utility functions |
-| packages/config | Shared configuration helpers |
+| packages/types       | Shared TypeScript types, enums, DTOs              |
+| packages/constants   | Shared global constants                           |
+| packages/validation  | Zod validation schemas                            |
+| packages/utils       | Shared utility functions                          |
+| packages/config      | Shared configuration helpers                      |
 
 ---
 
@@ -1264,6 +1264,7 @@ flowchart TD
     J --> K["📦 Release Candidate"]
     K --> L["🚀 Production"]
 ```
+
 ---
 
 # 🛠 Local Development
@@ -1272,12 +1273,12 @@ flowchart TD
 
 Install the following software before starting.
 
-| Requirement | Version |
-|-------------|---------|
-| Node.js | 22+ |
-| pnpm | 10+ |
-| Docker | Latest (for local Postgres + Redis via `docker compose`) |
-| Git | Latest |
+| Requirement | Version                                                  |
+| ----------- | -------------------------------------------------------- |
+| Node.js     | 22+                                                      |
+| pnpm        | 10+                                                      |
+| Docker      | Latest (for local Postgres + Redis via `docker compose`) |
+| Git         | Latest                                                   |
 
 > **Local services:** Postgres 17 and Redis 8 are provided by `docker-compose.yml`
 > at the repo root (`pnpm dev:local` starts them automatically). You do not
@@ -1437,28 +1438,28 @@ pnpm dev:api
 
 # 📜 Available Scripts
 
-| Command | Description |
-|----------|-------------|
-| pnpm dev | Start all services (web + api) |
-| pnpm dev:web | Start frontend (Vite dev server) |
-| pnpm dev:api | Start backend (Express with tsx watch) |
-| pnpm dev:local | One-command localhost bootstrap (Docker + migrate + seed + dev servers) |
-| pnpm build | Build all packages and apps |
-| pnpm build:web | Build frontend only |
-| pnpm build:api | Build backend only |
-| pnpm lint | Run ESLint across all packages |
-| pnpm format | Format source code with Prettier |
-| pnpm format:check | Check formatting without changes |
-| pnpm typecheck | TypeScript strict type checking |
-| pnpm test | Run tests |
-| pnpm prisma:generate | Generate Prisma Client |
-| pnpm prisma:migrate | Run database migrations |
-| pnpm prisma:studio | Open Prisma Studio |
-| pnpm prisma:seed | Seed development data |
-| pnpm screenshot | Capture dark + light screenshots of every localhost dashboard route |
-| pnpm screenshot:dev | Capture only the dark-theme screenshots (faster preview) |
-| pnpm deploy:api | Deploy API to Vercel (production) |
-| pnpm clean | Clean all build artifacts |
+| Command              | Description                                                             |
+| -------------------- | ----------------------------------------------------------------------- |
+| pnpm dev             | Start all services (web + api)                                          |
+| pnpm dev:web         | Start frontend (Vite dev server)                                        |
+| pnpm dev:api         | Start backend (Express with tsx watch)                                  |
+| pnpm dev:local       | One-command localhost bootstrap (Docker + migrate + seed + dev servers) |
+| pnpm build           | Build all packages and apps                                             |
+| pnpm build:web       | Build frontend only                                                     |
+| pnpm build:api       | Build backend only                                                      |
+| pnpm lint            | Run ESLint across all packages                                          |
+| pnpm format          | Format source code with Prettier                                        |
+| pnpm format:check    | Check formatting without changes                                        |
+| pnpm typecheck       | TypeScript strict type checking                                         |
+| pnpm test            | Run tests                                                               |
+| pnpm prisma:generate | Generate Prisma Client                                                  |
+| pnpm prisma:migrate  | Run database migrations                                                 |
+| pnpm prisma:studio   | Open Prisma Studio                                                      |
+| pnpm prisma:seed     | Seed development data                                                   |
+| pnpm screenshot      | Capture dark + light screenshots of every localhost dashboard route     |
+| pnpm screenshot:dev  | Capture only the dark-theme screenshots (faster preview)                |
+| pnpm deploy:api      | Deploy API to Vercel (production)                                       |
+| pnpm clean           | Clean all build artifacts                                               |
 
 ---
 
@@ -1844,6 +1845,7 @@ flowchart TB
     STAGING --> SMOKE
     SMOKE --> PROD
 ```
+
 ---
 
 ## CI Pipeline
@@ -1917,6 +1919,7 @@ flowchart TB
     BULLMQ --> POSTGRES
     BULLMQ --> STORAGE
 ```
+
 ---
 
 ## Deployment Targets
@@ -2144,38 +2147,38 @@ Future licensing terms may change as the platform evolves.
 
 # 📌 Project Status
 
-| Category | Status |
-|----------|--------|
-| Development | 🚧 Active |
-| Current Phase | Phase 1 – Admin Dashboard MVP (Phases 1–22 coverage) |
-| API (Express) | 🟢 Deployed to Vercel |
-| Frontend (React) | 🟢 Deployed to Vercel |
-| OAuth (Google + GitHub) | 🟢 Configured + Working |
-| User Management (CRUD) | 🟢 Complete (backend + frontend) with server-side filtering for role and status, page refactored into focused sub-components |
-| Roles & Permissions (RBAC) | 🟢 Implemented (enum-based) |
-| Data Table | 🟢 Reusable, sort/filter/paginate/select with enhanced filtering capabilities; all consuming pages refactored into <600-line sub-components |
-| Organizations | 🟢 Complete (list/create/edit + DataTable UI), refactored into hook + dialog + columns |
-| Audit Logs / System Logs | 🟢 API + Frontend Page, refactored into hook + columns |
-| File Manager | 🟢 Complete (backend + frontend with upload, folders, preview) and avatar upload integration; refactored into 7 focused files |
-| User Profile (name, avatar, password change) | 🟢 Complete (backend + frontend) with avatar upload integration |
-| Profile Navigation (6 tabs: Overview, Security, Permissions, Activity, Preferences, Sessions) | 🟢 Complete (shared `profileTabs` config; header `UserMenu` shortcuts + dedicated routes; dark-luxury `theme.palette` header chrome) |
-| User Preferences (full-page tab) | 🟢 Complete (16 persisted fields — theme mode, font family/size/weight, primary color, density, sidebar variant, border radius, contrast, notifications, language, timezone, date format, privacy) with live ThemeContext preview, debounced sliders, undo/reset/save |
-| UserMenu | 🟢 Complete (`UserMenuTrigger` + `UserMenuDropdown` with grouped sections, sparkle glow avatar, admin shortcuts) |
-| Global Search (Cmd/Ctrl+K) | 🟢 Complete (data-driven, live user search, route-scoped) |
-| Sidebar Navigation (platform-domain categories) | 🟢 Complete (Wallet & Payments, Marketplace, Bookings, Rewards, AI Services, Management, System, Security; roadmap modules marked "Soon") |
-| CI/CD (GitHub Actions) | 🟢 API Deploy Workflow |
-| AvatarUpload Reusable Component | 🟢 Complete (view-only + editable modes, camera overlay, initials fallback, custom sizes, SVG support; integrated into ProfilePage, UserFormDialog, OrganizationsDialog, table columns, user menus) |
-| Sidebar Logo Customization | 🟢 Complete (useAppLogo hook via app_logo_url SystemSetting; Logo component accepts src prop; admin camera overlay upload in sidebar) |
-| Reporting (CSV/Excel/PDF) | 🟢 Complete (backend + frontend, 4 report types, MUI-ified dialog, date presets, column selection, scheduling, email delivery, templates, comparison, WebSocket progress, dashboard widget, PDF branding) |
-| Real-time Features (WebSocket, live notifications) | 🟢 Complete (Phases 21-22 — WebSocket + live dashboard + presence) |
-| Reusable Form Components | 🟢 Complete (14 components + Zod) |
-| Feedback Components | 🟢 Complete (Toast queue, Loading, EmptyState, useConfirm) |
-| Mobile | 📋 Planned |
-| AI Chatbot | 🟢 Complete (OpenCode + multi-provider fallback) |
-| AI Assistant RAG | 🟢 Complete (data-aware, real-time org context) |
-| Floating Chat Widget | 🟢 Complete (FAB, keyboard shortcut, page-aware suggestions, minimized bar, full-page nav) |
-| Investment Platform | 📋 Planned |
-| Blockchain | 📋 Planned |
+| Category                                                                                      | Status                                                                                                                                                                                                                                                                |
+| --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Development                                                                                   | 🚧 Active                                                                                                                                                                                                                                                             |
+| Current Phase                                                                                 | Phase 1 – Admin Dashboard MVP (Phases 1–22 coverage)                                                                                                                                                                                                                  |
+| API (Express)                                                                                 | 🟢 Deployed to Vercel                                                                                                                                                                                                                                                 |
+| Frontend (React)                                                                              | 🟢 Deployed to Vercel                                                                                                                                                                                                                                                 |
+| OAuth (Google + GitHub)                                                                       | 🟢 Configured + Working                                                                                                                                                                                                                                               |
+| User Management (CRUD)                                                                        | 🟢 Complete (backend + frontend) with server-side filtering for role and status, page refactored into focused sub-components                                                                                                                                          |
+| Roles & Permissions (RBAC)                                                                    | 🟢 Implemented (enum-based)                                                                                                                                                                                                                                           |
+| Data Table                                                                                    | 🟢 Reusable, sort/filter/paginate/select with enhanced filtering capabilities; all consuming pages refactored into <600-line sub-components                                                                                                                           |
+| Organizations                                                                                 | 🟢 Complete (list/create/edit + DataTable UI), refactored into hook + dialog + columns                                                                                                                                                                                |
+| Audit Logs / System Logs                                                                      | 🟢 API + Frontend Page, refactored into hook + columns                                                                                                                                                                                                                |
+| File Manager                                                                                  | 🟢 Complete (backend + frontend with upload, folders, preview) and avatar upload integration; refactored into 7 focused files                                                                                                                                         |
+| User Profile (name, avatar, password change)                                                  | 🟢 Complete (backend + frontend) with avatar upload integration                                                                                                                                                                                                       |
+| Profile Navigation (6 tabs: Overview, Security, Permissions, Activity, Preferences, Sessions) | 🟢 Complete (shared `profileTabs` config; header `UserMenu` shortcuts + dedicated routes; dark-luxury `theme.palette` header chrome)                                                                                                                                  |
+| User Preferences (full-page tab)                                                              | 🟢 Complete (16 persisted fields — theme mode, font family/size/weight, primary color, density, sidebar variant, border radius, contrast, notifications, language, timezone, date format, privacy) with live ThemeContext preview, debounced sliders, undo/reset/save |
+| UserMenu                                                                                      | 🟢 Complete (`UserMenuTrigger` + `UserMenuDropdown` with grouped sections, sparkle glow avatar, admin shortcuts)                                                                                                                                                      |
+| Global Search (Cmd/Ctrl+K)                                                                    | 🟢 Complete (data-driven, live user search, route-scoped)                                                                                                                                                                                                             |
+| Sidebar Navigation (platform-domain categories)                                               | 🟢 Complete (Wallet & Payments, Marketplace, Bookings, Rewards, AI Services, Management, System, Security; roadmap modules marked "Soon")                                                                                                                             |
+| CI/CD (GitHub Actions)                                                                        | 🟢 API Deploy Workflow                                                                                                                                                                                                                                                |
+| AvatarUpload Reusable Component                                                               | 🟢 Complete (view-only + editable modes, camera overlay, initials fallback, custom sizes, SVG support; integrated into ProfilePage, UserFormDialog, OrganizationsDialog, table columns, user menus)                                                                   |
+| Sidebar Logo Customization                                                                    | 🟢 Complete (useAppLogo hook via app_logo_url SystemSetting; Logo component accepts src prop; admin camera overlay upload in sidebar)                                                                                                                                 |
+| Reporting (CSV/Excel/PDF)                                                                     | 🟢 Complete (backend + frontend, 4 report types, MUI-ified dialog, date presets, column selection, scheduling, email delivery, templates, comparison, WebSocket progress, dashboard widget, PDF branding)                                                             |
+| Real-time Features (WebSocket, live notifications)                                            | 🟢 Complete (Phases 21-22 — WebSocket + live dashboard + presence)                                                                                                                                                                                                    |
+| Reusable Form Components                                                                      | 🟢 Complete (14 components + Zod)                                                                                                                                                                                                                                     |
+| Feedback Components                                                                           | 🟢 Complete (Toast queue, Loading, EmptyState, useConfirm)                                                                                                                                                                                                            |
+| Mobile                                                                                        | 📋 Planned                                                                                                                                                                                                                                                            |
+| AI Chatbot                                                                                    | 🟢 Complete (OpenCode + multi-provider fallback)                                                                                                                                                                                                                      |
+| AI Assistant RAG                                                                              | 🟢 Complete (data-aware, real-time org context)                                                                                                                                                                                                                       |
+| Floating Chat Widget                                                                          | 🟢 Complete (FAB, keyboard shortcut, page-aware suggestions, minimized bar, full-page nav)                                                                                                                                                                            |
+| Investment Platform                                                                           | 📋 Planned                                                                                                                                                                                                                                                            |
+| Blockchain                                                                                    | 📋 Planned                                                                                                                                                                                                                                                            |
 
 ---
 
@@ -2285,7 +2288,7 @@ Your support helps shape the future of the Vestara ecosystem.
 
 ### **Build. Trade. Earn. Grow.**
 
-*A unified ecosystem for digital finance, commerce, rewards, bookings, and future investment opportunities.*
+_A unified ecosystem for digital finance, commerce, rewards, bookings, and future investment opportunities._
 
 **Made with ❤️ using React, TypeScript, Express, Prisma Postgres, and modern cloud-native technologies.**
 
@@ -2305,4 +2308,3 @@ opencode run --agent developer --model opencode/deepseek-v4-flash-free --auto --
 ```bash
 opencode run --agent developer --model opencode/deepseek-v4-flash-free --auto --print-logs --log-level INFO "Enter your message" --session your_session_id
 ```
-

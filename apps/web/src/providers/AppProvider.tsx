@@ -18,13 +18,13 @@ export function AppProvider({ children }: AppProviderProps) {
       <QueryProvider>
         <AuthProvider>
           <ThemeProvider>
-              <ToastProvider>
-                <WebSocketProvider>
-                  <LiveNotificationsProvider>
-                    <DateRangeProvider>{children}</DateRangeProvider>
-                  </LiveNotificationsProvider>
-                </WebSocketProvider>
-              </ToastProvider>
+            <ToastProvider>
+              <WebSocketProvider>
+                <LiveNotificationsProvider>
+                  <DateRangeProvider>{children}</DateRangeProvider>
+                </LiveNotificationsProvider>
+              </WebSocketProvider>
+            </ToastProvider>
           </ThemeProvider>
         </AuthProvider>
       </QueryProvider>

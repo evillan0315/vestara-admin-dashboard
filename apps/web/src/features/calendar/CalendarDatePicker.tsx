@@ -13,21 +13,24 @@
  */
 
 import { useMemo, useState, type JSX } from 'react';
-import {
-  Box,
-  Button,
-  IconButton,
-  Typography,
-  useTheme,
-  alpha,
-} from '@mui/material';
+import { Box, Button, IconButton, Typography, useTheme, alpha } from '@mui/material';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { DateRangeValue } from './DateRangeContext';
 
 const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 function startOfDay(date: Date): Date {
@@ -76,7 +79,9 @@ export default function CalendarDatePicker({
   const end = new Date(value.endDate);
 
   // Anchor month: follow the selection's start month when present.
-  const [viewMonth, setViewMonth] = useState(() => new Date(start.getFullYear(), start.getMonth(), 1));
+  const [viewMonth, setViewMonth] = useState(
+    () => new Date(start.getFullYear(), start.getMonth(), 1),
+  );
   const [hoverDay, setHoverDay] = useState<Date | null>(null);
   const [draftStart, setDraftStart] = useState<Date | null>(null);
 
@@ -111,7 +116,8 @@ export default function CalendarDatePicker({
       [s, e] = [e, s];
     }
     // Clamp to maxDays by shifting the start forward.
-    const spanDays = Math.round((startOfDay(e).getTime() - startOfDay(s).getTime()) / 86_400_000) + 1;
+    const spanDays =
+      Math.round((startOfDay(e).getTime() - startOfDay(s).getTime()) / 86_400_000) + 1;
     if (spanDays > maxDays) {
       s = startOfDay(e);
       s.setDate(s.getDate() - (maxDays - 1));
@@ -138,7 +144,10 @@ export default function CalendarDatePicker({
     const inRange = draftStart
       ? isBetween(day, draftStart, previewEnd)
       : isBetween(day, start, end);
-    const selected = isStart || isEnd || (draftStart && sameDay(day, previewEnd) && draftStart.getTime() !== previewEnd.getTime());
+    const selected =
+      isStart ||
+      isEnd ||
+      (draftStart && sameDay(day, previewEnd) && draftStart.getTime() !== previewEnd.getTime());
 
     let bgcolor = 'transparent';
     if (selected) bgcolor = primary.main;
@@ -170,7 +179,9 @@ export default function CalendarDatePicker({
         <IconButton
           size="small"
           aria-label="Previous month"
-          onClick={() => setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))}
+          onClick={() =>
+            setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))
+          }
           sx={{ color: text.primary }}
         >
           <ChevronLeft size={18} />
@@ -181,7 +192,9 @@ export default function CalendarDatePicker({
         <IconButton
           size="small"
           aria-label="Next month"
-          onClick={() => setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))}
+          onClick={() =>
+            setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))
+          }
           sx={{ color: text.primary }}
         >
           <ChevronRight size={18} />

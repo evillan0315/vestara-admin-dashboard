@@ -6,7 +6,8 @@ export const settingKeys = {
   all: ['settings'] as const,
   list: () => ['settings', 'list'] as const,
   detail: (key: string) => ['settings', key] as const,
-  auditHistory: (params?: Record<string, unknown>) => ['settings', 'audit-history', params] as const,
+  auditHistory: (params?: Record<string, unknown>) =>
+    ['settings', 'audit-history', params] as const,
 };
 
 export function useSettings() {

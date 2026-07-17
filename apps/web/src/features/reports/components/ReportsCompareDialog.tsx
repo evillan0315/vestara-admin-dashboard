@@ -46,7 +46,12 @@ function formatSize(bytes?: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function ReportsCompareDialog({ open, reportIds, reports, onClose }: ReportsCompareDialogProps) {
+export function ReportsCompareDialog({
+  open,
+  reportIds,
+  reports,
+  onClose,
+}: ReportsCompareDialogProps) {
   const compareMutation = useCompareReports();
   const [comparedData, setComparedData] = useState<Report[] | null>(null);
   const [loading, setLoading] = useState(false);

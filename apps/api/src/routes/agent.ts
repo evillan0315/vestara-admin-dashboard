@@ -104,7 +104,12 @@ router.put(
   validate(updateDataSourceSchema),
   async (req, res, next) => {
     try {
-      const data = await agentService.update(req.user!.organizationId, req.user!.id, paramId(req), req.body);
+      const data = await agentService.update(
+        req.user!.organizationId,
+        req.user!.id,
+        paramId(req),
+        req.body,
+      );
       res.json({ success: true, data });
     } catch (err) {
       next(err);

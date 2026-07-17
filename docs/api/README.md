@@ -20,9 +20,9 @@ Base URL: `/api/v1`
     - [Users](#get-users)
     - [Organizations](#organizations)
     - [Settings](#settings)
-     - [Audit Logs](#audit-logs)
-     - [Integrations](#integrations-ai-data-connector)
-     - [Chat](#chat-ai-chatbot)
+    - [Audit Logs](#audit-logs)
+    - [Integrations](#integrations-ai-data-connector)
+    - [Chat](#chat-ai-chatbot)
 - [Data Models](#data-models)
 - [Enums](#enums)
 - [Error Codes](#error-codes)
@@ -32,17 +32,17 @@ Base URL: `/api/v1`
 
 ## Technology Stack
 
-| Layer | Technology |
-|-------|------------|
-| Framework | Express.js 5 |
-| Language | TypeScript (strict mode) |
-| Database ORM | Prisma 7 (`prisma-client` generator with `PrismaPg` adapter) |
-| Database | Prisma Postgres (hosted PostgreSQL) |
-| Auth | JWT (access + refresh tokens) |
-| Password Hashing | bcryptjs |
-| Validation | Zod |
-| Logging | Pino |
-| Runtime | Node.js 22+ |
+| Layer            | Technology                                                   |
+| ---------------- | ------------------------------------------------------------ |
+| Framework        | Express.js 5                                                 |
+| Language         | TypeScript (strict mode)                                     |
+| Database ORM     | Prisma 7 (`prisma-client` generator with `PrismaPg` adapter) |
+| Database         | Prisma Postgres (hosted PostgreSQL)                          |
+| Auth             | JWT (access + refresh tokens)                                |
+| Password Hashing | bcryptjs                                                     |
+| Validation       | Zod                                                          |
+| Logging          | Pino                                                         |
+| Runtime          | Node.js 22+                                                  |
 
 ---
 
@@ -128,19 +128,19 @@ All API responses follow a consistent envelope structure.
 
 ### HTTP Status Codes Used
 
-| Code | Meaning |
-|------|---------|
-| 200 | OK |
-| 201 | Created |
-| 204 | No Content |
-| 400 | Bad Request |
-| 401 | Unauthorized |
-| 403 | Forbidden |
-| 404 | Not Found |
-| 409 | Conflict |
-| 422 | Unprocessable Entity (validation error) |
-| 429 | Too Many Requests |
-| 500 | Internal Server Error |
+| Code | Meaning                                 |
+| ---- | --------------------------------------- |
+| 200  | OK                                      |
+| 201  | Created                                 |
+| 204  | No Content                              |
+| 400  | Bad Request                             |
+| 401  | Unauthorized                            |
+| 403  | Forbidden                               |
+| 404  | Not Found                               |
+| 409  | Conflict                                |
+| 422  | Unprocessable Entity (validation error) |
+| 429  | Too Many Requests                       |
+| 500  | Internal Server Error                   |
 
 ---
 
@@ -152,16 +152,16 @@ Errors flow through a centralized error-handling middleware pipeline.
 
 Every application error extends `AppError` and carries a numeric HTTP status code, a machine-readable error code, and optional detail payload.
 
-| Error Class | Default Status | Default Code |
-|-------------|---------------|--------------|
-| `BadRequestError` | 400 | `INVALID_INPUT` |
-| `UnauthorizedError` | 401 | `TOKEN_INVALID` |
-| `ForbiddenError` | 403 | `FORBIDDEN` |
-| `NotFoundError` | 404 | `NOT_FOUND` |
-| `ConflictError` | 409 | `CONFLICT` |
-| `ValidationError` | 422 | `VALIDATION_ERROR` |
-| `RateLimitError` | 429 | `RATE_LIMITED` |
-| `InternalError` | 500 | `INTERNAL_ERROR` |
+| Error Class         | Default Status | Default Code       |
+| ------------------- | -------------- | ------------------ |
+| `BadRequestError`   | 400            | `INVALID_INPUT`    |
+| `UnauthorizedError` | 401            | `TOKEN_INVALID`    |
+| `ForbiddenError`    | 403            | `FORBIDDEN`        |
+| `NotFoundError`     | 404            | `NOT_FOUND`        |
+| `ConflictError`     | 409            | `CONFLICT`         |
+| `ValidationError`   | 422            | `VALIDATION_ERROR` |
+| `RateLimitError`    | 429            | `RATE_LIMITED`     |
+| `InternalError`     | 500            | `INTERNAL_ERROR`   |
 
 ### Validation Errors
 
@@ -218,15 +218,15 @@ Authorization: Bearer <access_token>
 
 Every response includes:
 
-| Header | Value |
-|--------|-------|
-| `Content-Security-Policy` | `script-src 'self'`, `style-src 'self' 'unsafe-inline'`, `img-src 'self' data: blob:` (prod) / `https:` (dev), `connect-src 'self' https: wss:`, `frame-ancestors 'none'` |
-| `X-Content-Type-Options` | `nosniff` |
-| `X-XSS-Protection` | `1; mode=block` |
-| `Referrer-Policy` | `strict-origin-when-cross-origin` |
-| `Permissions-Policy` | `camera=(), microphone=(), geolocation=(), payment=()` |
-| `Strict-Transport-Security` | `max-age=31536000; includeSubDomains; preload` (production) |
-| `X-Request-Id` | UUID (generated per request or echoed from client) |
+| Header                      | Value                                                                                                                                                                     |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Content-Security-Policy`   | `script-src 'self'`, `style-src 'self' 'unsafe-inline'`, `img-src 'self' data: blob:` (prod) / `https:` (dev), `connect-src 'self' https: wss:`, `frame-ancestors 'none'` |
+| `X-Content-Type-Options`    | `nosniff`                                                                                                                                                                 |
+| `X-XSS-Protection`          | `1; mode=block`                                                                                                                                                           |
+| `Referrer-Policy`           | `strict-origin-when-cross-origin`                                                                                                                                         |
+| `Permissions-Policy`        | `camera=(), microphone=(), geolocation=(), payment=()`                                                                                                                    |
+| `Strict-Transport-Security` | `max-age=31536000; includeSubDomains; preload` (production)                                                                                                               |
+| `X-Request-Id`              | UUID (generated per request or echoed from client)                                                                                                                        |
 
 ---
 
@@ -264,13 +264,13 @@ Register a new user account. Returns user details and authentication tokens.
 
 **Request Body**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `email` | string | yes | Valid email address |
-| `password` | string | yes | Min 8 chars, uppercase, lowercase, number |
-| `firstName` | string | yes | 1-100 characters |
-| `lastName` | string | yes | 1-100 characters |
-| `role` | string | no | User role (default: `admin`) |
+| Field       | Type   | Required | Description                               |
+| ----------- | ------ | -------- | ----------------------------------------- |
+| `email`     | string | yes      | Valid email address                       |
+| `password`  | string | yes      | Min 8 chars, uppercase, lowercase, number |
+| `firstName` | string | yes      | 1-100 characters                          |
+| `lastName`  | string | yes      | 1-100 characters                          |
+| `role`      | string | no       | User role (default: `admin`)              |
 
 **Response `201`**
 
@@ -300,10 +300,10 @@ Register a new user account. Returns user details and authentication tokens.
 
 **Error Codes**
 
-| Code | Status | Condition |
-|------|--------|-----------|
-| `VALIDATION_ERROR` | 422 | Invalid input fields |
-| `USER_ALREADY_EXISTS` | 409 | Email already registered |
+| Code                  | Status | Condition                |
+| --------------------- | ------ | ------------------------ |
+| `VALIDATION_ERROR`    | 422    | Invalid input fields     |
+| `USER_ALREADY_EXISTS` | 409    | Email already registered |
 
 ---
 
@@ -313,12 +313,12 @@ Authenticate with email and password. Returns user details and authentication to
 
 **Request Body**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `email` | string | yes | Registered email address |
-| `password` | string | yes | Account password |
-| `ipAddress` | string | no | Client IP (auto-detected if omitted) |
-| `userAgent` | string | no | Client user agent |
+| Field       | Type   | Required | Description                          |
+| ----------- | ------ | -------- | ------------------------------------ |
+| `email`     | string | yes      | Registered email address             |
+| `password`  | string | yes      | Account password                     |
+| `ipAddress` | string | no       | Client IP (auto-detected if omitted) |
+| `userAgent` | string | no       | Client user agent                    |
 
 **Response `200`**
 
@@ -326,10 +326,10 @@ Same shape as `/auth/register` response.
 
 **Error Codes**
 
-| Code | Status | Condition |
-|------|--------|-----------|
-| `VALIDATION_ERROR` | 422 | Invalid input fields |
-| `INVALID_CREDENTIALS` | 401 | Invalid email or password |
+| Code                  | Status | Condition                 |
+| --------------------- | ------ | ------------------------- |
+| `VALIDATION_ERROR`    | 422    | Invalid input fields      |
+| `INVALID_CREDENTIALS` | 401    | Invalid email or password |
 
 ---
 
@@ -339,9 +339,9 @@ Exchange a refresh token for a new access token and refresh token pair.
 
 **Request Body**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `refreshToken` | string | yes | Valid refresh token |
+| Field          | Type   | Required | Description         |
+| -------------- | ------ | -------- | ------------------- |
+| `refreshToken` | string | yes      | Valid refresh token |
 
 **Response `200`**
 
@@ -360,11 +360,11 @@ Exchange a refresh token for a new access token and refresh token pair.
 
 **Error Codes**
 
-| Code | Status | Condition |
-|------|--------|-----------|
-| `INVALID_INPUT` | 400 | Missing refresh token |
-| `REFRESH_TOKEN_INVALID` | 401 | Invalid or revoked refresh token |
-| `ACCOUNT_DISABLED` | 401 | User account is inactive |
+| Code                    | Status | Condition                        |
+| ----------------------- | ------ | -------------------------------- |
+| `INVALID_INPUT`         | 400    | Missing refresh token            |
+| `REFRESH_TOKEN_INVALID` | 401    | Invalid or revoked refresh token |
+| `ACCOUNT_DISABLED`      | 401    | User account is inactive         |
 
 ---
 
@@ -374,10 +374,10 @@ Revoke the refresh token and invalidate all sessions for the user.
 
 **Request Body**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `userId` | string | yes | ID of the user to log out |
-| `refreshToken` | string | no | Specific refresh token to revoke |
+| Field          | Type   | Required | Description                      |
+| -------------- | ------ | -------- | -------------------------------- |
+| `userId`       | string | yes      | ID of the user to log out        |
+| `refreshToken` | string | no       | Specific refresh token to revoke |
 
 **Response `200`**
 
@@ -389,9 +389,9 @@ Revoke the refresh token and invalidate all sessions for the user.
 
 **Error Codes**
 
-| Code | Status | Condition |
-|------|--------|-----------|
-| `INVALID_INPUT` | 400 | Missing user ID |
+| Code            | Status | Condition       |
+| --------------- | ------ | --------------- |
+| `INVALID_INPUT` | 400    | Missing user ID |
 
 ---
 
@@ -401,9 +401,9 @@ Get the currently authenticated user's profile.
 
 **Headers**
 
-| Header | Required | Value |
-|--------|----------|-------|
-| `Authorization` | yes | `Bearer <access_token>` |
+| Header          | Required | Value                   |
+| --------------- | -------- | ----------------------- |
+| `Authorization` | yes      | `Bearer <access_token>` |
 
 **Response `200`**
 
@@ -429,10 +429,10 @@ Get the currently authenticated user's profile.
 
 **Error Codes**
 
-| Code | Status | Condition |
-|------|--------|-----------|
-| `TOKEN_INVALID` | 401 | Missing or invalid access token |
-| `USER_INACTIVE` | 401 | User account is disabled |
+| Code            | Status | Condition                       |
+| --------------- | ------ | ------------------------------- |
+| `TOKEN_INVALID` | 401    | Missing or invalid access token |
+| `USER_INACTIVE` | 401    | User account is disabled        |
 
 ---
 
@@ -450,7 +450,14 @@ Get the current user's base info and extended profile (preferences, KYC).
 {
   "success": true,
   "data": {
-    "user": { "id": "uuid", "firstName": "John", "lastName": "Doe", "email": "john@example.com", "role": "admin", "avatarUrl": null },
+    "user": {
+      "id": "uuid",
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john@example.com",
+      "role": "admin",
+      "avatarUrl": null
+    },
     "profile": {
       "id": "uuid",
       "themeMode": "dark",
@@ -486,31 +493,31 @@ Update the current user's profile fields. Only provided fields are changed.
 
 **Request Body** (all fields optional):
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `firstName` | string | User's first name |
-| `lastName` | string | User's last name |
-| `avatarUrl` | string | Avatar image URL |
-| `themeMode` | enum | `light`, `dark`, or `system` |
-| `fontFamily` | enum | `inter`, `plus-jakarta-sans`, `roboto`, `system` |
-| `fontSizeScale` | number | 0.75 – 1.25 |
-| `fontWeight` | enum | `light`, `normal`, `medium`, `semibold`, `bold` |
-| `primaryColor` | enum | `gold`, `blue`, `purple`, `green`, `red`, `indigo`, `teal` |
-| `density` | enum | `compact`, `comfortable`, `spacious` |
-| `sidebarVariant` | enum | `default`, `compact`, `hidden` |
-| `borderRadiusScale` | number | 0.5 – 2.0 |
-| `contrastLevel` | enum | `normal`, `high` |
-| `language` | string | Locale code (e.g. `en`) |
-| `timezone` | string | IANA timezone (e.g. `UTC`) |
-| `dateFormat` | enum | `mdy`, `dmy`, `ymd` |
-| `emailNotifications` | boolean | Email notification toggle |
-| `pushNotifications` | boolean | Push notification toggle |
-| `loginAlerts` | boolean | Login alert toggle |
-| `marketingEmails` | boolean | Marketing email toggle |
-| `profileVisibility` | enum | `public`, `organization`, `private` |
-| `showEmail` | boolean | Show email on profile |
-| `showActivity` | boolean | Show activity on profile |
-| `searchable` | boolean | Allow profile to be found in search |
+| Field                | Type    | Description                                                |
+| -------------------- | ------- | ---------------------------------------------------------- |
+| `firstName`          | string  | User's first name                                          |
+| `lastName`           | string  | User's last name                                           |
+| `avatarUrl`          | string  | Avatar image URL                                           |
+| `themeMode`          | enum    | `light`, `dark`, or `system`                               |
+| `fontFamily`         | enum    | `inter`, `plus-jakarta-sans`, `roboto`, `system`           |
+| `fontSizeScale`      | number  | 0.75 – 1.25                                                |
+| `fontWeight`         | enum    | `light`, `normal`, `medium`, `semibold`, `bold`            |
+| `primaryColor`       | enum    | `gold`, `blue`, `purple`, `green`, `red`, `indigo`, `teal` |
+| `density`            | enum    | `compact`, `comfortable`, `spacious`                       |
+| `sidebarVariant`     | enum    | `default`, `compact`, `hidden`                             |
+| `borderRadiusScale`  | number  | 0.5 – 2.0                                                  |
+| `contrastLevel`      | enum    | `normal`, `high`                                           |
+| `language`           | string  | Locale code (e.g. `en`)                                    |
+| `timezone`           | string  | IANA timezone (e.g. `UTC`)                                 |
+| `dateFormat`         | enum    | `mdy`, `dmy`, `ymd`                                        |
+| `emailNotifications` | boolean | Email notification toggle                                  |
+| `pushNotifications`  | boolean | Push notification toggle                                   |
+| `loginAlerts`        | boolean | Login alert toggle                                         |
+| `marketingEmails`    | boolean | Marketing email toggle                                     |
+| `profileVisibility`  | enum    | `public`, `organization`, `private`                        |
+| `showEmail`          | boolean | Show email on profile                                      |
+| `showActivity`       | boolean | Show activity on profile                                   |
+| `searchable`         | boolean | Allow profile to be found in search                        |
 
 **Response `200`**: Returns the updated user and profile.
 
@@ -526,15 +533,15 @@ Returns a paginated, filterable list of users. Requires authentication.
 
 **Query Parameters**
 
-| Param | Type | Default | Description |
-|-------|------|---------|-------------|
-| `page` | number | 1 | Page number |
-| `perPage` | number | 20 | Results per page (max 100) |
-| `sortBy` | string | `createdAt` | Sort column |
-| `sortOrder` | enum | `desc` | Sort direction (`asc`, `desc`) |
-| `search` | string | — | Full-text search across name/email |
-| `role` | string | — | Filter by role (`super_admin`, `admin`, `moderator`, `support`) |
-| `isActive` | boolean | — | Filter by active/inactive status |
+| Param       | Type    | Default     | Description                                                     |
+| ----------- | ------- | ----------- | --------------------------------------------------------------- |
+| `page`      | number  | 1           | Page number                                                     |
+| `perPage`   | number  | 20          | Results per page (max 100)                                      |
+| `sortBy`    | string  | `createdAt` | Sort column                                                     |
+| `sortOrder` | enum    | `desc`      | Sort direction (`asc`, `desc`)                                  |
+| `search`    | string  | —           | Full-text search across name/email                              |
+| `role`      | string  | —           | Filter by role (`super_admin`, `admin`, `moderator`, `support`) |
+| `isActive`  | boolean | —           | Filter by active/inactive status                                |
 
 **Response `200`**
 
@@ -566,9 +573,9 @@ Returns a paginated, filterable list of users. Requires authentication.
 
 **Error Codes**
 
-| Code | Status | Condition |
-|------|--------|-----------|
-| `TOKEN_INVALID` | 401 | Missing or invalid access token |
+| Code            | Status | Condition                       |
+| --------------- | ------ | ------------------------------- |
+| `TOKEN_INVALID` | 401    | Missing or invalid access token |
 
 ---
 
@@ -598,10 +605,10 @@ Get a single user by ID. Requires authentication.
 
 **Error Codes**
 
-| Code | Status | Condition |
-|------|--------|-----------|
-| `TOKEN_INVALID` | 401 | Missing or invalid access token |
-| `NOT_FOUND` | 404 | User does not exist |
+| Code            | Status | Condition                       |
+| --------------- | ------ | ------------------------------- |
+| `TOKEN_INVALID` | 401    | Missing or invalid access token |
+| `NOT_FOUND`     | 404    | User does not exist             |
 
 ---
 
@@ -611,13 +618,13 @@ Create a new user. Requires `super_admin` or `admin` role.
 
 **Request Body**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `email` | string | yes | Valid email address |
-| `password` | string | yes | Min 8 chars, uppercase, lowercase, number |
-| `firstName` | string | yes | 1-100 characters |
-| `lastName` | string | yes | 1-100 characters |
-| `role` | string | no | User role (default: `admin`) |
+| Field       | Type   | Required | Description                               |
+| ----------- | ------ | -------- | ----------------------------------------- |
+| `email`     | string | yes      | Valid email address                       |
+| `password`  | string | yes      | Min 8 chars, uppercase, lowercase, number |
+| `firstName` | string | yes      | 1-100 characters                          |
+| `lastName`  | string | yes      | 1-100 characters                          |
+| `role`      | string | no       | User role (default: `admin`)              |
 
 **Response `201`**
 
@@ -640,11 +647,11 @@ Create a new user. Requires `super_admin` or `admin` role.
 
 **Error Codes**
 
-| Code | Status | Condition |
-|------|--------|-----------|
-| `VALIDATION_ERROR` | 422 | Invalid input fields |
-| `USER_ALREADY_EXISTS` | 409 | Email already registered |
-| `FORBIDDEN` | 403 | Insufficient role permissions |
+| Code                  | Status | Condition                     |
+| --------------------- | ------ | ----------------------------- |
+| `VALIDATION_ERROR`    | 422    | Invalid input fields          |
+| `USER_ALREADY_EXISTS` | 409    | Email already registered      |
+| `FORBIDDEN`           | 403    | Insufficient role permissions |
 
 ---
 
@@ -654,12 +661,12 @@ Update an existing user. Requires `super_admin` or `admin` role.
 
 **Request Body**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `email` | string | no | Valid email address |
-| `firstName` | string | no | 1-100 characters |
-| `lastName` | string | no | 1-100 characters |
-| `role` | string | no | User role |
+| Field       | Type   | Required | Description         |
+| ----------- | ------ | -------- | ------------------- |
+| `email`     | string | no       | Valid email address |
+| `firstName` | string | no       | 1-100 characters    |
+| `lastName`  | string | no       | 1-100 characters    |
+| `role`      | string | no       | User role           |
 
 **Response `200`**
 
@@ -667,11 +674,11 @@ Same shape as `POST /users` response.
 
 **Error Codes**
 
-| Code | Status | Condition |
-|------|--------|-----------|
-| `VALIDATION_ERROR` | 422 | Invalid input fields |
-| `NOT_FOUND` | 404 | User not found |
-| `FORBIDDEN` | 403 | Insufficient role permissions |
+| Code               | Status | Condition                     |
+| ------------------ | ------ | ----------------------------- |
+| `VALIDATION_ERROR` | 422    | Invalid input fields          |
+| `NOT_FOUND`        | 404    | User not found                |
+| `FORBIDDEN`        | 403    | Insufficient role permissions |
 
 ---
 
@@ -690,10 +697,10 @@ Delete a user. Requires `super_admin` role.
 
 **Error Codes**
 
-| Code | Status | Condition |
-|------|--------|-----------|
-| `NOT_FOUND` | 404 | User not found |
-| `FORBIDDEN` | 403 | Only super_admin can delete users |
+| Code        | Status | Condition                         |
+| ----------- | ------ | --------------------------------- |
+| `NOT_FOUND` | 404    | User not found                    |
+| `FORBIDDEN` | 403    | Only super_admin can delete users |
 
 ---
 
@@ -703,9 +710,9 @@ Toggle a user's active/inactive status. Requires `super_admin` or `admin` role.
 
 **Request Body**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `isActive` | boolean | yes | New active status |
+| Field      | Type    | Required | Description       |
+| ---------- | ------- | -------- | ----------------- |
+| `isActive` | boolean | yes      | New active status |
 
 **Response `200`**
 
@@ -722,10 +729,10 @@ Toggle a user's active/inactive status. Requires `super_admin` or `admin` role.
 
 **Error Codes**
 
-| Code | Status | Condition |
-|------|--------|-----------|
-| `NOT_FOUND` | 404 | User not found |
-| `FORBIDDEN` | 403 | Cannot deactivate own account |
+| Code        | Status | Condition                     |
+| ----------- | ------ | ----------------------------- |
+| `NOT_FOUND` | 404    | User not found                |
+| `FORBIDDEN` | 403    | Cannot deactivate own account |
 
 ---
 
@@ -739,13 +746,13 @@ Returns a paginated list of system settings.
 
 **Query Parameters**
 
-| Param | Type | Default | Description |
-|-------|------|---------|-------------|
-| `page` | number | 1 | Page number |
-| `perPage` | number | 20 | Results per page |
-| `sortBy` | string | `key` | Sort column |
-| `sortOrder` | enum | `asc` | Sort direction |
-| `search` | string | — | Search by key |
+| Param       | Type   | Default | Description      |
+| ----------- | ------ | ------- | ---------------- |
+| `page`      | number | 1       | Page number      |
+| `perPage`   | number | 20      | Results per page |
+| `sortBy`    | string | `key`   | Sort column      |
+| `sortOrder` | enum   | `asc`   | Sort direction   |
+| `search`    | string | —       | Search by key    |
 
 **Response `200`**
 
@@ -795,9 +802,9 @@ Get a single setting by its key.
 
 **Error Codes**
 
-| Code | Status | Condition |
-|------|--------|-----------|
-| `NOT_FOUND` | 404 | Setting key not found |
+| Code        | Status | Condition             |
+| ----------- | ------ | --------------------- |
+| `NOT_FOUND` | 404    | Setting key not found |
 
 ---
 
@@ -807,10 +814,10 @@ Create a new system setting. Requires `super_admin` or `admin` role.
 
 **Request Body**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `key` | string | yes | Unique setting key |
-| `value` | object | yes | Setting value (JSON) |
+| Field   | Type   | Required | Description          |
+| ------- | ------ | -------- | -------------------- |
+| `key`   | string | yes      | Unique setting key   |
+| `value` | object | yes      | Setting value (JSON) |
 
 **Response `201`**
 
@@ -818,11 +825,11 @@ Same shape as `GET /settings/:key` response.
 
 **Error Codes**
 
-| Code | Status | Condition |
-|------|--------|-----------|
-| `VALIDATION_ERROR` | 422 | Invalid input |
-| `ALREADY_EXISTS` | 409 | Setting key already exists |
-| `FORBIDDEN` | 403 | Insufficient role permissions |
+| Code               | Status | Condition                     |
+| ------------------ | ------ | ----------------------------- |
+| `VALIDATION_ERROR` | 422    | Invalid input                 |
+| `ALREADY_EXISTS`   | 409    | Setting key already exists    |
+| `FORBIDDEN`        | 403    | Insufficient role permissions |
 
 ---
 
@@ -832,9 +839,9 @@ Update an existing setting. Requires `super_admin` or `admin` role.
 
 **Request Body**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `value` | object | yes | New setting value (JSON) |
+| Field   | Type   | Required | Description              |
+| ------- | ------ | -------- | ------------------------ |
+| `value` | object | yes      | New setting value (JSON) |
 
 **Response `200`**
 
@@ -842,11 +849,11 @@ Same shape as `GET /settings/:key` response.
 
 **Error Codes**
 
-| Code | Status | Condition |
-|------|--------|-----------|
-| `VALIDATION_ERROR` | 422 | Invalid input |
-| `NOT_FOUND` | 404 | Setting key not found |
-| `FORBIDDEN` | 403 | Insufficient role permissions |
+| Code               | Status | Condition                     |
+| ------------------ | ------ | ----------------------------- |
+| `VALIDATION_ERROR` | 422    | Invalid input                 |
+| `NOT_FOUND`        | 404    | Setting key not found         |
+| `FORBIDDEN`        | 403    | Insufficient role permissions |
 
 ---
 
@@ -865,10 +872,10 @@ Delete a system setting. Requires `super_admin` role.
 
 **Error Codes**
 
-| Code | Status | Condition |
-|------|--------|-----------|
-| `NOT_FOUND` | 404 | Setting key not found |
-| `FORBIDDEN` | 403 | Only super_admin can delete settings |
+| Code        | Status | Condition                            |
+| ----------- | ------ | ------------------------------------ |
+| `NOT_FOUND` | 404    | Setting key not found                |
+| `FORBIDDEN` | 403    | Only super_admin can delete settings |
 
 ---
 
@@ -882,19 +889,19 @@ Returns a paginated, filterable list of audit log entries.
 
 **Query Parameters**
 
-| Param | Type | Default | Description |
-|-------|------|---------|-------------|
-| `page` | number | 1 | Page number |
-| `perPage` | number | 20 | Results per page |
-| `sortBy` | string | `createdAt` | Sort column |
-| `sortOrder` | enum | `desc` | Sort direction |
-| `action` | string | — | Filter by action (`login`, `logout`, `create`, `update`, `delete`, etc.) |
-| `entity` | string | — | Filter by entity type (`user`, `setting`, `audit_log`) |
-| `entityId` | string | — | Filter by affected entity ID |
-| `userId` | string | — | Filter by acting user ID |
-| `search` | string | — | Full-text search |
-| `startDate` | string | — | ISO date filter (start range) |
-| `endDate` | string | — | ISO date filter (end range) |
+| Param       | Type   | Default     | Description                                                              |
+| ----------- | ------ | ----------- | ------------------------------------------------------------------------ |
+| `page`      | number | 1           | Page number                                                              |
+| `perPage`   | number | 20          | Results per page                                                         |
+| `sortBy`    | string | `createdAt` | Sort column                                                              |
+| `sortOrder` | enum   | `desc`      | Sort direction                                                           |
+| `action`    | string | —           | Filter by action (`login`, `logout`, `create`, `update`, `delete`, etc.) |
+| `entity`    | string | —           | Filter by entity type (`user`, `setting`, `audit_log`)                   |
+| `entityId`  | string | —           | Filter by affected entity ID                                             |
+| `userId`    | string | —           | Filter by acting user ID                                                 |
+| `search`    | string | —           | Full-text search                                                         |
+| `startDate` | string | —           | ISO date filter (start range)                                            |
+| `endDate`   | string | —           | ISO date filter (end range)                                              |
 
 **Response `200`**
 
@@ -952,9 +959,9 @@ Get a single audit log entry by ID.
 
 **Error Codes**
 
-| Code | Status | Condition |
-|------|--------|-----------|
-| `NOT_FOUND` | 404 | Audit log entry not found |
+| Code        | Status | Condition                 |
+| ----------- | ------ | ------------------------- |
+| `NOT_FOUND` | 404    | Audit log entry not found |
 
 ---
 
@@ -1012,9 +1019,9 @@ Get a single organization by ID or slug.
 
 **Error Codes**
 
-| Code | Status | Condition |
-|------|--------|-----------|
-| `NOT_FOUND` | 404 | Organization not found |
+| Code        | Status | Condition              |
+| ----------- | ------ | ---------------------- |
+| `NOT_FOUND` | 404    | Organization not found |
 
 #### `POST /organizations`
 
@@ -1022,11 +1029,11 @@ Create a new organization.
 
 **Request Body**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | Yes | Organization name (2–100 chars) |
-| `slug` | string | Yes | URL-friendly identifier (lowercase, alphanumeric, hyphens) |
-| `logoUrl` | string | No | URL to organization logo |
+| Field     | Type   | Required | Description                                                |
+| --------- | ------ | -------- | ---------------------------------------------------------- |
+| `name`    | string | Yes      | Organization name (2–100 chars)                            |
+| `slug`    | string | Yes      | URL-friendly identifier (lowercase, alphanumeric, hyphens) |
+| `logoUrl` | string | No       | URL to organization logo                                   |
 
 **Response `201`**
 
@@ -1048,10 +1055,10 @@ Create a new organization.
 
 **Error Codes**
 
-| Code | Status | Condition |
-|------|--------|-----------|
-| `ORGANIZATION_SLUG_EXISTS` | 409 | An organization with this slug already exists |
-| `VALIDATION_ERROR` | 422 | Invalid input data |
+| Code                       | Status | Condition                                     |
+| -------------------------- | ------ | --------------------------------------------- |
+| `ORGANIZATION_SLUG_EXISTS` | 409    | An organization with this slug already exists |
+| `VALIDATION_ERROR`         | 422    | Invalid input data                            |
 
 #### `PUT /organizations/:id`
 
@@ -1059,10 +1066,10 @@ Update an organization's name or logo.
 
 **Request Body**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | No | Organization name |
-| `logoUrl` | string | No | Organization logo URL (set to `null` to clear) |
+| Field     | Type   | Required | Description                                    |
+| --------- | ------ | -------- | ---------------------------------------------- |
+| `name`    | string | No       | Organization name                              |
+| `logoUrl` | string | No       | Organization logo URL (set to `null` to clear) |
 
 **Response `200`**
 
@@ -1084,10 +1091,10 @@ Update an organization's name or logo.
 
 **Error Codes**
 
-| Code | Status | Condition |
-|------|--------|-----------|
-| `NOT_FOUND` | 404 | Organization not found |
-| `VALIDATION_ERROR` | 422 | Invalid input data |
+| Code               | Status | Condition              |
+| ------------------ | ------ | ---------------------- |
+| `NOT_FOUND`        | 404    | Organization not found |
+| `VALIDATION_ERROR` | 422    | Invalid input data     |
 
 ---
 
@@ -1127,17 +1134,17 @@ Create a data source. Requires `SUPER_ADMIN`/`ADMIN`/`MODERATOR`.
 
 **Request Body:**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | yes | Display name |
-| `url` | string (URL) | yes | External API endpoint |
-| `method` | `GET` \| `POST` | no (default `GET`) | HTTP method |
-| `headers` | object | no | Additional request headers |
-| `queryParams` | object | no | Query string params |
-| `authType` | `none` \| `bearer` \| `basic` | no (default `none`) | Auth scheme |
-| `authorization` | string | conditional | Token/credentials (required when `authType` ≠ `none`) |
-| `body` | object | no | JSON body (for `POST`) |
-| `isActive` | boolean | no (default `true`) | Whether the source is enabled |
+| Field           | Type                          | Required            | Description                                           |
+| --------------- | ----------------------------- | ------------------- | ----------------------------------------------------- |
+| `name`          | string                        | yes                 | Display name                                          |
+| `url`           | string (URL)                  | yes                 | External API endpoint                                 |
+| `method`        | `GET` \| `POST`               | no (default `GET`)  | HTTP method                                           |
+| `headers`       | object                        | no                  | Additional request headers                            |
+| `queryParams`   | object                        | no                  | Query string params                                   |
+| `authType`      | `none` \| `bearer` \| `basic` | no (default `none`) | Auth scheme                                           |
+| `authorization` | string                        | conditional         | Token/credentials (required when `authType` ≠ `none`) |
+| `body`          | object                        | no                  | JSON body (for `POST`)                                |
+| `isActive`      | boolean                       | no (default `true`) | Whether the source is enabled                         |
 
 **Response (Success — `201`):** the created `DataSource` DTO (without `authorization`).
 
@@ -1170,7 +1177,7 @@ Fetch the external API, normalize the JSON, and return an analysis (field types,
   "success": true,
   "data": {
     "dataSourceId": "clxxx",
-    "data": [ { "id": 1, "name": "Leanne", "...": "..." } ],
+    "data": [{ "id": 1, "name": "Leanne", "...": "..." }],
     "recordCount": 10,
     "fields": [
       { "name": "id", "type": "number", "sample": 1 },
@@ -1181,7 +1188,7 @@ Fetch the external API, normalize the JSON, and return an analysis (field types,
       "title": "name by id",
       "xAxis": "name",
       "yAxis": "id",
-      "series": [ { "name": "id", "dataKeys": ["id"] } ],
+      "series": [{ "name": "id", "dataKeys": ["id"] }],
       "insight": "AI-enhanced summary of the dataset (when available)"
     }
   }
@@ -1204,17 +1211,17 @@ OpenCode → OpenAI → Anthropic → Mock (fallback)
 
 #### Available Models
 
-| Model | Provider | Description |
-|-------|----------|-------------|
-| `mimo-v2.5-free` | OpenCode | Reasoning, text, and image support (default) |
-| `deepseek-v4-flash-free` | OpenCode | Fast coding and general tasks |
-| `nemotron-3-ultra-free` | OpenCode | NVIDIA 1M context |
-| `north-mini-code-free` | OpenCode | Compact coding specialist |
-| `gpt-4` | OpenAI | Most capable model for complex tasks |
-| `gpt-4o-mini` | OpenAI | Fast and cost-effective |
-| `claude-sonnet-4-20250514` | Anthropic | Balanced performance and speed |
-| `claude-haiku-3.5` | Anthropic | Fastest Claude model |
-| `mock` | Built-in | Demo mode — no API key required |
+| Model                      | Provider  | Description                                  |
+| -------------------------- | --------- | -------------------------------------------- |
+| `mimo-v2.5-free`           | OpenCode  | Reasoning, text, and image support (default) |
+| `deepseek-v4-flash-free`   | OpenCode  | Fast coding and general tasks                |
+| `nemotron-3-ultra-free`    | OpenCode  | NVIDIA 1M context                            |
+| `north-mini-code-free`     | OpenCode  | Compact coding specialist                    |
+| `gpt-4`                    | OpenAI    | Most capable model for complex tasks         |
+| `gpt-4o-mini`              | OpenAI    | Fast and cost-effective                      |
+| `claude-sonnet-4-20250514` | Anthropic | Balanced performance and speed               |
+| `claude-haiku-3.5`         | Anthropic | Fastest Claude model                         |
+| `mock`                     | Built-in  | Demo mode — no API key required              |
 
 ---
 
@@ -1249,12 +1256,12 @@ List the authenticated user's conversations (org-scoped).
 
 **Query Parameters**
 
-| Param | Type | Default | Description |
-|-------|------|---------|-------------|
-| `page` | number | 1 | Page number |
-| `perPage` | number | 20 | Results per page (max 100) |
-| `search` | string | — | Search by title |
-| `isArchived` | boolean | — | Filter by archive status |
+| Param        | Type    | Default | Description                |
+| ------------ | ------- | ------- | -------------------------- |
+| `page`       | number  | 1       | Page number                |
+| `perPage`    | number  | 20      | Results per page (max 100) |
+| `search`     | string  | —       | Search by title            |
+| `isArchived` | boolean | —       | Filter by archive status   |
 
 **Response `200`**
 
@@ -1291,12 +1298,12 @@ Create a new conversation.
 
 **Request Body**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `title` | string | no | Conversation title (default: "New Conversation") |
-| `model` | string | no | AI model ID (default: `mimo-v2.5-free`) |
-| `systemPrompt` | string | no | Custom system prompt |
-| `firstMessage` | string | no | Optional first user message to send immediately |
+| Field          | Type   | Required | Description                                      |
+| -------------- | ------ | -------- | ------------------------------------------------ |
+| `title`        | string | no       | Conversation title (default: "New Conversation") |
+| `model`        | string | no       | AI model ID (default: `mimo-v2.5-free`)          |
+| `systemPrompt` | string | no       | Custom system prompt                             |
+| `firstMessage` | string | no       | Optional first user message to send immediately  |
 
 **Response `201`**
 
@@ -1358,9 +1365,9 @@ Rename a conversation.
 
 **Request Body**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `title` | string | yes | New conversation title |
+| Field   | Type   | Required | Description            |
+| ------- | ------ | -------- | ---------------------- |
+| `title` | string | yes      | New conversation title |
 
 **Response `200`**
 
@@ -1409,10 +1416,10 @@ List messages in a conversation (paginated).
 
 **Query Parameters**
 
-| Param | Type | Default | Description |
-|-------|------|---------|-------------|
-| `page` | number | 1 | Page number |
-| `perPage` | number | 50 | Results per page (max 100) |
+| Param     | Type   | Default | Description                |
+| --------- | ------ | ------- | -------------------------- |
+| `page`    | number | 1       | Page number                |
+| `perPage` | number | 50      | Results per page (max 100) |
 
 **Response `200`**
 
@@ -1446,10 +1453,10 @@ Send a message to a conversation and receive an AI response. The AI provider fal
 
 **Request Body**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `content` | string | yes | Message content (non-empty) |
-| `model` | string | no | Override model for this message |
+| Field     | Type   | Required | Description                     |
+| --------- | ------ | -------- | ------------------------------- |
+| `content` | string | yes      | Message content (non-empty)     |
+| `model`   | string | no       | Override model for this message |
 
 **Response `200`**
 
@@ -1476,11 +1483,11 @@ Send a message to a conversation and receive an AI response. The AI provider fal
 
 **Error Codes**
 
-| Code | Status | Condition |
-|------|--------|-----------|
-| `VALIDATION_ERROR` | 400 | Empty message content |
-| `NOT_FOUND` | 404 | Conversation not found |
-| `TOKEN_INVALID` | 401 | Missing or invalid access token |
+| Code               | Status | Condition                       |
+| ------------------ | ------ | ------------------------------- |
+| `VALIDATION_ERROR` | 400    | Empty message content           |
+| `NOT_FOUND`        | 404    | Conversation not found          |
+| `TOKEN_INVALID`    | 401    | Missing or invalid access token |
 
 ---
 
@@ -1510,109 +1517,109 @@ Get chat statistics for the current organization.
 
 ### User
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string (uuid) | Unique identifier |
-| `email` | string | Email address (unique) |
-| `firstName` | string | Given name |
-| `lastName` | string | Family name |
-| `role` | enum (UserRole) | Authorization role |
-| `isActive` | boolean | Account active flag |
-| `avatarUrl` | string \| null | Avatar image URL |
-| `lastLoginAt` | string \| null | ISO timestamp of last login |
-| `createdAt` | string | ISO timestamp of creation |
-| `updatedAt` | string | ISO timestamp of last update |
+| Field         | Type            | Description                  |
+| ------------- | --------------- | ---------------------------- |
+| `id`          | string (uuid)   | Unique identifier            |
+| `email`       | string          | Email address (unique)       |
+| `firstName`   | string          | Given name                   |
+| `lastName`    | string          | Family name                  |
+| `role`        | enum (UserRole) | Authorization role           |
+| `isActive`    | boolean         | Account active flag          |
+| `avatarUrl`   | string \| null  | Avatar image URL             |
+| `lastLoginAt` | string \| null  | ISO timestamp of last login  |
+| `createdAt`   | string          | ISO timestamp of creation    |
+| `updatedAt`   | string          | ISO timestamp of last update |
 
 ### Auth Tokens
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `accessToken` | string | JWT access token |
-| `refreshToken` | string | JWT refresh token |
-| `expiresIn` | number | Access token TTL (seconds) |
+| Field          | Type   | Description                |
+| -------------- | ------ | -------------------------- |
+| `accessToken`  | string | JWT access token           |
+| `refreshToken` | string | JWT refresh token          |
+| `expiresIn`    | number | Access token TTL (seconds) |
 
 ### Audit Log
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string (uuid) | Unique identifier |
-| `action` | enum (AuditAction) | Performed action |
-| `entity` | enum (EntityType) | Affected entity type |
-| `entityId` | string | Affected entity ID |
-| `userId` | string | Acting user ID |
-| `userName` | string \| undefined | Acting user display name |
-| `metadata` | object \| undefined | Action-specific payload |
-| `ipAddress` | string \| undefined | Client IP |
-| `userAgent` | string \| undefined | Client user agent |
-| `createdAt` | string | ISO timestamp |
+| Field       | Type                | Description              |
+| ----------- | ------------------- | ------------------------ |
+| `id`        | string (uuid)       | Unique identifier        |
+| `action`    | enum (AuditAction)  | Performed action         |
+| `entity`    | enum (EntityType)   | Affected entity type     |
+| `entityId`  | string              | Affected entity ID       |
+| `userId`    | string              | Acting user ID           |
+| `userName`  | string \| undefined | Acting user display name |
+| `metadata`  | object \| undefined | Action-specific payload  |
+| `ipAddress` | string \| undefined | Client IP                |
+| `userAgent` | string \| undefined | Client user agent        |
+| `createdAt` | string              | ISO timestamp            |
 
 ### Organization
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string | Unique identifier (UUID) |
-| `name` | string | Organization name |
-| `slug` | string | URL-friendly identifier (unique) |
-| `logoUrl` | string \| null | Organization logo URL |
-| `userCount` | number | Number of member users (computed) |
-| `createdAt` | string | ISO timestamp of creation |
-| `updatedAt` | string | ISO timestamp of last update |
+| Field       | Type           | Description                       |
+| ----------- | -------------- | --------------------------------- |
+| `id`        | string         | Unique identifier (UUID)          |
+| `name`      | string         | Organization name                 |
+| `slug`      | string         | URL-friendly identifier (unique)  |
+| `logoUrl`   | string \| null | Organization logo URL             |
+| `userCount` | number         | Number of member users (computed) |
+| `createdAt` | string         | ISO timestamp of creation         |
+| `updatedAt` | string         | ISO timestamp of last update      |
 
 ### System Setting
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string (uuid) | Unique identifier |
-| `key` | string | Setting key (unique) |
-| `value` | object | Setting value (JSON) |
+| Field       | Type                | Description           |
+| ----------- | ------------------- | --------------------- |
+| `id`        | string (uuid)       | Unique identifier     |
+| `key`       | string              | Setting key (unique)  |
+| `value`     | object              | Setting value (JSON)  |
 | `updatedBy` | string \| undefined | Last modifier user ID |
-| `createdAt` | string | ISO timestamp |
-| `updatedAt` | string | ISO timestamp |
+| `createdAt` | string              | ISO timestamp         |
+| `updatedAt` | string              | ISO timestamp         |
 
 ### Chat Conversation
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string (uuid) | Unique identifier |
-| `title` | string | Conversation title |
-| `model` | string | AI model ID used |
-| `systemPrompt` | string \| null | Custom system prompt |
-| `userId` | string | Owner user ID |
-| `organizationId` | string | Organization scope |
-| `messageCount` | number | Total messages (computed) |
-| `isArchived` | boolean | Archive flag |
-| `createdAt` | string | ISO timestamp |
-| `updatedAt` | string | ISO timestamp |
+| Field            | Type           | Description               |
+| ---------------- | -------------- | ------------------------- |
+| `id`             | string (uuid)  | Unique identifier         |
+| `title`          | string         | Conversation title        |
+| `model`          | string         | AI model ID used          |
+| `systemPrompt`   | string \| null | Custom system prompt      |
+| `userId`         | string         | Owner user ID             |
+| `organizationId` | string         | Organization scope        |
+| `messageCount`   | number         | Total messages (computed) |
+| `isArchived`     | boolean        | Archive flag              |
+| `createdAt`      | string         | ISO timestamp             |
+| `updatedAt`      | string         | ISO timestamp             |
 
 ### Chat Message
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string (uuid) | Unique identifier |
-| `role` | enum (ChatRole) | `user`, `assistant`, or `system` |
-| `content` | string | Message content |
-| `model` | string \| null | Model used (for assistant messages) |
-| `conversationId` | string | Parent conversation ID |
-| `createdAt` | string | ISO timestamp |
+| Field            | Type            | Description                         |
+| ---------------- | --------------- | ----------------------------------- |
+| `id`             | string (uuid)   | Unique identifier                   |
+| `role`           | enum (ChatRole) | `user`, `assistant`, or `system`    |
+| `content`        | string          | Message content                     |
+| `model`          | string \| null  | Model used (for assistant messages) |
+| `conversationId` | string          | Parent conversation ID              |
+| `createdAt`      | string          | ISO timestamp                       |
 
 ### Data Source
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string (uuid) | Unique identifier |
-| `name` | string | Display name |
-| `url` | string | External API endpoint |
-| `method` | `GET` \| `POST` | HTTP method |
-| `headers` | object | Additional request headers |
-| `queryParams` | object | Query string params |
-| `authType` | `none` \| `bearer` \| `basic` | Auth scheme |
-| `authorization` | string \| null | Secret (never serialized to the client) |
-| `body` | object \| null | JSON body (for `POST`) |
-| `isActive` | boolean | Whether the source is enabled |
-| `organizationId` | string | Organization scope |
-| `createdById` | string \| null | Creator user ID |
-| `createdAt` | string | ISO timestamp |
-| `updatedAt` | string | ISO timestamp |
+| Field            | Type                          | Description                             |
+| ---------------- | ----------------------------- | --------------------------------------- |
+| `id`             | string (uuid)                 | Unique identifier                       |
+| `name`           | string                        | Display name                            |
+| `url`            | string                        | External API endpoint                   |
+| `method`         | `GET` \| `POST`               | HTTP method                             |
+| `headers`        | object                        | Additional request headers              |
+| `queryParams`    | object                        | Query string params                     |
+| `authType`       | `none` \| `bearer` \| `basic` | Auth scheme                             |
+| `authorization`  | string \| null                | Secret (never serialized to the client) |
+| `body`           | object \| null                | JSON body (for `POST`)                  |
+| `isActive`       | boolean                       | Whether the source is enabled           |
+| `organizationId` | string                        | Organization scope                      |
+| `createdById`    | string \| null                | Creator user ID                         |
+| `createdAt`      | string                        | ISO timestamp                           |
+| `updatedAt`      | string                        | ISO timestamp                           |
 
 ---
 
@@ -1620,57 +1627,57 @@ Get chat statistics for the current organization.
 
 ### UserRole
 
-| Value | Description |
-|-------|-------------|
-| `super_admin` | Full system access |
-| `admin` | Administrative access |
-| `moderator` | Content moderation |
-| `support` | Customer support |
+| Value         | Description           |
+| ------------- | --------------------- |
+| `super_admin` | Full system access    |
+| `admin`       | Administrative access |
+| `moderator`   | Content moderation    |
+| `support`     | Customer support      |
 
 ### AuditAction
 
-| Value | Description |
-|-------|-------------|
-| `login` | User login |
-| `logout` | User logout |
-| `create` | Resource creation |
-| `update` | Resource update |
-| `delete` | Resource deletion |
-| `approve` | Approval action |
-| `reject` | Rejection action |
-| `suspend` | Account suspension |
-| `activate` | Account activation |
-| `password_change` | Password change |
-| `settings_update` | Settings modification |
-| `settings_delete` | Settings deletion |
-| `data_source_create` | Data source creation |
-| `data_source_update` | Data source update |
-| `data_source_delete` | Data source deletion |
-| `data_source_fetch` | Data source external fetch |
+| Value                | Description                |
+| -------------------- | -------------------------- |
+| `login`              | User login                 |
+| `logout`             | User logout                |
+| `create`             | Resource creation          |
+| `update`             | Resource update            |
+| `delete`             | Resource deletion          |
+| `approve`            | Approval action            |
+| `reject`             | Rejection action           |
+| `suspend`            | Account suspension         |
+| `activate`           | Account activation         |
+| `password_change`    | Password change            |
+| `settings_update`    | Settings modification      |
+| `settings_delete`    | Settings deletion          |
+| `data_source_create` | Data source creation       |
+| `data_source_update` | Data source update         |
+| `data_source_delete` | Data source deletion       |
+| `data_source_fetch`  | Data source external fetch |
 
 ### EntityType
 
-| Value | Description |
-|-------|-------------|
-| `user` | User entity |
-| `role` | Role entity |
-| `setting` | System setting |
+| Value       | Description     |
+| ----------- | --------------- |
+| `user`      | User entity     |
+| `role`      | Role entity     |
+| `setting`   | System setting  |
 | `audit_log` | Audit log entry |
 
 ### SortOrder
 
-| Value | Description |
-|-------|-------------|
-| `asc` | Ascending |
-| `desc` | Descending |
+| Value  | Description |
+| ------ | ----------- |
+| `asc`  | Ascending   |
+| `desc` | Descending  |
 
 ### ChatRole
 
-| Value | Description |
-|-------|-------------|
-| `user` | Human user message |
+| Value       | Description           |
+| ----------- | --------------------- |
+| `user`      | Human user message    |
 | `assistant` | AI assistant response |
-| `system` | System-level prompt |
+| `system`    | System-level prompt   |
 
 ---
 
@@ -1678,55 +1685,55 @@ Get chat statistics for the current organization.
 
 ### Authentication
 
-| Code | Description |
-|------|-------------|
-| `INVALID_CREDENTIALS` | Email or password is incorrect |
-| `TOKEN_EXPIRED` | Access token has expired |
-| `TOKEN_INVALID` | Access token is malformed or invalid |
-| `REFRESH_TOKEN_INVALID` | Refresh token is invalid or revoked |
-| `ACCOUNT_DISABLED` | User account has been deactivated |
-| `ACCOUNT_LOCKED` | Account temporarily locked due to too many failed login attempts (30 min) |
-| `EMAIL_NOT_VERIFIED` | Email has not been verified |
+| Code                    | Description                                                               |
+| ----------------------- | ------------------------------------------------------------------------- |
+| `INVALID_CREDENTIALS`   | Email or password is incorrect                                            |
+| `TOKEN_EXPIRED`         | Access token has expired                                                  |
+| `TOKEN_INVALID`         | Access token is malformed or invalid                                      |
+| `REFRESH_TOKEN_INVALID` | Refresh token is invalid or revoked                                       |
+| `ACCOUNT_DISABLED`      | User account has been deactivated                                         |
+| `ACCOUNT_LOCKED`        | Account temporarily locked due to too many failed login attempts (30 min) |
+| `EMAIL_NOT_VERIFIED`    | Email has not been verified                                               |
 
 ### Authorization
 
-| Code | Description |
-|------|-------------|
-| `FORBIDDEN` | Insufficient privileges |
+| Code                       | Description                 |
+| -------------------------- | --------------------------- |
+| `FORBIDDEN`                | Insufficient privileges     |
 | `INSUFFICIENT_PERMISSIONS` | Missing required permission |
 
 ### Validation
 
-| Code | Description |
-|------|-------------|
+| Code               | Description                      |
+| ------------------ | -------------------------------- |
 | `VALIDATION_ERROR` | Request failed schema validation |
-| `INVALID_INPUT` | Invalid or missing input data |
+| `INVALID_INPUT`    | Invalid or missing input data    |
 
 ### Resource
 
-| Code | Description |
-|------|-------------|
-| `NOT_FOUND` | Requested resource does not exist |
-| `ALREADY_EXISTS` | Resource already exists |
-| `CONFLICT` | Resource conflict |
+| Code             | Description                       |
+| ---------------- | --------------------------------- |
+| `NOT_FOUND`      | Requested resource does not exist |
+| `ALREADY_EXISTS` | Resource already exists           |
+| `CONFLICT`       | Resource conflict                 |
 
 ### User
 
-| Code | Description |
-|------|-------------|
-| `USER_NOT_FOUND` | User not found |
-| `USER_ALREADY_EXISTS` | Email already registered |
-| `PASSWORD_MISMATCH` | Current password is incorrect |
-| `SAME_PASSWORD` | New password matches current |
+| Code                  | Description                   |
+| --------------------- | ----------------------------- |
+| `USER_NOT_FOUND`      | User not found                |
+| `USER_ALREADY_EXISTS` | Email already registered      |
+| `PASSWORD_MISMATCH`   | Current password is incorrect |
+| `SAME_PASSWORD`       | New password matches current  |
 
 ### System
 
-| Code | Description |
-|------|-------------|
-| `INTERNAL_ERROR` | Unexpected server error |
+| Code                  | Description                     |
+| --------------------- | ------------------------------- |
+| `INTERNAL_ERROR`      | Unexpected server error         |
 | `SERVICE_UNAVAILABLE` | Service temporarily unavailable |
-| `RATE_LIMITED` | Too many requests |
-| `DATABASE_ERROR` | Database operation failed |
+| `RATE_LIMITED`        | Too many requests               |
+| `DATABASE_ERROR`      | Database operation failed       |
 
 ---
 
@@ -1817,10 +1824,10 @@ Services and repositories are instantiated once as singletons and exported from 
 
 The API consumes shared packages from the monorepo:
 
-| Package | Purpose |
-|---------|---------|
-| `@vestara/types` | DTOs, enums, shared interfaces |
-| `@vestara/validation` | Zod schemas and validation utilities |
-| `@vestara/constants` | HTTP status codes, error codes, route paths |
-| `@vestara/utils` | Shared utility functions |
-| `@vestara/config` | Shared configuration |
+| Package               | Purpose                                     |
+| --------------------- | ------------------------------------------- |
+| `@vestara/types`      | DTOs, enums, shared interfaces              |
+| `@vestara/validation` | Zod schemas and validation utilities        |
+| `@vestara/constants`  | HTTP status codes, error codes, route paths |
+| `@vestara/utils`      | Shared utility functions                    |
+| `@vestara/config`     | Shared configuration                        |

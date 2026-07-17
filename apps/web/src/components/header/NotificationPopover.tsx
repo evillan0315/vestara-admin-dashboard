@@ -1,12 +1,12 @@
-import type { JSX } from "react";
+import type { JSX } from 'react';
 
-import { Box, Divider, IconButton, Popover, Typography, useTheme } from "@mui/material";
+import { Box, Divider, IconButton, Popover, Typography, useTheme } from '@mui/material';
 
-import { CheckCheck } from "lucide-react";
+import { CheckCheck } from 'lucide-react';
 
-import NotificationList from "./NotificationList";
+import NotificationList from './NotificationList';
 
-import type { Notification } from "./types";
+import type { Notification } from './types';
 
 export interface NotificationPopoverProps {
   anchorEl: HTMLElement | null;
@@ -45,12 +45,12 @@ export default function NotificationPopover({
       anchorEl={anchorEl}
       onClose={onClose}
       anchorOrigin={{
-        vertical: "bottom",
-        horizontal: "right",
+        vertical: 'bottom',
+        horizontal: 'right',
       }}
       transformOrigin={{
-        vertical: "top",
-        horizontal: "right",
+        vertical: 'top',
+        horizontal: 'right',
       }}
       slotProps={{
         paper: {
@@ -59,8 +59,8 @@ export default function NotificationPopover({
             width: 380,
             bgcolor: background.paper,
             border: `1px solid ${divider}`,
-            borderRadius: "14px",
-            overflow: "hidden",
+            borderRadius: '14px',
+            overflow: 'hidden',
           },
         },
       }}
@@ -69,9 +69,9 @@ export default function NotificationPopover({
         sx={{
           px: 2,
           py: 1.75,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
         <Typography

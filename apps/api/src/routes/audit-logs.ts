@@ -66,24 +66,20 @@ router.get(
  * GET /audit-logs/:id — Get a single audit log by ID
  * Access: SUPER_ADMIN, ADMIN
  */
-router.get(
-  '/:id',
-  requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN),
-  async (req, res, next) => {
-    try {
-      const id = param(req.params.id);
-      const log = await auditLogRepository.findById(id);
-      if (!log) {
-        return res.status(404).json({
-          success: false,
-          error: { code: 'NOT_FOUND', message: 'Audit log not found' },
-        });
-      }
-      sendSuccess(res, { log });
-    } catch (error) {
-      next(error);
+router.get('/:id', requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN), async (req, res, next) => {
+  try {
+    const id = param(req.params.id);
+    const log = await auditLogRepository.findById(id);
+    if (!log) {
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Audit log not found' },
+      });
     }
-  },
-);
+    sendSuccess(res, { log });
+  } catch (error) {
+    next(error);
+  }
+});
 
 export default router;
