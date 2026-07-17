@@ -29,6 +29,10 @@ if (typeof (BigInt.prototype as unknown as Record<string, unknown>).toJSON !== '
 export function createApp(): express.Application {
   const app = express();
 
+  // Trust the first proxy (Nginx) so X-Forwarded-For is respected by
+  // express-rate-limit for accurate per-client identification.
+  app.set('trust proxy', 1);
+
   // ── Security headers (Helmet: CSP, HSTS, Referrer-Policy, etc.) ──
   app.use(securityHeaders);
   app.use(permissionsPolicy);

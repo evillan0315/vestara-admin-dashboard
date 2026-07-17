@@ -3,9 +3,16 @@ import { settingsRepository, auditLogRepository } from '../repositories/index.js
 
 export class SettingsService {
   /**
-   * Get a setting by key.
+   * Get a setting by key (returns null when not found).
    */
   async findByKey(key: string, organizationId: string) {
+    return settingsRepository.findByKey(key, organizationId);
+  }
+
+  /**
+   * Get a setting by key or throw (404 when not found).
+   */
+  async findByKeyOrThrow(key: string, organizationId: string) {
     return settingsRepository.findByKeyOrThrow(key, organizationId);
   }
 
@@ -84,7 +91,7 @@ export class SettingsService {
    * Delete a setting.
    */
   async delete(key: string, organizationId: string, updatedBy?: string) {
-    const setting = await this.findByKey(key, organizationId);
+    const setting = await this.findByKeyOrThrow(key, organizationId);
 
     await settingsRepository.delete(key, organizationId);
 

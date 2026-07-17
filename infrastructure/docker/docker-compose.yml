@@ -1,0 +1,92 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Vestara Admin Dashboard — production Docker stack
+#
+# Services:
+#   postgres  PostgreSQL 17 (primary datastore)
+#   redis     Redis 8 (WebSocket/Socket.IO adapter + BullMQ)
+#   api       Express 5 API + WebSocket (single instance, forked)
+#   web       Nginx edge: serves the SPA + reverse-proxies /api/v1, /socket.io,
+#             and /api/v1/ws to `api`
+#
+# Build args / env:
+#   - The API and web read runtime variables from the `env_file` (.env.deploy).
+#   - Postgres credentials come from a compose `.env` (POSTGRES_USER/PASSWORD/DB)
+#     generated on the server so they stay in sync with DATABASE_URL.
+#   - VITE_API_URL is injected at web BUILD time (Vite evaluates it then).
+#
+# Usage (on the server, from the repo root after `docker compose` is available):
+#   docker compose -f infrastructure/docker/docker-compose.yml --env-file infrastructure/docker/.env up -d --build
+#   docker compose -f infrastructure/docker/docker-compose.yml logs -f api
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: vestara-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-vestara_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vestara_password}
+      POSTGRES_DB: ${POSTGRES_DB:-vestara_db}
+    volumes:
+      - vestara_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vestara_user} -d ${POSTGRES_DB:-vestara_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:8-alpine
+    container_name: vestara-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - vestara_redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: ../..
+      dockerfile: infrastructure/docker/Dockerfile.api
+    container_name: vestara-api
+    restart: unless-stopped
+    # Runtime secrets + config from the server's .env.deploy (git-ignored).
+    env_file:
+      - ../docker/.env.deploy
+    environment:
+      # Hostnames resolve to the compose services (override any localhost in .env.deploy).
+      DATABASE_URL: postgresql://${POSTGRES_USER:-vestara_user}:${POSTGRES_PASSWORD:-vestara_password}@postgres:5432/${POSTGRES_DB:-vestara_db}
+      REDIS_URL: redis://redis:6379
+      NODE_ENV: production
+      API_PORT: 5000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    expose:
+      - "5000"
+
+  web:
+    build:
+      context: ../..
+      dockerfile: infrastructure/docker/Dockerfile.web
+      args:
+        VITE_API_URL: ${VITE_API_URL:-https://vestara.meetlily.org/api/v1}
+        VITE_APP_NAME: ${VITE_APP_NAME:-Vestara Admin}
+    container_name: vestara-web
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "80:80"
+      - "443:443"
+
+volumes:
+  vestara_pgdata:
+  vestara_redisdata:

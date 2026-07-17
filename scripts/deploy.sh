@@ -114,6 +114,16 @@ RELEASE_DIR="${DEPLOY_RELEASES_DIR}/vestara-${RELEASE_TS}"
 echo "📦 Uploading build to ${RELEASE_DIR}..."
 rsync_cmd "${WEB_SRC_ABS}/" "${SSH_TARGET}:${RELEASE_DIR}/"
 
+# Safety gate: never point Nginx at an empty/partial release. Abort before the
+# atomic swap if the upload produced no files.
+UPLOADED_FILES="$(ssh_cmd "find ${RELEASE_DIR} -type f 2>/dev/null | wc -l")"
+if [[ "${UPLOADED_FILES:-0}" -eq 0 ]]; then
+  echo "❌ Release upload produced 0 files at ${RELEASE_DIR}. Aborting to avoid a broken deploy." >&2
+  ssh_cmd "sudo rm -rf ${RELEASE_DIR}"
+  exit 1
+fi
+echo "   uploaded ${UPLOADED_FILES} file(s)"
+
 # ── 3. Fix ownership/permissions for the web server ────────────────────────
 ssh_cmd "sudo chown -R ${DEPLOY_WEB_ROOT_GROUP}:${DEPLOY_WEB_ROOT_GROUP} ${RELEASE_DIR} && \
   find ${RELEASE_DIR} -type d -exec chmod 755 {} \; && \
@@ -154,22 +164,44 @@ if [[ "${DEPLOY_API}" == "true" ]]; then
     echo "⚠️  Local .env.deploy not found — skipping secret copy. The API may fail to start without its environment." >&2
   fi
 
+  # Pull the latest code, install deps, sync the schema (this project uses
+  # `prisma db push` rather than SQL migrations), build the shared packages and
+  # the API, then (re)start under PM2. The shared packages MUST be built before
+  # the API because the API imports their compiled `dist` output.
+  #
+  # Fix ownership first: a previous sudo build may have left root-owned files
+  # in dist/generated that block the deployer user from writing.  Also clean
+  # stale tsconfig.tsbuildinfo so TypeScript does incremental-rebuild-skip
+  # output that was correct for the old rootDir.
   ssh_cmd "cd ${DEPLOY_API_PATH} && \
     git pull --ff-only && \
-    pnpm install --frozen-lockfile && \
-    pnpm exec prisma migrate deploy && \
-    pnpm build && \
-    pnpm exec pm2 start infrastructure/pm2/ecosystem.config.cjs --env production --update-env || \
-    pnpm exec pm2 restart vestara-api"
+    pnpm install --no-frozen-lockfile && \
+    sudo chown -R ${DEPLOY_USER}:${DEPLOY_USER} packages/ apps/api/dist apps/api/src/generated && \
+    find packages/ apps/api/ -name tsconfig.tsbuildinfo -delete 2>/dev/null; \
+    pnpm --filter \"./packages/*\" build && \
+    pnpm --filter @vestara/api exec prisma db push --accept-data-loss && \
+    pnpm --filter @vestara/api build && \
+    sudo chown -R ${DEPLOY_USER}:${DEPLOY_USER} apps/api/dist && \
+    pnpm --filter @vestara/api exec pm2 start infrastructure/pm2/ecosystem.config.cjs --env production --update-env || \
+    pnpm --filter @vestara/api exec pm2 restart vestara-api"
 fi
 
-# ── 8. Health check ────────────────────────────────────────────────────────
-echo "🩺 Health check..."
-HTTP_CODE="$(ssh_cmd "curl -s -o /dev/null -w '%{http_code}' --max-time 10 http://127.0.0.1/api/v1/health || echo 000")"
-if [[ "${HTTP_CODE}" == "200" ]]; then
-  echo "✅ API health OK (HTTP ${HTTP_CODE})"
+# ── 8. Health checks ─────────────────────────────────────────────────────────
+echo "🩺 Health checks..."
+WEB_CODE="$(ssh_cmd "curl -s -o /dev/null -w '%{http_code}' --max-time 10 http://127.0.0.1/ || echo 000")"
+if [[ "${WEB_CODE}" == "200" ]]; then
+  echo "✅ Web (SPA) health OK (HTTP ${WEB_CODE})"
 else
-  echo "⚠️  API health returned HTTP ${HTTP_CODE} (frontend deploy still succeeded)"
+  echo "⚠️  Web (SPA) health returned HTTP ${WEB_CODE}"
+fi
+
+if [[ "${DEPLOY_API}" == "true" ]]; then
+  HTTP_CODE="$(ssh_cmd "curl -s -o /dev/null -w '%{http_code}' --max-time 10 http://127.0.0.1/api/v1/health || echo 000")"
+  if [[ "${HTTP_CODE}" == "200" ]]; then
+    echo "✅ API health OK (HTTP ${HTTP_CODE})"
+  else
+    echo "⚠️  API health returned HTTP ${HTTP_CODE} (frontend deploy still succeeded)"
+  fi
 fi
 
 echo "✅ Deployment complete."

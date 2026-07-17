@@ -165,6 +165,7 @@ router.get(
 
 /**
  * GET /settings/:key — Get a single setting by key
+ * Returns 200 with null data when the key doesn't exist (optional setting).
  * Access: SUPER_ADMIN, ADMIN
  */
 router.get(
@@ -174,7 +175,7 @@ router.get(
     try {
       const key = param(req.params.key);
       const setting = await settingsService.findByKey(key, req.user!.organizationId);
-      sendSuccess(res, { setting });
+      sendSuccess(res, { setting: setting ?? null });
     } catch (error) {
       next(error);
     }

@@ -1,7 +1,9 @@
 # Self-Hosted Deployment Guide
 
+> **Live at** [`vestara.meetlily.org`](https://vestara.meetlily.org) — Ubuntu 22.04 VPS, Nginx + Let's Encrypt TLS, PM2, PostgreSQL 17, Redis 8.
+
 This guide explains how to deploy the **Vestara Admin Dashboard** on your own
-server (e.g. an Ubuntu 24.04 LTS VPS), fully under your control — no Vercel
+server (e.g. an Ubuntu 22.04 LTS VPS), fully under your control — no Vercel
 required.
 
 The application is a pnpm/Turborepo monorepo:
@@ -172,16 +174,17 @@ node -v && pnpm -v
 ```bash
 sudo systemctl enable --now postgresql
 sudo -u postgres psql <<'SQL'
-CREATE DATABASE vestara_admin;
-CREATE USER vestara WITH PASSWORD 'CHANGE_ME_STRONG_PASSWORD';
-GRANT ALL PRIVILEGES ON DATABASE vestara_admin TO vestara;
+CREATE DATABASE vestara_db;
+CREATE USER vestara_user WITH PASSWORD 'CHANGE_ME_STRONG_PASSWORD';
+GRANT ALL PRIVILEGES ON DATABASE vestara_db TO vestara_user;
+ALTER USER vestara_user WITH SUPERUSER;
 SQL
 ```
 
 You will use this connection string in the env file:
 
 ```
-DATABASE_URL=postgresql://vestara:CHANGE_ME_STRONG_PASSWORD@127.0.0.1:5432/vestara_admin?schema=public
+DATABASE_URL=postgresql://vestara_user:CHANGE_ME_STRONG_PASSWORD@127.0.0.1:5432/vestara_db?schema=public
 ```
 
 ### 4. Redis
@@ -232,7 +235,7 @@ CORS_ORIGIN=https://vestara.meetlily.org
 CLIENT_URL=https://vestara.meetlily.org
 
 # ── Database ───────────────────────────────────
-DATABASE_URL=postgresql://vestara:CHANGE_ME_STRONG_PASSWORD@127.0.0.1:5432/vestara_admin?schema=public
+DATABASE_URL=postgresql://vestara_user:CHANGE_ME_STRONG_PASSWORD@127.0.0.1:5432/vestara_db?schema=public
 
 # ── Redis (cache, sessions, BullMQ) ────────────
 REDIS_URL=redis://127.0.0.1:6379
@@ -517,14 +520,14 @@ What the script does:
 1. Optionally builds `apps/web`.
 2. Uploads `apps/web/dist/` to a new timestamped release dir
    (`/var/www/releases/vestara-<timestamp>`) via `rsync` over SSH.
-3. Fixes ownership/permissions for the web server user.
-4. Atomically swaps the web root symlink to the new release
+3. **Safety gate**: aborts if the upload produced 0 files (avoids pointing Nginx at an empty release).
+4. Fixes ownership/permissions for the web server user.
+5. Atomically swaps the web root symlink to the new release
    (`ln -sfn … && mv -Tf`) — Nginx never serves a half-written build.
-5. Prunes old releases beyond `DEPLOY_KEEP_RELEASES`.
-6. Runs `nginx -t && systemctl reload nginx`.
-7. Optionally (`--api`) pulls, installs, migrates, builds, and restarts the API
-   via PM2 on the remote server.
-8. Runs a `/api/v1/health` check.
+6. Prunes old releases beyond `DEPLOY_KEEP_RELEASES`.
+7. Runs `nginx -t && systemctl reload nginx`.
+8. Optionally (`--api`) pulls, installs, **fixes ownership** (handles root-owned files from previous sudo builds), **cleans stale `tsconfig.tsbuildinfo`**, builds packages, pushes schema via `prisma db push`, builds the API, and restarts via PM2.
+9. Runs `/api/v1/health` and SPA health checks.
 
 ### 4. GitHub Actions (zero-click on push)
 
@@ -555,7 +558,7 @@ set `DEPLOY_API=true` in `deploy.env`. The private key is written to a
   traffic also flows over Socket.IO at `/socket.io/`.
 - **API logs:** `pnpm exec pm2 logs vestara-api` or `/var/www/logs/api-*.log`.
 - **Nginx logs:** `/var/log/nginx/vestara.access.log`, `/var/log/nginx/vestara.error.log`.
-- **PostgreSQL:** `sudo -u postgres psql -d vestara_admin -c "SELECT 1"`.
+- **PostgreSQL:** `sudo -u postgres psql -d vestara_db -c "SELECT 1"`.
 - **Redis:** `redis-cli ping`.
 
 External monitoring (optional): point Uptime-Kuma / Healthchecks.io at
@@ -602,12 +605,16 @@ External monitoring (optional): point Uptime-Kuma / Healthchecks.io at
 | `502 Bad Gateway` on `/api/*` | API not running or wrong port. Check `pm2 status` and that `PORT=5000` matches the Nginx `proxy_pass`. |
 | `502` only on first load after restart | Brief restart window; expected. Use `pm2 reload` for graceful restart. |
 | CORS error in browser console | `CORS_ORIGIN` doesn't match the browser origin. Set it to the exact `https://vestara.meetlily.org`. |
+| `ERR_ERL_UNEXPECTED_X_FORWARDED_FOR` in API logs | Nginx sends `X-Forwarded-For` but Express doesn't trust it. The fix is `app.set('trust proxy', 1)` in `apps/api/src/app.ts` (already applied). |
+| `GET /settings/:key` returns 404 for optional settings | The setting doesn't exist yet. The fix is to use the non-throwing `findByKey()` in `SettingsService` (already applied) — returns `null` gracefully. |
 | `401` immediately after login on reload | Access token expired and refresh failed. Ensure `JWT_REFRESH_SECRET` matches across restarts and `REDIS_URL` is reachable (refresh tokens/sessions may use Redis). |
 | `PrismaClientInitializationError` | `DATABASE_URL` missing or wrong. Run Prisma from repo root where `.env` lives. |
 | Migrations fail | Use `prisma migrate deploy` (not `dev`) in production; ensure DB user has DDL rights. |
 | WebSocket not connecting | Nginx missing `Upgrade`/`Connection` headers, or behind a proxy that strips them. Verify the `/api/` block. |
 | Static page blank / routes 404 | Nginx missing `try_files $uri $uri/ /index.html;` SPA fallback. |
 | OAuth redirect mismatch | `*_CALLBACK_URL` must exactly equal the provider's configured redirect URI and the browser origin. |
+| API build produces no output / stale dist | Stale `tsconfig.tsbuildinfo` from a previous build with different `rootDir`. Run `find packages/ apps/api/ -name tsconfig.tsbuildinfo -delete` before rebuilding. The deploy script handles this automatically. |
+| `EACCES: permission denied` on API dist | A previous `sudo` build left root-owned files. Run `sudo chown -R deployer:deployer apps/api/dist apps/api/src/generated` before rebuilding. The deploy script handles this automatically. |
 
 For local debugging, run the API in dev mode:
 

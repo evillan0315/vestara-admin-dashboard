@@ -16,7 +16,7 @@
 <p align="center">
 
 ![License](https://img.shields.io/badge/license-Proprietary-gold?style=for-the-badge)
-![Status](https://img.shields.io/badge/status-Phase%201%20%E2%80%93%20Admin%20Dashboard%20%E2%80%93%20Phases%2020%2F30%20Complete-success?style=for-the-badge)
+![Status](https://img.shields.io/badge/status-Phase%201%20%E2%80%93%20Admin%20Dashboard%20%E2%80%93%20Phases%2028%2F30%20Complete-success?style=for-the-badge)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![Express](https://img.shields.io/badge/Express-5.x-000000?style=for-the-badge&logo=express)
@@ -1919,26 +1919,28 @@ flowchart TB
 
 ## Deployment Targets
 
-### Frontend (Current)
+### Self-Hosted (Primary)
 
-- ✅ **Vercel** — `vestara-admin-web.vercel.app`
+- ✅ **VPS** — `vestara.meetlily.org` (Ubuntu 22.04, Nginx + PM2 + PostgreSQL + Redis)
+  - **Web**: static SPA served by Nginx at `/`, API reverse-proxied at `/api/v1`
+  - **API**: Express 5 + PM2 (single forked instance for in-process WebSocket/BullMQ state)
+  - **TLS**: Let's Encrypt via Certbot with auto-renewal
+  - **Deploy**: `scripts/deploy.sh` (SSH + atomic symlink swap), `--api` flag for server-side rebuild
+  - **Docs**: `docs/SELF_HOSTED_DEPLOYMENT.md`
 
-### Backend (Current)
+### Vercel (Alternative)
 
+- ✅ **Vercel** — `vestara-admin-web.vercel.app` (static SPA)
 - ✅ **Vercel Serverless** — `vestara-admin-api.vercel.app` (Express mounted at `/api/v1`)
 
-### Self-Hosted (Alternative)
+> For production use, the self-hosted path is recommended over Vercel because the API
+> hosts persistent WebSocket connections and background jobs (BullMQ) that serverless
+> functions cannot hold.
 
-A full self-hosted path is supported for VPS / dedicated hosts:
+### Database
 
-- **Web**: built static SPA served by **Nginx** (`infrastructure/nginx/vestara.meetlily.org.conf`) — single-domain, proxies `/api/v1` → `127.0.0.1:5000`, WebSocket upgrade on `/api/v1/ws` + `/socket.io/`, TLS via Certbot, security headers.
-- **API**: **Express + PM2** (`infrastructure/pm2/ecosystem.config.cjs`, single forked instance for in-process WebSocket/BullMQ state), auto-loading runtime secrets from a git-ignored `.env.deploy`.
-- **Deploy**: `scripts/deploy.sh` syncs the web build over SSH (atomic symlink swap) and optionally pulls/builds/restarts the API; `deploy.env` holds the SSH target config.
-- **Docs**: `docs/SELF_HOSTED_DEPLOYMENT.md` and `infrastructure/local/README.md`.
-
-### Database (Current)
-
-- **Prisma Postgres** — hosted PostgreSQL with `PrismaPg` adapter
+- **Self-Hosted**: PostgreSQL 17 on the same VPS, managed by the system `postgresql` service
+- **Vercel**: Prisma Postgres (hosted PostgreSQL with `PrismaPg` adapter)
 - **Multi-Tenant Schema** — Organization model with org-scoped resources (Users, SystemSettings, AuditLogs, Sessions, RefreshTokens)
 
 ---
@@ -2202,7 +2204,12 @@ Future licensing terms may change as the platform evolves.
 - ✅ AI Assistant RAG (data-aware, real-time org context injection)
 - ✅ Floating Chat Widget (FAB, keyboard shortcut `Cmd+Shift+K`, page-aware suggestions, minimized bar, full-page nav)
 - ✅ Sidebar Navigation (reorganized into platform-domain categories: Wallet & Payments, Marketplace, Bookings, Rewards, AI Services, Management, System, Security; roadmap modules marked "Soon")
-- 🟡 Security Hardening (rate limiting, CSRF, password policies)
+- ✅ Self-Hosted Deployment (Ubuntu VPS, Nginx, PM2, PostgreSQL, Redis, Let's Encrypt TLS — live at `vestara.meetlily.org`)
+- ✅ Automated Deploy Script (`scripts/deploy.sh` — SSH + atomic symlink swap, `--api` flag for full server rebuild)
+- ✅ Nginx Site Config (`infrastructure/nginx/vestara.conf` — SPA + API proxy + WebSocket + TLS + security headers)
+- ✅ PM2 Ecosystem Config (`infrastructure/pm2/ecosystem.config.cjs` — forked mode, `.env.deploy` auto-load, systemd auto-start)
+- ✅ Trust Proxy fix (Express `trust proxy` set for Nginx reverse proxy — rate limiting identifies real client IPs)
+- ✅ Settings route fix (`GET /settings/:key` returns `null` gracefully for missing optional settings instead of 404)
 - ✅ Reporting (CSV/Excel/PDF export, MUI-ified dialog with date presets, column selection, scheduling/email, templates CRUD, comparison, WebSocket real-time progress, dashboard widget, PDF branding with org logo, row selection + bulk delete)
 - ✅ Real-time features (WebSocket, live notifications)
 - ✅ Testing & Performance optimization with optimistic updates for improved user experience
