@@ -65,7 +65,9 @@ export function createApp(): express.Application {
       },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-Id'],
+      // Cache preflight results for 24 hours to reduce OPTIONS requests.
+      maxAge: 86400,
     }),
   );
 

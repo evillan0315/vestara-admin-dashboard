@@ -54,6 +54,7 @@ export enum AuditAction {
   DATA_SOURCE_UPDATE = 'data_source_update',
   DATA_SOURCE_DELETE = 'data_source_delete',
   DATA_SOURCE_FETCH = 'data_source_fetch',
+  ACCOUNT_UNLOCK = 'account_unlock',
   ERROR = 'error',
 }
 

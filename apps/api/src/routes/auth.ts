@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { validate } from '../middleware/validate.js';
+import { authenticate } from '../middleware/authenticate.js';
+import { requireRole } from '../middleware/authenticate.js';
 import { AuthResponseDTO, UserRole } from '@vestara/types';
 import { createUserSchema, loginSchema, scorePasswordStrength } from '@vestara/validation';
 import { PASSWORD_POLICY, COMMON_PASSWORDS } from '@vestara/constants';
@@ -222,5 +224,43 @@ router.post('/password-strength', (req, res) => {
     data: { score, strength, feedback },
   });
 });
+
+/**
+ * POST /auth/unlock - Admin-only: unlock a locked user account
+ *
+ * Requires super_admin or admin role. Resets the target user's
+ * failedLoginAttempts counter and clears lockedUntil.
+ */
+router.post(
+  '/unlock',
+  authenticate,
+  requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  async (req, res, next) => {
+    try {
+      const { userId: targetUserId } = req.body;
+      if (!targetUserId) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_INPUT',
+            message: 'Target user ID is required',
+          },
+        });
+      }
+
+      const adminUserId = req.user!.id;
+      const adminOrgId = req.user!.organizationId;
+
+      await authService.unlockAccount(targetUserId, adminUserId, adminOrgId);
+
+      res.json({
+        success: true,
+        data: { message: 'Account unlocked successfully' },
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+);
 
 export default router;

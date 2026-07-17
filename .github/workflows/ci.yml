@@ -173,7 +173,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - name: Dependency audit
-        run: pnpm audit --audit-level=moderate || true
+        run: pnpm audit --audit-level=high
 
       - name: Check for committed secrets
         run: |

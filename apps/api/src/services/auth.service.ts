@@ -276,6 +276,30 @@ export class AuthService {
   }
 
   /**
+   * Admin-only: unlock a locked user account.
+   * Resets failedLoginAttempts to 0 and clears lockedUntil.
+   */
+  async unlockAccount(targetUserId: string, adminUserId: string, adminOrgId: string) {
+    const targetUser = await userRepository.findById(targetUserId);
+    if (!targetUser) {
+      throw new UnauthorizedError('User not found', ERROR_CODES.USER_NOT_FOUND);
+    }
+
+    await userRepository.updateLoginAttempts(targetUserId, 0, null);
+
+    await this.logAudit('ACCOUNT_UNLOCK', 'user', targetUserId, adminOrgId, {
+      unlockedBy: adminUserId,
+    });
+
+    logger.info(
+      { targetUserId, adminUserId },
+      'Account unlocked by admin',
+    );
+
+    return { success: true };
+  }
+
+  /**
    * Generate JWT access and refresh tokens.
    */
   private async generateTokens(userId: string, organizationId: string) {
