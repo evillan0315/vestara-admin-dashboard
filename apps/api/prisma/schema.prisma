@@ -64,6 +64,9 @@ model User {
   provider     String?  // "google" | "github" | null (email/password)
   providerId   String?  // OAuth provider's user ID
   lastLoginAt  DateTime?
+  // Account lockout fields (Phase 23 — Security Hardening)
+  failedLoginAttempts Int      @default(0)
+  lockedUntil         DateTime?
   organizationId String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

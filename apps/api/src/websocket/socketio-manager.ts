@@ -54,6 +54,28 @@ class SocketIoManager {
   // Local presence index (userId -> presence) per organization.
   private presenceByOrg = new Map<string, Map<string, WsPresenceUser>>();
 
+  // ── WebSocket connection rate limiting ──────────────────────────
+  // Sliding window: max 10 connection attempts per IP per minute.
+  // Prevents brute-force token guessing over WebSocket connections.
+  private connectionAttempts = new Map<string, number[]>();
+  private static readonly WS_RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
+  private static readonly WS_RATE_LIMIT_MAX = 10;
+
+  private isRateLimited(ip: string): boolean {
+    const now = Date.now();
+    const attempts = this.connectionAttempts.get(ip) ?? [];
+    // Prune old entries outside the window.
+    const recent = attempts.filter((t) => now - t < SocketIoManager.WS_RATE_LIMIT_WINDOW_MS);
+    this.connectionAttempts.set(ip, recent);
+    return recent.length >= SocketIoManager.WS_RATE_LIMIT_MAX;
+  }
+
+  private recordConnectionAttempt(ip: string): void {
+    const attempts = this.connectionAttempts.get(ip) ?? [];
+    attempts.push(Date.now());
+    this.connectionAttempts.set(ip, attempts);
+  }
+
   get isAttached(): boolean {
     return this.attached;
   }
@@ -114,6 +136,17 @@ class SocketIoManager {
   }
 
   private async handleConnection(socket: SocketConnection['socket']): Promise<void> {
+    // ── Rate limit connection attempts by IP ──────────────────────────
+    const clientIp = (socket.handshake.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim()
+      ?? socket.handshake.address;
+    if (this.isRateLimited(clientIp)) {
+      logger.warn({ ip: clientIp }, '[socket.io] connection rate-limited');
+      socket.emit(WS_EVENT.ERROR, { message: 'Too many connection attempts' });
+      socket.disconnect(true);
+      return;
+    }
+    this.recordConnectionAttempt(clientIp);
+
     const token =
       (socket.handshake.auth?.token as string | undefined) ??
       (socket.handshake.query?.token as string | undefined);
@@ -272,6 +305,7 @@ class SocketIoManager {
     this.attached = false;
     this.connections.clear();
     this.presenceByOrg.clear();
+    this.connectionAttempts.clear();
   }
 
   /** Runtime stats for the `/api/v1/ws/status` admin endpoint. */

@@ -1,8 +1,9 @@
 import bcrypt from 'bcryptjs';
 import type { UserRole } from '@vestara/types';
-import { ERROR_CODES } from '@vestara/constants';
+import { ERROR_CODES, ACCOUNT_LOCKOUT } from '@vestara/constants';
 import { JwtService } from '../utils/jwt.js';
 import { ConflictError, UnauthorizedError } from '../utils/errors.js';
+import { logger } from '../utils/logger.js';
 import {
   userRepository,
   sessionRepository,
@@ -145,9 +146,60 @@ export class AuthService {
       throw new UnauthorizedError('Invalid credentials', ERROR_CODES.INVALID_CREDENTIALS);
     }
 
+    // ── Account lockout check ──────────────────────────────────────
+    // If the account is currently locked, reject immediately without
+    // comparing the password (prevents timing-based enumeration).
+    if (user.lockedUntil && user.lockedUntil > new Date()) {
+      await this.logAudit('LOGIN_FAILED_LOCKED', 'user', user.id, user.organizationId, {
+        ipAddress,
+        lockedUntil: user.lockedUntil.toISOString(),
+      });
+      throw new UnauthorizedError(
+        'Account is temporarily locked due to too many failed login attempts',
+        ERROR_CODES.ACCOUNT_LOCKED,
+      );
+    }
+
+    // If the lockout has expired, reset the counter before checking.
+    if (user.lockedUntil && user.lockedUntil <= new Date()) {
+      await userRepository.updateLoginAttempts(user.id, 0, null);
+    }
+
     const isValidPassword = await bcrypt.compare(password, user.passwordHash);
     if (!isValidPassword) {
+      // ── Increment failed attempts ────────────────────────────────
+      const attempts = (user.failedLoginAttempts ?? 0) + 1;
+      const shouldLock = attempts >= ACCOUNT_LOCKOUT.MAX_FAILED_ATTEMPTS;
+      const lockedUntil = shouldLock
+        ? new Date(Date.now() + ACCOUNT_LOCKOUT.LOCKOUT_DURATION_MS)
+        : null;
+
+      await userRepository.updateLoginAttempts(user.id, attempts, lockedUntil);
+
+      logger.warn(
+        { userId: user.id, email: user.email, attempts, locked: shouldLock },
+        'Failed login attempt',
+      );
+
+      await this.logAudit('LOGIN_FAILED', 'user', user.id, user.organizationId, {
+        ipAddress,
+        attempts,
+        locked: shouldLock,
+      });
+
+      if (shouldLock) {
+        throw new UnauthorizedError(
+          'Account locked due to too many failed login attempts',
+          ERROR_CODES.ACCOUNT_LOCKED,
+        );
+      }
+
       throw new UnauthorizedError('Invalid credentials', ERROR_CODES.INVALID_CREDENTIALS);
+    }
+
+    // ── Successful login — reset failed attempts ───────────────────
+    if ((user.failedLoginAttempts ?? 0) > 0) {
+      await userRepository.updateLoginAttempts(user.id, 0, null);
     }
 
     await userRepository.updateLastLogin(user.id);

@@ -274,6 +274,17 @@ export class UserRepository extends BaseRepository {
   }
 
   /**
+   * Update failed login attempt counter and optional lockout timestamp.
+   * Used by AuthService for brute-force protection.
+   */
+  async updateLoginAttempts(id: string, attempts: number, lockedUntil: Date | null) {
+    return this.prisma.user.update({
+      where: { id },
+      data: { failedLoginAttempts: attempts, lockedUntil },
+    });
+  }
+
+  /**
    * Update user password.
    */
   async updatePassword(id: string, passwordHash: string) {

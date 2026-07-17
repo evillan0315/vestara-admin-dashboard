@@ -22,13 +22,21 @@ export const securityHeaders: RequestHandler = helmet({
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
+      // In production, restrict images to self-hosted + data/blob URIs.
+      // In dev, allow any HTTPS source (user avatars, AI markdown images).
+      imgSrc: isProduction
+        ? ["'self'", 'data:', 'blob:']
+        : ["'self'", 'data:', 'blob:', 'https:'],
       fontSrc: ["'self'", 'data:', 'https:'],
+      // connect-src stays broad: the app connects to OAuth providers (Google,
+      // GitHub), the OpenCode AI API, and user-configured external data
+      // sources via the Data Connector feature.
       connectSrc: ["'self'", 'https:', 'wss:'],
       frameSrc: ["'none'"],
       objectSrc: ["'none'"],
       baseUri: ["'self'"],
       formAction: ["'self'"],
+      frameAncestors: ["'none'"],
       upgradeInsecureRequests: isProduction ? [] : null,
     },
   },
@@ -37,7 +45,7 @@ export const securityHeaders: RequestHandler = helmet({
     ? { maxAge: 31536000, includeSubDomains: true, preload: true }
     : false,
   referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-  frameguard: { action: 'deny' },
+  frameguard: false, // Replaced by CSP frame-ancestors
   xssFilter: true,
   noSniff: true,
   permittedCrossDomainPolicies: { permittedPolicies: 'none' },

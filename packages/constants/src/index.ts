@@ -57,6 +57,9 @@ export const ERROR_CODES = {
   // Organization
   ORGANIZATION_SLUG_EXISTS: 'ORGANIZATION_SLUG_EXISTS',
 
+  // Account Security
+  ACCOUNT_LOCKED: 'ACCOUNT_LOCKED',
+
   // System
   INTERNAL_ERROR: 'INTERNAL_ERROR',
   SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
@@ -244,6 +247,20 @@ export const COMMON_PASSWORDS = new Set<string>([
   'passw0rd',
   'p@ssw0rd',
 ]);
+
+// ── Account Lockout ───────────────────────────
+
+/**
+ * Brute-force protection. After `MAX_FAILED_ATTEMPTS` consecutive failed
+ * logins the account is locked for `LOCKOUT_DURATION_MS`. The counter resets
+ * on successful login.
+ */
+export const ACCOUNT_LOCKOUT = {
+  /** Max failed login attempts before lockout. */
+  MAX_FAILED_ATTEMPTS: 5,
+  /** Lockout duration in milliseconds (30 minutes). */
+  LOCKOUT_DURATION_MS: 30 * 60 * 1000,
+} as const;
 
 // ── User Constants ─────────────────────────────
 

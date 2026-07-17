@@ -8,6 +8,7 @@ import { securityHeaders, permissionsPolicy } from './middleware/security-header
 import { apiRateLimiter } from './middleware/rate-limit.js';
 import { csrfProtection } from './middleware/csrf.js';
 import { sanitizeInput } from './middleware/sanitize.middleware.js';
+import { requestId } from './middleware/request-id.js';
 import routes from './routes/index.js';
 import { API_PREFIX } from '@vestara/constants';
 
@@ -37,6 +38,9 @@ export function createApp(): express.Application {
   app.use(securityHeaders);
   app.use(permissionsPolicy);
 
+  // Request ID for distributed tracing (generates or accepts X-Request-Id).
+  app.use(requestId);
+
   // CORS — allow known origins + any Vercel deployment
   const allowedOrigins = [
     process.env.CORS_ORIGIN,
@@ -65,9 +69,10 @@ export function createApp(): express.Application {
     }),
   );
 
-  // Body parsing
-  app.use(express.json({ limit: '10mb' }));
-  app.use(express.urlencoded({ extended: true }));
+  // Body parsing — 1 MB default for JSON/text; file uploads use their own
+  // multer limits (5 MB for images, 100 MB for general files).
+  app.use(express.json({ limit: '1mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
   // Serve local uploaded files at /api/files/ (used by LocalStorageProvider in dev)
   app.use(
