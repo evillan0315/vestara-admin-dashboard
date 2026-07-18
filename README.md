@@ -153,6 +153,26 @@ The goal is simple:
 
 ---
 
+# Platform Domains
+
+                    VESTARA COMMAND CENTER
+
+┌───────────────────────────────────────────────────────────┐
+│                                                           │
+│                    Enterprise Workspace                   │
+│                                                           │
+├───────────────┬───────────────┬───────────────────────────┤
+│ Administration│ Marketplace   │ AI Services              │
+├───────────────┼───────────────┼───────────────────────────┤
+│ Organizations │ Wallet        │ Analytics                │
+├───────────────┼───────────────┼───────────────────────────┤
+│ Memberships   │ Rewards       │ Reports                  │
+├───────────────┼───────────────┼───────────────────────────┤
+│ Security      │ System        │ Developer Services        │
+└───────────────┴───────────────┴───────────────────────────┘
+
+---
+
 # Technology Stack
 
 The Vestara Command Center is built using a modern, enterprise-ready technology stack designed for scalability, maintainability, and long-term evolution.
