@@ -155,19 +155,7 @@ The goal is simple:
 
 # Platform Domains
 
-┌───────────────────────────────────────────────────────────┐
-│                                                           │
-│                    Enterprise Workspace                   │
-│                                                           │
-├───────────────┬───────────────┬───────────────────────────┤
-│ Administration│ Marketplace   │ AI Services              │
-├───────────────┼───────────────┼───────────────────────────┤
-│ Organizations │ Wallet        │ Analytics                │
-├───────────────┼───────────────┼───────────────────────────┤
-│ Memberships   │ Rewards       │ Reports                  │
-├───────────────┼───────────────┼───────────────────────────┤
-│ Security      │ System        │ Developer Services        │
-└───────────────┴───────────────┴───────────────────────────┘
+<img src="./screens/vestara-command-center.png" width="100%" alt="Vestara Command Center"/>
 
 ---
 
