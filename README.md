@@ -155,8 +155,6 @@ The goal is simple:
 
 # Platform Domains
 
-                    VESTARA COMMAND CENTER
-
 ┌───────────────────────────────────────────────────────────┐
 │                                                           │
 │                    Enterprise Workspace                   │
