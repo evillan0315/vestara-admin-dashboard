@@ -1,5 +1,6 @@
 import { type Request, type Response, type NextFunction } from 'express';
 import { logger } from '../utils/logger.js';
+import { recordRequest } from '../utils/metrics.js';
 
 export function requestLogger(req: Request, res: Response, next: NextFunction): void {
   const start = Date.now();
@@ -10,12 +11,15 @@ export function requestLogger(req: Request, res: Response, next: NextFunction): 
     const duration = Date.now() - start;
     const { statusCode } = res;
 
+    // Record metrics for the metrics collector
+    recordRequest(method, url, statusCode, duration);
+
     logger.info(
       {
         method,
         url,
         statusCode,
-        duration: `${duration}ms`,
+        duration,
         contentLength: res.get('content-length') || 0,
         ...(requestId ? { requestId } : {}),
       },

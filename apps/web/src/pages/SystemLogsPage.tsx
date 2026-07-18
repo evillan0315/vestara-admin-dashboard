@@ -20,10 +20,10 @@ export function SystemLogsPage(): ReactElement {
   return (
     <PageContainer>
       <Box>
-        <Typography variant="h4" fontWeight={700}>
+        <Typography variant="h4" fontWeight={700} sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
           System Logs
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>
+        <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5, display: { xs: 'none', sm: 'block' } }}>
           View audit trail and system activity logs.
         </Typography>
       </Box>

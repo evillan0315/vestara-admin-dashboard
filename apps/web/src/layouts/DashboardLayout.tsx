@@ -148,6 +148,7 @@ export default function DashboardLayout({
           sx={{
             flex: 1,
             p: { xs: 2, sm: 3, md: 3.5 },
+            pb: { xs: 'calc(2rem + env(safe-area-inset-bottom, 0px))', sm: 3 },
             display: 'flex',
             flexDirection: 'column',
             gap: { xs: 2, sm: 3 },

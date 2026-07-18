@@ -12,15 +12,21 @@ const StyledChartCard = styled(Paper)(({ theme }) => ({
     padding: theme.spacing(3),
   },
   height: '100%',
+  overflowX: 'auto',
+  WebkitOverflowScrolling: 'touch',
 }));
 
-const ChartTitleRow = styled(Box)({
+const ChartTitleRow = styled(Box)(({ theme }) => ({
   display: 'flex',
-  alignItems: 'center',
+  alignItems: 'flex-start',
   justifyContent: 'space-between',
   gap: 12,
   marginBottom: 8,
-});
+  [theme.breakpoints.down('sm')]: {
+    flexDirection: 'column',
+    gap: 4,
+  },
+}));
 
 // ── Props ──────────────────────────────────────────
 

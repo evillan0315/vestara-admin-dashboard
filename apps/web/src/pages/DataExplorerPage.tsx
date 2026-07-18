@@ -35,6 +35,8 @@ const ChartCard = styled(Paper)(({ theme }) => ({
     padding: theme.spacing(3),
   },
   height: '100%',
+  overflowX: 'auto',
+  WebkitOverflowScrolling: 'touch',
 }));
 
 type Record_ = Record<string, unknown>;
@@ -176,7 +178,7 @@ export default function DataExplorerPage() {
           yAxis={[{ scaleType: 'band', data: entries.map(([label]) => label) }]}
           series={[{ data: entries.map(([, value]) => value), color: theme.palette.primary.main }]}
           xAxis={[{ min: 0 }]}
-          margin={{ top: 8, right: 24, bottom: 24, left: 120 }}
+          margin={{ top: 8, right: 24, bottom: 24, left: 60 }}
         />
       );
     }
@@ -194,8 +196,8 @@ export default function DataExplorerPage() {
     }
     if (chart.type === 'table') {
       return (
-        <Box sx={{ maxHeight: 360, overflow: 'auto' }}>
-          <Table size="small">
+        <Box sx={{ maxHeight: 360, overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <Table size="small" sx={{ minWidth: 500 }}>
             <TableHead>
               <TableRow>
                 {fields.slice(0, 8).map((f) => (
@@ -221,15 +223,23 @@ export default function DataExplorerPage() {
 
   return (
     <Box sx={{ p: { xs: 2, md: 3 } }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-        <Button startIcon={<ArrowBack />} onClick={() => navigate('/integrations')}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          alignItems: { xs: 'flex-start', sm: 'center' },
+          gap: 2,
+          mb: 3,
+        }}
+      >
+        <Button startIcon={<ArrowBack />} onClick={() => navigate('/integrations')} sx={{ minWidth: 0 }}>
           Back
         </Button>
-        <Box sx={{ flex: 1 }}>
-          <Typography variant="h4" fontWeight={700}>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Typography variant="h4" fontWeight={700} sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
             Data Explorer
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' } }}>
             Live visualization of the connected REST API response.
           </Typography>
         </Box>
@@ -238,6 +248,7 @@ export default function DataExplorerPage() {
           variant="contained"
           onClick={() => fetchMut.mutate(id)}
           disabled={fetchMut.isPending}
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
         >
           {fetchMut.isPending ? 'Fetching…' : 'Refresh'}
         </Button>

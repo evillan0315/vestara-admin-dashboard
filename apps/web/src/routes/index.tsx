@@ -31,6 +31,7 @@ const DataExplorerPage = lazyPage(() => import('../pages/DataExplorerPage'), 'Da
 const DocsPage = lazyPage(() => import('../pages/DocsPage'), 'DocsPage');
 const ProfilePage = lazyPage(() => import('../pages/ProfilePage'), 'ProfilePage');
 const AdminPage = lazyPage(() => import('../pages/AdminPage'), 'AdminPage');
+const MonitoringPage = lazyPage(() => import('../pages/MonitoringPage'), 'MonitoringPage');
 const LoginPage = lazyPage(() => import('../pages/LoginPage'), 'LoginPage');
 const RegisterPage = lazyPage(() => import('../pages/RegisterPage'), 'RegisterPage');
 const ForgotPasswordPage = lazyPage(
@@ -109,6 +110,7 @@ export function AppRoutes() {
             <Route path="/preferences" element={<ProfilePage />} />
             <Route path="/sessions" element={<ProfilePage />} />
             <Route path="/admin" element={<AdminPage />} />
+            <Route path="/monitoring" element={<MonitoringPage />} />
             <Route path="/docs" element={<DocsPage />} />
           </Route>
         </Route>

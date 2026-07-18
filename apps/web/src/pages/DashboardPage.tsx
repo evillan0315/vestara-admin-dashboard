@@ -175,15 +175,23 @@ export function DashboardPage() {
   return (
     <DashboardContainer>
       {/* ── Header ────────────────────────── */}
-      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, flexWrap: 'wrap' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          alignItems: { xs: 'flex-start', sm: 'flex-start' },
+          gap: 2,
+          flexWrap: 'wrap',
+        }}
+      >
         <Box sx={{ flex: 1, minWidth: 220 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <Typography variant="h4" fontWeight={700}>
+            <Typography variant="h4" fontWeight={700} sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
               Dashboard
             </Typography>
             <LiveBadge />
           </Box>
-          <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5, display: { xs: 'none', sm: 'block' } }}>
             Welcome back! Here's what's happening with your platform.
           </Typography>
         </Box>
@@ -340,17 +348,19 @@ export function DashboardPage() {
               </Typography>
             }
           >
-            {chartsLoading ? (
-              <ChartSkeleton height={300} />
-            ) : (
-              <LineChart
-                height={300}
-                series={[{ data: daily.values, area: true, color: theme.palette.primary.main }]}
-                xAxis={[{ scaleType: 'band', data: daily.labels }]}
-                yAxis={[{ min: 0 }]}
-                margin={{ top: 16, right: 16, bottom: 28, left: 36 }}
-              />
-            )}
+            <Box sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', minWidth: 0 }}>
+              {chartsLoading ? (
+                <ChartSkeleton height={300} />
+              ) : (
+                <LineChart
+                  height={300}
+                  series={[{ data: daily.values, area: true, color: theme.palette.primary.main }]}
+                  xAxis={[{ scaleType: 'band', data: daily.labels }]}
+                  yAxis={[{ min: 0 }]}
+                  margin={{ top: 16, right: 16, bottom: 28, left: 36 }}
+                />
+              )}
+            </Box>
           </ChartCard>
         </Grid>
 
@@ -408,27 +418,29 @@ export function DashboardPage() {
         {/* Activity by action type — click to inspect */}
         <Grid size={{ xs: 12, md: 4 }}>
           <ChartCard title="Activity by Action" subtitle="Click to inspect in System Logs">
-            {chartsLoading ? (
-              <ChartSkeleton height={240} />
-            ) : byAction.length === 0 ? (
-              <EmptyChart height={260} />
-            ) : (
-              <BarChart
-                layout="horizontal"
-                height={260}
-                series={[
-                  {
-                    data: byAction.map((entry) => entry.value),
-                    color: theme.palette.primary.main,
-                    highlightScope: { highlight: 'item', fade: 'global' },
-                  },
-                ]}
-                yAxis={[{ scaleType: 'band', data: byAction.map((entry) => entry.label) }]}
-                xAxis={[{ min: 0 }]}
-                margin={{ top: 8, right: 24, bottom: 24, left: 100 }}
-                onItemClick={handleActionBarClick}
-              />
-            )}
+            <Box sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', minWidth: 0 }}>
+              {chartsLoading ? (
+                <ChartSkeleton height={240} />
+              ) : byAction.length === 0 ? (
+                <EmptyChart height={260} />
+              ) : (
+                <BarChart
+                  layout="horizontal"
+                  height={260}
+                  series={[
+                    {
+                      data: byAction.map((entry) => entry.value),
+                      color: theme.palette.primary.main,
+                      highlightScope: { highlight: 'item', fade: 'global' },
+                    },
+                  ]}
+                  yAxis={[{ scaleType: 'band', data: byAction.map((entry) => entry.label) }]}
+                  xAxis={[{ min: 0 }]}
+                  margin={{ top: 8, right: 24, bottom: 24, left: 100 }}
+                  onItemClick={handleActionBarClick}
+                />
+              )}
+            </Box>
           </ChartCard>
         </Grid>
 

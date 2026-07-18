@@ -3,6 +3,8 @@ import {
   Tab as MuiTab,
   Box,
   styled,
+  useTheme,
+  useMediaQuery,
   type SxProps,
   type Theme,
 } from '@mui/material';
@@ -44,10 +46,13 @@ export const Tabs: FC<TabsProps> = ({
   value: controlledValue,
   defaultValue,
   onChange,
-  variant = 'standard',
+  variant: variantProp = 'standard',
   centered,
   sx,
 }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const variant = isMobile ? 'scrollable' : variantProp;
   const [internalValue, setInternalValue] = useState<string | number>(
     defaultValue ?? items[0]?.value ?? 0,
   );
@@ -66,7 +71,7 @@ export const Tabs: FC<TabsProps> = ({
       value={currentValue}
       onChange={handleChange}
       variant={variant}
-      centered={centered}
+      centered={isMobile ? false : centered}
       sx={sx}
     >
       {items.map((item) => (

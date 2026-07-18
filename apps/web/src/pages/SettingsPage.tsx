@@ -41,8 +41,9 @@ const Card = styled(Paper)(({ theme }) => ({
 
 const SettingRow = styled(Box)(({ theme }) => ({
   display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  gap: theme.spacing(1),
   padding: theme.spacing(2, 3),
   borderBottom: `1px solid ${theme.palette.divider}`,
   '&:last-child': {
@@ -50,6 +51,12 @@ const SettingRow = styled(Box)(({ theme }) => ({
   },
   '&:hover': {
     backgroundColor: theme.palette.action.hover,
+  },
+  [theme.breakpoints.up('sm')]: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: theme.spacing(2),
   },
 }));
 
@@ -63,20 +70,28 @@ const KeyLabel = styled(Typography)(({ theme }) => ({
 const ValuePreview = styled(Typography)(({ theme }) => ({
   fontSize: '0.8125rem',
   color: theme.palette.text.secondary,
-  maxWidth: 400,
+  maxWidth: '100%',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
+  [theme.breakpoints.up('sm')]: {
+    maxWidth: 400,
+  },
 }));
 
 const HeaderBox = styled(Box)(({ theme }) => ({
   display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
+  flexDirection: 'column',
+  gap: theme.spacing(1.5),
   padding: theme.spacing(2, 3),
   borderBottom: `1px solid ${theme.palette.divider}`,
   backgroundColor:
     theme.palette.mode === 'light' ? theme.palette.grey[50] : theme.palette.background.default,
+  [theme.breakpoints.up('sm')]: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
 }));
 
 // ── Component ──
@@ -162,10 +177,10 @@ export function SettingsPage(): ReactElement {
     return (
       <PageContainer>
         <Box>
-          <Typography variant="h4" fontWeight={700}>
+          <Typography variant="h4" fontWeight={700} sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
             Settings
           </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5, display: { xs: 'none', sm: 'block' } }}>
             Configure your platform preferences and system settings.
           </Typography>
         </Box>
@@ -180,7 +195,7 @@ export function SettingsPage(): ReactElement {
     return (
       <PageContainer>
         <Box>
-          <Typography variant="h4" fontWeight={700}>
+          <Typography variant="h4" fontWeight={700} sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
             Settings
           </Typography>
         </Box>
@@ -200,10 +215,10 @@ export function SettingsPage(): ReactElement {
   return (
     <PageContainer>
       <Box>
-        <Typography variant="h4" fontWeight={700}>
+        <Typography variant="h4" fontWeight={700} sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
           Settings
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>
+        <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5, display: { xs: 'none', sm: 'block' } }}>
           Configure your platform preferences and system settings.
         </Typography>
       </Box>
@@ -213,7 +228,7 @@ export function SettingsPage(): ReactElement {
           <Typography variant="subtitle2" fontWeight={600}>
             System Settings ({settingsEntries.length})
           </Typography>
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
             <Tooltip title="Change History">
               <IconButton size="small" onClick={() => setAuditOpen(true)}>
                 <HistoryIcon fontSize="small" />
@@ -234,7 +249,7 @@ export function SettingsPage(): ReactElement {
                 <RefreshIcon fontSize="small" />
               </IconButton>
             </Tooltip>
-            <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={handleCreate}>
+            <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={handleCreate} sx={{ width: { xs: '100%', sm: 'auto' } }}>
               Add Setting
             </Button>
           </Box>
@@ -270,7 +285,7 @@ export function SettingsPage(): ReactElement {
                     : String(value)}
                 </ValuePreview>
               </Box>
-              <Box sx={{ display: 'flex', gap: 0.5, ml: 2, flexShrink: 0 }}>
+              <Box sx={{ display: 'flex', gap: 0.5, ml: { xs: 0, sm: 2 }, flexShrink: 0 }}>
                 <Tooltip title="Edit setting">
                   <IconButton size="small" onClick={() => handleEdit(key, value)}>
                     <EditIcon fontSize="small" />

@@ -1,10 +1,13 @@
-import { Paper, Grid, Typography, styled } from '@mui/material';
+import { Paper, Grid, Typography, styled, type Theme } from '@mui/material';
 
-const StatCard = styled(Paper)(({ theme }) => ({
+const StatCard = styled(Paper)(({ theme }: { theme: Theme }) => ({
   borderRadius: 12,
   border: `1px solid ${theme.palette.divider}`,
   boxShadow: 'none',
-  padding: theme.spacing(3),
+  padding: theme.spacing(2),
+  [theme.breakpoints.up('sm')]: {
+    padding: theme.spacing(3),
+  },
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
@@ -13,11 +16,14 @@ const StatCard = styled(Paper)(({ theme }) => ({
   textAlign: 'center',
 }));
 
-const StatValue = styled(Typography)(({ theme }) => ({
-  fontSize: '2.5rem',
+const StatValue = styled(Typography)(({ theme }: { theme: Theme }) => ({
+  fontSize: '2rem',
   fontWeight: 700,
   color: theme.palette.primary.main,
   lineHeight: 1.2,
+  [theme.breakpoints.up('sm')]: {
+    fontSize: '2.5rem',
+  },
 }));
 
 const StatLabel = styled(Typography)(({ theme }) => ({

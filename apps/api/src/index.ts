@@ -22,6 +22,34 @@ async function main(): Promise<void> {
     );
   });
 
+  // ── Process exception handlers ────────────────────────────────────────
+  process.on('uncaughtException', (err) => {
+    logger.fatal({ err }, 'Uncaught exception — shutting down');
+    process.exit(1);
+  });
+
+  process.on('unhandledRejection', (reason) => {
+    logger.error({ reason }, 'Unhandled promise rejection');
+    // Don't exit — many are recoverable (e.g., failed WS broadcast)
+  });
+
+  // ── Scheduled tasks ───────────────────────────────────────────────────
+  // Purge audit logs older than 90 days every 24 hours.
+  const RETENTION_DAYS = 90;
+  const CLEANUP_INTERVAL_MS = 24 * 60 * 60 * 1000;
+
+  setInterval(async () => {
+    try {
+      const cutoff = new Date(Date.now() - RETENTION_DAYS * 24 * 60 * 60 * 1000);
+      const { auditLogRepository } = await import('./repositories/index.js');
+      await auditLogRepository.deleteOlderThan(cutoff);
+      logger.info({ retentionDays: RETENTION_DAYS }, 'Audit log cleanup completed');
+    } catch (err) {
+      logger.error({ err }, 'Failed to purge expired audit logs');
+    }
+  }, CLEANUP_INTERVAL_MS).unref();
+
+  // ── Graceful shutdown ─────────────────────────────────────────────────
   const shutdown = (signal: string): void => {
     logger.info({ signal }, 'Shutting down server');
     getWebSocketManager().shutdown();

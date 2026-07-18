@@ -68,7 +68,7 @@ export function UsersPage(): ReactElement {
         value={ctx.searchTerm}
         onChange={ctx.handleSearchChange}
         size="small"
-        sx={{ minWidth: 200 }}
+        sx={{ width: { xs: '100%', sm: 200 }, minWidth: 0 }}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -84,7 +84,7 @@ export function UsersPage(): ReactElement {
           ) : null,
         }}
       />
-      <FormControl size="small" sx={{ minWidth: 130 }}>
+      <FormControl size="small" sx={{ width: { xs: '100%', sm: 130 }, minWidth: 0 }}>
         <Select
           value={ctx.roleFilter === '' ? '' : ctx.roleFilter}
           onChange={(e) => ctx.handleRoleFilterChange(e.target.value)}
@@ -106,7 +106,7 @@ export function UsersPage(): ReactElement {
           ))}
         </Select>
       </FormControl>
-      <FormControl size="small" sx={{ minWidth: 130 }}>
+      <FormControl size="small" sx={{ width: { xs: '100%', sm: 130 }, minWidth: 0 }}>
         <Select
           value={ctx.statusFilter === '' ? '' : String(ctx.statusFilter)}
           onChange={(e) => ctx.handleStatusFilterChange(e.target.value)}
@@ -146,13 +146,44 @@ export function UsersPage(): ReactElement {
 
   return (
     <PageContainer>
-      <Box>
-        <Typography variant="h4" fontWeight={700}>
-          Users
-        </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>
-          Manage user accounts and permissions.
-        </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          alignItems: { xs: 'flex-start', sm: 'flex-start' },
+          justifyContent: 'space-between',
+          gap: 2,
+        }}
+      >
+        <Box sx={{ minWidth: 0 }}>
+          <Typography variant="h4" fontWeight={700} sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
+            Users
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5, display: { xs: 'none', sm: 'block' } }}>
+            Manage user accounts and permissions.
+          </Typography>
+        </Box>
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', width: { xs: '100%', sm: 'auto' } }}>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<DownloadIcon />}
+            onClick={ctx.handleExport}
+            disabled={ctx.exporting || ctx.isLoading}
+            sx={{ flex: { xs: 1, sm: 'none' } }}
+          >
+            Export
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<AddIcon />}
+            onClick={ctx.handleCreate}
+            sx={{ flex: { xs: 1, sm: 'none' } }}
+          >
+            Add User
+          </Button>
+        </Box>
       </Box>
 
       {ctx.userStats && (
@@ -211,27 +242,6 @@ export function UsersPage(): ReactElement {
         onPageChange={ctx.handlePageChange}
         onPerPageChange={ctx.setPerPage}
         filters={filterControls}
-        actions={
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button
-              variant="outlined"
-              size="small"
-              startIcon={<DownloadIcon />}
-              onClick={ctx.handleExport}
-              disabled={ctx.exporting || ctx.isLoading}
-            >
-              Export
-            </Button>
-            <Button
-              variant="contained"
-              size="small"
-              startIcon={<AddIcon />}
-              onClick={ctx.handleCreate}
-            >
-              Add User
-            </Button>
-          </Box>
-        }
       />
 
       <UsersDialogs

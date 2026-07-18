@@ -21,6 +21,7 @@ import {
   BookText,
   FileBarChart,
   ShieldCheck,
+  Activity,
 } from 'lucide-react';
 
 export interface NavItem {
@@ -134,6 +135,12 @@ export const navGroups: NavGroup[] = [
         label: 'System Logs',
         icon: ScrollText,
         path: '/system-logs',
+        allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
+      },
+      {
+        label: 'Monitoring',
+        icon: Activity,
+        path: '/monitoring',
         allowedRoles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
       },
       {

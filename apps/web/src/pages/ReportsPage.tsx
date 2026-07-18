@@ -67,12 +67,21 @@ export function ReportsPage(): ReactElement {
 
   return (
     <PageContainer>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Box>
-          <Typography variant="h4" fontWeight={700}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          alignItems: { xs: 'flex-start', sm: 'center' },
+          justifyContent: 'space-between',
+          gap: 2,
+          flexWrap: 'wrap',
+        }}
+      >
+        <Box sx={{ minWidth: 0 }}>
+          <Typography variant="h4" fontWeight={700} sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
             Reports
           </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5, display: { xs: 'none', sm: 'block' } }}>
             Generate and manage data export reports.
           </Typography>
         </Box>
@@ -80,7 +89,7 @@ export function ReportsPage(): ReactElement {
           variant="outlined"
           startIcon={<RefreshIcon />}
           onClick={() => ctx.refetch()}
-          sx={{ textTransform: 'none' }}
+          sx={{ textTransform: 'none', width: { xs: '100%', sm: 'auto' } }}
         >
           Refresh
         </Button>

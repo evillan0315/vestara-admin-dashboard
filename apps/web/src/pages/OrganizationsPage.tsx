@@ -23,13 +23,31 @@ export function OrganizationsPage(): ReactElement {
 
   return (
     <PageContainer>
-      <Box>
-        <Typography variant="h4" fontWeight={700}>
-          Organizations
-        </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>
-          Manage organizations and their settings.
-        </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          alignItems: { xs: 'flex-start', sm: 'center' },
+          justifyContent: 'space-between',
+          gap: 2,
+        }}
+      >
+        <Box sx={{ minWidth: 0 }}>
+          <Typography variant="h4" fontWeight={700} sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
+            Organizations
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5, display: { xs: 'none', sm: 'block' } }}>
+            Manage organizations and their settings.
+          </Typography>
+        </Box>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={ctx.handleCreate}
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
+        >
+          Add Organization
+        </Button>
       </Box>
 
       <DataTable<OrganizationDTO>
@@ -55,11 +73,6 @@ export function OrganizationsPage(): ReactElement {
         emptyIcon={<BusinessIcon sx={{ fontSize: 48 }} />}
         emptyTitle="No organizations found"
         emptyDescription="No organizations match your search criteria."
-        actions={
-          <Button variant="contained" startIcon={<AddIcon />} onClick={ctx.handleCreate}>
-            Add Organization
-          </Button>
-        }
       />
 
       <OrganizationsDialog

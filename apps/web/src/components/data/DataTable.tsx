@@ -117,18 +117,23 @@ const TableRowStyled = styled(TableRow, {
 
 const ToolbarContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: theme.spacing(2),
+  flexDirection: 'column' as const,
+  alignItems: 'stretch',
+  gap: theme.spacing(1.5),
   padding: theme.spacing(2, 2, 1.5, 2),
-  flexWrap: 'wrap',
+  [theme.breakpoints.up('sm')]: {
+    flexDirection: 'row' as const,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: theme.spacing(2),
+  },
 }));
 
 const SearchField = styled(TextField)(({ theme }) => ({
-  minWidth: { xs: '100%', sm: 280 },
-  maxWidth: { xs: '100%', sm: 400 },
-  [theme.breakpoints.down('sm')]: {
-    width: '100%',
+  width: '100%',
+  [theme.breakpoints.up('sm')]: {
+    minWidth: 280,
+    maxWidth: 400,
   },
   '& .MuiOutlinedInput-root': {
     borderRadius: 8,
@@ -149,6 +154,9 @@ const PaginationContainer = styled(Box)(({ theme }) => ({
   borderTop: `1px solid ${theme.palette.divider}`,
   flexWrap: 'wrap',
   gap: theme.spacing(1),
+  '& > *': {
+    minWidth: 0,
+  },
 }));
 
 const PageButton = styled(IconButton)(({ theme }) => ({
@@ -297,9 +305,18 @@ export function DataTable<T>({
       {/* Toolbar */}
       {(searchable || title || actions || filters) && (
         <ToolbarContainer>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
+              flexWrap: 'wrap',
+              flex: 1,
+              minWidth: 0,
+            }}
+          >
             {title && (
-              <Typography variant="subtitle1" fontWeight={600}>
+              <Typography variant="subtitle1" fontWeight={600} sx={{ whiteSpace: 'nowrap' }}>
                 {title}
               </Typography>
             )}
@@ -326,10 +343,33 @@ export function DataTable<T>({
               />
             )}
             {filters && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>{filters}</Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.5,
+                  flexWrap: 'wrap',
+                  width: { xs: '100%', sm: 'auto' },
+                }}
+              >
+                {filters}
+              </Box>
             )}
           </Box>
-          {actions && <Box sx={{ display: 'flex', gap: 1, flexShrink: 0 }}>{actions}</Box>}
+          {actions && (
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 1,
+                flexShrink: 0,
+                flexWrap: 'wrap',
+                width: { xs: '100%', sm: 'auto' },
+                justifyContent: { xs: 'stretch', sm: 'flex-end' },
+              }}
+            >
+              {actions}
+            </Box>
+          )}
         </ToolbarContainer>
       )}
 

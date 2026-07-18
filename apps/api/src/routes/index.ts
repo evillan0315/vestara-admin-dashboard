@@ -15,12 +15,16 @@ import docsRouter from './docs.js';
 import reportsRouter from './reports.js';
 import websocketRouter from './websocket.js';
 import agentRouter from './agent.js';
+import metricsRouter from './metrics.js';
 
 const router = Router();
 
 // Mount feature routes
 router.use(healthRateLimiter);
 router.use(healthRouter);
+
+// Metrics (Prometheus + JSON) — uses permissive health limiter
+router.use(metricsRouter);
 
 // Auth routes — strict brute-force protection (counts only failures).
 router.use('/auth', authRateLimiter, authRouter);

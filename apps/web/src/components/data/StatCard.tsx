@@ -38,9 +38,14 @@ const IconContainer = styled(Box, {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  width: 48,
-  height: 48,
-  borderRadius: 12,
+  width: 40,
+  height: 40,
+  borderRadius: 10,
+  [theme.breakpoints.up('sm')]: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+  },
   backgroundColor:
     iconColor === 'primary'
       ? `${theme.palette.primary.main}15`
@@ -54,6 +59,10 @@ const IconContainer = styled(Box, {
               ? `${theme.palette.warning.main}15`
               : `${theme.palette.info.main}15`,
   '& svg': {
+    fontSize: 20,
+    [theme.breakpoints.up('sm')]: {
+      fontSize: 24,
+    },
     color:
       iconColor === 'primary'
         ? theme.palette.primary.main
@@ -122,13 +131,13 @@ export const StatCard = memo(
 
     return (
       <StyledCard sx={sx}>
-        <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
+        <CardContent sx={{ p: { xs: 2, sm: 3 }, '&:last-child': { pb: { xs: 2, sm: 3 } } }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <Box sx={{ flex: 1 }}>
               <Typography variant="body2" color="text.secondary" gutterBottom>
                 {title}
               </Typography>
-              <Typography variant="h4" fontWeight={700}>
+              <Typography variant="h4" fontWeight={700} sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
                 {loading ? '—' : value}
               </Typography>
             </Box>
