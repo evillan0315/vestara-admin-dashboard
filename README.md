@@ -564,11 +564,40 @@ Every contribution should improve the consistency, maintainability, and long-ter
 
 ---
 
+# Engineering Philosophy
+
+Vestara is engineered around a simple principle:
+
+> Complexity should exist inside the platform, not in the user experience.
+
+Every architectural decision is evaluated against four questions:
+
+- Does it reduce operational complexity?
+- Can it scale across organizations?
+- Can AI enhance this workflow?
+- Will it remain maintainable five years from now?
+
+This philosophy guides every design decision throughout the Vestara ecosystem.
+
+---
+
 # License
 
 This project is licensed under the MIT License.
 
 See the `LICENSE` file for additional information.
+
+# Vestara Ecosystem
+
+| Repository | Purpose |
+|------------|---------|
+| Vestara Blueprint | Strategic architecture and engineering standards |
+| Vestara Command Center | Enterprise administration platform |
+| Vestara API | Backend services |
+| Vestara AI Platform | AI infrastructure |
+| Vestara Mobile | Mobile experience |
+| Vestara SDK | Developer toolkit |
+| Vestara CLI | Command-line tooling |
 
 ---
 
@@ -589,3 +618,7 @@ It is the operational interface of a growing ecosystem designed to unify enterpr
 Vestara Blueprint • Command Center • API • AI Platform • Mobile • Marketplace • SDK • CLI
 
 </div>
+
+---
+
+> 📚 This repository follows the **Vestara Documentation Standard (VDS)** to ensure consistency across the entire Vestara ecosystem.
