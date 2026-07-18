@@ -157,6 +157,26 @@ The goal is simple:
 
 The Vestara Command Center is built using a modern, enterprise-ready technology stack designed for scalability, maintainability, and long-term evolution.
 
+| Layer            | Technology                    |
+| ---------------- | ----------------------------- |
+| Language         | TypeScript                    |
+| Frontend         | React 19                      |
+| Build Tool       | Vite                          |
+| UI Framework     | Material UI                   |
+| Styling          | Tailwind CSS v4               |
+| State Management | TanStack Query, React Context |
+| Routing          | React Router v7               |
+| Forms            | React Hook Form + Zod         |
+| Charts           | Recharts                      |
+| Icons            | Material Icons                |
+| HTTP Client      | Axios                         |
+| Authentication   | JWT / OAuth                   |
+| Backend          | Fastify                       |
+| Database         | PostgreSQL                    |
+| ORM              | Prisma                        |
+| Package Manager  | pnpm                          |
+
+
 ## Frontend
 
 | Technology | Purpose |
