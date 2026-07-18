@@ -20,7 +20,7 @@ The official enterprise command center for managing organizations, intelligence,
 ![Version](https://img.shields.io/badge/Release-Alpha-F59E0B?style=for-the-badge)
 ![Architecture](https://img.shields.io/badge/Architecture-AI%20Native-10B981?style=for-the-badge)
 ![Frontend](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge)
-![Backend](https://img.shields.io/badge/Fastify-TypeScript-000000?style=for-the-badge)
+![Backend](https://img.shields.io/badge/Express%205-TypeScript-000000?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-7C3AED?style=for-the-badge)
 
 </div>
@@ -65,7 +65,7 @@ As additional Vestara services are introduced, this repository will remain the c
 | **Repository** | `vestara-admin-dashboard` |
 | **Architecture** | AI-Native Enterprise Platform |
 | **Frontend** | React 19 + TypeScript |
-| **Backend** | Fastify + TypeScript |
+| **Backend** | Express 5 + TypeScript |
 | **UI Framework** | Material UI |
 | **Styling** | Tailwind CSS v4 |
 | **Authentication** | JWT · OAuth · Enterprise Ready |
@@ -241,11 +241,11 @@ The Vestara Command Center is built using a modern, enterprise-ready technology 
 | State Management | TanStack Query, React Context |
 | Routing          | React Router v7               |
 | Forms            | React Hook Form + Zod         |
-| Charts           | Recharts                      |
+| Charts           | MUI X Charts                   |
 | Icons            | Material Icons                |
 | HTTP Client      | Axios                         |
 | Authentication   | JWT / OAuth                   |
-| Backend          | Fastify                       |
+| Backend          | Express 5                      |
 | Database         | PostgreSQL                    |
 | ORM              | Prisma                        |
 | Package Manager  | pnpm                          |
@@ -262,7 +262,7 @@ The Vestara Command Center is built using a modern, enterprise-ready technology 
 | Tailwind CSS v4 | Utility-First Styling |
 | React Router | Client Routing |
 | TanStack Query | Server State Management |
-| Recharts | Data Visualization |
+| MUI X Charts | Data Visualization |
 
 ---
 
@@ -270,7 +270,7 @@ The Vestara Command Center is built using a modern, enterprise-ready technology 
 
 | Technology | Purpose |
 |------------|---------|
-| Fastify | High Performance REST API |
+| Express 5 | High Performance REST API |
 | TypeScript | Backend Development |
 | Prisma ORM | Database Access |
 | PostgreSQL | Primary Database |
