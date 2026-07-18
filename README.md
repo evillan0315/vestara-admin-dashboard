@@ -161,18 +161,6 @@ The Vestara Command Center is composed of independent platform modules that coll
 | Developer Platform | REST APIs, SDKs, integrations |
 | Platform Operations | Monitoring, health checks, observability |
 
-# Platform Principles
-
-| Principle | Philosophy |
-|-----------|------------|
-| 🤖 AI Native | Intelligence is part of the platform, not an add-on. |
-| 🏢 Enterprise Ready | Built for organizations from day one. |
-| 🧩 Modular Architecture | Independent services connected through shared standards. |
-| ⚡ Developer First | Modern tooling, APIs, documentation, and automation. |
-| 🔒 Secure by Design | Governance, compliance, and operational security by default. |
-| 🚀 Future Ready | Designed to evolve alongside autonomous AI systems. |
-
----
 
 | Domain | Purpose |
 |---------|---------|
@@ -217,6 +205,21 @@ Database
 
 AI Providers
 ```
+
+---
+
+# Platform Principles
+
+| Principle | Philosophy |
+|-----------|------------|
+| 🤖 AI Native | Intelligence is part of the platform, not an add-on. |
+| 🏢 Enterprise Ready | Built for organizations from day one. |
+| 🧩 Modular Architecture | Independent services connected through shared standards. |
+| ⚡ Developer First | Modern tooling, APIs, documentation, and automation. |
+| 🔒 Secure by Design | Governance, compliance, and operational security by default. |
+| 🚀 Future Ready | Designed to evolve alongside autonomous AI systems. |
+
+---
 
 # Platform Domains
 
