@@ -37,6 +37,25 @@ Rather than acting as a traditional administration dashboard, the Command Center
 
 As the platform evolves, every Vestara service—from AI assistants and marketplace services to payment infrastructure, knowledge management, automation, and developer tooling—will integrate through this unified operational environment.
 
+# Why This Repository Exists
+
+The Vestara ecosystem is composed of multiple services, APIs, AI components, and future applications.
+
+This repository delivers the enterprise command center responsible for operating those services through a single intelligent interface.
+
+Its responsibilities include:
+
+- Platform administration
+- Organization management
+- AI operations
+- Marketplace administration
+- Analytics
+- Reporting
+- System governance
+- Enterprise configuration
+
+As additional Vestara services are introduced, this repository will remain the central operational workspace for managing the platform.
+
 # Platform at a Glance
 
 | | |
