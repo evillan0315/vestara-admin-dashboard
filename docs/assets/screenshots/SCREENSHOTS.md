@@ -6,7 +6,7 @@
 
 ## 01 · Secure Authentication
 
-![Login Page](../../screens/login-page-dark.png)
+![Login Page](../../screens/product/product/login-page-dark.png)
 
 Enterprise authentication designed for secure access, future single sign-on integrations, and organization-aware identity management.
 
@@ -21,7 +21,7 @@ Enterprise authentication designed for secure access, future single sign-on inte
 
 ## 02 · Operational Dashboard
 
-![Dashboard Dark](../../screens/dashboard-dark.png)
+![Dashboard Dark](../../screens/product/product/dashboard-dark.png)
 
 A unified operational overview providing visibility into platform health, system activity, users, audit events, and operational metrics.
 
@@ -37,7 +37,7 @@ A unified operational overview providing visibility into platform health, system
 
 ## 03 · Operational Intelligence
 
-![Analytics Dark](../../screens/analytics-dark.png)
+![Analytics Dark](../../screens/product/analytics-dark.png)
 
 Interactive analytics designed for monitoring platform usage, operational trends, and enterprise insights.
 
@@ -53,7 +53,7 @@ Interactive analytics designed for monitoring platform usage, operational trends
 
 ## 04 · Enterprise Reporting
 
-![Reports Dark](../../screens/reports-dark.png)
+![Reports Dark](../../screens/product/reports-dark.png)
 
 Generate, export, and manage operational reports while maintaining complete visibility across platform activities.
 
@@ -69,7 +69,7 @@ Generate, export, and manage operational reports while maintaining complete visi
 
 ## 05 · Knowledge & Document Management
 
-![Files Dark](../../screens/files-dark.png)
+![Files Dark](../../screens/product/files-dark.png)
 
 Enterprise-grade file and document management forming the foundation for future AI knowledge services and intelligent document processing.
 
@@ -85,7 +85,7 @@ Enterprise-grade file and document management forming the foundation for future 
 
 ## 06 · User Management
 
-![Users Dark](../../screens/users-dark.png)
+![Users Dark](../../screens/product/users-dark.png)
 
 Full user lifecycle management with role-based access control, bulk operations, and comprehensive filtering.
 
@@ -102,7 +102,7 @@ Full user lifecycle management with role-based access control, bulk operations, 
 
 ## 07 · Organization Management
 
-![Organizations Dark](../../screens/organizations-dark.png)
+![Organizations Dark](../../screens/product/organizations-dark.png)
 
 Multi-tenant organization management with logo upload and member tracking.
 
@@ -117,7 +117,7 @@ Multi-tenant organization management with logo upload and member tracking.
 
 ## 08 · System Settings
 
-![Settings Dark](../../screens/settings-dark.png)
+![Settings Dark](../../screens/product/settings-dark.png)
 
 System configuration management with audit trail, import/export, and JSON validation.
 
@@ -133,7 +133,7 @@ System configuration management with audit trail, import/export, and JSON valida
 
 ## 09 · System Monitoring
 
-![System Logs Dark](../../screens/system-logs-dark.png)
+![System Logs Dark](../../screens/product/system-logs-dark.png)
 
 Real-time system monitoring with audit trail, error tracking, and health metrics.
 

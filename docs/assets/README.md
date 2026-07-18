@@ -10,9 +10,9 @@ Every Vestara repository must include these 6 visual assets. They establish a co
 
 | ID | Asset | Location | Status |
 |----|-------|----------|--------|
-| VDS-101 | Hero Banner | `screens/vestara-command-center-hero-image.png` | Complete |
+| VDS-101 | Hero Banner | `screens/vds/vestara-command-center-hero-image.png` | Complete |
 | VDS-102 | Architecture Diagram | `docs/assets/architecture/ARCHITECTURE.md` | Complete |
-| VDS-103 | Platform Domains | `screens/vestara-command-center.png` | Complete |
+| VDS-103 | Platform Domains | `screens/vds/vestara-command-center.png` | Complete |
 | VDS-104 | Product Tour | `docs/assets/screenshots/SCREENSHOTS.md` | Complete |
 | VDS-105 | Technology Stack | `docs/assets/technology/TECHNOLOGY.md` | Complete |
 | VDS-106 | Repository Structure | `docs/assets/diagrams/DIAGRAMS.md` | Complete |
@@ -23,7 +23,7 @@ Every Vestara repository must include these 6 visual assets. They establish a co
 
 **Purpose:** Primary visual identity for the repository. Used in README headers, documentation landing pages, and promotional materials.
 
-**File:** `screens/vestara-command-center-hero-image.png`
+**File:** `screens/vds/vestara-command-center-hero-image.png`
 
 **Specifications:**
 - Width: 1920px (recommended)
@@ -33,7 +33,7 @@ Every Vestara repository must include these 6 visual assets. They establish a co
 
 **Usage:**
 ```markdown
-<img src="./screens/vestara-command-center-hero-image.png" width="100%" alt="Vestara Command Center"/>
+<img src="./screens/vds/vestara-command-center-hero-image.png" width="100%" alt="Vestara Command Center"/>
 ```
 
 **Current asset:** Full-width hero showing the Command Center dashboard with dark theme and gold accents.
@@ -70,7 +70,7 @@ Every Vestara repository must include these 6 visual assets. They establish a co
 
 **Purpose:** Visual representation of all platform modules, their status, and relationships.
 
-**File:** `screens/vestara-command-center.png`
+**File:** `screens/vds/vestara-command-center.png`
 
 **Specifications:**
 - Shows all platform domains as a unified interface
@@ -79,7 +79,7 @@ Every Vestara repository must include these 6 visual assets. They establish a co
 
 **Usage:**
 ```markdown
-<img src="./screens/vestara-command-center.png" width="100%" alt="Vestara Command Center"/>
+<img src="./screens/vds/vestara-command-center.png" width="100%" alt="Vestara Command Center"/>
 ```
 
 **Current asset:** Full platform overview showing all domain modules.
@@ -174,7 +174,7 @@ Every Vestara repository must include these 6 visual assets. They establish a co
 | Resolution | 2x for Retina displays |
 | Max file size | 2MB for screenshots, 5MB for hero |
 | Naming | `feature-name-theme.png` (e.g., `dashboard-dark.png`) |
-| Directory | `screens/` for images, `docs/assets/` for documentation |
+| Directory | `screens/product/` for app screenshots, `screens/vds/` for VDS assets, `assets/brand/` for brand assets, `assets/marketing/` for promotional content |
 
 ### Theme Variants
 
@@ -188,11 +188,24 @@ Provide both light and dark variants for:
 
 ```
 screens/
-├── {feature}-dark.png
-├── {feature}-light.png
-├── vestara-command-center-hero-image.png    (VDS-101)
-├── vestara-command-center.png               (VDS-103)
-└── vestara-ecosystem-architecture.png       (supplementary)
+├── product/
+│   ├── {feature}-dark.png
+│   └── {feature}-light.png
+├── vds/
+│   ├── vestara-command-center-hero-image.png    (VDS-101)
+│   ├── vestara-command-center.png               (VDS-103)
+│   └── vestara-ecosystem-architecture.png       (supplementary)
+└── elite-companions/
+    └── ...
+
+assets/
+├── brand/
+│   ├── favicon.svg
+│   └── logo.svg
+├── marketing/
+│   └── ... (promotional images)
+└── media/
+    └── ... (videos)
 ```
 
 ---

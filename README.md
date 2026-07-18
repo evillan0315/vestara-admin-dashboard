@@ -8,7 +8,7 @@
 
 <br>
 
-<img src="./screens/vestara-command-center-hero-image.png" width="100%" alt="Vestara Command Center"/>
+<img src="./screens/vds/vestara-command-center-hero-image.png" width="100%" alt="Vestara Command Center"/>
 
 <br>
 
@@ -82,7 +82,7 @@ The following previews demonstrate the current state of development running with
 
 ## 01 · Secure Authentication
 
-![Login](./screens/login-page-dark.png)
+![Login](./screens/product/login-page-dark.png)
 
 Enterprise authentication designed for secure access, future single sign-on integrations, and organization-aware identity management.
 
@@ -90,7 +90,7 @@ Enterprise authentication designed for secure access, future single sign-on inte
 
 ## 02 · Operational Dashboard
 
-![Dashboard](./screens/dashboard-dark.png)
+![Dashboard](./screens/product/dashboard-dark.png)
 
 A unified operational overview providing visibility into platform health, system activity, users, audit events, and operational metrics.
 
@@ -98,7 +98,7 @@ A unified operational overview providing visibility into platform health, system
 
 ## 03 · Operational Intelligence
 
-![Analytics](./screens/analytics-dark.png)
+![Analytics](./screens/product/analytics-dark.png)
 
 Interactive analytics designed for monitoring platform usage, operational trends, and enterprise insights.
 
@@ -106,7 +106,7 @@ Interactive analytics designed for monitoring platform usage, operational trends
 
 ## 04 · Enterprise Reporting
 
-![Reports](./screens/reports-dark.png)
+![Reports](./screens/product/reports-dark.png)
 
 Generate, export, and manage operational reports while maintaining complete visibility across platform activities.
 
@@ -114,7 +114,7 @@ Generate, export, and manage operational reports while maintaining complete visi
 
 ## 05 · Knowledge & Document Management
 
-![Files](./screens/files-dark.png)
+![Files](./screens/product/files-dark.png)
 
 Enterprise-grade file and document management forming the foundation for future AI knowledge services and intelligent document processing.
 
@@ -122,7 +122,7 @@ Enterprise-grade file and document management forming the foundation for future 
 
 <p align="center">
 
-<img src="./screens/vestara-ecosystem-architecture.png" width="100%" />
+<img src="./screens/vds/vestara-ecosystem-architecture.png" width="100%" />
 
 </p>
 
@@ -225,7 +225,7 @@ AI Providers
 
 # Platform Domains
 
-<img src="./screens/vestara-command-center.png" width="100%" alt="Vestara Command Center"/>
+<img src="./screens/vds/vestara-command-center.png" width="100%" alt="Vestara Command Center"/>
 
 ---
 
@@ -408,9 +408,9 @@ The Vestara Documentation Portal follows the [Vestara Documentation Standard (VD
 
 | ID | Asset | Location |
 |----|-------|----------|
-| VDS-101 | Hero Banner | [`screens/`](./screens/) |
+| VDS-101 | Hero Banner | [`screens/vds/`](./screens/vds/) |
 | VDS-102 | Architecture Diagram | [`docs/assets/architecture/`](./docs/assets/architecture/) |
-| VDS-103 | Platform Domains | [`screens/`](./screens/) |
+| VDS-103 | Platform Domains | [`screens/vds/`](./screens/vds/) |
 | VDS-104 | Product Tour | [`docs/assets/screenshots/`](./docs/assets/screenshots/) |
 | VDS-105 | Technology Stack | [`docs/assets/technology/`](./docs/assets/technology/) |
 | VDS-106 | Repository Structure | [`docs/assets/diagrams/`](./docs/assets/diagrams/) |

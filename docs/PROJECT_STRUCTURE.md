@@ -647,36 +647,39 @@ infrastructure/
 
 ---
 
-## screens/ — Product Screenshots (VDS-101, VDS-103, VDS-104)
+## screens/ — Screenshots & Visual Assets
 
 ```text
 screens/
-├── analytics-dark.png           # Analytics page (dark)
-├── analytics-light.png          # Analytics page (light)
-├── dashboard-dark.png           # Dashboard (dark)
-├── dashboard-light.png          # Dashboard (light)
-├── files-dark.png               # File manager (dark)
-├── files-light.png              # File manager (light)
-├── integrations-dark.png        # Integrations (dark)
-├── integrations-light.png       # Integrations (light)
-├── login-page-dark.png          # Login page (dark)
-├── organizations-dark.png       # Organizations (dark)
-├── organizations-light.png      # Organizations (light)
-├── profile-dark.png             # Profile (dark)
-├── profile-light.png            # Profile (light)
-├── reports-dark.png             # Reports (dark)
-├── reports-light.png            # Reports (light)
-├── settings-dark.png            # Settings (dark)
-├── settings-light.png           # Settings (light)
-├── system-logs-dark.png         # System logs (dark)
-├── system-logs-light.png        # System logs (light)
-├── users-dark.png               # Users page (dark)
-├── vestara-command-center-hero-image.png  # VDS-101: Hero banner
-├── vestara-command-center.png            # VDS-103: Platform domains
-├── vestara-ecosystem-architecture.png    # Architecture visual
-├── vestara-ecosystem.png                 # Ecosystem overview
+├── product/                         # App screenshots (dark/light variants)
+│   ├── analytics-dark.png           # Analytics page (dark)
+│   ├── analytics-light.png          # Analytics page (light)
+│   ├── dashboard-dark.png           # Dashboard (dark)
+│   ├── dashboard-light.png          # Dashboard (light)
+│   ├── files-dark.png               # File manager (dark)
+│   ├── files-light.png              # File manager (light)
+│   ├── integrations-dark.png        # Integrations (dark)
+│   ├── integrations-light.png       # Integrations (light)
+│   ├── login-page-dark.png          # Login page (dark)
+│   ├── organizations-dark.png       # Organizations (dark)
+│   ├── organizations-light.png      # Organizations (light)
+│   ├── profile-dark.png             # Profile (dark)
+│   ├── profile-light.png            # Profile (light)
+│   ├── reports-dark.png             # Reports (dark)
+│   ├── reports-light.png            # Reports (light)
+│   ├── settings-dark.png            # Settings (dark)
+│   ├── settings-light.png           # Settings (light)
+│   ├── system-logs-dark.png         # System logs (dark)
+│   ├── system-logs-light.png        # System logs (light)
+│   └── users-dark.png               # Users page (dark)
 │
-└── elite-companions/
+├── vds/                             # VDS mandatory visual assets
+│   ├── vestara-command-center-hero-image.png  # VDS-101: Hero banner
+│   ├── vestara-command-center.png            # VDS-103: Platform domains
+│   ├── vestara-ecosystem-architecture.png    # Architecture visual
+│   └── vestara-ecosystem.png                 # Ecosystem overview
+│
+└── elite-companions/                # Elite companion dashboard screenshots
     ├── vestara-admin-elite-dashboard-booking.png
     ├── vestara-admin-elite-dashboard-client.png
     ├── vestara-admin-elite-dashboard-companion.png
@@ -744,46 +747,53 @@ scripts/
 
 ## assets/ — Marketing & Media
 
+## assets/ — Brand, Marketing & Media
+
 ```text
 assets/
-├── Elite Companions Hero Zoomed.png
-├── Executive Business Companion.png
-├── favicon.svg
-├── Filipino Elite Evening Companion Female.png
-├── Filipino Elite Evening Companion Marionette.png
-├── Full Elite Companions Hero.png
-├── Landing Page 01.png
-├── Landing Page Companion Page Individual.png
-├── Landing Page Companion Page.png
-├── logo.svg
-├── Luxury Cocktail Companion Female 01.png
-├── Luxury Cocktail Dress.png
-├── Luxury Evening Gown Female 03.png
-├── Luxury Evening Gown Female 04.png
-├── Luxury Evening Gown Female 05.png
-├── Luxury Evening Gown Female.png
-├── Luxury Evening Gown Male.png
-├── Resort Companion.png
-├── Vestara Dashboard Elite.png
-├── Vestara Companion Elite FB post.png
-├── Vestara Elite Companion Animated Dashboard.mp4
-├── Vestara Elite Companion Animated Promotion.mp4
-├── Vestara Elite Companion Dashboard 01.png
-├── Vestara Elite Companion Investor Marketing.mp4
-├── Vestara Elite Companion Marionette.png
-├── Vestara Elite Companion Solo marionette.png
-├── Vestara Full HD Dashboard Elite.png
-├── Vestara Promotional Content 03.png
-├── vestara-companion-02.png
-├── vestara-elite-companion-page.png
-├── vestara-elite-dashboard.png
-├── vestara-elite-facebook-post.png
-├── vestara-elite-investor-marketing-ads.png
-├── vestara-elite-investor-promotional.png
-├── vestara-elite-investor-security-marketing-ads.png
-├── vestara-elite-marketing-recruitment.png
-├── vestara-elite-promotional-content.png
-└── vestara-elite-promotional-marketing.png
+├── brand/                           # Brand identity assets
+│   ├── favicon.svg                  # SVG favicon
+│   └── logo.svg                     # App logo (SVG)
+│
+├── marketing/                       # Promotional images
+│   ├── Elite Companions Hero Zoomed.png
+│   ├── Executive Business Companion.png
+│   ├── Filipino Elite Evening Companion Female.png
+│   ├── Filipino Elite Evening Companion Marionette.png
+│   ├── Full Elite Companions Hero.png
+│   ├── Landing Page 01.png
+│   ├── Landing Page Companion Page Individual.png
+│   ├── Landing Page Companion Page.png
+│   ├── Luxury Cocktail Companion Female 01.png
+│   ├── Luxury Cocktail Dress.png
+│   ├── Luxury Evening Gown Female 03.png
+│   ├── Luxury Evening Gown Female 04.png
+│   ├── Luxury Evening Gown Female 05.png
+│   ├── Luxury Evening Gown Female.png
+│   ├── Luxury Evening Gown Male.png
+│   ├── Resort Companion.png
+│   ├── Vestara Dashboard Elite.png
+│   ├── Vestara Companion Elite FB post.png
+│   ├── Vestara Elite Companion Dashboard 01.png
+│   ├── Vestara Elite Companion Marionette.png
+│   ├── Vestara Elite Companion Solo marionette.png
+│   ├── Vestara Full HD Dashboard Elite.png
+│   ├── Vestara Promotional Content 03.png
+│   ├── vestara-companion-02.png
+│   ├── vestara-elite-companion-page.png
+│   ├── vestara-elite-dashboard.png
+│   ├── vestara-elite-facebook-post.png
+│   ├── vestara-elite-investor-marketing-ads.png
+│   ├── vestara-elite-investor-promotional.png
+│   ├── vestara-elite-investor-security-marketing-ads.png
+│   ├── vestara-elite-marketing-recruitment.png
+│   ├── vestara-elite-promotional-content.png
+│   └── vestara-elite-promotional-marketing.png
+│
+└── media/                           # Video content
+    ├── Vestara Elite Companion Animated Dashboard.mp4
+    ├── Vestara Elite Companion Animated Promotion.mp4
+    └── Vestara Elite Companion Investor Marketing.mp4
 ```
 
 ---
@@ -801,7 +811,7 @@ assets/
 | `packages/` | 15 | Shared packages |
 | `docs/` | ~30 | Documentation portal |
 | `infrastructure/` | 12 | Docker, Nginx, PM2 |
-| `screens/` | 33 | Product screenshots |
+| `screens/` | 33 | Screenshots (product, VDS, elite) |
 | `scripts/` | 6 | Automation |
-| `assets/` | 38 | Marketing/media |
+| `assets/` | 38 | Brand, marketing, media |
 | **Total** | **~384** | **Excluding node_modules, dist, .git** |
