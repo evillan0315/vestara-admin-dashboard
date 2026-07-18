@@ -144,7 +144,9 @@ The goal is simple:
 
 > Build one intelligent platform capable of managing every aspect of modern digital operations.
 
-# Platform Capabilities
+# Enterprise Domains
+
+The Vestara Command Center is composed of independent platform modules that collectively provide a unified enterprise operating experience.
 
 | Capability | Description |
 |------------|-------------|
@@ -171,6 +173,50 @@ The goal is simple:
 | 🚀 Future Ready | Designed to evolve alongside autonomous AI systems. |
 
 ---
+
+| Domain | Purpose |
+|---------|---------|
+| Dashboard | Operational overview and platform insights |
+| Organizations | Multi-tenant organization management |
+| Memberships | Member lifecycle and subscription management |
+| Marketplace | Products, services, and digital commerce |
+| Wallet & Payments | Financial transactions and digital wallets |
+| Bookings | Appointment and scheduling services |
+| Rewards | Loyalty and incentive programs |
+| AI Services | AI assistants, providers, and automation |
+| Reports | Business intelligence and reporting |
+| Analytics | Platform metrics and operational intelligence |
+| Administration | Configuration and governance |
+| Security | Authentication, authorization, and auditing |
+| System | Monitoring, health, logs, and diagnostics |
+
+```
+Users
+
+↓
+
+Command Center
+
+↓
+
+Feature Modules
+
+↓
+
+Shared Services
+
+↓
+
+Vestara API
+
+↓
+
+Database
+
+↓
+
+AI Providers
+```
 
 # Platform Domains
 
@@ -334,54 +380,6 @@ vestara-admin-dashboard
 
 ---
 
-# Platform Modules
-
-The Vestara Command Center is composed of independent platform modules that collectively provide a unified enterprise operating experience.
-
-| Domain | Purpose |
-|---------|---------|
-| Dashboard | Operational overview and platform insights |
-| Organizations | Multi-tenant organization management |
-| Memberships | Member lifecycle and subscription management |
-| Marketplace | Products, services, and digital commerce |
-| Wallet & Payments | Financial transactions and digital wallets |
-| Bookings | Appointment and scheduling services |
-| Rewards | Loyalty and incentive programs |
-| AI Services | AI assistants, providers, and automation |
-| Reports | Business intelligence and reporting |
-| Analytics | Platform metrics and operational intelligence |
-| Administration | Configuration and governance |
-| Security | Authentication, authorization, and auditing |
-| System | Monitoring, health, logs, and diagnostics |
-
-                        React Application
-
-                              │
-
-                      React Router v7
-
-                              │
-
-        ┌─────────────────────┼─────────────────────┐
-
-        ▼                     ▼                     ▼
-
-     Layouts              Feature Modules       Shared Components
-
-        │                     │                     │
-
-        └───────────────┬─────┴─────────────────────┘
-                        │
-
-                   API Services
-
-                        │
-
-                 Vestara API Platform
-
-                        │
-
-                Database / AI Services
 
 # Installation
 
