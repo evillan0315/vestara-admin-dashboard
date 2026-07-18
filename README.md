@@ -76,11 +76,13 @@ As additional Vestara services are introduced, this repository will remain the c
 
 The following previews demonstrate the current state of development running within the live Vestara development environment.
 
+> Full product tour: [`docs/assets/screenshots/SCREENSHOTS.md`](./docs/assets/screenshots/SCREENSHOTS.md)
+
 ---
 
 ## 01 · Secure Authentication
 
-![](./screens/login.png)
+![Login](./screens/login-page-dark.png)
 
 Enterprise authentication designed for secure access, future single sign-on integrations, and organization-aware identity management.
 
@@ -88,7 +90,7 @@ Enterprise authentication designed for secure access, future single sign-on inte
 
 ## 02 · Operational Dashboard
 
-![](./screens/dashboard.png)
+![Dashboard](./screens/dashboard-dark.png)
 
 A unified operational overview providing visibility into platform health, system activity, users, audit events, and operational metrics.
 
@@ -96,7 +98,7 @@ A unified operational overview providing visibility into platform health, system
 
 ## 03 · Operational Intelligence
 
-![](./screens/analytics.png)
+![Analytics](./screens/analytics-dark.png)
 
 Interactive analytics designed for monitoring platform usage, operational trends, and enterprise insights.
 
@@ -104,7 +106,7 @@ Interactive analytics designed for monitoring platform usage, operational trends
 
 ## 04 · Enterprise Reporting
 
-![](./screens/reports.png)
+![Reports](./screens/reports-dark.png)
 
 Generate, export, and manage operational reports while maintaining complete visibility across platform activities.
 
@@ -112,7 +114,7 @@ Generate, export, and manage operational reports while maintaining complete visi
 
 ## 05 · Knowledge & Document Management
 
-![](./screens/file-manager.png)
+![Files](./screens/files-dark.png)
 
 Enterprise-grade file and document management forming the foundation for future AI knowledge services and intelligent document processing.
 
@@ -312,39 +314,36 @@ Current and planned integrations include:
 
 # Project Architecture
 
-The Vestara Command Center follows a domain-driven architecture where functionality is organized into independent feature modules while sharing common platform services and UI components.
+The Vestara Command Center follows a domain-driven architecture organized as a pnpm monorepo with Turborepo orchestration.
 
 ```text
 vestara-admin-dashboard
 │
-├── src
-│   ├── app/                 # Application bootstrap
-│   ├── assets/              # Static assets
-│   ├── components/          # Shared UI components
-│   ├── config/              # Application configuration
-│   ├── constants/           # Global constants
-│   ├── contexts/            # React Context providers
-│   ├── features/            # Business domains
+├── apps/
+│   ├── api/                 # Express 5 backend (@vestara/api)
+│   │   ├── prisma/          # Schema, migrations, seed
+│   │   └── src/             # Routes, services, repositories
 │   │
-│   │   ├── authentication/
-│   │   ├── dashboard/
-│   │   ├── organizations/
-│   │   ├── memberships/
-│   │   ├── marketplace/
-│   │   ├── wallet/
-│   │   ├── bookings/
-│   │   ├── rewards/
-│   │   ├── ai/
-│   │   ├── reports/
-│   │   ├── analytics/
-│   │   ├── administration/
-│   │   └── system/
-│   │
-│   ├── hooks/
-│   ├── layouts/
-│   ├── pages/
-│   ├── routes/
-│   ├── services/
+│   └── web/                 # React 19 SPA (@vestara/web)
+│       └── src/             # Components, features, pages
+│
+├── packages/                # Shared monorepo packages
+│   ├── types/               # @vestara/types
+│   ├── constants/           # @vestara/constants
+│   ├── validation/          # @vestara/validation
+│   ├── utils/               # @vestara/utils
+│   └── config/              # @vestara/config
+│
+├── docs/                    # Documentation portal
+│   ├── assets/              # Visual assets (VDS-101 through VDS-106)
+│   ├── decisions/           # Architecture Decision Records
+│   └── standards/           # Engineering standards
+│
+├── screens/                 # Product screenshots
+├── turbo.json               # Turborepo pipeline config
+├── pnpm-workspace.yaml      # Workspace definition
+└── package.json
+```
 │   ├── store/
 │   ├── theme/
 │   ├── types/
@@ -367,22 +366,56 @@ The repository is organized into logical areas that separate source code, docume
 vestara-admin-dashboard
 │
 ├── .github/             GitHub workflows and templates
-├── docs/                Project documentation
-├── public/              Static public assets
+├── apps/                Application source code
+│   ├── api/             Express 5 backend
+│   └── web/             React 19 frontend
+├── docs/                Documentation portal (VDS)
+│   ├── assets/          Visual assets (diagrams, screenshots)
+│   ├── decisions/       Architecture Decision Records
+│   └── standards/       Engineering standards
+├── packages/            Shared monorepo packages
 ├── screens/             Product screenshots
-├── src/                 Application source code
 │
 ├── package.json
 ├── pnpm-lock.yaml
-├── vite.config.ts
-├── tsconfig.json
-├── eslint.config.js
+├── turbo.json
+├── pnpm-workspace.yaml
 ├── README.md
 └── LICENSE
 ```
 
 ---
 
+# Documentation
+
+The Vestara Documentation Portal follows the [Vestara Documentation Standard (VDS)](./docs/standards/VDS.md) and provides comprehensive guides for developers, architects, and contributors.
+
+| Document | Purpose |
+|----------|---------|
+| [Overview](./docs/OVERVIEW.md) | Platform overview and principles |
+| [Quick Start](./docs/QUICK_START.md) | Get running in 5 minutes |
+| [Architecture](./docs/assets/architecture/ARCHITECTURE.md) | System design and data flow |
+| [Frontend Guide](./docs/FRONTEND.md) | React, MUI, theming, components |
+| [Backend Guide](./docs/BACKEND.md) | Express, Prisma, services, routes |
+| [AI Platform](./docs/AI_PLATFORM.md) | Providers, chat, RAG, data connectors |
+| [Security](./docs/SECURITY.md) | Auth, hardening, policies |
+| [API Reference](./docs/api/README.md) | Full REST API documentation |
+| [Deployment](./docs/DEPLOYMENT.md) | Vercel and self-hosted guides |
+| [Changelog](./docs/CHANGELOG.md) | Version history |
+| [Roadmap](./docs/ROADMAP.md) | Development phases and status |
+
+### Visual Assets (VDS)
+
+| ID | Asset | Location |
+|----|-------|----------|
+| VDS-101 | Hero Banner | [`screens/`](./screens/) |
+| VDS-102 | Architecture Diagram | [`docs/assets/architecture/`](./docs/assets/architecture/) |
+| VDS-103 | Platform Domains | [`screens/`](./screens/) |
+| VDS-104 | Product Tour | [`docs/assets/screenshots/`](./docs/assets/screenshots/) |
+| VDS-105 | Technology Stack | [`docs/assets/technology/`](./docs/assets/technology/) |
+| VDS-106 | Repository Structure | [`docs/assets/diagrams/`](./docs/assets/diagrams/) |
+
+---
 
 # Installation
 

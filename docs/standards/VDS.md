@@ -173,6 +173,37 @@ What was decided?
 
 ---
 
+## Mandatory Visual Assets
+
+Every Vestara repository must include these 6 visual assets. They create a recognizable documentation language across the ecosystem.
+
+| ID | Asset | Location | Purpose |
+|----|-------|----------|---------|
+| VDS-101 | Hero Banner | `screens/` | Primary visual identity |
+| VDS-102 | Architecture Diagram | `docs/assets/architecture/` | System design visualization |
+| VDS-103 | Platform Domains | `screens/` | Module overview |
+| VDS-104 | Product Tour | `docs/assets/screenshots/` | Feature walkthrough |
+| VDS-105 | Technology Stack | `docs/assets/technology/` | Tech choices and roles |
+| VDS-106 | Repository Structure | `docs/assets/diagrams/` | Codebase organization |
+
+See [`docs/assets/README.md`](../assets/README.md) for full specifications, naming conventions, and compliance checklist.
+
+### Image Standards
+
+| Property | Standard |
+|----------|---------|
+| Format | PNG (preferred), SVG, WebP |
+| Resolution | 2x for Retina displays |
+| Max file size | 2MB for screenshots, 5MB for hero |
+| Naming | `{feature}-theme.png` (e.g., `dashboard-dark.png`) |
+| Directory | `screens/` for images |
+
+### Theme Variants
+
+Provide both light and dark variants for all dashboard and feature pages.
+
+---
+
 ## Compliance
 
 Every contribution should be evaluated against the VDS during code review:
@@ -182,3 +213,4 @@ Every contribution should be evaluated against the VDS during code review:
 - [ ] Breaking changes are noted in CHANGELOG.md
 - [ ] Architecture changes update ARCHITECTURE.md
 - [ ] Code examples are complete and runnable
+- [ ] Visual assets included for new features (VDS-101 through VDS-106)
